@@ -1,0 +1,2040 @@
+﻿
+<div class="d__f-- fd__c-- height__100--">
+    <div class="h__56-- bg__FFFFFF-- bb__E5E7EB-- d__f-- ai__c-- jc__sb-- px__20-- gap__16--">
+        <div class="d__f-- fd__c-- gap__2--">
+            <span class="fs__xl-- fw__8-- tc__111827--">Image Management</span>
+            <div class="d__f-- ai__c-- gap__5-- cur-poiter"
+                 popover-template="'templates/UIBPopovers/patientDetailsPopover.html'"
+                 popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}"
+                 popover-class="profile__popover" dynamic-click-popover-placement>
+                <a><i class="icons__w16-- info__w16--o"></i></a>
+                <span class="fs__sm-- fw__5-- tc__9CA3AF--">{{PaitentDetails.FullName}} · MR No: {{PaitentDetails.PatientDisplayId}}</span>
+            </div>
+        </div>
+        <a class="btn__close--2" ng-click="GOTOConsultation()">
+            <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+    <div class="h__45-- bg__FFFFFF-- bb__E5E7EB-- d__f-- ai__c-- jc__sb-- px__20--">
+        <div class="d__f-- ai__c-- gap__5--">
+            <span class="fs__md-- fw__6-- tc__9CA3AF--">Diagnosis :</span>
+            <div class="d__f-- ai__c-- gap__4-- fw__nw--">
+                <span ng-repeat="ditem in selectedImageStudyObj.ConnectedDiagnosisList | limitTo:2 track by $index" class="fs__lg-- fw__7-- tc__111827--">
+                    {{ditem.DiagnosisName}} <span ng-if="!$last">,</span>
+                </span>
+
+                <span ng-if="selectedImageStudyObj.ConnectedDiagnosisList.length > 2"
+                      class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__F3F4F6-- border__E4E4E4-- tc__6B7280-- c__p--"
+                      uib-popover-template="'DiagnosisPopoverContent.html'"
+                      uib-popover-scope="{ diagnosisNames: selectedImageStudyObj.ConnectedDiagnosisList }"
+                      popover-trigger="mouseenter"
+                      popover-placement="auto bottom"
+                      popover-append-to-body="false"
+                      popover-class="denial__codes--Popover"
+                      ng-mouseenter="diagnosisNames = selectedImageStudyObj.ConnectedDiagnosisList">
+                    +{{selectedImageStudyObj.ConnectedDiagnosisList.length - 2}}
+                </span>
+            </div>
+        </div>
+        <div class="d__f-- ai__c-- gap__14--">
+            <button class="button__D1D5DB-- ws__nowrap--" ng-if="getOrderImagesObj.showSyncButton" ng-class="syncEnabled ? 'active' : ''" ng-click="syncZoom()">
+                <i svg-icon="icon__sync--" size="15" ng-style="{ color: syncEnabled ? '#1D5558' : '#6A7282' }"></i>{{syncEnabled ? 'Un Sync Images' : 'Sync Images'}}
+            </button>
+            <button class="button__D1D5DB-- ws__nowrap--" ng-class="isFullView ? 'active' : ''" ng-click="toggleFullViewImages()"><i svg-icon="icon__fullview--" size="15" ng-style="{ color: isFullView ? '#1D5558' : '#6A7282' }"></i>Full View</button>
+            <button class="button__D1D5DB-- ws__nowrap--" ng-class="showOrderInvestigations ? 'active' : ''" ng-click="openCloseOrderInvestigationsOverlay()"><i svg-icon="icon__threelines--h" size="15" ng-style="{ color: showOrderInvestigations ? '#1D5558' : '#6A7282' }"></i>Orders/Investigations</button>
+            <button class="btn__lg-- btn__1d5558--f ws__nowrap--" ng-show="selectedImageStudyObj.PatientOrderId!==0" ng-click="navtoupdateInterpretation()">Add/update Interpretation</button>
+        </div>
+    </div>
+    <div class="flex__1-- d__f-- overflow-hidden min__h0-- position__relative--">
+        <div class="flex__1-- d__f-- fd__c-- min__w0-- min__h0-- overflow-hidden">
+            <div class="flex__1-- d__g-- gtc__2--1fr gap__2-- bg__4A4D50-- p__0-- overflow-hidden" ng-show="imageMainTab==1" ng-class="{'fullview__mode--active': isFullView}">
+                <button type="button" class="position__absolute-- top__28-- border__FFFFFF38--2 left__48-6--per zindex-10 bg__FFFFFF1F-- w__40-- h__40-- bradius__50--per tc__FFFFFF-- d__f-- ai__c-- jc__c-- c__p-- backdrop__filter--blur2" ng-if="isFullView" ng-click="toggleFullViewImages()" title="Close (Esc)">
+                    <i svg-icon="icon__cross--" size="14" style="color:#ffffff;"></i>
+                </button>
+                <div class="bg__00000000-- d__f-- fd__c-- min__w0-- min__h0-- position__relative-- overflow-hidden" ng-class="isFullView ? 'gap__2--' : ''">
+                    <div class="flex__1-- bg__0A0D0E-- position__relative-- min__h0-- overflow-hidden div__hover--">
+                        <!-- OD image canvas -->
+                        <div class="position__absolute-- inset__0--" ng-show="ODImgObj.IsImage && !ODImgObj.isDicomFile">
+                            <canvas id="ODviewer" class="viewer position__absolute-- inset__0-- width__100-- height__100--"
+                                    ng-class="isDrawingOD ? 'cursor__crosshair--' : ''"
+                                    canvas-touch-draw="isDrawingOD" touch-draw-color="penColor"
+                                    on-pinch="zoomInClick($delta)" pinch-disabled="isDrawingOD" touch-pan touch-pan-disabled="isDrawingOD"
+                                    ng-mouseleave="canMove=false" ng-mousedown="mousedown($event)" ng-mouseup="mouseup($event)"
+                                    ng-mousemove="mousedrag($event,canMove)"></canvas>
+                        </div>
+                        <!-- OD DICOM -->
+                        <div class="position__absolute-- inset__0--" ng-show="ODImgObj.IsImage && ODImgObj.isDicomFile">
+                            <div id="dwvOD" class="width__100-- height__100--"></div>
+                        </div>
+                        <!-- OD PDF -->
+                        <div class="position__absolute-- inset__0--" ng-if="ODImgObj.IsPdf">
+                            <iframe ng-src="{{getTrustedUrl(ODImgObj.S3URL)}}" class="width__100-- height__100--" frameborder="0"></iframe>
+                        </div>
+                        <!-- OD empty state -->
+                        <div class="position__absolute-- inset__0-- d__f-- fd__c-- ai__c-- jc__c-- gap__8-- pe__none--" ng-if="selectedImageStudyFiles.RightEyeFiles.length==0">
+                            <span class="fs__md-- fw__6-- tc__ffffffb3--">No OD image available</span>
+                        </div>
+                        <div class="position__absolute-- top__14-- left__16-- zindex__5-- pe__none-- d__f-- fd__c-- gap__2--" ng-if="selectedImageStudyFiles.RightEyeFiles.length>0">
+                            <span class="fs__xl-- fw__8-- tc__FFFFFF-- tx__s--soft">OD – {{selectedImageStudyObj.OrderName}}</span>
+                            <span class="fs__sm-- fw__5-- tc__ffffffb3-- tx__s--soft">{{selectedImageStudyObj.ModalityName}}</span>
+                        </div>
+                        <div class="position__absolute-- top__14-- right__14-- zindex__5-- bg__ffffff24-- tc__FFFFFF-- bradius__6-- py__4-- px__9-- fs__sm-- fw__8-- backdrop__filter--blur2" ng-if="selectedImageStudyFiles.RightEyeFiles.length>0">
+                            OD
+                        </div>
+                        <!-- OD page nav (multi-page PDF/TIFF) -->
+                        <div class="position__absolute-- top__14-- left__50--per zindex__5-- d__f-- ai__c-- gap__8-- bg__1A1A1A-- bradius__6-- px__8-- py__4--"
+                             ng-if="options.controls.image && ODImgObj.IsImage" ng-hide="options.controls.totalPage==1">
+                            <a ng-click="options.controls.numPage=options.controls.numPage-1"><i class="icons__w16-- minus__w16--w"></i></a>
+                            <span class="fs__sm-- fw__6-- tc__FFFFFF--">{{options.controls.numPage}}/{{options.controls.totalPage}}</span>
+                            <a ng-click="options.controls.numPage=options.controls.numPage+1"><i class="icons__w16-- add__w16--w"></i></a>
+                        </div>
+                        <div class="position__absolute-- bottom__60-- left__50--per transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- opacity__0-- pe__none-- trans__opacity-transform--15 active__show--" ng-class="isDrawingOD ? 'active' : ''">
+                            <button class="button__circle--19 bg__EF4444--" title="Red" ng-class="penColor=='#EF4444' ? 'active' : ''" ng-click="setPenColor('#EF4444')"></button>
+                            <button class="button__circle--19 bg__F59E0B--" title="Amber" ng-class="penColor=='#F59E0B' ? 'active' : ''" ng-click="setPenColor('#F59E0B')"></button>
+                            <button class="button__circle--19 bg__1D5558--" title="Teal" ng-class="penColor=='#1D5558' ? 'active' : ''" ng-click="setPenColor('#1D5558')"></button>
+                            <button class="button__circle--19 bg__2563EB--" title="Blue" ng-class="penColor=='#2563EB' ? 'active' : ''" ng-click="setPenColor('#2563EB')"></button>
+                            <button class="button__circle--19 bg__111827--" title="Black" ng-class="penColor=='#111827' ? 'active' : ''" ng-click="setPenColor('#111827')"></button>
+                            <button class="button__circle--19 bg__FFFFFF--" title="White" ng-class="penColor=='#FFFFFF' ? 'active' : ''" ng-click="setPenColor('#FFFFFF')"></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24 px__8-- ws__nowrap--" uib-tooltip="Save Drawing" tooltip-placement="auto top" tooltip-append-to-body="true" ng-click="saveCanvasDrawingDetails('OD')"><span class="fs__sm-- fw__7-- tc__FFFFFF--">Save</span></button>
+                            <button class="button__tools--ffffff24" title="Clear Drawing" ng-click="clearDrawing('OD')"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" title="Close" ng-click="enableDrawing('OD')"><i svg-icon="icon__cross--" size="13" style="color: #ffffffa6;"></i></button>
+                        </div>
+                        <div class="position__absolute-- bottom__16-- transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- trans__opacity-transform--15 active__show-- active left__50--per" ng-if="selectedImageStudyFiles.RightEyeFiles.length>0">
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom Out" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-hide="options.controls.disableZoom||selectedImageStudyFiles.RightEyeFiles.length==0" ng-click="zoomInClick(-1)"><i svg-icon="icon__zoomout--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom In" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-hide="options.controls.disableZoom||selectedImageStudyFiles.RightEyeFiles.length==0" ng-click="zoomInClick(1)"><i svg-icon="icon__zoomin--" size="13" style="color: #ffffffa6;"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Reset" tooltip-placement="auto top" tooltip-append-to-body="true" ng-click="resizeTo('page')"><i class="icons__w16-- restore__w16--w"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Left" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-hide="options.controls.disableRotate||selectedImageStudyFiles.RightEyeFiles.length==0" ng-click="rotate(-1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Right" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-hide="options.controls.disableRotate||selectedImageStudyFiles.RightEyeFiles.length==0" ng-click="rotate(1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6; transform: scaleX(-1);"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Flip Vertical" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-click="flipImage('OD','v')"><i svg-icon="icon__flipvertical--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Flip Horizontal" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOD" ng-click="flipImage('OD','h')"><i svg-icon="icon__fliphorizontal--" size="13" style="color: #ffffffa6;"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Draw" tooltip-placement="auto top" tooltip-append-to-body="true" ng-class="isDrawingOD ? 'active' : ''" ng-click="enableDrawing('OD')"><i svg-icon="icon__drawpen--" size="13" style="color: #ffffffa6;"></i></button>
+                            <div class="dropdown dropup cstm-dropdown" ng-show="selectedImageStudyFiles.RightEyeFiles.length>0">
+                                <a class="button__tools--ffffff24 d__f-- ai__c-- jc__c--" id="moreMenuOD" data-toggle="dropdown" uib-tooltip="More" tooltip-placement="auto top" tooltip-append-to-body="true">
+                                    <i svg-icon="icon__more--" size="13" style="color: #ffffffa6;"></i>
+                                </a>
+                                <div class="dropdown-menu right-0 left-auto w-150" role="menu" aria-labelledby="moreMenuOD">
+                                    <div class="apptsearchdroplist overflow__hidden--y">
+                                        <ul>
+                                            <li ng-show="ODImgObj.IsPdf || ODImgObj.isDicomFile">
+                                                <a id="resetlayoutOD" disabled>Reset Layout</a>
+                                            </li>
+                                            <li ng-show="ODImgObj.IsPdf || ODImgObj.isDicomFile">
+                                                <a ng-click="saveDrawingCanvas('OD')">Save Drawing</a>
+                                            </li>
+                                            <li>
+                                                <a title="show Single Full Screen" ng-click="navtoOpenCustomImageManagementPopup('OD','single')">Single Full</a>
+                                            </li>
+                                            <li>
+                                                <a title="show Multi Full Screen" ng-click="navtoOpenCustomImageManagementPopup('OD','multi')">Multi Full</a>
+                                            </li>
+                                            <li>
+                                                <a title="Send Document to OS" ng-click="navDocumentToOtherSection('OS')">Send to OS</a>
+                                            </li>
+                                            <li ng-show="ODImgObj.isDicomFile">
+                                                <div class="dicom-radio-imagemng" id="toolsOD"></div>
+                                            </li>
+                                            <li>
+                                                <a ng-click="navtoOpenProgressionPopup('OD','compare')">Single View</a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="navtoOpenProgressionPopup('OD','grid')">Grid View</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h__56-- flex__shrink--0 d__f-- ai__c-- gap__2-- py__6-- px__8-- bg__101314-- bt__34383B-- overflow__auto--x" ng-if="!isFullView">
+                        <div class="d__f-- fd__c-- ai__c-- flex__shrink--0 c__p-- p__3-- bradius__8-- bg__transparent bg__1d555866--active"
+                             ng-repeat="imgitem in selectedImageStudyFiles.RightEyeFiles"
+                             ng-class="imgitem.isActive ? 'active' : ''"
+                             title="{{imgitem.DocumentName}}"
+                             ng-click="clickonParticularImage(imgitem, $index)">
+                            <div class="w__38-- h__38-- bradius__6-- overflow-hidden border__ffffff26--2 bg__0A0D0E-- position__relative-- flex__shrink--0"
+                                 ng-class="imgitem.isActive ? 'border__1D5558--2-active' : ''">
+                                <div class="position__absolute-- inset__0--">
+                                    <img ng-if="imgitem.isDicomFile && imgitem.FileType !== 'application/pdf'" src="./img/diconIcon.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && (imgitem.FileType === 'application/pdf' || imgitem.FileType === 'pdf' || imgitem.FileType === 'Pdf')" src="img/pdf.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && (imgitem.FileType === 'image/tiff' || imgitem.FileType === 'tif' || imgitem.FileType === 'tiff')" src="img/appt-list/tifficon.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && imgitem.FileType !== 'application/pdf' && imgitem.FileType !== 'pdf' && imgitem.FileType !== 'Pdf' && imgitem.FileType !== 'image/tiff' && imgitem.FileType !== 'tif' && imgitem.FileType !== 'tiff'" ng-src="{{imgitem.small}}" style="width:100%;height:100%;object-fit:cover;" />
+                                </div>
+                            </div>
+                            <label class="fs__sm-- fw__7-- lh__12-- m__0--" ng-class="imgitem.isActive ? 'tc__FFFFFF--' : 'tc__ffffffb3--'">
+                                <span ng-if="imgitem.OrganId==1">OD</span>
+                                <span ng-if="imgitem.OrganId==2">OS</span>
+                                <span ng-if="imgitem.OrganId==3">OU</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg__00000000-- d__f-- fd__c-- min__w0-- min__h0-- position__relative-- overflow-hidden" ng-class="isFullView ? 'gap__2--' : ''">
+                    <div class="flex__1-- bg__0A0D0E-- position__relative-- min__h0-- overflow-hidden div__hover--">
+                        <!-- OS image canvas -->
+                        <div class="position__absolute-- inset__0--" ng-show="OSImgObj.IsImage && !OSImgObj.isDicomFile">
+                            <canvas id="OSviewer" class="viewer position__absolute-- inset__0-- width__100-- height__100--"
+                                    ng-class="isDrawingOS ? 'cursor__crosshair--' : ''"
+                                    canvas-touch-draw="isDrawingOS" touch-draw-color="penColor"
+                                    on-pinch="zoomInClickOS($delta)" pinch-disabled="isDrawingOS" touch-pan touch-pan-disabled="isDrawingOS"
+                                    ng-mouseleave="canMoveOS=false" ng-mousedown="mousedownOS($event)" ng-mouseup="mouseupOS($event)"
+                                    ng-mousemove="mousedragOS($event,canMoveOS)"></canvas>
+                        </div>
+                        <!-- OS DICOM -->
+                        <div class="position__absolute-- inset__0--" ng-show="OSImgObj.IsImage && OSImgObj.isDicomFile">
+                            <div id="dwvOS" class="width__100-- height__100--"></div>
+                        </div>
+                        <!-- OS PDF -->
+                        <div class="position__absolute-- inset__0--" ng-if="OSImgObj.IsPdf">
+                            <iframe ng-src="{{getTrustedUrl(OSImgObj.S3URL)}}" class="width__100-- height__100--" frameborder="0"></iframe>
+                        </div>
+                        <!-- OS empty state -->
+                        <div class="position__absolute-- inset__0-- d__f-- fd__c-- ai__c-- jc__c-- gap__8-- pe__none--" ng-if="selectedImageStudyFiles.LeftEyeFiles.length==0">
+                            <span class="fs__md-- fw__6-- tc__ffffffb3--">No OS image available</span>
+                        </div>
+                        <div class="position__absolute-- top__14-- left__16-- zindex__5-- pe__none-- d__f-- fd__c-- gap__2--" ng-if="selectedImageStudyFiles.LeftEyeFiles.length>0">
+                            <span class="fs__xl-- fw__8-- tc__FFFFFF-- tx__s--soft">OS – {{selectedImageStudyObj.OrderName}}</span>
+                            <span class="fs__sm-- fw__5-- tc__ffffffb3-- tx__s--soft">{{selectedImageStudyObj.ModalityName}}</span>
+                        </div>
+                        <div class="position__absolute-- top__14-- right__14-- zindex__5-- bg__ffffff24-- tc__FFFFFF-- bradius__6-- py__4-- px__9-- fs__sm-- fw__8-- backdrop__filter--blur2" ng-if="selectedImageStudyFiles.LeftEyeFiles.length>0">
+                            OS
+                        </div>
+                        <!-- OS page nav (multi-page PDF/TIFF) -->
+                        <div class="position__absolute-- top__14-- left__50--per zindex__5-- d__f-- ai__c-- gap__8-- bg__1A1A1A-- bradius__6-- px__8-- py__4--"
+                             ng-if="optionsOS.controls.image && OSImgObj.IsImage && !OSImgObj.LeftEyeIcon" ng-hide="optionsOS.controls.totalPage==1">
+                            <a ng-click="optionsOS.controls.numPage=optionsOS.controls.numPage-1"><i class="icons__w16-- minus__w16--w"></i></a>
+                            <span class="fs__sm-- fw__6-- tc__FFFFFF--">{{optionsOS.controls.numPage}}/{{optionsOS.controls.totalPage}}</span>
+                            <a ng-click="optionsOS.controls.numPage=optionsOS.controls.numPage+1"><i class="icons__w16-- add__w16--w"></i></a>
+                        </div>
+                        <div class="position__absolute-- bottom__60-- left__50--per transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- opacity__0-- pe__none-- trans__opacity-transform--15 active__show--" ng-class="isDrawingOS ? 'active' : ''">
+                            <button class="button__circle--19 bg__EF4444--" title="Red" ng-class="penColor=='#EF4444' ? 'active' : ''" ng-click="setPenColor('#EF4444')"></button>
+                            <button class="button__circle--19 bg__F59E0B--" title="Amber" ng-class="penColor=='#F59E0B' ? 'active' : ''" ng-click="setPenColor('#F59E0B')"></button>
+                            <button class="button__circle--19 bg__1D5558--" title="Teal" ng-class="penColor=='#1D5558' ? 'active' : ''" ng-click="setPenColor('#1D5558')"></button>
+                            <button class="button__circle--19 bg__2563EB--" title="Blue" ng-class="penColor=='#2563EB' ? 'active' : ''" ng-click="setPenColor('#2563EB')"></button>
+                            <button class="button__circle--19 bg__111827--" title="Black" ng-class="penColor=='#111827' ? 'active' : ''" ng-click="setPenColor('#111827')"></button>
+                            <button class="button__circle--19 bg__FFFFFF--" title="White" ng-class="penColor=='#FFFFFF' ? 'active' : ''" ng-click="setPenColor('#FFFFFF')"></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24 px__8-- ws__nowrap--" uib-tooltip="Save Drawing" tooltip-placement="auto top" tooltip-append-to-body="true" ng-click="saveCanvasDrawingDetails('OS')"><span class="fs__sm-- fw__7-- tc__FFFFFF--">Save</span></button>
+                            <button class="button__tools--ffffff24" title="Clear Drawing" ng-click="clearDrawing('OS')"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" title="Close" ng-click="enableDrawing('OS')"><i svg-icon="icon__cross--" size="13" style="color: #ffffffa6;"></i></button>
+                        </div>
+                        <div class="position__absolute-- bottom__16-- transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- trans__opacity-transform--15 active__show-- active left__50--per" ng-if="selectedImageStudyFiles.LeftEyeFiles.length>0">
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom Out" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-hide="optionsOS.controls.disableZoom||selectedImageStudyFiles.LeftEyeFiles.length==0" ng-click="zoomInClickOS(-1)"><i svg-icon="icon__zoomout--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom In" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-hide="optionsOS.controls.disableZoom||selectedImageStudyFiles.LeftEyeFiles.length==0" ng-click="zoomInClickOS(1)"><i svg-icon="icon__zoomin--" size="13" style="color: #ffffffa6;"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Reset" tooltip-placement="auto top" tooltip-append-to-body="true" ng-click="resizeToOS('page')"><i class="icons__w16-- restore__w16--w"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Left" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-hide="optionsOS.controls.disableRotate||selectedImageStudyFiles.LeftEyeFiles.length==0" ng-click="rotateOS(-1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Right" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-hide="optionsOS.controls.disableRotate||selectedImageStudyFiles.LeftEyeFiles.length==0" ng-click="rotateOS(1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6; transform: scaleX(-1);"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Flip Vertical" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-click="flipImage('OS','v')"><i svg-icon="icon__flipvertical--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Flip Horizontal" tooltip-placement="auto top" tooltip-append-to-body="true" ng-disabled="isDrawingOS" ng-click="flipImage('OS','h')"><i svg-icon="icon__fliphorizontal--" size="13" style="color: #ffffffa6;"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Draw" tooltip-placement="auto top" tooltip-append-to-body="true" ng-class="isDrawingOS ? 'active' : ''" ng-click="enableDrawing('OS')"><i svg-icon="icon__drawpen--" size="13" style="color: #ffffffa6;"></i></button>
+                            <div class="dropdown dropup cstm-dropdown" ng-show="selectedImageStudyFiles.LeftEyeFiles.length>0">
+                                <a class="button__tools--ffffff24 d__f-- ai__c-- jc__c--" id="moreMenuOS" data-toggle="dropdown" uib-tooltip="More" tooltip-placement="auto top" tooltip-append-to-body="true">
+                                    <i svg-icon="icon__more--" size="13" style="color: #ffffffa6;"></i>
+                                </a>
+                                <div class="dropdown-menu right-0 left-auto w-150" role="menu" aria-labelledby="moreMenuOS">
+                                    <div class="apptsearchdroplist overflow__hidden--y">
+                                        <ul>
+                                            <li ng-show="OSImgObj.IsPdf || OSImgObj.isDicomFile">
+                                                <a id="resetlayoutOS" disabled>Reset Layout</a>
+                                            </li>
+                                            <li ng-show="OSImgObj.IsPdf || OSImgObj.isDicomFile">
+                                                <a ng-click="saveDrawingCanvas('OS')">Save Drawing</a>
+                                            </li>
+                                            <li>
+                                                <a title="show Single Full Screen" ng-click="navtoOpenCustomImageManagementPopup('OS','single')">Single Full</a>
+                                            </li>
+                                            <li>
+                                                <a title="show Multi Full Screen" ng-click="navtoOpenCustomImageManagementPopup('OS','multi')">Multi Full</a>
+                                            </li>
+                                            <li>
+                                                <a title="Send Document to OD" ng-click="navDocumentToOtherSection('OD')">Send to OD</a>
+                                            </li>
+                                            <li ng-show="OSImgObj.isDicomFile">
+                                                <div class="dicom-radio-imagemng" id="toolsOS"></div>
+                                            </li>
+                                            <li>
+                                                <a ng-click="navtoOpenProgressionPopup('OS','compare')">Single View</a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="navtoOpenProgressionPopup('OS','grid')">Grid View</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h__56-- flex__shrink--0 d__f-- ai__c-- gap__2-- py__6-- px__8-- bg__101314-- bt__34383B-- overflow__auto--x" ng-if="!isFullView">
+                        <div class="d__f-- fd__c-- ai__c-- flex__shrink--0 c__p-- p__3-- bradius__8-- bg__transparent bg__1d555866--active"
+                             ng-repeat="imgitem in selectedImageStudyFiles.LeftEyeFiles"
+                             ng-class="imgitem.isActive ? 'active' : ''"
+                             title="{{imgitem.DocumentName}}"
+                             ng-click="clickonRParticularImage(imgitem, $index)">
+                            <div class="w__38-- h__38-- bradius__6-- overflow-hidden border__ffffff26--2 bg__0A0D0E-- position__relative-- flex__shrink--0"
+                                 ng-class="imgitem.isActive ? 'border__1D5558--2-active' : ''">
+                                <div class="position__absolute-- inset__0--">
+                                    <img ng-if="imgitem.isDicomFile && imgitem.FileType !== 'application/pdf'" src="./img/diconIcon.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && (imgitem.FileType === 'application/pdf' || imgitem.FileType === 'pdf' || imgitem.FileType === 'Pdf')" src="img/pdf.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && (imgitem.FileType === 'image/tiff' || imgitem.FileType === 'tif' || imgitem.FileType === 'tiff')" src="img/appt-list/tifficon.png" style="width:100%;height:100%;object-fit:contain;" />
+                                    <img ng-if="!imgitem.isDicomFile && imgitem.FileType !== 'application/pdf' && imgitem.FileType !== 'pdf' && imgitem.FileType !== 'Pdf' && imgitem.FileType !== 'image/tiff' && imgitem.FileType !== 'tif' && imgitem.FileType !== 'tiff'" ng-src="{{imgitem.small}}" style="width:100%;height:100%;object-fit:cover;" />
+                                </div>
+                            </div>
+                            <label class="fs__sm-- fw__7-- lh__12-- m__0--" ng-class="imgitem.isActive ? 'tc__FFFFFF--' : 'tc__ffffffb3--'">
+                                <span ng-if="imgitem.OrganId==1">OD</span>
+                                <span ng-if="imgitem.OrganId==2">OS</span>
+                                <span ng-if="imgitem.OrganId==3">OU</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--No data-->
+            <!-- Investigation Files preview: thumbnail rail + single-image viewer -->
+            <div class="flex__1-- d__f-- min__w0-- min__h0-- bg__0A0D0E-- overflow-hidden" ng-show="imageMainTab==2">
+
+                <!-- empty state -->
+                <div class="flex__1-- d__f-- fd__c-- jc__c-- ai__c-- gap__10--" ng-show="PirticulardayImagesArray.length == 0">
+                    <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                    <h1 class="fs__2l-- fw__6-- tc__FFFFFF-- m__0--">No File Found</h1>
+                    <label class="fs__lg-- fw__5-- tc__ffffffb3--">
+                        No files have been uploaded yet. Images will show up here once available.
+                    </label>
+                </div>
+
+                <div class="flex__1-- d__f-- min__w0-- min__h0-- overflow-hidden" ng-hide="PirticulardayImagesArray.length == 0">
+
+                    <!-- thumbnail rail -->
+                    <div class="w__90-- flex__shrink--0 d__f-- fd__c-- gap__8-- p__8-- overflow__auto--y slim-scroll bg__101314--" style="border-right:1px solid #34383B;">
+                        <div class="c__p-- bradius__8-- p__3-- flex__shrink--0"
+                             ng-repeat="img in PirticulardayImagesArray track by $index"
+                             ng-class="img.isActive ? 'bg__1d555866--' : ''"
+                             title="{{img.DocumentName}}"
+                             ng-click="clickonParticularinvImage(img,$index)">
+                            <div class="width__100-- bradius__6-- overflow-hidden border__ffffff26--2 bg__0A0D0E-- position__relative--"
+                                 ng-class="img.isActive ? 'border__1D5558--2-active' : ''">
+                                <img ng-if="img.isDicomFile && img.FileType !== 'application/pdf'" src="./img/diconIcon.png" class="width__100--" />
+                                <img ng-if="!img.isDicomFile && (img.FileType === 'application/pdf' || img.FileType === 'pdf' || img.FileType === 'Pdf')" src="img/pdf.png" class="width__100--" />
+                                <img ng-if="!img.isDicomFile && (img.FileType === 'image/tiff' || img.FileType === 'tif' || img.FileType === 'tiff')" src="img/appt-list/tifficon.png" class="width__100--" />
+                                <img ng-if="!img.isDicomFile && img.FileType !== 'application/pdf' && img.FileType !== 'pdf' && img.FileType !== 'Pdf' && img.FileType !== 'image/tiff' && img.FileType !== 'tif' && img.FileType !== 'tiff'" ng-src="{{img.small}}" class="width__100--" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- viewer -->
+                    <div class="flex__1-- position__relative-- min__w0-- min__h0-- overflow-hidden">
+                        <div class="position__absolute-- inset__0--" ng-show="ODinvImgObj.IsImage">
+                            <canvas id="Imgviewer" class="viewer position__absolute-- inset__0-- width__100-- height__100--"
+                                    on-pinch="ZoomIninvClick($delta)" touch-pan
+                                    ng-mouseleave="canMoveInv=false" ng-mousedown="mousedownInv($event)" ng-mouseup="mouseupInv($event)"
+                                    ng-mousemove="mousedragInv($event,canMoveInv)"></canvas>
+                        </div>
+                        <div class="position__absolute-- inset__0--" ng-if="ODinvImgObj.IsPdf">
+                            <iframe ng-src="{{getTrustedUrl(ODinvImgObj.S3URL)}}" class="width__100-- height__100--" frameborder="0"></iframe>
+                        </div>
+
+                        <!-- page nav -->
+                        <div class="position__absolute-- top__14-- left__50--per zindex__5-- d__f-- ai__c-- gap__8-- bg__1A1A1A-- bradius__6-- px__8-- py__4--"
+                             ng-if="optionsInv.controls.image" ng-hide="optionsInv.controls.totalPage==1 || ODinvImgObj.IsPdf">
+                            <a ng-click="optionsInv.controls.numPage=optionsInv.controls.numPage-1"><i class="icons__w16-- minus__w16--w"></i></a>
+                            <span class="fs__sm-- fw__6-- tc__FFFFFF--">{{optionsInv.controls.numPage}}/{{optionsInv.controls.totalPage}}</span>
+                            <a ng-click="optionsInv.controls.numPage=optionsInv.controls.numPage+1"><i class="icons__w16-- add__w16--w"></i></a>
+                        </div>
+
+                        <!-- toolbar -->
+                        <div class="position__absolute-- bottom__16-- left__50--per transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- active__show-- active"
+                             ng-if="optionsInv.controls.image" ng-hide="ODinvImgObj.IsPdf">
+                            <button class="button__tools--ffffff24" uib-tooltip="Reset" tooltip-placement="auto top" tooltip-append-to-body="true" ng-click="resizeToinv('page')"><i class="icons__w16-- restore__w16--w"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Left" tooltip-placement="auto top" tooltip-append-to-body="true" ng-hide="optionsInv.controls.disableRotate" ng-click="rotateInvImg(-1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Rotate Right" tooltip-placement="auto top" tooltip-append-to-body="true" ng-hide="optionsInv.controls.disableRotate" ng-click="rotateInvImg(1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6; transform: scaleX(-1);"></i></button>
+                            <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom Out" tooltip-placement="auto top" tooltip-append-to-body="true" ng-hide="optionsInv.controls.disableZoom" ng-click="ZoomIninvClick(-1)"><i svg-icon="icon__zoomout--" size="13" style="color: #ffffffa6;"></i></button>
+                            <button class="button__tools--ffffff24" uib-tooltip="Zoom In" tooltip-placement="auto top" tooltip-append-to-body="true" ng-hide="optionsInv.controls.disableZoom" ng-click="ZoomIninvClick(1)"><i svg-icon="icon__zoomin--" size="13" style="color: #ffffffa6;"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex__1-- d__g-- gtc__2--1fr gap__2-- bg__4A4D50-- p__0-- overflow-hidden" ng-if="false">
+                <div class="bg__00000000-- d__f-- fd__c-- min__w0-- min__h0-- position__relative-- overflow-hidden">
+                    <div class="flex__1-- bg__0A0D0E-- position__relative-- min__h0-- overflow-hidden">
+                        <span class="fs__xl-- fw__8-- tc__FFFFFF-- position__absolute-- top__14-- left__16-- zindex__5-- pe__none-- tx__s--soft">OD – Right Eye</span>
+                        <div class="position__absolute-- inset__0-- d__f-- fd__c-- ai__c-- jc__c-- gap__10-- tc__FFFFFF59-- p__20--">
+                            <i svg-icon="icon__image--" size="32" style="color: #ffffff66;"></i>
+                            <span class="fs__xl-- fw__7-- tc__FFFFFFBF--">No image selected</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg__00000000-- d__f-- fd__c-- min__w0-- min__h0-- position__relative-- overflow-hidden">
+                    <div class="flex__1-- bg__0A0D0E-- position__relative-- min__h0-- overflow-hidden">
+                        <span class="fs__xl-- fw__8-- tc__FFFFFF-- position__absolute-- top__14-- left__16-- zindex__5-- pe__none-- tx__s--soft">OS – Left Eye</span>
+                        <div class="position__absolute-- inset__0-- d__f-- fd__c-- ai__c-- jc__c-- gap__10-- tc__FFFFFF59-- p__20--">
+                            <i svg-icon="icon__image--" size="32" style="color: #ffffff66;"></i>
+                            <span class="fs__xl-- fw__7-- tc__FFFFFFBF--">No image selected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay__style--1 d__f-- fd__c-- overlay__top--146" ng-class="{'open': showOrderInvestigations}">
+        <div class="h__39-- bg__FFFFFF-- bb__E5E7EB-- d__f-- ai__c-- jc__sb-- pl__8-- pr__15-- pt__5-- flex__shrink--0">
+            <ul class="tab__style--5">
+                <li ng-class="imageMainTab ==1 ? 'active' :''">
+                    <a ng-click="navtoMainImageTab(1)">Orders View</a>
+                </li>
+                <li ng-class="imageMainTab ==2 ? 'active' :''">
+                    <a ng-click="navtoMainImageTab(2)">Investigation Files</a>
+                </li>
+            </ul>
+            <a class="btn__close--2" ng-click="openCloseOrderInvestigationsOverlay()">
+                <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+            </a>
+        </div>
+        <div class="d__f-- fd__c-- overflow__auto--y slim-scroll">
+            <div class="px__16-- py__14-- bg__FFFFFF-- bb__F3F4F6-- d__f-- fd__c-- gap__8--">
+                <span class="fs__sm-- fw__8-- tc__9CA3AF-- tt__u-- ">MODALITY</span>
+                <div class="d__f-- ai__c-- gap__8--">
+                    <div class="form__group width__100--" ng-show="imageMainTab==1">
+                        <select ng-model="getOrderSearchReq.ModalityId"
+                                ng-options="mitem.ModalityId as mitem.ModalityName+' ('+mitem.ModalityShortName+')' for mitem in MasterModalityArray"
+                                ng-change="changeModalityForStudies(getOrderSearchReq.ModalityId)">
+                        </select>
+                    </div>
+                    <div class="form__group width__100--" ng-show="imageMainTab==2">
+                        <select ng-model="getOrderImagesObj.ModalityId"
+                                ng-options="mitem.ModalityId as mitem.ModalityName+' ('+mitem.ModalityShortName+')' for mitem in MasterModalityArray"
+                                ng-change="changeModalityForImagesGet(getOrderImagesObj.ModalityId)">
+                        </select>
+                    </div>
+                    <button class="btn__lg-- btn__1d5558--f ws__nowrap--" ng-click="NavtoCreateNewOrderNew()">Create Order</button>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- gap__12-- bg__F0F2F5--" ng-show="imageMainTab==1">
+                <div class="d__f-- fd__c--" ng-repeat="aitem in PatientAllOrdersList">
+                    <div class="d__f-- ai__fs-- jc__sb-- gap__10-- px__14-- py__12-- bb__F3F4F6-- bg__FFFFFF-- c__p--"
+                         ng-class="aitem.IsActive ? 'active' : ''"
+                         ng-click="showOrderInterpretation(aitem); aitem.IsExpanded = !aitem.IsExpanded">
+                        <div class="d__f-- fd__c-- gap__2-- min-w-0">
+                            <span class="fs__lg-- fw__8-- tc__111827--">{{aitem.ProcedureName}}</span>
+                            <span class="fs__sm-- fw__6-- tc__9CA3AF--">
+                                <span ng-if="aitem.OrderName">{{aitem.OrderName}} · </span>{{aitem.OrderDate | date:'MM/dd/yyyy'}}
+                            </span>
+                        </div>
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <span class="tt__u-- flex__shrink--0 bg__E8F2F2-- tc__1D5558-- fs__sm-- fw__8-- px__8-- py__4-- bradius__5-- ws__nowrap--">{{aitem.ModalityName}}</span>
+                            <i svg-icon="icon__arrowdown--" size="8" style="color:#9ca3af"></i><!--icon__flip--90--m-->
+                        </div>
+                    </div>
+                    <div class="px__14-- py__2-- d__f-- fd__c-- bg__FFFFFF--" ng-show="aitem.IsExpanded">
+                        <div class="d__f-- ai__c-- jc__sb-- py__10-- px__4-- c__p-- hover__F0F2F5--bg" ng-repeat="sitem in aitem.PatientFiles" ng-class="!$last ? 'bb__F3F4F6--' : ''">
+                            <div class="d__f-- ai__c-- gap__10-- min-w-0">
+                                <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-click="$event.stopPropagation();">
+                                    <input type="checkbox" class="checkbox" ng-model="sitem.IsChecked" ng-change="onCompareSelectionChange(sitem)">
+                                    <span class="lbl"></span>
+                                </label>
+                                <span class="w__26-- h__26-- bradius__6-- bg__F0F2F5-- d__f-- ai__c-- jc__c-- flex__shrink--0 tc__9CA3AF--"><i svg-icon="icon__image--" size="14" style="color: #9ca3af;"></i></span>
+                                <span title="{{sitem.DocumentName}}" class="fs__md-- fw__6-- tc__111827-- overflow-hidden to__ellipsis-- ws__nowrap-- flex__1--">{{sitem.DocumentName}}</span>
+                            </div>
+                            <span class="fs__sm-- fw__8-- px__10-- py__3-- bradius__6-- flex__shrink--0"
+                                  ng-class="sitem.OrganName == 'OU' ? 'tc__A5884F-- bg__A5884F26--' : (sitem.OrganName == 'OS' ? 'tc__5EA697-- bg__5EA69726--' : 'tc__1D5558-- bg__E8F2F2--')">{{sitem.OrganName}}</span>
+                        </div>
+                    </div>
+                    <!--<div class="d__f-- ai__c-- gap__8-- pt__10-- px__14-- bg__FFFFFF--">
+                        <span class="fs__sm-- fw__6-- tc__4B5563--">Images</span>
+                        <span class="bg__1D5558-- tc__FFFFFF-- fs__sm-- fw__7-- bradius__50--per w__18-- h__18-- d__f-- ai__c-- jc__c--">4</span>
+                    </div>
+                    <div class="d__g-- gtc__2--1fr gap__8-- px__14-- py__10-- bg__FFFFFF--" ng-repeat="i in [1,2]">
+                        <div class="position__relative-- bradius__8-- overflow-hidden aspratio__4of3-- bg__000000-- c__p-- border__00000000--2 trans__border-opacity--12 border__1D5558--active">
+                            <div class="position__absolute-- inset__0--"><img src="" /></div>
+                            <label class="cur-poiter d__f-- ai__c-- gap__5-- position__absolute-- top__6-- right__6--">
+                                <input type="checkbox" class="checkbox">
+                                <span class="lbl"></span>
+                            </label>
+                            <div class="position__absolute-- top__6-- left__6-- bg__00000099-- tc__FFFFFF-- fs__sm-- fw__8-- px__6-- py__2-- bradius__4-- zindex__2--">OD</div>
+                            <span class="position__absolute-- left__0-- bottom__0-- right__0-- px__7-- py__12-- fs__sm-- fw__7-- tc__FFFFFF-- bg__linear-transparent-black80-- ws__nowrap-- overflow-hidden text-overflow-ellipsis zindex__1--">Fundus Photo</span>
+                        </div>
+                        <div class="position__relative-- bradius__8-- overflow-hidden aspratio__4of3-- bg__000000-- c__p-- border__00000000--2 trans__border-opacity--12 border__1D5558--active">
+                            <div class="position__absolute-- inset__0--"><img src="" /></div>
+                            <label class="cur-poiter d__f-- ai__c-- gap__5-- position__absolute-- top__6-- right__6--">
+                                <input type="checkbox" class="checkbox">
+                                <span class="lbl"></span>
+                            </label>
+                            <div class="position__absolute-- top__6-- left__6-- bg__00000099-- tc__FFFFFF-- fs__sm-- fw__8-- px__6-- py__2-- bradius__4-- zindex__2--">OS</div>
+                            <span class="position__absolute-- left__0-- bottom__0-- right__0-- px__7-- py__12-- fs__sm-- fw__7-- tc__FFFFFF-- bg__linear-transparent-black80-- ws__nowrap-- overflow-hidden text-overflow-ellipsis zindex__1--">Fundus Photo</span>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- gap__12-- bg__F0F2F5--" ng-show="imageMainTab==2">
+                <div class="d__f-- fd__c-- bg__FFFFFF--" ng-repeat="aitem in ImagesTabObj.allPatientImagesArray">
+                    <div class="d__f-- ai__c-- jc__sb-- px__14-- py__12-- bb__F3F4F6-- c__p--" ng-click="aitem.IsExpanded = !aitem.IsExpanded">
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-click="$event.stopPropagation();">
+                                <input type="checkbox" class="checkbox" ng-model="aitem.IsCheckAll" ng-click="checkAllImagesOfAppointment(aitem); refreshCompareCount()">
+                                <span class="lbl"></span>
+                            </label>
+                            <div class="d__f-- fd__c-- gap__2--">
+                                <span class="fs__lg-- fw__8-- tc__111827--">{{aitem.CreatedDt | date:'MM-dd-yyyy'}}</span>
+                                <span class="fs__sm-- fw__6-- tc__9CA3AF--">{{aitem.ModalityNamesLabel}}</span>
+                            </div>
+                        </div>
+                        <div class="d__f-- ai__c-- gap__10--" ng-if="aitem.TotalFilesCount != 0">
+                            <span class="w__22-- h__22-- bradius__6-- border__d1d5db-- d__f-- ai__c-- jc__c-- fs__sm-- fw__7-- tc__4B5563-- flex__shrink--0 bg__FFFFFF--">{{aitem.TotalFilesCount}}</span>
+                            <i svg-icon="icon__arrowdown--" size="8" style="color: #9ca3af;"></i><!--icon__flip--90--m-->
+                        </div>
+                    </div>
+                    <div class="px__14-- py__2-- d__f-- fd__c--" ng-show="aitem.IsExpanded" ng-repeat="mitem in aitem.ModilityTypes">
+                        <span class="fs__sm-- fw__7-- tc__4B5563-- pt__8-- px__4--">{{mitem.ModalityName}}</span>
+                        <div class="d__f-- ai__c-- jc__sb-- py__10-- px__4-- c__p-- hover__F0F2F5--bg" ng-repeat="sitem in mitem.PatientFiles" ng-class="!$last ? 'bb__F3F4F6--' : ''">
+                            <div class="d__f-- ai__c-- gap__10-- min-w-0">
+                                <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-click="$event.stopPropagation();">
+                                    <input type="checkbox" class="checkbox" ng-model="sitem.IsActive" ng-click="checkEachImageFile(sitem); refreshCompareCount()">
+                                    <span class="lbl"></span>
+                                </label>
+                                <span title="{{sitem.DocumentName}}" class="fs__md-- fw__6-- tc__111827-- overflow-hidden to__ellipsis-- ws__nowrap-- flex__1--">{{sitem.DocumentName}}</span>
+                            </div>
+                            <span class="fs__sm-- fw__8-- px__10-- py__3-- bradius__6-- flex__shrink--0"
+                                  ng-class="sitem.OrganName == 'OU' ? 'tc__A5884F-- bg__A5884F26--' : (sitem.OrganName == 'OS' ? 'tc__5EA697-- bg__5EA69726--' : 'tc__1D5558-- bg__E8F2F2--')">{{sitem.OrganName}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="d__f-- ai__c-- gap__10-- px__16-- py__12-- bg__FFFFFF-- bt__E5E7EB-- flex__shrink--0 position__sticky-- bottom__0--">
+            <button class="button__1D5558--o h__35--" ng-disabled="compareCount==0" ng-click="clearCompareSelection()">Clear</button>
+            <button class="button__1D5558--f h__35-- flex__1--" ng-disabled="compareCount==0" ng-click="openCompareView()">
+                Compare<span ng-if="compareCount>0"> ({{compareCount}})</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay backdrop -->
+    <div class="overlay__backdrop-- overlaybackdrop__top--146"
+         ng-if="showOrderInvestigations"
+         ng-click="openCloseOrderInvestigationsOverlay()">
+    </div>
+
+    <!-- Compare view: 4-up grid of the selected images, extra rows scroll -->
+    <div class="position__absolute-- inset__0-- zindex-10 bg__0A0D0E-- overflow__auto--y slim-scroll" ng-if="isCompareView">
+        <button type="button" class="position__absolute-- top__28-- left__50--per border__FFFFFF38--2 zindex-10 bg__FFFFFF1F-- w__40-- h__40-- bradius__50--per tc__FFFFFF-- d__f-- ai__c-- jc__c-- c__p-- backdrop__filter--blur2"
+                ng-click="closeCompareView()" title="Close (Esc)">
+            <i svg-icon="icon__cross--" size="14" style="color:#ffffff;"></i>
+        </button>
+        <div class="d__g-- gtc__2--1fr gap__2-- bg__4A4D50--">
+            <div class="bg__0A0D0E-- position__relative-- overflow-hidden div__hover--"
+                 ng-repeat="tile in compareTiles track by $index"
+                 on-wheel="compareZoom(tile, $delta)"
+                 on-pinch="compareZoom(tile, $delta)"
+                 on-pan="comparePan(tile, $dx, $dy)"
+                 ng-style="{'min-height': 'calc(50vh - 40px)'}">
+
+                <!-- empty slot -->
+                <div class="position__absolute-- inset__0-- d__f-- ai__c-- jc__c-- pe__none--" ng-if="!tile">
+                    <span class="fs__md-- fw__6-- tc__FFFFFF--">Empty</span>
+                </div>
+
+                <!-- image -->
+                <div class="position__absolute-- inset__0-- d__f-- ai__c-- jc__c-- overflow-hidden" ng-if="tile">
+                    <img ng-src="{{tile.Url}}" style="max-width:100%;max-height:100%;"
+                         ng-style="compareTileStyle(tile)" style="transition: transform .12s ease;" />
+                </div>
+
+                <div class="position__absolute-- top__14-- left__16-- zindex__5-- pe__none-- d__f-- fd__c-- gap__2--" ng-if="tile">
+                    <span class="fs__lg-- fw__8-- tc__FFFFFF-- tx__s--soft">{{tile.OrganName}} – {{tile.DocumentName}}</span>
+                    <span class="fs__sm-- fw__5-- tc__ffffffb3-- tx__s--soft">{{tile.ModalityName}}</span>
+                </div>
+                <div class="position__absolute-- top__14-- right__14-- zindex__5-- bg__ffffff24-- tc__FFFFFF-- bradius__6-- py__4-- px__9-- fs__sm-- fw__8-- backdrop__filter--blur2" ng-if="tile">
+                    {{tile.OrganName}}
+                </div>
+
+                <!-- per-tile toolbar -->
+                <div class="position__absolute-- bottom__16-- left__50--per transform__x50per--y6px d__f-- ai__c-- gap__6-- bg__1A1A1A-- bradius__9-- px__8-- py__6-- boxs__00000080--8-28 zindex__6-- trans__opacity-transform--15 active__show-- active" ng-if="tile">
+                    <button class="button__tools--ffffff24" title="Zoom Out" ng-click="compareZoom(tile,-1)"><i svg-icon="icon__zoomout--" size="13" style="color: #ffffffa6;"></i></button>
+                    <button class="button__tools--ffffff24" title="Zoom In" ng-click="compareZoom(tile,1)"><i svg-icon="icon__zoomin--" size="13" style="color: #ffffffa6;"></i></button>
+                    <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                    <button class="button__tools--ffffff24" title="Rotate Left" ng-click="compareRotate(tile,-1)"><i svg-icon="icon__rotateleft--" size="13" style="color: #ffffffa6;"></i></button>
+                    <button class="button__tools--ffffff24" title="Flip Vertical" ng-click="compareFlip(tile,'v')"><i svg-icon="icon__flipvertical--" size="13" style="color: #ffffffa6;"></i></button>
+                    <button class="button__tools--ffffff24" title="Flip Horizontal" ng-click="compareFlip(tile,'h')"><i svg-icon="icon__fliphorizontal--" size="13" style="color: #ffffffa6;"></i></button>
+                    <span class="w__1-- h__20-- bg__ffffff26-- bradius__6-- border__none-- bg__00000000-- position__relative-- min__h0-- overflow-hidden"></span>
+                    <button class="button__tools--ffffff24" title="Reset" ng-click="compareReset(tile)"><i svg-icon="icon__sync--" size="13" style="color: #ffffffa6;"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/ng-template" id="InterpretationbottomPopover.html">
+    <!--New design-->
+    <div class="modal__style--1" ng-if="false">
+        <div class="modal__header-- position__relative--">
+            <h1>Interpretation</h1>
+            <button class="btn__lg-- btn__1d5558--f">Save</button>
+            <a class="position__absolute-- right-0" ng-click="uibclose()" style="top:-40px;"><i class="icons__w16-- close__w32--"></i></a>
+        </div>
+        <div class="modal__body--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position">
+                    <div class="d__f-- fd__c-- gap__y--10">
+                        <div class="border__E4E4E4-- bg__F9F9F9-- p__5--  d__f-- fd__c-- gap__y--8 br__5--">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <div class="d__f-- fd__c-- gap__y--5">
+                                    <p class="tc__1D1D1D-- fw__6-- fs__lg-- m__0--">
+                                        <span class="px__5-- fs__md-- tc__FFFFFF-- fs__normal-- br__4-- fw__4-- od-bg">OD</span>
+                                        92133 - Diagnostic Test·OCT·Optic Nerve·OU
+                                    </p>
+                                    <label class="fs__lg-- fw__4-- tc__656565--">Modality - <span class="fw__5-- tc__1D1D1D--">Corneal topo</span></label>
+                                </div>
+                                <div class="d__f-- fd__r-- gap__10-- ai__c--">
+                                    <p class="m__0-- fs__md-- tc__1D1D1D-- fw__5-- fs__normal--"> <span class="m__0-- fs__lg-- tc__656565-- fw__6-- fs__normal--">Scheduled on: </span>12-18-2024</p>
+                                    <span class="status__green--">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row nocolpad">
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Modality</label>
+                                    <select>
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Upload Right Eye</label>
+                                    <div class="input__style--4">
+                                        <input type="file" id="file__choose--" name="upload">
+                                        <label for="file__choose--">
+                                            No File Choosen
+                                        </label>
+                                        <span>
+                                            <i class="upload__w16--w icons__w16--"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Upload Left Eye</label>
+                                    <div class="input__style--4">
+                                        <input type="file" id="file__choose--" name="upload">
+                                        <label for="file__choose--">
+                                            No File Choosen
+                                        </label>
+                                        <span>
+                                            <i class="upload__w16--w icons__w16--"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Image Quality</label>
+                                    <div class="d__f-- ai__c-- gap__x--5">
+                                        <button class="btn__lg-- btn__1d5558--f">Good</button>
+                                        <button class="btn__lg-- btn__3C3C3C--o">Fair</button>
+                                        <button class="btn__lg-- btn__3C3C3C--o">Poor</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label>Right Eye</label>
+                                    <ul class="d__f-- fw__w-- gap__5--">
+                                        <li class="list__none-- width__49--" ng-repeat="i in [1,2,3]">
+                                            <div class="d__f-- ai__c-- jc__sb-- border__E4E4E4-- bradius-5 p__5--">
+                                                <div class="d__f-- ai__c-- gap__10--">
+                                                    <img src="" width="36" height="36" />
+                                                    <div class="d__f-- fd__c-- gap__10--">
+                                                        <label class="fs__lg-- fw__4-- tc__5E6366-- lh__normal--">Right Eye.jpg</label>
+                                                        <span class="fs__lg-- fw__4-- tc__A7A7A7-- lh__normal--">224kb</span>
+                                                    </div>
+                                                </div>
+                                                <a><i class="icons__w16-- cancel__w16--o"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label>Left Eye</label>
+                                    <ul class="d__f-- fw__w-- gap__5--">
+                                        <li class="list__none-- width__49--" ng-repeat="i in [1,2,3]">
+                                            <div class="d__f-- ai__c-- jc__sb-- border__E4E4E4-- bradius-5 p__5--">
+                                                <div class="d__f-- ai__c-- gap__10--">
+                                                    <img src="" width="36" height="36" />
+                                                    <div class="d__f-- fd__c-- gap__10--">
+                                                        <label class="fs__lg-- fw__4-- tc__5E6366-- lh__normal--">Right Eye.jpg</label>
+                                                        <span class="fs__lg-- fw__4-- tc__A7A7A7-- lh__normal--">224kb</span>
+                                                    </div>
+                                                </div>
+                                                <a><i class="icons__w16-- cancel__w16--o"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section__style--4">
+                            <div class="section__header--">
+                                <h1>Result</h1>
+                                <ul class="flex-flow-list py__2--">
+                                    <li>
+                                        <div class="form__group w-150">
+                                            <select>
+                                                <option>Option</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <button class="btn__lg-- btn__1d5558--o">
+                                            <i class="icons__w16-- add__w16--o"></i>
+                                            Add as Template
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="section__body-- gap__10--y">
+                                <div class="br__5-- p__5-- border__E4E4E4--">
+                                    <table class="table tableno-bordered tableno-padding m__0--">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    <span class="p__5-- fs__md-- tc__FFFFFF-- fs__normal-- br__4-- fw__4-- od-bg width__100-- d__b-- text-center">OD</span>
+                                                </th>
+                                                <th>
+                                                    <span class="p__5-- fs__md-- tc__FFFFFF-- fs__normal-- br__4-- fw__4-- os-bg width__100-- d__b-- text-center">OS</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="p__5-- fs__md-- tc__1D1D1D-- fs__normal-- br__4-- fw__5-- bg__F9F9F9-- width__100-- d__b-- text-center">IOL Lens</span>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span class="p__5-- fs__md-- tc__1D1D1D-- fs__normal-- br__4-- fw__5-- bg__F9F9F9-- width__100-- d__b-- text-center">IOL Power</span>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span class="p__5-- fs__md-- tc__1D1D1D-- fs__normal-- br__4-- fw__5-- bg__F9F9F9-- width__100-- d__b-- text-center">Manufacturer</span>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <select>
+                                                            <option>Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row d__f-- fw__w-- gap__y--10">
+                                    <div class="col-lg-4">
+                                        <div class="form__group">
+                                            <label>Technician</label>
+                                            <select>
+                                                <option>Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="form__group">
+                                            <label>Technician Remarks</label>
+                                            <input placeholder="Enter Remarks" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form__group">
+                                            <label>Provider</label>
+                                            <select>
+                                                <option>Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="form__group">
+                                            <label>Provider Remarks</label>
+                                            <input placeholder="Enter Remarks" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E4E4E4-- bg__F9F9F9-- p__5--  d__f-- fd__c-- gap__y--8 br__5--">
+                            <div class="d__f-- ai__c-- fd__r-- jc__sb--">
+                                <p class="tc__1D1D1D-- fw__6-- fs__lg-- m__0--">
+                                    Diagnosis
+                                </p>
+                                <div class="dropdown cstm-dropdown">
+                                    <button class="btn__sm-- btn__1d5558--o" id="dropdownMenu1" data-toggle="dropdown">
+                                        <i class="icons__w16-- add__w16--o"></i>
+                                        Add Diagnosis
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu1">
+                                        <div class="d__f-- fd__c-- gap__5-- px__5--">
+                                            <div class="d__f-- fd__r--  jc__sb-- ai__c-- gap__10--">
+                                                <h2 class="m__0-- fs__normal-- fs__lg-- fw__6-- tc__1D1D1D--">Select Diagnosis</h2>
+                                                <a class="d__f-- ai__c-- gap__x--4 tc__1D5558-- tx__h--a fs__md-- fw__5--">
+                                                    <i class="icons__w16-- copybox__w16--o"></i>
+                                                    Copy  from Second eye
+                                                </a>
+                                            </div>
+                                            <div class="position__relative--">
+                                                <input type="search" class="input__style--1 icons-search">
+                                            </div>
+                                        </div>
+                                        <div class="apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="i in [1,2,3,4,5]">
+                                                    <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                        <input type="checkbox" class="checkbox">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fs__lg-- fw__5-- tc__656565--">92012 (General) Established Patient - Eye Exam Intermediate</span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__10--">
+                                <ul class="d__f-- fd__c-- m__0-- gap__y--6 pl__15--">
+                                    <li class="fs__md-- tc__656565-- fw__4-- fs__normal-- ng-scope" ng-repeat="i in [1,2,3]"><span class="fw__5-- tc__1D1D1D--">H18.60</span> Keratoconus</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--New Design ended-->
+    <div class="modal-header">
+        <h4 class="modal-title">Interpretation</h4>
+        <button type="button" class="btn btn-link" ng-click="uibclose()"><i class="fas fa-times text-danger"></i></button>
+    </div>
+    <div class="modal-body p-10 overflow-y-auto overflow-x-hidden bg-white" style="height: calc(100vh - 32px) ">
+        <div class="dis-flex flex-direction-column justify-content-between h-100">
+            <ul class="asc-summary-list align-items-center">
+                <!--<li>
+                    <h3>Interpretation </h3>
+                </li>-->
+                <li>
+                    <span>Order Name :</span>
+                    <label>{{selectedImageStudyObj.OrderName}}</label>
+                </li>
+                <li>
+                    <span>Modality : </span>
+                    <label>{{selectedImageStudyObj.ModalityName}}</label>
+                </li>
+                <li>
+                    <!--<span>Image Quality :</span>-->
+                    <ul class="checklist-actions m-t-6">
+                        <li>
+                            <label>Image Quality :</label>
+                        </li>
+                        <li>
+                            <button ng-class="(selectedImageStudyObj.ImageQuality =='Good')?'bg-ehnote text-white form-outline':'form-outline'" ng-click="selectedImageStudyObj.ImageQuality='Good'">Good</button>
+                        </li>
+                        <li>
+                            <button ng-class="(selectedImageStudyObj.ImageQuality =='Fair')?'bg-ehnote text-white form-outline':'form-outline'" ng-click="selectedImageStudyObj.ImageQuality='Fair'">Fair</button>
+                        </li>
+                        <li>
+                            <button ng-class="(selectedImageStudyObj.ImageQuality =='Poor')?'bg-ehnote text-white form-outline':'form-outline'" ng-click="selectedImageStudyObj.ImageQuality='Poor'">Poor</button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <div class="asc-templates-view m-b-5 col-lg-12 col-md-6 col-sm-12">
+                        <select class="form-outline flex" ng-model="selectedImageStudyObj.SelectedImageManagementTemplate" ng-options="item as item.TemplateName for item in TempObj.ImageManagementTemplates" ng-change="OnselectImageManagementTemplate(selectedImageStudyObj.SelectedImageManagementTemplate);">
+                            <option value="">Select</option>
+                        </select>
+                        <!--<a class="white-nowrap"  popover-auto ng-click="AddChecklistProcedureTemplate();">Add Template</a>-->
+                        <a class="white-nowrap"
+                           popover-class="ros-popover-width popover-width-300 m-0"
+                           popover-trigger="outsideClick"
+                           popover-is-open="TempObj.IsFindingsTemplateSavePopOver"
+                           ng-click="addtemplatepopover()"
+                           popover-placement="bottom-right"
+                           uib-popover-template="ImageManagementTemplateUrl.templateUrl">
+                            Add Template
+                        </a>
+                    </div>
+                </li>
+            </ul>
+            <div class="p-6 m-t-6 bg-white bradius-6">
+                <table class="interpretation-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <label class="organ-od width-100 bradius-6 text-center p-6">OD</label>
+                            </th>
+                            <th>
+                                <label class="organ-os width-100 bradius-6 text-center p-6">OS</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <!-- Corneal Topography  -->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===1" class="bg-f2f2f2">
+                        <tr>
+                            <th>K1 Value : </th>
+                            <td>
+                                <input type="text" placeholder="Enter k1 value" ng-model="selectedImageStudyObj.ODK1Value" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter k1 value" ng-model="selectedImageStudyObj.OSK1Value" maxlength="7" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>K2 Value : </th>
+                            <td>
+                                <input type="text" placeholder="Enter k2 value" ng-model="selectedImageStudyObj.ODK2Value" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter k2 value" ng-model="selectedImageStudyObj.OSK2Value" maxlength="7" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>CYL Value : </th>
+                            <td>
+                                <input type="text" placeholder="Enter CYL value" ng-model="selectedImageStudyObj.ODCYLValue" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter CYL value" ng-model="selectedImageStudyObj.OSCYLValue" maxlength="7" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Corneal Thickness :</th>
+                            <td>
+
+
+                                <div class="form-group asc-group">
+
+                                    <span>
+                                        <input type="text" class="form-outline" placeholder="Enter Corneal" ng-model="selectedImageStudyObj.ODCornealThicknessValue" maxlength="7" />
+
+                                        <button disabled>μm</button>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group asc-group">
+
+                                    <span>
+                                        <input type="text" class="form-outline" placeholder="Enter Corneal" ng-model="selectedImageStudyObj.OSCornealThicknessValue" maxlength="7" />
+
+                                        <button disabled>μm</button>
+                                    </span>
+                                </div>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!--Endothelial cell Count  -->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===2" class="bg-f2f2f2">
+                        <tr>
+                            <th>No of Cells :</th>
+                            <td>
+                                <input type="text" placeholder="Enter No of Cells" ng-model="selectedImageStudyObj.ODEndothelialCellCountValue" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter No of Cells" ng-model="selectedImageStudyObj.OSEndothelialCellCountValue" maxlength="7" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Cell Density :</th>
+                            <td>
+
+                                <input type="text" class="form-outline" placeholder="Enter Cell Density" ng-model="selectedImageStudyObj.ODEndothelialCellDensity" maxlength="7" />
+
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter Cell Density" ng-model="selectedImageStudyObj.OSEndothelialCellDensity" maxlength="7" />
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Corneal Thickness :</th>
+                            <td>
+
+                                <!--<input type="text" class="form-outline" placeholder="Enter Corneal Thickness" ng-model="selectedImageStudyObj.ODEndoCornealThicknessValue" maxlength="7" />-->
+
+                                <div class="form-group asc-group">
+
+                                    <span>
+                                        <input type="text" class="form-outline" placeholder="Enter Corneal" ng-model="selectedImageStudyObj.ODEndoCornealThicknessValue" maxlength="7" />
+
+                                        <button disabled>μm</button>
+                                    </span>
+                                </div>
+
+
+                            </td>
+                            <td>
+                                <div class="form-group asc-group">
+
+                                    <span>
+                                        <input type="text" class="form-outline" placeholder="Enter Corneal" ng-model="selectedImageStudyObj.OSEndoCornealThicknessValue" maxlength="7" />
+
+                                        <button disabled>μm</button>
+                                    </span>
+                                </div>
+                                <!--<input type="text" class="form-outline" placeholder="Enter Corneal Thickness" ng-model="selectedImageStudyObj.OSEndoCornealThicknessValue" maxlength="7" />-->
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!--Slit Lamp Photography  -->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===3" class="bg-f2f2f2">
+                        <tr>
+                            <th>SL Photo :</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.ODOCTMACFindings"
+                                           placeholder="Select SL-Photo Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item.FindingDescription as item.FindingDescription for item in getMasterFindingValues($viewValue, 5 , 26)"
+                                           typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.ODOCTMACFindings)" />
+                                </div>
+                            </td>
+                            <td>
+
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSOCTMACFindings"
+                                           placeholder="Select SL-Photo Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item.FindingDescription as item.FindingDescription for item in getMasterFindingValues($viewValue, 5 , 26)"
+                                           typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.OSOCTMACFindings)" />
+                                </div>
+
+
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- A-Scan -->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===4" class="bg-f2f2f2">
+                        <tr>
+                            <th>IOL Lens :</th>
+
+                            <td>
+                                <select ng-model="selectedImageStudyObj.ODIOLLensValue"
+                                        ng-options="item.LensType as item.LensType for item in TypesofLens">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select ng-model="selectedImageStudyObj.OSIOLLensValue"
+                                        ng-options="item.LensType as item.LensType for item in TypesofLens">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>IOL Power:</th>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.ODIOLPower"
+                                        ng-options="item.Power as item.Power for item in DiopterArray">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.OSIOLPower"
+                                        ng-options="item.Power as item.Power for item in DiopterArray">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Manufacturer :</th>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.ODIOLManufacturer"
+                                        ng-options="item.Manufacturer as item.Manufacturer for item in Manufacturers">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.OSIOLManufacturer"
+                                        ng-options="item.Manufacturer as item.Manufacturer for item in Manufacturers">
+                                    <option value="">Select</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <!-- OCT -->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===5" class="bg-f2f2f2">
+                        <tr>
+                            <th>Macular Findings :</th>
+                            <td>
+
+                                <div class="form-group pos-relative">
+                                    <input type="text"
+                                           autocomplete="off"
+                                           class="form-outline"
+                                           ng-model="selectedImageStudyObj.ODMacularFindingObj"
+                                           placeholder="Select Macular Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 33,1)"
+                                           typeahead-on-select="changeMacularFinding(selectedImageStudyObj,selectedImageStudyObj.ODMacularFindingObj,'OD')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODMaculaShowAddNewBtn&&selectedImageStudyObj.ODMacularFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.ODMacularFindingObj,6,33,'OD')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+
+
+                                <div class="form-group pos-relative">
+                                    <input type="text"
+                                           autocomplete="off"
+                                           class="form-outline"
+                                           ng-model="selectedImageStudyObj.OSMacularFindingObj"
+                                           placeholder="Select Macular Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 33,2)"
+                                           typeahead-on-select="changeMacularFinding(selectedImageStudyObj,selectedImageStudyObj.OSMacularFindingObj,'OS')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSMaculaShowAddNewBtn&&selectedImageStudyObj.OSMacularFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.OSMacularFindingObj,6,33,'OS')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr class="bg-white">
+                            <th> </th>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.MacularFindingArray | filter:{'OrganId':1,'TypeId':4,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+
+                                        <a href="javascript:;" ng-click="RemovePosteriorMacuData(item,'OD')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.MacularFindingArray | filter:{'OrganId':2,'TypeId':4,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorMacuData(item,'OS')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+
+                                </ul>
+
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>Macular Thickness :</th>
+                            <td>
+                                <input type="text" placeholder="Enter" ng-model="selectedImageStudyObj.ODMacularThickNess" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter" ng-model="selectedImageStudyObj.OSMacularThickNess" maxlength="7" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ON Findings :</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text"
+                                           autocomplete="off" class="form-outline"
+                                           ng-model="selectedImageStudyObj.ODONfindingObj"
+                                           placeholder="Select Findings Here"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 2144,1)"
+                                           typeahead-on-select="changeONFinding(selectedImageStudyObj,selectedImageStudyObj.ODONfindingObj,'OD')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODDiscShowAddNewBtn&&selectedImageStudyObj.ODONfindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.ODONfindingObj,6,2144,'OD')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSONfindingObj"
+                                           placeholder="Select Findings Here"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 2144,2)"
+                                           typeahead-on-select="changeONFinding(selectedImageStudyObj,selectedImageStudyObj.OSONfindingObj,'OS')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSDiskShowAddNewBtn&&selectedImageStudyObj.OSONfindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.OSONfindingObj,6,2144,'OS')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr class="bg-white">
+                            <th></th>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.ONFindingArray | filter:{'OrganId':1,'TypeId':5,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorONData(item,'OD')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.ONFindingArray | filter:{'OrganId':2,'TypeId':5,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorONData(item,'OS')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>RNFL Thickness :</th>
+                            <td>
+                                <input type="text" placeholder="Enter" ng-model="selectedImageStudyObj.ODRHFLThickNess" maxlength="7" />
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Enter" ng-model="selectedImageStudyObj.OSRHFLThickNess" maxlength="7" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>  AS-OCT</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.ODASOCTfindingValue"
+                                           placeholder="Select AS-OCT Here"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item.FindingDescription as item.FindingDescription for item in GetOrgFindingValues($viewValue, 5 , 26,1)"
+                                           typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.ODASOCTfindingValue)" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODCorneaShowAddNewBtn&&selectedImageStudyObj.ODASOCTfindingValue!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Anterior',selectedImageStudyObj.ODASOCTfindingValue,5,26,'OD')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSASOCTfindingValue"
+                                           placeholder="Select AS-OCT Here"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item.FindingDescription as item.FindingDescription for item in GetOrgFindingValues($viewValue, 5 , 26,2)"
+                                           typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.OSASOCTfindingValue)" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSCorneaShowAddNewBtn&&selectedImageStudyObj.OSASOCTfindingValue!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Anterior',selectedImageStudyObj.OSASOCTfindingValue,5,26,'OS')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- FA/ICG -->
+                    <!--typeahead-on-select="changeODMacularFinding(selectedImageStudyObj,selectedImageStudyObj.ODFundusFindingObj,6)"-->
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===6" class="bg-f2f2f2">
+                        <tr>
+                            <th>Fundus Findings :</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.ODFundusFindingObj"
+                                           placeholder="Select Fundus Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 35, 1)"
+                                           typeahead-on-select="changeFundusFinding(selectedImageStudyObj,selectedImageStudyObj.ODFundusFindingObj,'OD')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODRetinaShowAddNewBtn&&selectedImageStudyObj.ODFundusFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.ODFundusFindingObj,6,35,'OD')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSFundusFindingObj"
+                                           placeholder="Select Fundus Findings"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 35, 2)"
+                                           typeahead-on-select="changeFundusFinding(selectedImageStudyObj,selectedImageStudyObj.OSFundusFindingObj,'OS')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSRetinaShowAddNewBtn&&selectedImageStudyObj.OSFundusFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.OSFundusFindingObj,6,35,'OS')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="bg-white">
+                            <th></th>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.FundusFindingArray | filter:{'OrganId':1,'TypeId':1,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosterioFundusData(item,'OD')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.FundusFindingArray | filter:{'OrganId':2,'TypeId':1,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosterioFundusData(item,'OS')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>FA :</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.ODFAFindingObj"
+                                           placeholder="Select FA"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 39, 1,'FA')"
+                                           typeahead-on-select="changeFAFinding(selectedImageStudyObj,selectedImageStudyObj.ODFAFindingObj,'OD')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODFAShowAddNewBtn&&selectedImageStudyObj.ODFAFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.ODFAFindingObj,6,39,'OD','FA')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text" class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSFAFindingObj"
+                                           placeholder="Select FA"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 39, 2,'FA')"
+                                           typeahead-on-select="changeFAFinding(selectedImageStudyObj,selectedImageStudyObj.OSFAFindingObj,'OS')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSFAShowAddNewBtn&&selectedImageStudyObj.OSFAFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.OSFAFindingObj,6,39,'OS','FA')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="bg-white">
+                            <th></th>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.FAFindingArray | filter:{'OrganId':1,'TypeId':2,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorFAData(item,'OD')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.FAFindingArray | filter:{'OrganId':2,'TypeId':2,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorFAData(item,'OS')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ICG :</th>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text"
+                                           autocomplete="off"
+                                           class="form-outline"
+                                           ng-model="selectedImageStudyObj.ODICGFindingObj"
+                                           placeholder="Select ICG"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 39, 1,'ICG')"
+                                           typeahead-on-select="changeICGFinding(selectedImageStudyObj,selectedImageStudyObj.ODICGFindingObj,'OD')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.ODICGShowAddNewBtn&&selectedImageStudyObj.ODICGFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.ODICGFindingObj,6,39,'OD','ICG')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group pos-relative">
+                                    <input type="text"
+                                           class="form-outline"
+                                           autocomplete="off"
+                                           ng-model="selectedImageStudyObj.OSICGFindingObj"
+                                           placeholder="Select ICG"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.FindingDescription for item in GetOrgFindingValues($viewValue, 6 , 39, 2,'ICG')"
+                                           typeahead-on-select="changeICGFinding(selectedImageStudyObj,selectedImageStudyObj.OSICGFindingObj,'OS')" />
+                                    <ul class="dropdown-menu pos-absolute dropdown dropdown-toggle" ng-show="selectedImageStudyObj.OSICGShowAddNewBtn&&selectedImageStudyObj.OSICGFindingObj!=''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                        <li><a ng-click="navtoAddNew('Posterior',selectedImageStudyObj.OSICGFindingObj,6,39,'OS','ICG')">Add New</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="bg-white">
+                            <th></th>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.ICGFindingArray | filter:{'OrganId':1,'TypeId':3,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorICGData(item,'OD')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="dis-flex justify-space-between list-none" ng-repeat="item in selectedImageStudyObj.ICGFindingArray | filter:{'OrganId':2,'TypeId':3,'DeleteInd':'N'} track by $index">
+                                    <li class="width-80">
+                                        {{item.FindingValue}}
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="RemovePosteriorICGData(item,'OS')" title="Remove"><i class="fas fa-times text-danger"></i></a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===7" class="bg-f2f2f2">
+                        <tr>
+                            <th>Frequencies :</th>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.ODFrequenciesValue">
+                                    <option value="">Select Frequency</option>
+                                    <option value="10 MHz">10 MHz</option>
+                                    <option value="20 MHz">20 MHz</option>
+                                    <option value="35 MHz">35 MHz</option>
+                                    <option value="50 MHz">50 MHz</option>
+                                    <option value="100 MHz">100 MHz</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select ng-model="selectedImageStudyObj.OSFrequenciesValue">
+                                    <option value="">Select Frequency</option>
+                                    <option value="10 MHz">10 MHz</option>
+                                    <option value="20 MHz">20 MHz</option>
+                                    <option value="35 MHz">35 MHz</option>
+                                    <option value="50 MHz">50 MHz</option>
+                                    <option value="100 MHz">100 MHz</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Findings :</th>
+                            <td>
+                                <input type="text"
+                                       autocomplete="off"
+                                       ng-model="selectedImageStudyObj.ODFindingValue"
+                                       placeholder="Select Findings"
+                                       typeahead-min-length="0"
+                                       typeahead-focus-on-select="false"
+                                       uib-typeahead="item.FindingDescription as item.FindingDescription for item in getMasterFindingValues($viewValue, 6 , 35)"
+                                       typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.ODFindingValue)" />
+                            </td>
+                            <td>
+                                <input type="text"
+                                       autocomplete="off"
+                                       ng-model="selectedImageStudyObj.OSFindingValue"
+                                       placeholder="Select Findings"
+                                       typeahead-min-length="0"
+                                       typeahead-focus-on-select="false"
+                                       uib-typeahead="item.FindingDescription as item.FindingDescription for item in getMasterFindingValues($viewValue, 6 , 35)"
+                                       typeahead-on-select="changeODMacularFinding(selectedImageStudyObj.OSFindingValue)" />
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                    <tbody ng-if="selectedImageStudyObj.ModalityId===8" class="bg-f2f2f2">
+
+                        <tr>
+                            <th>Fixation loss :</th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODFixationLoss" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSFixationLoss" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>False Positive Errors : </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODFalsePositiveErrors" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSFalsePositiveErrors" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>
+                                False Negative Errors :
+                            </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODFalseNegitiveErrors" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSFalseNegitiveErrors" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th> TD Probability Plot : </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODTDProbabilityPlot" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSTDProbabilityPlot" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>PD Probability Plot :</th>
+                            <td>
+
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODPDProbabilityPlot" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSPDProbabilityPlot" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Mean Deviation :
+                            </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODMeanDeviation" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSMeanDeviation" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Pattern Standard Deviation :
+                            </th>
+                            <td>
+
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODPatternStandardDeviation" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSPatternStandardDeviation" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Visual field index :
+                            </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODVisualFieldIndex" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSVisualFieldIndex" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                GHT :
+
+                            </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODGHTValue" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSGHTValue" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                HVF Findings :
+                            </th>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.ODHVFFindingValue" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-outline" placeholder="Enter" ng-model="selectedImageStudyObj.OSHVFFindingValue" />
+                            </td>
+                        </tr>
+
+
+                    </tbody>
+                </table>
+
+                <table class="interpretation-table">
+                    <tbody class="bg-f2f2f2">
+                        <tr>
+                            <th width="28%">Technician :</th>
+                            <th>
+                                <div class="form-group">
+                                    <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        {{selectedImageStudyObj.TechnicianObj.FullName}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app right-0 m-l-auto" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Provider" ng-model="searchdoctor.technicianTxt" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in AllTecniciansList | filter:{'FullName':searchdoctor.technicianTxt}" ng-click="chooseTechnicianforImageStudy(item)">
+                                                    <a href="javascript:;">{{item.FullName}}</a>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="28%">Technician Remarks :</th>
+                            <th>
+                                <input type="text" class="form-outline  msd-elastic: \n;" placeholder="add Technician notes" ng-model="selectedImageStudyObj.TechnicianRemarks">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="28%">Provider :</th>
+                            <th>
+                                <div class="form-group">
+                                    <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        {{selectedImageStudyObj.DoctorObj.FullName}}
+                                    </button>
+
+                                    <div class="dropdown-menu dr-drop-app right-0 m-l-auto" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Provider" ng-model="searchdoctor.doctorTxt" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in clinicDoctorList | filter:{'FullName':searchdoctor.doctorTxt}" ng-click="chooseDoctorforImageStudy(item)">
+                                                    <a href="javascript:;">{{item.FullName}}</a>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="28%">Provider Remarks :</th>
+                            <th>
+                                <input type="text" class="form-outline  msd-elastic: \n;" placeholder="add Provider notes" ng-model="selectedImageStudyObj.ProviderRemarks">
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <section class="eh-panel b-0">
+
+                    <div class="eh-body">
+                        <div class="form-group">
+                            <!--<input type="text" class="form-outline icons-search bg-inputy" />-->
+                            <input type="text" class="form-outline icons-search bg-inputy"
+                                   placeholder="Search Diagnosis/ICD 10 Codes"
+                                   ng-model="selectedImageStudyObj.SelectedDiagObj"
+                                   maxlength="100"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in getCombinedList($viewValue)"
+                                   typeahead-on-select="onselectDiagnosisitem(selectedImageStudyObj.SelectedDiagObj,item)"
+                                   ng-change="changeselectDiagnosisitem(selectedImageStudyObj.SelectedDiagObj,item)" />
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label>Diagnosis <em>*</em></label>
+                        <ul class="list-group m-b-5">
+                            <li class="list-group-item" ng-repeat="ditem in selectedImageStudyObj.DiagnosisListArray  | filter:{DeleteInd: 'N'}">
+                                <small class="fs-12"> {{ditem.ICD10CODE}} |   {{ditem.ICD10DIAGNAME}} </small>
+                                <img src="img/close-red.svg" width="12" style="float:right;" ng-click="deleteDiagitem(ditem,$index)">
+
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+
+
+
+            <div class="dis-flex justify-content-end grid-gap-5 m-t-10">
+                <button class="btn btn-outline-danger" ng-click="ClearImgFindingObj(selectedImageStudyObj)">Clear</button>
+                <button class="btn btn-ehnote" ng-click="saveImageManagementStudyDetails()">Save</button>
+            </div>
+        </div>
+    </div>
+
+</script>
+
+
+<script type="text/ng-template" id="anteriorPosteriorNotes.html">
+    <div class="row">
+        <button class="btn btn-ehnote pull-right" ng-click="SaveExamNotesPopup(sitem, ExamFinfingNotes);">Save Notes</button>
+        <div class="col-lg-12">
+            <div class="form-group">
+                <label>Add Notes</label>
+                <textarea ng-model="ExamFinfingNotes" class="form-control" rows="3" placeholder="Enter Notes" maxlength="50"></textarea>
+            </div>
+        </div>
+    </div>
+</script>
+<style>
+
+    #image-gallery {
+        width: 100%;
+        position: relative;
+        height: calc(64vh);
+        background: #000;
+        overflow: hidden;
+    }
+
+    #rimage-gallery {
+        width: 100%;
+        position: relative;
+        height: calc(64vh);
+        background: #000;
+        overflow: hidden;
+    }
+
+    #image-gallery .image-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+    }
+
+    #image-gallery .prev,
+    #image-gallery .next {
+        position: absolute;
+        height: 32px;
+        margin-top: -66px;
+        top: 50%;
+    }
+
+    #image-gallery .prev {
+        left: 20px;
+    }
+
+    #image-gallery .next {
+        right: 20px;
+        cursor: pointer;
+    }
+
+    #image-gallery .footer-info {
+        position: absolute;
+        height: 50px;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        line-height: 50px;
+        font-size: 24px;
+        text-align: center;
+        color: white;
+        border-top: 1px solid #fff;
+    }
+
+
+
+
+
+    #rimage-gallery .image-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+    }
+
+    #rimage-gallery .prev,
+    #rimage-gallery .next {
+        position: absolute;
+        height: 32px;
+        margin-top: -66px;
+        top: 50%;
+    }
+
+    #rimage-gallery .prev {
+        left: 20px;
+    }
+
+    #rimage-gallery .next {
+        right: 20px;
+        cursor: pointer;
+    }
+
+    #rimage-gallery .footer-info {
+        position: absolute;
+        height: 50px;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        line-height: 50px;
+        font-size: 24px;
+        text-align: center;
+        color: white;
+        border-top: 1px solid #fff;
+    }
+
+
+    #ouimage-gallery {
+        width: 100%;
+        position: relative;
+        height: calc(64vh);
+        background: #000;
+        overflow: hidden;
+    }
+
+
+
+        #ouimage-gallery .image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0px;
+        }
+
+        #ouimage-gallery .prev,
+        #ouimage-gallery .next {
+            position: absolute;
+            height: 32px;
+            margin-top: -66px;
+            top: 50%;
+        }
+
+        #ouimage-gallery .prev {
+            left: 20px;
+        }
+
+        #ouimage-gallery .next {
+            right: 20px;
+            cursor: pointer;
+        }
+
+        #ouimage-gallery .footer-info {
+            position: absolute;
+            height: 50px;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            line-height: 50px;
+            font-size: 24px;
+            text-align: center;
+            color: white;
+            border-top: 1px solid #fff;
+        }
+
+
+
+
+    .viewer-container {
+        background-color: #404040;
+        border-radius: 5px;
+        border-color: black;
+        border-width: 2px;
+        box-shadow: 2px 2px 4px inset;
+        z-index: 5;
+        /*height: 500px !important;
+        margin-top: 57px;*/
+    }
+
+    canvas.viewer {
+        z-index: 1;
+        padding-top: 2px;
+        padding-left: 2px;
+        padding-right: 2px;
+        padding-bottom: 0px;
+        width: 100% !important;
+        /*height: 500px !important;*/
+    }
+
+
+
+    .command {
+        z-index: 10;
+        bottom: 20px;
+        /*	right : 20px;*/
+    }
+
+        .command > .btn {
+            z-index: 100;
+            opacity: 0.8;
+            margin-left: 2px;
+        }
+
+            .command > .btn > i {
+                z-index: 100;
+            }
+
+
+    .layerGroup {
+        display: inline-block;
+        height: 500px;
+        width: 100%;
+        margin: 5px;
+        background-color: #000000;
+        /* allow child centering */
+        position: relative;
+    }
+
+    .layer {
+        /* needed for overlay */
+        position: absolute;
+        /* center */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /*canvas {*/
+    /* avoid parent auto-resize */
+    /*vertical-align: middle;
+    }*/
+
+    .line {
+        padding: 5px;
+    }
+    /** tooltip */
+    .layerGroup span {
+        display: none;
+        background-color: palegreen;
+        padding: 2px;
+    }
+
+    .layerGroup:hover span {
+        display: inline-block;
+        position: absolute;
+        overflow: hidden;
+    }
+    /** crossshair */
+    .layerGroup hr {
+        pointer-events: none;
+        border: none;
+        position: absolute;
+        margin: 0;
+    }
+
+    hr.horizontal {
+        border-top: 2px dashed lime;
+    }
+
+    hr.vertical {
+        border-top: 2px dashed lime;
+        transform-origin: left;
+        transform: rotate(90deg);
+    }
+</style>
+
+<script type="text/ng-template" id="DiagnosisPopoverContent.html">
+    <div class="denial__popover--">
+        <div class="denial__popover__header--">
+            DIAGNOSIS
+        </div>
+        <div class="denial__popover__body--">
+            <span class="denial__popover__badge--" ng-repeat="i in diagnosisNames.slice(2)">{{i.DiagnosisName}}</span>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,169 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Doctor Availability</h1>
+        <a class="btn__close--" ng-click="ClosePopup()">
+            <i class="close__w32--"></i>
+        </a>
+    </div>
+    <div class="modal__body--">
+        <div class="h-100 dis-flex flex-direction-column">
+            <div class="dis-flex justify-space-between align-items-center">
+                <!--<ul class="appointment-dwm-select mb-0">
+                <li class="active">
+                    <a href="javascript:;" class="appList" ng-model="calendarView" ng-click="loadCalenderEvent('day')">Day</a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="appList" ng-model="calendarView" ng-click="loadCalenderEvent('week')">Week</a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="appList" ng-model="calendarView" ng-click="loadCalenderEvent('month')">Month</a>
+                </li>
+            </ul>-->
+                <div class="calendar-details-footer dis-block bg-transp" ng-show="calobj.IsShow">
+                    <!--<button class="open-appointment btn-block" ng-click="allCalbookAppointmentForSelectedSlots(calobj)">{{ 'BOOKAPPOINTMENT' | translate}}</button>-->
+                    <!--<button class="open-appointment btn-block" ng-show="UserAccessRights.AllAccessRights.APPCalendarBookAppointment" ng-click="allCalbookAppointmentForSelectedSlots(calobj, 2)">{{ 'BOOKAPPOINTMENT' | translate}}</button>-->
+                    <button class="open-profile btn-block" ng-show="UserAccessRights.AllAccessRights.OPBlockSlotAccess" ng-click="blocktheSelectedSlots(calobj)">{{ 'BLOCKTHESLOT' | translate}}</button>
+                    <button class="cancel-appointment btn-block" ng-click="clearSelectedSlots(calobj)">{{ 'CLEAR' | translate}}</button>
+                </div>
+                <div class="col-lg-12" ng-if="BreakEventObj.IsShow">
+                    <div class="appointment-select">
+                        <div class="dis-flex justify-space-between">
+                            <label>{{ 'BREAKSLOTDETAILS' | translate}}</label>
+                            <span>
+                                <a href="javascript:;" uib-popover-template="DoctorBlockedSlotsLogPopover.templateUrl"
+                                   popover-placement="bottom-right" popover-trigger="outsideClick"
+                                   popover-append-to-body="true" popover-class="increase-popover-width-bottom" ng-click="GetBlockedSlotsLog(BreakEventObj);" ng-if="BreakEventObj.infoobj.SlotInfo.BreakType === 'BlockedSlots'">
+                                    <img src="img/info-icon.svg" width="18">
+                                </a>
+                            </span>
+                        </div>
+                        <p class="m-t-5 m-b-5"><b> {{ 'DOCTORNAME' | translate}} : </b><span>Dr. {{BreakEventObj.DoctorName}}</span></p>
+                        <p class="m-t-5 m-b-5" ng-show="BreakEventObj.BreakReason != ''"><b> Break Reason : </b><span>{{BreakEventObj.BreakReason}}</span></p>
+                        <p class="m-t-5 m-b-5" ng-show="BreakEventObj.BreakRemarks != ''"><b> Break Remarks : </b><span> {{BreakEventObj.BreakRemarks}}</span></p>
+                        <ul>
+                            <li>
+                                <b>{{ 'STARTTIME' | translate}}: </b>
+                                <span>{{BreakEventObj.StartTime | date : 'shortTime'}}</span>
+                            </li>
+                            <li>
+                                <b> {{ 'ENDTIME' | translate}}: </b>
+                                <span>{{BreakEventObj.EndTime | date : 'shortTime'}}</span>
+                            </li>
+                        </ul>
+                        <div class="calendar-details-footer dis-block bg-transp">
+                            <button class="open-profile cancel-Appt width-48 m-t-5" ng-click="DeleteBreakSlot(BreakEventObj)"> {{ 'UNBLOCKSLOT' | translate}}</button>
+                            <button class="cancel-appointment width-48 m-t-5" ng-click="clearBreakDetails()"> {{ 'CLEAR' | translate}}</button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="dis-flex align-items-center justify-content-end flex grid-gap-5">
+                    <div class="form-group">
+                        <label>{{ 'SELECTDOCTOR' | translate}}</label>
+                        <ui-select ng-model="selectApptDocObj" theme="bootstrap" on-select="changeApptDoctor(selectApptDocObj)" class="uiselect-custom">
+                            <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{selectApptDocObj.SecondUserFullName?selectApptDocObj.SecondUserFullName:"Select Doctors"}}</ui-select-match>
+                            <ui-select-choices repeat="item in ClinicDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                <span ng-bind-html="item.SecondUserFullName | highlight: $select.search"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <!--<div class="form__group">
+                    <label>Visit Reason *</label>
+                    <select class="">
+                        <option>Cataract Surgery with Laser in...</option>
+                    </select>
+                </div>-->
+                    <div class="form-group">
+                        <label>{{ 'VISITREASON' | translate}}</label>
+
+                        <ui-select ng-model="selectedVisitReasonObj" theme="bootstrap" on-select="onSelectVisitReason(selectedVisitReasonObj)" class="uiselect-custom">
+                            <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{selectedVisitReason != "" ? selectedVisitReason : 'Select Visit Reason'}}</ui-select-match>
+                            <ui-select-choices repeat="item in Visitreasons | filter: $select.search" null-option="EmptySelect" loose-null>
+                                <span ng-bind-html="item.Reason | highlight: $select.search"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+
+                    <div class="form__group">
+                        <label>&nbsp;</label>
+                        <input type="text" class="icons-calendar" ng-model="ConsultationDt" datepickerpreauthpatient readonly date-format-input />
+                    </div>
+                    <div class="form__group mt-20">
+                        <button class="btn__sm-- btn__1d5558--o grid-gap-10" ng-click="applyFilters()">
+                            Apply
+                        </button>
+                    </div>
+                    <!--<div class="form__group mt-20">
+                    <button class="b-0 bg-none" ng-click="ClearFilters()" title="Clear Filters">
+                        <i class="reload-icon"></i>
+                    </button>
+                </div>-->
+                </div>
+            </div>
+            <div class="pos-relative h-100">
+                <div class="adjustable-position">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <!--class="h-scroll"-->
+                            <div resize ng-style="heightAAD()">
+                                <div id='calendarFull'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="p-10 justify-content-end dis-flex border-top">
+            <button class="btn__lg-- btn__1d5558--f">Save Changes</button>
+        </div>-->
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="BreakSlotsRemarksPopUp.html">
+    <div>
+        <div class="modal-common-dialog">
+            <div class="model-popup-header">
+                <h4 class="modal-title" id="myModalLabel" ng-if="IsForAddingBreakSlot"> {{ 'BLOCKSLOT' | translate}}</h4>
+                <h4 class="modal-title" id="myModalLabel" ng-if="!IsForAddingBreakSlot"> {{ 'UNBLOCKSLOT' | translate}}</h4>
+                <a id="close_popup" ng-click="closePopup()" class="light-font pull-right fclosepopup m-t-0">x</a>
+            </div>
+            <div class="row m-l-10 m-t-10" ng-show="IsForAddingBreakSlot">
+                <div class="col-md-12">
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Break">
+                        <span>{{ 'BREAK' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Emergency Surgery">
+                        <span> {{ 'EMERGENCYSURGERY' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Personal Emergency">
+                        <span>{{ 'PERSONALEMERGENCY' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Others">
+                        <span>{{ 'OTHERS' | translate}}</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group m-10">
+                        <label class="control-label">{{ 'ENTERREMARKS' | translate}}</label>
+                        <textarea type="text" class="form-control mt-10" rows="5" ng-model="Remarks" />
+                    </div>
+                </div>
+            </div>
+            <div class="row pull-right">
+                <div class="col-md-12 col-sm-12 col-xs-12 mb-10 mt-5 mr-10">
+                    <button class="btn danger-btn light-font" ng-click="closePopup()"> {{ 'CLOSE' | translate}}</button>
+                    <button class="btn primary-btn" ng-click="SaveRemarksAndBlockSlot();" ng-if="IsForAddingBreakSlot">{{ 'SAVE' | translate}} </button>
+                    <button class="btn primary-btn" ng-click="SaveRemarksAndUnBlockSlot();" ng-if="!IsForAddingBreakSlot">{{ 'SAVE' | translate}} </button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,308 @@
+﻿<div class="modal-header">
+    <h2 class="modal-title">
+       Ledger
+    </h2>
+    <button type="button" class="close m-r-10 m-b-3 m-t-0" ng-click="CloseLedgerPopup()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+<div class="modal-body bg-fafbfc">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="table-responsive">
+                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                    <tbody>
+                        <tr>
+                            <td class="w-150">
+                                <div class="form-group">
+                                    <label>From Date</label>
+                                  
+                                    <input type="text" class="form-control icons-calendar"  placeholder="MM-DD-YYYY"  ng-model="GetPatientClaimSearchObj.FromDate" datepickerregpatientus readonly />
+                                </div>
+                            </td>
+                            <td class="w-150">
+                                <div class="form-group">
+                                    <label>To Date</label>
+                                   
+                                    <input type="text" class="form-control icons-calendar"  placeholder="MM-DD-YYYY" ng-model="GetPatientClaimSearchObj.ToDate" datepickerregpatientus readonly />
+                                </div>
+                            </td>
+                            <td class="w-200">
+                                <div class="form-group">
+                                    <label>Claim No</label>
+                                    <input type="text" class="form-control" placeholder="Search with invoice number" ng-model="GetPatientClaimSearchObj.PatientClaimNumber" maxlength="10" noSpecialChar/>
+                                </div>
+                            </td>
+                            <td colspan="2">
+                                <div class="form-group m-t-25">
+                                    <button class="btn btn-success p-l-30 p-r-30" ng-click="GetPatientAllClaimsList(1);">Search</button>
+                                    <button class="btn btn-discard-us p-l-30 p-r-30" ng-click="ClearAllClaimsSearch();">Clear</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="border-d2d2d2">
+        <div class="row" ng-show="PatientClaimsArray.length > 0">
+            <div class="col-lg-12 bg-edfaff">
+                <div class="col-lg-3 p-l-0">
+                    <div class="tile-header b-0 text-center">
+                        <h1 class="p-15">Claims List</h1>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="tile-header b-0 text-center">
+                        <ul class="us-controls dis-inline-flex pull-right">
+                         
+                            <li class="tile-header b-0">
+                                <label class="cur-poiter">
+                                    <input type="checkbox" id="shoIdClaims" class="checkbox" ng-model="GetPatientClaimSearchObj.IsShowAllDueCLaims" ng-change="ChangeGetOnlyDuesList(GetPatientClaimSearchObj.IsShowAllDueCLaims);">
+                                    <span class="lbl"></span>
+                                    <span class="usc-remarks fs-14"><b>show Claims with the Due</b></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-show="PatientClaimsArray.length > 0">
+            <div class="col-lg-3 p-r-0">
+                <div class="eh-panel b-0 p-0 b-radius">
+                    <div class="eh-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 m-l-5 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th>Claim Number</th>
+                                                <!--<th>Billing Provider</th>
+                                                <th>Rendering Provider</th>
+                                                <th>Payor</th>-->
+                                                <th>Claim Amount</th>
+                                                <!--<th>Payment Amount</th>-->
+                                                <th>Due</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in PatientClaimsArray" ng-class="item.IsSelectedClaim ? 'invoice-body':''" ng-click="GetPatientClaimDetailsById(item);">
+                                                <td>
+                                                    <p class="m-b-0">{{item.PatientClaimNumber}}</p>
+                                                    <p class="m-b-0">{{item.ClaimDate | date:'MM/dd/yyyy'}}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-b-0 text-d02626" ng-show="item.TotalClaimAmount != 0">${{item.TotalClaimAmount}}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-b-0 text-d02626" ng-show="item.TotalBalance != 0">${{item.TotalBalance}}</p>
+                                                </td>
+                                                <td class="text-center" ng-show="item.IsShowItems == false">
+                                                    <i class="fa fa-chevron-down"></i>
+                                                </td>
+                                                <td class="text-center" ng-show="item.IsShowItems == true">
+                                                    <i class="fa fa-chevron-right"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                 <div class="EH-pagination text-center">
+                                     <uib-pagination total-items="PatientInvoiceSerachObj.Count"
+                                                     ng-model="GetPatientClaimSearchObj.PageNumber"
+                                                     ng-change="GetPatientAllClaimsList(GetPatientClaimSearchObj.PageNumber)"
+                                                     ng-show="GetPatientClaimSearchObj.Count > 10"
+                                                     max-size="GetPatientClaimSearchObj.PageSize"
+                                                     class=""
+                                                     boundary-link-numbers="true"
+                                                     rotate="false">
+
+                                     </uib-pagination>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-lg-9" ng-show="selectedClaimDetails.ClaimLineItems.length > 0">
+                <section class="eh-panel b-0 p-0 b-radius">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th class="w-50">S.No</th>
+                                                <th class="w-100">Date</th>
+                                                <th>Service</th>
+                                                <th>Place of Service</th>
+                                                <th class="w-80">Unit Charge</th>
+                                                <th>Units</th>
+                                                <th>Total Charge</th>
+                                                <th>Copay</th>
+                                                <th class="w-50">Due</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bb-d2d2d2" ng-repeat-start="sitem in  selectedClaimDetails.ClaimLineItems" ng-click="showLineitemsTransaction(sitem)">
+                                                <td>{{$index+1}}</td>
+                                                <td>
+                                                    {{sitem.DOSfrom | date:'MM-dd-yyyy'}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.ServiceCode}} - {{sitem.ServiceName}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.PlaceOfServiceName}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.UnitCharge}}
+                                                </td>
+                                                <td>{{sitem.Quantity}}</td>
+                                                <td>{{sitem.TotalChargeAmount}}</td>
+                                                <td>
+                                                    {{sitem.PatientCoPay}}
+                                                </td>
+                                                <td class="text-danger">{{sitem.TotalBalance}}</td>
+                                            </tr>
+                                            <tr ng-repeat-end ng-show="sitem.showTransactionContent">
+                                                <td colspan="7">
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width:200px">Transaction Date</th>
+                                                                <th style="width:200px">Type</th>
+                                                                <th style="width:200px">Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="citem in sitem.ClaimTransactions">
+                                                                <td>{{citem.TransactionDate | date:'MM-dd-yyyy'}}</td>
+                                                                <td>{{citem.TransactionType}}</td>
+                                                                <td>{{citem.TransactionAmount}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                       
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="modal-footer text-left p-10" style=" background-image: linear-gradient(to bottom, #f6f6f6, #e5e5e5) !important;">
+                                    <a>
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b>HFCA PRINT</b>
+                                    </a>
+                                    <a class="m-l-10">
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b> PRINT FINAL BILL</b>
+                                    </a>
+                                    <a class="m-l-10">
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b> PRINT appointment wise BILL</b>
+                                    </a>
+                                    <button type="button" class="btn btn-save-us pull-right m-l-10" ng-click="AddpaymentShow();" ng-disabled="SelectedInvoiceObj.TotalBalance == 0">
+                                        <img src="img/consultation/add-payment.png" /> Add Payment
+                                    </button>
+                                    <button type="button" class="btn btn-view-payment pull-right" ng-click="onClickViewPaymentList()">{{ShowBillViewList == true ? 'Hide Payment Details' :'View Payment Details'}}</button>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12" ng-show="ShowBillViewList == true">
+                                <div class="table-responsive" ng-show="mainBillingObject.BillingHistoryDetails.length > 0">
+                                    <table class="table tableno-bordered m-b-0 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th class="w-100">Date</th>
+                                                <th>ReceiptId</th>
+                                                <th>Paid</th>
+                                                <th>Mode of Payment</th>
+                                                <th>Transaction Number</th>
+                                                <th>Created By</th>
+                                                <th>Branch</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bb-d2d2d2" ng-repeat="sitem in  mainBillingObject.BillingHistoryDetails">
+                                                <td>{{sitem.CreatedDt | date:'MM-dd-yyyy'}}</td>
+                                                <td>{{sitem.ReceiptNo}}</td>
+                                                <td>{{sitem.BilledCost}} </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>{{sitem.CreatedBy}}</td>
+                                                <td>{{sitem.BranchName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div ng-show="mainBillingObject.BillingHistoryDetails.length == 0">
+                                    <div class="billing-cominsoon text-center">
+                                        <div class="msg" style=" height: 40px;">
+                                            <p class="goback-text m-t-20">No Results Found</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+             
+
+            <div class="col-lg-9" ng-show="selectedClaimDetails.ClaimLineItems.length == 0">
+                <section class="eh-panel b-0 p-0 b-radius" style="height: 260px;">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12" style="height:260px !important">
+                                <div class="billing-cominsoon text-center">
+                                    <img src="img/no-data/no-results.png" style="margin-top:45px;">
+                                    <div class="msg">
+                                        <p class="goback-text">No Claim Line Items Found</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+        <div class="row" ng-show="PatientClaimsArray.length == 0">
+            <div class="col-lg-12">
+                <section class="eh-panel b-0 p-0 b-radius" style="height: 260px;">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12" style="height:260px !important">
+                                <div class="billing-cominsoon text-center">
+                                    <img src="img/no-data/no-results.png" style="margin-top:45px;">
+                                    <div class="msg">
+                                        <p class="goback-text">No Claims Found</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

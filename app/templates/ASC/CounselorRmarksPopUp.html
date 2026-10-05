@@ -1,0 +1,233 @@
+﻿<div class="modal-content">
+    <div class="modal-header book-popup-appt">
+        <button type="button" class="close" ng-click="cancel('cancel')">&times;</button>
+        <h4 class="modal-title">Counsellor Remarks</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="Cosnler-login table-responsive">
+                    <table class="table tableno-bordered well-sm well">
+                        <tr>
+                            <td width="30%">
+                                <div class="form-group mb-0">
+                                    <label>Category</label>
+                                    <select class="form-control" ng-model="RemarksObject.SurgeryCategoryObj" ng-options="item as item.Name for item in masterSurgeryCatergoryList track by item.CategoryId" ng-change="addMainCategory(RemarksObject)">
+                                        <option value="">Select category</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td width="50%">
+                                <div class="form-group mb-0">
+                                    <label>Surgery Performed <span class="error">*</span></label>
+                                    <input type="text"
+                                           class="form-control pad-r-box"
+                                           placeholder="Search"
+                                           maxlength="100"
+                                           name="treatment"
+                                           ng-model="RemarksObject.SurgeryObject"
+                                           typeahead-min-length="3"
+                                           typeahead-on-select="changeSurgeryPerformed(RemarksObject)"
+                                           uib-typeahead="Surgeryitem as Surgeryitem.SurgeryName for Surgeryitem in getOrgSurgeries($viewValue,RemarksObject)" />
+                                </div>
+
+                            </td>
+                            <td width="20%">
+                                <div class="form-group mb-0">
+                                    <label>Surgery Status:</label>
+                                    <select class="form-control" ng-model="RemarksObject.SurgeryStatusId" convert-to-number ng-disabled="true">
+                                        <option value="0">Select</option>
+                                        <option value="1">Advised</option>
+                                        <option value="2">Accepted</option>
+                                        <option value="3">InProgress</option>
+                                        <option value="4">Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <b>Instructions To Counsellor :</b>
+                                <span ng-bind="RemarksObject.SurgeryInstructions"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-info mb-10">
+                    <div class="panel-heading">Counsellor Remarks</div>
+                    <div class="panel-body pt-10">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="form-group mb-0">
+                                    <label>Remarks</label>
+                                    <textarea class="form-control" rows="2" ng-model="RemarksObject.CounselorRemarks"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group mb-0">
+                                    <label>FollowUp Date</label>
+                                    <input class="form-control icons-calendar"
+                                           ng-model="RemarksObject.FollowUpDate"
+                                           datepickerapnl />
+                                    <!--<textarea class="form-control" rows="2" ng-model="RemarksObject.FollowUpDate"></textarea>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>        
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-warning mb-0">
+                    <div class="panel-heading">Payment Mode</div>
+                    <div class="panel-body pt-10">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Payment Mode</label>     
+                                    <select name="repeatSelect"
+                                            id="repeatSelect"
+                                            class="form-control"
+                                            ng-model="RemarksObject.PaymentInfoDetails.PaymentTypeId"
+                                            ng-options="option.PaymentModeId as option.PaymentModeName for option in masterPaymentModes"
+                                            ng-change="InsuranceModeChange(RemarksObject.PaymentInfoDetails.PaymentTypeId)" ng-selected="RemarksObject.PaymentInfoDetails.PaymentTypeId">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4" ng-if="RemarksObject.PaymentInfoDetails.PaymentTypeId == 17">
+                                <div class="form-group">
+                                    <label>Insurance Type</label>
+                                    <select class="form-control select-dropdown"
+                                            ng-model="RemarksObject.InsuranceId"
+                                            ng-options="item.Id as item.Name for item in InsuranceMode">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Approved Amount</label>
+                                    <input type="text" class="form-control" placeholder="" numbers-only="numbers-only"  ng-model="RemarksObject.ApprovedAmount">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group mb-0">
+                                    <label>Cost</label>
+                                    <input type="text" class="form-control" placeholder="Enter Amount" ng-model="RemarksObject.SurgeryCost" numbers-only="numbers-only" ng-change="changeCounselorCost(RemarksObject)">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb-0">
+                                    <label>Discount</label>
+                                    <div class="center-block">
+                                        <input type="text" class="form-control inp-pack center-block width-70" placeholder="Enter Discount" ng-model="RemarksObject.discountValue" numbers-only="numbers-only" maxlength="2" ng-change="changeCounselorCost(RemarksObject)" ng-show="RemarksObject.discountType=='P'">
+                                        <input type="text" class="form-control inp-pack center-block width-70" placeholder="Enter Discount" ng-model="RemarksObject.discountValue" numbers-only="numbers-only" ng-change="changeCounselorCost(RemarksObject)" ng-show="RemarksObject.discountType=='A'">
+                                        <select class="pack-select center-block" ng-change="changeDiscountType(RemarksObject)" ng-model="RemarksObject.discountType">
+                                            <option value="P">%</option>
+                                            <option value="A">INR</option>
+                                        </select>
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb-0">
+                                    <label>Final Amount</label>
+                                    <input type="text" class="form-control" ng-model="RemarksObject.SurgeryFinalCost" ng-disabled="true">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="row" ng-if="RemarksObject.PaymentInfoDetails.PaymentTypeId == 2">
+            <div class="col-lg-12 row-bg-billing">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" class="form-control" placeholder="Enter Card Number"
+                               ng-model="RemarksObject.PaymentInfoDetails.CardDetails.CardNumber" numbers-only maxlength="19" />
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label>Card Type</label>
+                        <select class="form-control select-dropdown"
+                                ng-model="RemarksObject.PaymentInfoDetails.CardDetails.CardType"
+                                ng-options="option.Id as option.Name for option in RemarksObject.CardTypeDetails">
+                            <option value="">Select</option>
+                        </select>
+
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Name On Card</label>
+                        <input type="text" class="form-control" placeholder="Enter Name On Card"
+                               ng-model="RemarksObject.PaymentInfoDetails.CardDetails.CardHolderName" alphabets-only />
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label>Expire Date</label>
+                        <input type="text" class="form-control" placeholder="MM/YY"
+                               ng-model="RemarksObject.PaymentInfoDetails.CardDetails.CardExpDate" maxlength="7" />
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label>Transaction No</label>
+                        <input type="text" class="form-control" ng-model="RemarksObject.PaymentInfoDetails.TransactionNumber" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="RemarksObject.PaymentInfoDetails.PaymentTypeId == 3">
+            <div class="col-lg-12 row-bg-billing">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label>Cheque Number</label>
+                        <input type="text" class="form-control" placeholder="Enter Cheque Number"
+                               ng-model="RemarksObject.PaymentInfoDetails.ChequeDetails.ChequeNumber" />
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" class="form-control" placeholder="Enter Bank Name"
+                               ng-model="RemarksObject.PaymentInfoDetails.ChequeDetails.BankName" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+
+
+
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-lg-12">
+                <button class="btn-sm btn-danger btn" ng-click="cancel('cancel')">Cancel</button>
+                <button class="btn-sm btn-success btn pl-50 pr-50" ng-click="SaveCounselorRemarks(RemarksObject)">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

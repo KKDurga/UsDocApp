@@ -1,0 +1,1337 @@
+﻿<div class="height__100-- d__f-- fd__c--" ng-controller="UsAgingRejectedclaimsCtrl">
+
+    <div class="d__f-- jc__sb-- ai__c--" ng-if="false">
+        <h1 class="fs__normal-- fs__xl-- fw__6-- tc__1D1D1D-- m__0--"><span class=" ml__10--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--"></span></h1>
+        <ul class="flex-flow-list gap__10--">
+            <li>
+                <div class="form__group w-300 d__f-- ai__c-- gap__10--">
+                    <label class="ws__nowrap--">Claim Search</label>
+                    <input class="input__style--2" id="input_claimsearch277" placeholder="Search Claim No." ng-model="SearchClaimListObj.ClaimNumber" ng-enter="SearchPatientwithClaimId(1,'Claims')" />
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" ng-if="false">
+        <table class="table tableno-bordered tableno-padding m__0--" id="table_ack277">
+            <tbody>
+                <tr>
+                    <td width="9%">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input type="text" id="input_fromdate277" class=" icons-calendar cur-default bg-white"
+                                   ng-model="SearchAckmtObj.FromDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="9%">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input type="text" id="input_todate277" class=" icons-calendar cur-default bg-white"
+                                   ng-model="SearchAckmtObj.ToDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient
+                                   mindate="{{SearchAckmtObj.FromDate}}" readonly />
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group pos-relative">
+                            <label>Billing Provider </label>
+                            <select ng-model="SearchAckmtObj.BillingProviderId" id="select_providersns"
+                                    ng-options="item.OrganizationBillingProviderId as (item.BillingProviderName + ' - (' + item.OrganizationName + ')') for item in ClaimProviderList">
+                                <option value=""> Select </option>
+                            </select>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group ">
+                            <label>Rendering Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                    {{SearchAckmtObj.SelectRenderingStatusString}}
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchtxtb.txt1" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.AllRenderingStatusCheck" ng-click="checkAllRendering(SearchAckmtObj.AllRenderingStatusCheck)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in SearchAckmtObj.RenderingProviderList | filter:{'FullName':searchtxtb.txt1} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="InsuranceRenderingToggle(item);">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group" typehead-dropdown-direction>
+                            <label>Payor Name</label>
+                            <input type="text" id="input_payername277" class="icons-search"
+                                   autocomplete="off"
+                                   name="InsurancePayor"
+                                   placeholder="Enter Payer Name"
+                                   ng-model="SearchAckmtObj.PayorObj"
+                                   typeahead-min-length="0"
+                                   typeahead-on-select="ChangeInsurancePayor(SearchAckmtObj.PayorObj)"
+                                   uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                        </div>
+                    </td>
+                    <td width="10%" ng-if="SearchAckmtObj.Type!='Denial Followup'">
+                        <div class="form__group">
+                            <label for="apptList__bookType">User</label>
+                            <div class="dropdown cstm-dropdown width-100 " button-dropdown-direction>
+                                <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{SearchAckmtObj.SelectUserStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="$event.stopPropagation()">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="SearchAckmtObj.UserFullName" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="SearchAckmtObj.AllUserStatusCheck" ng-click="checkAllInsuranceUser(SearchAckmtObj.AllUserStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in AllUsersList | filter:{'FullName':SearchAckmtObj.UserFullName} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="ChangesUser(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.FullName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group pos-relative">
+                            <label>Alert Type </label>
+                            <select ng-model="SearchAckmtObj.Type" id="select_providersns"
+                                    ng-options="item.ClaimTypeName as item.ClaimTypeName for item in AlertClaimList">
+                                <option value="" disabled> Select </option>
+                            </select>
+                        </div>
+                    </td>
+                    <td width="8%">
+                        <div class="m-t-24">
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsShowAmount">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">Show Money</span>
+                            </label>
+                        </div>
+
+                    </td>
+                    <td width="7%">
+                        <div class="m-t-24">
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsDOsDate">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">DOS Date</span>
+                            </label>
+                        </div>
+                    </td>
+
+
+                    <td width="10%">
+                        <div class="d__f-- ai__c-- gap__x--8 mt__20--">
+
+                            <button class="btn__lg-- btn__2D2D47--f" id="button_applyq" ng-click="SearchAgingRejected()">
+                                Apply
+                            </button>
+                            <button class=" b-0" id="buttonreloadq" ng-click="refreshDetails()">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <div class="d__f-- ai__c-- jc__sb-- px__6-- py__8-- bb__e4e4e4-- gap__20--" ng-if="false">
+        <div class="d__f-- ai__c-- gap__14--">
+            <h1 class="m__0-- fs__2l-- fw__7-- tc__1D1D1D-- white-nowrap">Claim Summary</h1>
+            <!--<span class=" ml__10--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--">{{ClaimListCount}}</span>-->
+            <div class="switch__gray-white" ng-if="ClaimSubtabActive ===1 || ClaimSubtabActive === 12">
+                <div class="switch__btn--" ng-class="ClaimSubtabActive === 1 ? 'active' : ''" ng-click="filtertabs(1,'All',1)">List</div>
+                <div class="switch__btn--" ng-class="ClaimSubtabActive === 12 ? 'active' : ''" ng-click="navtoSubtabs(12)">Claims Summary</div>
+            </div>
+        </div>
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="13%">
+                        <div class="form__group flex">
+                            <label>From Date</label>
+                            <input type="text" id="input_fromdate277" class=" icons-calendar cur-default bg-white"
+                                   ng-model="SearchAckmtObj.FromDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="13%">
+                        <div class="form__group flex">
+                            <label>To Date</label>
+                            <input type="text" id="input_todate277" class=" icons-calendar cur-default bg-white"
+                                   ng-model="SearchAckmtObj.ToDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient
+                                   mindate="{{SearchAckmtObj.FromDate}}" readonly />
+                        </div>
+                    </td>
+                    <td width="22%">
+                        <div class="form__group">
+                            <label>&nbsp;</label>
+                            <input type="text" placeholder="Search payer..." class="input__style--7" id="input_payername277"
+                                   autocomplete="off"
+                                   name="InsurancePayor"
+                                   ng-model="SearchAckmtObj.PayorObj"
+                                   typeahead-min-length="0"
+                                   typeahead-on-select="ChangeInsurancePayor(SearchAckmtObj.PayorObj)"
+                                   uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="m-t-24">
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsShowAmount">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">Show Money</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="m-t-24">
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsDOsDate">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">DOS Date</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="valign-bottom">
+                        <div class="dis-flex align-items-center grid-gap-10 m-b-2">
+                            <button class="btn__lg-- btn__2D2D47--f mt__20--" id="button_applyq" ng-click="SearchAgingRejected()">
+                                Apply
+                            </button>
+                            <button class=" b-0 mt__20--" id="buttonreloadq" ng-click="refreshDetails()">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+
+                    </td>
+                    <td>
+                        <button class="button__1D5558--o mt__20--" popover-trigger="outsideClick" popover-class="opfilter-popover m-0" filter-panel popover-placement="auto" popover-append-to-body="true" uib-popover-template="'claimSummaryFilter.html'"><i svg-icon="icon__filter--" size="14" style="color: #1D5558"></i>Filter</button>
+                        <script type="text/ng-template" id="claimSummaryFilter.html">
+                            <div class="d__f-- fd__c--">
+                                <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                                    <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                    <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                </div>
+                                <div class="two-sections">
+                                    <div class="width__40-- br__DDD-- px__8-- py__3--">
+                                        <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'AdjWindows'">
+                                            <!--<li data-target="#AdjWindows" data-toggle="tab" ng-click="activeTab = 'AdjWindows'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'AdjWindows' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">Adj. windows</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>
+                                            <li data-target="#Status" data-toggle="tab" ng-click="activeTab = 'Status'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Status' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">Status</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>-->
+                                            <li data-target="#Billingprovider" data-toggle="tab" ng-click="activeTab = 'Billingprovider'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Billingprovider' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">Billing Provider</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>
+                                            <li data-target="#Renderingprovider" data-toggle="tab" ng-click="activeTab = 'Renderingprovider'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Renderingprovider' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">Rendering  Provider</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>
+                                            <!--<li data-target="#User" data-toggle="tab" ng-click="activeTab = 'User'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'User' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">User</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>-->
+                                            <li data-target="#Alerttype" data-toggle="tab" ng-click="activeTab = 'Alerttype'">
+                                                <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Alerttype' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                    <span class="fs__normal-- fs__lg--">Alert Type</span>
+                                                    <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content flex p__8--">
+                                        <!--<div class="tab-pane fade in active" id="AdjWindows">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">All statuses</span>
+                                                        </label>
+                                                        <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--">4</span>Results Found</label>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">On track (>30 days)</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">Due soon (2-30 days)</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">Due date (1 day)</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">Overdue</span>
+                                                                    </label>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                        <!--<div class="tab-pane fade" id="Status">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">All adj windows</span>
+                                                        </label>
+                                                        <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--">4</span>Results Found</label>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">60-day window</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">90-day window</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">120-day window</span>
+                                                                    </label>
+                                                                </li>
+                                                                <li>
+                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                        <input type="checkbox" class="checkbox">
+                                                                        <span class="lbl"></span>
+                                                                        <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">180-day window</span>
+                                                                    </label>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                        <div class="tab-pane fade" id="Billingprovider">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <h2>Billing Provider</h2>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <div class="form__group pos-relative">
+                                                                <select ng-model="SearchAckmtObj.BillingProviderId" id="select_providersns"
+                                                                        ng-options="item.OrganizationBillingProviderId as (item.BillingProviderName + ' - (' + item.OrganizationName + ')') for item in ClaimProviderList">
+                                                                    <option value=""> Select </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="Renderingprovider">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <h2>Rendering Provider</h2>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                                                <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                                                    {{SearchAckmtObj.SelectRenderingStatusString}}
+                                                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="mainsearch-App">
+                                                                                <i class="fas fa-search"></i>
+                                                                            </span>
+                                                                        </span>
+                                                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchtxtb.txt1" />
+                                                                    </div>
+                                                                    <div class="apptsearchdroplist">
+                                                                        <ul>
+                                                                            <li>
+                                                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                    <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.AllRenderingStatusCheck" ng-click="checkAllRendering(SearchAckmtObj.AllRenderingStatusCheck)">
+                                                                                    <span class="lbl"></span>
+                                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                                                </label>
+                                                                            </li>
+                                                                            <li ng-repeat="item in SearchAckmtObj.RenderingProviderList | filter:{'FullName':searchtxtb.txt1} track by $index">
+                                                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="InsuranceRenderingToggle(item);">
+                                                                                    <span class="lbl"></span>
+                                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                                                                </label>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--<div class="tab-pane fade" id="User">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <h2>User</h2>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <div class="form__group" ng-if="SearchAckmtObj.Type!='Denial Followup'">
+                                                                <div class="dropdown cstm-dropdown width-100 " button-dropdown-direction>
+                                                                    <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                                                        <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                                                        {{SearchAckmtObj.SelectUserStatusString}}
+                                                                    </button>
+                                                                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="$event.stopPropagation()">
+                                                                        <div class="p-5">
+                                                                            <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="SearchAckmtObj.UserFullName" />
+                                                                        </div>
+                                                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                            <ul>
+                                                                                <li>
+                                                                                    <div class="checkbox cn">
+                                                                                        <label>
+                                                                                            <input name="checkbox-11" type="checkbox" ng-model="SearchAckmtObj.AllUserStatusCheck" ng-click="checkAllInsuranceUser(SearchAckmtObj.AllUserStatusCheck)">
+                                                                                            <span class="checkbox-material">
+                                                                                                <span class="check"></span>
+                                                                                            </span>
+                                                                                            <small>All</small>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                                <li ng-repeat="item in AllUsersList | filter:{'FullName':SearchAckmtObj.UserFullName} track by $index">
+                                                                                    <div class="checkbox cn">
+                                                                                        <label>
+                                                                                            <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="ChangesUser(item)">
+                                                                                            <span class="checkbox-material">
+                                                                                                <span class="check"></span>
+                                                                                            </span>
+                                                                                            <small ng-bind="item.FullName"></small>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                        <div class="tab-pane fade" id="Alerttype">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <div class="section__style--4 d__f-- fd__c--">
+                                                    <div class="section__header-- px__10-- jc__sb--">
+                                                        <h2>Alert Type</h2>
+                                                    </div>
+                                                    <div class="section__body-- border__E4E4E4--">
+                                                        <div class="h__190-- overflow__auto--y slim-scroll">
+                                                            <div class="form__group pos-relative">
+                                                                <select ng-model="SearchAckmtObj.Type" id="select_providersns"
+                                                                        ng-options="item.ClaimTypeName as item.ClaimTypeName for item in AlertClaimList">
+                                                                    <option value="" disabled> Select </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                    <a class="d__f-- ai__c-- gap__5-- fs__normal-- fs__lg-- fw__5-- tc__1D5558--"><i class="icons__w16-- restore__w16--o" ng-click="refreshDetails()"></i>Reset</a>
+                                    <button class="btn__lg-- btn__1d5558--f" ng-click="SearchAgingRejected()">{{ 'APPLY' | translate}}</button>
+                                </div>
+                            </div>
+                        </script>
+                    </td>
+                    <!--<td>
+                        <button class="button__1D5558--o mt__20--"><i svg-icon="icon__download--square" size="14" style="color: #1D5558"></i>Export</button>
+                    </td>-->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d__f-- jc__fs-- gap__5--x height__100-- bg__FFFFFF--" ng-if="false">
+        <div class="d__f-- fd__c-- height__100-- flex">
+            <div class="position__relative-- height__100--" ng-if="RejctedSummarylist.length > 0">
+                <div class="adjustable-position slim-scroll overflow__auto--x c__p--" drag-scroll>
+                    <table class="table__style--21 border__none-- bradius__0-- table-layout-auto ws__nowrap--" id="table_notsubmitedmain">
+                        <thead>
+                            <tr>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 bradius__3--tl top__0-- zindex-10 text-center borderright__E4E4E4--" width="4%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">S.No.</label></th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 left__0-- bg__FFF--" width="15%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Payor Name</label></th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #E8F5E9 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Today</label>
+                                    <span>({{Agingtotals.TotalToday}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #C8E6C9 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">1-3 Days</label>
+                                    <span>({{Agingtotals.Total1to3Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #A5D6A7 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">4-7 Days</label>
+                                    <span>({{Agingtotals.Total4to7Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFF9C4 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">8-14 Days</label>
+                                    <span>({{Agingtotals.Total8to14Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFF59D !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">15-29 Days</label>
+                                    <span>({{Agingtotals.Total15to29Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFE082 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">30-44 Days</label>
+                                    <span>({{Agingtotals.Total30to44Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFCC80 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">45-59 Days</label>
+                                    <span>({{Agingtotals.Total45to59Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFB74D !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">60-89 Days</label>
+                                    <span>({{Agingtotals.Total60to89Days}})</span>
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #FFCDD2 !important">
+                                    <label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">90+ Days</label>
+                                    <span>({{Agingtotals["Total90+Days"]}})</span>
+
+                                </th>
+                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" style="background-color: #E3F2FD !important"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Total</label><span>({{Agingtotals["TotalDays"]}})</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="border__none--">
+
+                            <tr class="hover__1D55581A--bg bg__FFFFFF--" ng-repeat="item in RejctedSummarylist track by $index">
+                                <td class="py__8-- px__6-- zindex-1 position__sticky-- left__0-- borderright__E4E4E4-- bg__FFF-- vl__middle-- hover__E8EEEE-- text-center">
+                                    <span class="fs__normal-- fs__lg-- fw__5-- tc__656565--">{{ (SearchAckmtObj.PageNumber - 1) * 100 + ($index + 1) }}</span>
+                                </td>
+                                <td class="zindex-1 position__sticky-- left__0-- bg__FFF--">{{item.MasterPayorName}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === 'Today'}" ng-click="setAgingDates(item,'Today')">{{item.Today}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '1-3Days'}" ng-click="setAgingDates(item,'1-3Days')">{{item['1-3Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '4-7Days'}" ng-click="setAgingDates(item,'4-7Days')">{{item['4-7Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '8-14Days'}" ng-click="setAgingDates(item,'8-14Days')">{{item['8-14Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '15-29Days'}" ng-click="setAgingDates(item,'15-29Days')">{{item['15-29Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '30-44Days'}" ng-click="setAgingDates(item,'30-44Days')">{{item['30-44Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '45-59Days'}" ng-click="setAgingDates(item,'45-59Days')">{{item['45-59Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '60-89Days'}" ng-click="setAgingDates(item,'60-89Days')">{{item['60-89Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A" ng-class="{'bg__C71D271A--': item.selectedAging === '90+Days'}" ng-click="setAgingDates(item,'90+Days')">{{item['90+Days']}}</td>
+                                <td class="c__p-- bg__h--C71D271A">{{item.Total}}</td>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+            <div class="position__relative-- height__100--" ng-if="RejctedSummarylist.length == 0">
+                <div class="adjustable-position">
+                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100-- bg__EBEDEE7D--">
+                        <a><i class="nodata__1-- a2__nodata--1"></i></a>
+                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Claims Yet</h1>
+                        <label class="fs__normal-- fs__lg-- fw__5-- tc__4A4A4A--">There are no claims associated with this patient.</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d__f-- ai__c-- jc__c-- py__5-- bt__DDD--" ng-if="RejctedSummarylist.length > 100">
+                <div class="EH-pagination">
+                    <uib-pagination total-items="RejctedSummaryCount"
+                                    ng-model="SearchAckmtObj.PageNumber"
+                                    ng-change="SearchAgingRejected(SearchAckmtObj.PageNumber)"
+                                    max-size="5"
+                                    class=""
+                                    items-per-page="100"
+                                    boundary-link-numbers="true"
+                                    rotate="false"></uib-pagination>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="d__f-- fd__c-- height__100-- width__60--" ng-if="RejctedClaimdetails.length > 0">
+            <div class="section__style--4 height__100--">
+                <div class="section__header-- py__5-- bg__FFFFFF--">
+                    <span class="fs__lg-- fw__7-- tc__000-- fs__normal--">{{ClaimdetailsObj.PayorName}}  <span class="px__5-- py__3-- border__E4E4E4-- bg__FEF9C6-- fs__md-- fw__6-- tc__000-- fs__normal--"> {{ClaimdetailsObj.Range}}</span></span>
+                    <div class="d__f-- ai__c-- gap__5--x">
+                        <div class="position__relative-- p__2--" ng-if="false">
+                            <a class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" ng-click="excelExports()"><i svg-icon="icon__download--" size="14" style="color: #6A7282"></i></a>
+                            <span class="p__3-- top_ bg__C71D27-- bradius__10-- position__absolute-- top__0-- right__0--"></span>
+                        </div>
+                        <button class="btn__lg-- btn__1d5558--o" id="button_applyq" ng-click="ClickForPrintdData()">Print</button>
+                        <button class="btn__lg-- btn__1d5558--f" ng-click="ClickForExceldData(SearchAckmtObj.Type)">Export Excel</button>
+                        <a class="btn__close--2" ng-click="ClearSelectedData()">
+                            <i class="icons__w16-- close__w16--o"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="section__body-- p__0-- height__100--">
+                    <div class="position__relative-- height__100--">
+                        <div class="adjustable-position slim-scroll bg__EBF3FB-- overflow__auto--x c__p--" drag-scroll>
+                            <table class="table__style--20 table-layout-auto ws__nowrap-- p__5--" id="table_notsubmitedmain">
+                                <thead>
+                                    <tr>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 left__0--" width="2%"></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 left__30--"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">S.No.</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10" style="left: 65px" width="8%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Name</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Claim No</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Mr No</label></th>
+
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="10%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">DOS</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Claim Amount</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="10%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">User</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="15%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Billing Provider</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">NPI</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Rendering Provider Name</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="8%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">NPI</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="12%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Status Description</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1" width="12%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">File Name</label></th>
+                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1 right__0--" width="3%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Action</label></th>
+                                        <th ng-if="ClaimdetailsObj.Type=='Denial Followup'" class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1 right__0--" width="3%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Adj Req</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table tableno-bordered m__0-- table-layout-fix" ng-repeat="item in RejctedClaimdetails track by $index">
+
+                                    <tr class="bg__FFFFFF--">
+                                        <td class="valign-middle py__8-- px__6-- zindex-1 position__sticky-- left__0-- bg__FFF--">
+                                            <a href="javascript:;" ng-click="openAccordianItem(item)">
+                                                <i class="icons__w16-- arrowrightfill__w16--l"></i>
+                                            </a>
+                                        </td>
+                                        <td class="py__8-- px__6-- zindex-1 position__sticky-- left__30-- bg__FFF--">
+                                            <span class="fs__normal-- fs__lg-- fw__5-- tc__656565--">{{ (SearchAckmtObj.PageNumber - 1) * 100 + ($index + 1) }}</span>
+                                        </td>
+                                        <td class="py__8-- px__6-- zindex-1 position__sticky-- bg__FFF--" style="left: 65px">{{item.PatientFullName}}</td>
+                                        <td class="py__8-- px__6-- " ng-click="navtoClaimSummaryPopup(item)"><a href="javascript:;">{{item.PatientClaimNumber}}</a></td>
+                                        <td class="py__8-- px__6-- ">{{item.PatientMRNo}}</td>
+
+                                        <td class="py__8-- px__6-- ">{{item.DOSFrom| date:'MM-dd-yyyy'}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.TotalClaimAmount}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.ClaimCreatedBy}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.BillingProviderName}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.BillingProviderNPI}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.RenderingProviderName}}</td>
+                                        <td class="py__8-- px__6-- ">{{item.RenderingProviderNPI}}</td>
+                                        <td class="py__8-- px__6-- "><span class="no-wrapappt w__150--">{{item.StatusDescription}}</span></td>
+                                        <td class="py__8-- px__6-- "><span class="no-wrapappt w__150--">{{item.FileName}}</span></td>
+                                        <td class="py__8-- px__6-- right__0--" ng-click="navtoClaimSummaryPopup(item, 'ClaimlifeCycle')"> <a><i class="icons__w18-- circular-arrow--"></i></a></td>
+                                        <td ng-if="ClaimdetailsObj.Type=='Denial Followup'" title="Adjustment request" class="py__8-- px__6-- right__0--" ng-click="navtoOpenDenialpopupmanagement(item)">  <a class="light-icon d__b--"><i class="icons__w16-- drawarrowbox__w16--l"></i></a></td>
+                                    </tr>
+                                    <tr ng-show="item.isOpen">
+                                        <td colspan="15">
+                                            <table class="table tableno-bordered tableno-padding m__0-- border__DDD-- boxs__0000001A--br10">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 bradius__3--tl position__sticky-- top__0-- left__0-- zindex-10 text-center borderright__E4E4E4--" width="4%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">S.No.</label></th>
+                                                        <!--<th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">DOS </label></th>-->
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">CPT</label></th>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Units</label></th>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Modifiers</label></th>
+                                                        <!--<th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">DOS</label></th>-->
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Charge Amt</label></th>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Insurance Bls</label></th>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Bls</label></th>
+                                                        <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">WriteOff Amt</label></th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody ng-repeat="Aitem in item.PatientClaimLineItems track by $index">
+                                                    <tr class="hover__1D55581A--bg bg__FFFFFF--">
+                                                        <td class="py__8-- px__6-- zindex-1 position__sticky-- left__0-- borderright__E4E4E4-- bg__FFF-- vl__middle-- hover__E8EEEE-- text-center">
+                                                            <span class="fs__normal-- fs__lg-- fw__5-- tc__656565--">{{$index + 1}}</span>
+                                                        </td>
+                                                        <!--<td>{{Aitem.DOSfrom| date:'MM-dd-yyyy'}}</td>-->
+                                                        <td>{{Aitem.ServiceCode}}</td>
+                                                        <td>{{Aitem.Quantity}}</td>
+                                                        <td>{{Aitem.Modifiers}}</td>
+                                                        <td>{{Aitem.TotalChargeAmount}}</td>
+                                                        <td>{{Aitem.InsuranceBalance}}</td>
+                                                        <td>{{Aitem.PatientBalance}}</td>
+                                                        <td>{{Aitem.WriteOffAmount}}</td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="position__relative-- height__100-- flex" ng-if="RejctedClaimdetails.length == 0">
+                <div class="adjustable-position">
+                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100-- bg__EBEDEE7D--">
+                        <a><i class="nodata__1-- a2__nodata--1"></i></a>
+                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Claims Yet</h1>
+                        <label class="fs__normal-- fs__lg-- fw__5-- tc__4A4A4A--">There are no claims associated with this payor.</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d__f-- ai__c-- jc__c-- py__5-- bt__DDD--" ng-if="RejctedClaimdetails.length > 100">
+                <div class="EH-pagination">
+                    <uib-pagination total-items="RejctedClaimdetailsCount"
+                                    ng-model="SearchAckmtObj.PageNumber"
+                                    ng-change="SearchAgingRejected(SearchAckmtObj.PageNumber)"
+                                    max-size="5"
+                                    class=""
+                                    items-per-page="100"
+                                    boundary-link-numbers="true"
+                                    rotate="false"></uib-pagination>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="d__f-- fd__c-- height__100-- c__d--">
+        <div class="d__f-- ai__c-- jc__sb-- px__16-- py__8-- bb__e4e4e4-- gap__15--">
+            <div class="d__f-- ai__c-- gap__14--">
+                <h1 class="m__0-- fs__2l-- fw__7-- tc__1D1D1D-- white-nowrap">Claim</h1>
+                <!--<span class=" ml__5--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--">{{RejctedSummarylist.length}}</span>-->
+                <div class="switch__gray-white" ng-if="ClaimSubtabActive ===1 || ClaimSubtabActive === 12">
+                    <div class="switch__btn--" ng-class="ClaimSubtabActive === 1 ? 'active' : ''" ng-click="filtertabs(1,'All',1)">List</div>
+                    <div class="switch__btn--" ng-class="ClaimSubtabActive === 12 ? 'active' : ''" ng-click="navtoSubtabs(12)">Summary</div>
+                </div>
+            </div>
+            <div class="form__group w-300 d__f-- ai__c-- gap__10--">
+                <label class="ws__nowrap--">Claim Search</label>
+                <input class="input__style--2" id="input_claimsearch277" placeholder="Search Claim No." ng-model="SearchAckmtObj.ClaimNumber" ng-enter="SearchPatientwithClaimId(1,'Claims')" />
+            </div>
+        </div>
+        <div class="bb__C8DEDE-- bg__F0F7F7-- px__16-- py__8--">
+            <table class="table tableno-bordered tableno-padding m__0--" id="table_claimsSummary">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="form__group flex">
+                                <label>From Date</label>
+                                <input type="text" id="input_fromdate277" class=" icons-calendar cur-default bg-white"
+                                       ng-model="SearchAckmtObj.FromDate"
+                                       placeholder="MM-DD-YYYY"
+                                       datepickerregpatient readonly />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group flex">
+                                <label>To Date</label>
+                                <input type="text" id="input_todate277" class=" icons-calendar cur-default bg-white"
+                                       ng-model="SearchAckmtObj.ToDate"
+                                       placeholder="MM-DD-YYYY"
+                                       datepickerregpatient
+                                       mindate="{{SearchAckmtObj.FromDate}}" readonly />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group">
+                                <label>Alert Type </label>
+                                <select ng-model="SearchAckmtObj.Type" id="select_providersns"
+                                        ng-options="item.ClaimTypeName as item.ClaimTypeName for item in AlertClaimList">
+                                    <option value="" disabled> Select </option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group">
+                                <label>&nbsp;</label>
+                                <input type="text" placeholder="Search payer..." class="input__style--7" id="input_payername277"
+                                       autocomplete="off"
+                                       name="InsurancePayor"
+                                       ng-model="SearchAckmtObj.PayorObj"
+                                       typeahead-min-length="0"
+                                       typeahead-on-select="ChangeInsurancePayor(SearchAckmtObj.PayorObj)"
+                                       uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                            </div>
+                        </td>
+                        <td>
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5 mt__20--">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsShowAmount">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">Show Money</span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="cur-poiter dis-flex align-items-center grid-gap-5 mt__20--">
+                                <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.IsDOsDate">
+                                <span class="lbl"></span>
+                                <span class="text-s12w500c000 l-h-0 fs-14">DOS Date</span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="d__f-- ai__c-- gap__x--8 mt__20--">
+                                <button class="button__1D5558--o" popover-trigger="outsideClick" popover-class="opfilter-popover m-0" filter-panel popover-placement="auto" popover-append-to-body="true" uib-popover-template="'claimSummaryFilter.html'"><i svg-icon="icon__filter--" size="14" style="color: #1D5558"></i>Filter</button>
+                                <script type="text/ng-template" id="claimSummaryFilter.html">
+                                    <div class="d__f-- fd__c--">
+                                        <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                                            <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                            <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                        </div>
+                                        <div class="two-sections">
+                                            <div class="width__40-- br__DDD-- px__8-- py__3--">
+                                                <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'Billingprovider'">
+                                                    <li data-target="#Billingprovider" data-toggle="tab" ng-click="activeTab = 'Billingprovider'">
+                                                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Billingprovider' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                            <span class="fs__normal-- fs__lg--">Billing Provider</span>
+                                                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                        </div>
+                                                    </li>
+                                                    <li data-target="#Renderingprovider" data-toggle="tab" ng-click="activeTab = 'Renderingprovider'">
+                                                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Renderingprovider' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                                            <span class="fs__normal-- fs__lg--">Rendering  Provider</span>
+                                                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="tab-content flex p__8--">
+                                                <div class="tab-pane fade in active" id="Billingprovider">
+                                                    <div class="d__f-- fd__c-- gap__5--">
+                                                        <div class="section__style--4 d__f-- fd__c--">
+                                                            <div class="section__header-- px__10-- jc__sb--">
+                                                                <h2>Billing Provider</h2>
+                                                            </div>
+                                                            <div class="section__body-- border__E4E4E4--">
+                                                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                                                    <div class="form__group pos-relative">
+                                                                        <select ng-model="SearchAckmtObj.BillingProviderId" id="select_providersns"
+                                                                                ng-options="item.OrganizationBillingProviderId as (item.BillingProviderName + ' - (' + item.OrganizationName + ')') for item in ClaimProviderList">
+                                                                            <option value=""> Select </option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="Renderingprovider">
+                                                    <div class="d__f-- fd__c-- gap__5--">
+                                                        <div class="section__style--4 d__f-- fd__c--">
+                                                            <div class="section__header-- px__10-- jc__sb--">
+                                                                <h2>Rendering Provider</h2>
+                                                            </div>
+                                                            <div class="section__body-- border__E4E4E4--">
+                                                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                                                        <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                                                            {{SearchAckmtObj.SelectRenderingStatusString}}
+                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                <span class="input-group-addon">
+                                                                                    <span class="mainsearch-App">
+                                                                                        <i class="fas fa-search"></i>
+                                                                                    </span>
+                                                                                </span>
+                                                                                <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchtxtb.txt1" />
+                                                                            </div>
+                                                                            <div class="apptsearchdroplist">
+                                                                                <ul>
+                                                                                    <li>
+                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                            <input type="checkbox" class="checkbox" ng-model="SearchAckmtObj.AllRenderingStatusCheck" ng-click="checkAllRendering(SearchAckmtObj.AllRenderingStatusCheck)">
+                                                                                            <span class="lbl"></span>
+                                                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                                                        </label>
+                                                                                    </li>
+                                                                                    <li ng-repeat="item in SearchAckmtObj.RenderingProviderList | filter:{'FullName':searchtxtb.txt1} track by $index">
+                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                            <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="InsuranceRenderingToggle(item);">
+                                                                                            <span class="lbl"></span>
+                                                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                                                                        </label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                            <a class="d__f-- ai__c-- gap__5-- fs__normal-- fs__lg-- fw__5-- tc__1D5558--"><i class="icons__w16-- restore__w16--o" ng-click="refreshDetails()"></i>Reset</a>
+                                            <button class="btn__lg-- btn__1d5558--f" ng-click="SearchAgingRejected()">{{ 'APPLY' | translate}}</button>
+                                        </div>
+                                    </div>
+                                </script>
+                                <button class="btn__sm-- btn__1d5558--f lh__normal--" id="button_applyq" ng-click="SearchAgingRejected()">
+                                    Apply
+                                </button>
+                                <button class="button__1D5558--o" id="buttonreloadq" ng-click="refreshDetails()">
+                                    <i svg-icon="icon__reset--o" size="13" style="color: #000;"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d__f-- fd__c-- gap__6--y p__10-- bg__F7F8FA-- height__100--" ng-if="RejctedSummarylist.length > 0">
+            <div class="d__f-- fd__c-- bg__FFF-- bradius__8-- border__E4E4E4-- overflow-hidden height__100--" ng-class="RejctedClaimdetails.length > 0 ? 'flex__04--' : 'flex__1--'">
+                <!--flex__1-- -->
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll">
+                        <table class="table__style--31" id="table__claimSummary">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th width="17%">PAYER NAME</th>
+                                    <th class="text-center bg__C5EED4-- tc__256F40--">
+                                        <span>Today <span>({{Agingtotals.TotalToday}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__BCE8CA-- tc__27673A--">
+                                        <span>1-3 DAYS <span>({{Agingtotals.Total1to3Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__BCE7B0-- tc__446523--">
+                                        <span>4-7 DAYS <span>({{Agingtotals.Total4to7Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__EFE39A-- tc__6C6116--">
+                                        <span>8-14 DAYS <span>({{Agingtotals.Total8to14Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__EDCA8E-- tc__684915--">
+                                        <span>15-29 DAYS <span>({{Agingtotals.Total15to29Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__EBAE83-- tc__633514--">
+                                        <span>30-44 DAYS <span>({{Agingtotals.Total30to44Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__F49675-- tc__5E2713--">
+                                        <span>45-59 DAYS <span>({{Agingtotals.Total45to59Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__F78464-- tc__571915--">
+                                        <span>60-89 DAYS <span>({{Agingtotals.Total60to89Days}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__DC6868-- tc__161A16--">
+                                        <span>90+ DAYS <span>({{Agingtotals["Total90+Days"]}})</span></span>
+                                    </th>
+                                    <th class="text-center bg__BFDBFE-- tc__1E3A8A--">
+                                        <span>TOTAL <span>({{Agingtotals["TotalDays"]}})</span></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in RejctedSummarylist track by $index">
+                                    <td ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">{{ ((SearchAckmtObj.PageNumber - 1) * SearchAckmtObj.PageSize) + ($index + 1) }}</td>
+                                    <td class="tc__1D1D1D-- fw__6--" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <div class="w__220--">
+                                            <span class="ws__nowrap-- to__ellipsis-- d__b-- o__h--" title="{{item.MasterPayorName}}">{{item.MasterPayorName}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__EDF7EE--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === 'Today' ,'disabled': item['Today'] === 0}"
+                                              ng-mousedown="setAgingDates(item,'Today')">{{item.Today}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__E4F5E1--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '1-3Days','disabled': item['1-3Days'] === 0}" ng-mousedown="setAgingDates(item,'1-3Days')">{{item['1-3Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__F2F8DF--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '4-7Days','disabled': item['4-7Days'] === 0}" ng-mousedown="setAgingDates(item,'4-7Days')">{{item['4-7Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FDF8DB--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '8-14Days','disabled': item['8-14Days'] === 0}" ng-mousedown="setAgingDates(item,'8-14Days')">{{item['8-14Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FEF3D0--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '15-29Days','disabled': item['15-29Days'] === 0}" ng-mousedown="setAgingDates(item,'15-29Days')">{{item['15-29Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FEEAD0--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '30-44Days','disabled': item['30-44Days'] === 0}" ng-mousedown="setAgingDates(item,'30-44Days')">{{item['30-44Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FDE0C8--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '45-59Days','disabled': item['45-59Days'] === 0}" ng-mousedown="setAgingDates(item,'45-59Days')">{{item['45-59Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FDD4C2--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '60-89Days','disabled': item['60-89Days'] === 0}" ng-mousedown="setAgingDates(item,'60-89Days')">{{item['60-89Days']}}</span>
+                                    </td>
+
+                                    <td class="text-center" ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''">
+                                        <span class="digit__box-- box__FCE4E4--" ng-class="{'outline__1D5558--2half oo__2--' : selectedAgingPayorId === item.MasterPayorId && selectedAgingRange === '90+Days','disabled': item['90+Days'] === 0}" ng-mousedown="setAgingDates(item,'90+Days')">{{item['90+Days']}}</span>
+                                    </td>
+                                    <td ng-class="selectedAgingPayorId === item.MasterPayorId ? 'bg__E8F2F2--' : ''" class="tc__1D1D1D-- fw__6-- text-center">{{item.Total}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="d__f-- ai__c-- gap__15-- px__14-- py__7-- bt__E4E4E4-- bg__F9FAFB-- fs__md-- tc__9CA3AF--">
+                    <div>Payers: <b class="tc__1D1D1D--">{{RejctedSummarylist.length}}</b></div>
+                    <div><b class="tc__1D1D1D--">{{Agingtotals["TotalDays"]}} total claims</b></div>
+
+                    <div class="d__f-- ai__c-- gap__10-- ml__auto-- flex__shrink--0">
+                        <span>
+                            <b class="tc__1D1D1D--">
+                                {{ startRecord }}–{{ endRecord }}
+                            </b>
+                            of
+                            <b class="tc__1D1D1D--">
+                                {{ RejctedSummaryCount }}
+                            </b>
+                        </span>
+                        <button class="btn__arrow--"
+                                ng-class="{ 'disabled': SearchAckmtObj.PageNumber === 1 }"
+                                ng-disabled="SearchAckmtObj.PageNumber === 1"
+                                ng-click="changePage(SearchAckmtObj.PageNumber - 1)">
+                            <i svg-icon="icon__arrow--" size="10"
+                               style="color: #4B5563; transform: scaleX(-1)"></i>
+                        </button>
+
+                        <button class="btn__arrow--"
+                                ng-class="{ 'disabled': endRecord >= RejctedSummaryCount }"
+                                ng-disabled="endRecord >= RejctedSummaryCount"
+                                ng-click="changePage(SearchAckmtObj.PageNumber + 1)">
+                            <i svg-icon="icon__arrow--" size="10"
+                               style="color: #4B5563;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- bradius__8-- border__C8DEDE-- boxs__1D5558-- overflow-hidden bg__FFF-- height__100--" ng-if="RejctedClaimdetails.length > 0">
+                <div class="d__f-- ai__c-- jc__sb-- px__14-- py__8-- bg__F0F7F7-- bb__C8DEDE--">
+                    <div class="d__f-- ai__c-- gap__8-- fs__md-- fw__7-- tc__1D5558--">
+                        <i svg-icon="icon__leftalignlist--" size="10" style="color: #4B5563"></i>
+                        <span>{{ClaimdetailsObj.PayorName}} · {{ClaimdetailsObj.Range}}</span>
+                        <span class="py__2-- px__8-- bradius__99-- fs__xs-- fw__7-- tc__FFFFFF-- bg__1D5558--">{{RejctedClaimdetailsCount}} claims</span>
+                    </div>
+                    <div class="d__f-- ai__c-- gap__6--">
+                        <div class="position__relative-- p__2--">
+                            <a class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" ng-click="excelExports()"><i svg-icon="icon__download--" size="14" style="color: #6A7282"></i></a>
+                            <span class="p__3-- top_ bg__C71D27-- bradius__10-- position__absolute-- top__0-- right__0--"></span>
+                        </div>
+                        <button class="button__1D5558--o" ng-click="ClickForExceldData(SearchAckmtObj.Type)">Export to Excel</button>
+                        <button class="button__1D5558--o" id="button_applyq" ng-click="ClickForPrintdData()">Print</button>
+                        <button class="button__DC2626--o" ng-click="ClearSelectedData()"><i svg-icon="icon__cross--" size="10" style="color: #dc2626;"></i>Close</button>
+                    </div>
+                </div>
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll overflow__auto--x">
+                        <table class="table__style--31" id="table__claimSummarymedicare">
+                            <thead>
+                                <tr>
+                                    <th width="2%" class="position__sticky-- left__0-- z-index-five"></th>
+                                    <th width="3%" class="position__sticky-- left__45-- z-index-five">S. No</th>
+                                    <th class="position__sticky-- z-index-five left__103-- br__E4E4E4--">Patient Name</th>
+                                    <th>Claim No.</th>
+                                    <th>Patient MR No</th>
+                                    <th>DOS</th>
+                                    <th>Claim amount</th>
+                                    <th>User</th>
+                                    <th>Billing provider</th>
+                                    <th>Bill prov npi</th>
+                                    <th>Rendering provider name</th>
+                                    <th>Ren prov npi</th>
+                                    <th>Status description</th>
+                                    <th>File name</th>
+                                    <th class="min__w60-- position__sticky-- z-index-five bl__E4E4E4--" ng-class="ClaimdetailsObj.Type=='Denial Followup' ? 'right__73--' : 'right__0--'">Action</th>
+                                    <th class="min__w60-- position__sticky-- z-index-five right__0--" ng-if="ClaimdetailsObj.Type=='Denial Followup'">Adj Req</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="item in RejctedClaimdetails track by $index">
+                                <tr>
+                                    <td class="min__w20-- position__sticky-- z-index-four bl__E4E4E4-- left__0--" ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">
+                                        <a href="javascript:;" ng-click="openAccordianItem(item)">
+                                            <i class="icons__w16-- arrowrightfill__w16--l" ng-class="item.isOpen ? 'icon__flip--90' : ''"></i>
+                                        </a>
+                                    </td>
+                                    <td class="min__w20-- position__sticky-- z-index-four left__45--" ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{ ((ClaimPagination.PageNumber - 1) * ClaimPagination.PageSize) + ($index + 1) }}</td>
+                                    <td class="tc__1D5558-- fw__6-- hover__underline-- c__p-- min__w100-- position__sticky-- z-index-four left__103-- br__E4E4E4--" ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.PatientFullName}}</td>
+                                    <td class="tc__1D5558-- fw__6-- hover__underline-- c__p--" ng-click="navtoClaimSummaryPopup(item)" ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.PatientClaimNumber}}</td>
+                                    <td class="tc__1D1D1D-- fw__6--" ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.PatientMRNo}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.DOSFrom| date:'MM-dd-yyyy'}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.TotalClaimAmount}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.ClaimCreatedBy}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.BillingProviderName}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.BillingProviderNPI}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.RenderingProviderName}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''">{{item.RenderingProviderNPI}}</td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''"><span class="no-wrapappt w__150--">{{item.StatusDescription}}</span></td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''"><span class="no-wrapappt w__150--">{{item.FileName}}</span></td>
+                                    <td class="min__w60-- bl__E4E4E4-- position__sticky-- z-index-four"
+                                        ng-class="[item.isOpen ? 'bg__FCFAF5-- bb__none--' : '', ClaimdetailsObj.Type == 'Denial Followup' ? 'right__73--' : 'right__0--']">
+                                        <a href="javascript:;" uib-tooltip="Claim Lifecycle" tooltip-append-to-body="true" tooltip-placement="auto" ng-click="navtoClaimSummaryPopup(item, 'ClaimlifeCycle')">
+                                            <i class="icons__w18-- circular-arrow--"></i>
+                                        </a>
+                                    </td>
+                                    <td ng-class="item.isOpen ? 'bg__FCFAF5-- bb__none--' : ''" class="position__sticky-- right__0-- z-index-four" ng-if="ClaimdetailsObj.Type=='Denial Followup'">
+                                        <a class="light-icon d__b--" uib-tooltip="Adjustment request" tooltip-append-to-body="true" tooltip-placement="auto" ng-click="navtoOpenDenialpopupmanagement(item)"><i class="icons__w16-- drawarrowbox__w16--l"></i></a>
+                                    </td>
+                                </tr>
+                                <tr ng-show="item.isOpen">
+                                    <td class="px__35-- py__12-- bg__FCFAF5--" ng-attr-colspan="{{ ClaimdetailsObj.Type =='Denial Followup' ? 16 : 15 }}">
+                                        <table class="table__style--31 border__E4E4E4-- boxs__0000001A--br10">
+                                            <thead>
+                                                <tr>
+                                                    <th width="3%">S.No.</th>
+                                                    <th>CPT</th>
+                                                    <th>Units</th>
+                                                    <th>Modifiers</th>
+                                                    <th>Charge Amt</th>
+                                                    <th>Insurance Bls</th>
+                                                    <th>Patient Bls</th>
+                                                    <th>WriteOff Amt</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="Aitem in item.PatientClaimLineItems track by $index">
+                                                    <td class="bg__FFF--">{{$index + 1}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.ServiceCode}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.Quantity}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.Modifiers}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.TotalChargeAmount}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.InsuranceBalance}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.PatientBalance}}</td>
+                                                    <td class="bg__FFF--">{{Aitem.WriteOffAmount}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="d__f-- ai__c-- gap__20-- px__14-- py__7-- bt__E4E4E4-- bg__F9FAFB-- fs__md-- tc__9CA3AF--">
+                    <div>Claims: <b class="tc__1D1D1D--">{{RejctedClaimdetails.length}}</b></div>
+                    <div>Total Billed: <b class="tc__1D1D1D--">${{ClaimsTotalAmount}}</b></div>
+                    <div>Ins.Balance: <b class="tc__1D1D1D--">${{ClaimsInsuranceBalance}}</b></div>
+                    <div class="d__f-- ai__c-- gap__10-- ml__auto-- flex__shrink--0">
+                        <span>
+                            <b class="tc__1D1D1D--">
+                                {{ claimStart   }}–{{ claimEnd   }}
+                            </b>
+                            of
+                            <b class="tc__1D1D1D--">
+                                {{ RejctedClaimdetailsCount }}
+                            </b>
+                        </span>
+                        <button class="btn__arrow--"
+                                ng-class="{ 'disabled': ClaimPagination.PageNumber === 1 }"
+                                ng-disabled="ClaimPagination.PageNumber === 1"
+                                ng-click="changeClaimPage(ClaimPagination.PageNumber - 1,ClaimdetailsObj,ClaimdetailsObj.Range)">
+                            <i svg-icon="icon__arrow--" size="10"
+                               style="color: #4B5563; transform: scaleX(-1)"></i>
+                        </button>
+
+                        <button class="btn__arrow--"
+                                ng-class="{ 'disabled': claimEnd  >= RejctedClaimdetailsCount }"
+                                ng-disabled="claimEnd  >= RejctedClaimdetailsCount"
+                                ng-click="changeClaimPage(ClaimPagination.PageNumber + 1,ClaimdetailsObj,ClaimdetailsObj.Range)">
+                            <i svg-icon="icon__arrow--" size="10"
+                               style="color: #4B5563;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="position__relative-- height__100--" ng-if="RejctedSummarylist.length == 0">
+            <div class="adjustable-position">
+                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100-- bg__EBEDEE7D--">
+                    <a><i class="nodata__1-- a2__nodata--1"></i></a>
+                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Claims Yet</h1>
+                    <label class="fs__normal-- fs__lg-- fw__5-- tc__4A4A4A--">There are no claims associated with this patient.</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="ClaimAgingReport" style="display:none;">
+        <div style="border: 1px solid #ccc; padding: 20px; width: 800px; margin: auto;background: #fff;">
+            <!--<img src="assertus-logo.png" height="40">--><br>
+            <img src="{{HospitalAddressArray.OrganizationBase64}}" height="40"><br>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr>
+                    <td>
+                        <div style="display:flex; justify-content:space-between;align-items:end; width:100%">
+                            <span style="font-size:20px; font-weight:700">{{ClaimdetailsObj.Type}}</span>
+                            <table style="border: 1px solid #1D1D1D">
+                                <tbody>
+                                    <tr>
+                                        <td style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 400; line-height: normal; border-bottom: 1px solid #1D1D1D; padding: 5px ">
+                                            Total of claims: <b style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 600; line-height: normal;">{{ClaimdetailsObj.Count}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 400; line-height: normal; padding: 5px">Total of Charge: <b style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 600; line-height: normal;">${{ClaimdetailsObj.TotalAmount| number:2}}</b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+                <tbody>
+                    <tr>
+                        <td width="50%" style="color: #000; font-family: Inter; font-size: 14px; font-style: italic; font-weight: 700; line-height: 10px; /* 111.111% */ letter-spacing: 0.211px;">{{ClaimdetailsObj.PayorName}} {{ClaimdetailsObj.Range}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; table-layout:fixed;">
+                <thead>
+                    <tr>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:15%;">Provider</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">Claim No</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:20%">Patient Name & MRN</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:11%">Service Date</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">Charges</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">User</th>
+                        <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:25%;">File</th>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="item in PrintRejctedClaimdetails">
+                    <tr>
+                        <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.BillingProviderName}}</td>
+                        <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.PatientClaimNumber}}</td>
+                        <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                            <span style="display: block">{{item.PatientMRNo}}</span>
+                            {{item.PatientFullName}}
+                        </td>
+                        <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                            {{item.DOSFrom| date:'MM-dd-yyyy'}}
+                        </td>
+                        <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                            ${{item.TotalClaimAmount| number:2}}
+                        </td>
+                        <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.ClaimCreatedBy}}</td>
+                        <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px; word-break: break-all; ">{{item.FileName}}</td>
+                    </tr>
+                </tbody>
+
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td colspan="3" style="color: #1D1D1D; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 600; line-height: normal; padding: 6px 4px ">{{ClaimdetailsObj.Count}} Claims</td>
+                        <td colspan="3" style="color: #1D1D1D; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 600; line-height: normal; padding: 6px 4px">${{ClaimdetailsObj.TotalAmount| number:2}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+
+</div>

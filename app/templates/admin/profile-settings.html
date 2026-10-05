@@ -1,0 +1,206 @@
+ <div class="profile-settings">
+    <div class="row">
+        <div class="col-md-3">
+            <section class="tile tile-shadow m-b-0" ng-hide="subOrganizationGroupsArray.length == 0">
+                <div class="tile-header">
+                    <h1> {{ 'LISTOFPROFILEROLES' | translate}}</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form__group m-b-0">
+                                <input type="text" name="search" class="icons-search" placeholder="{{ 'SEARCHBYGROUPBYPROFILEORGROUPNAME' | translate}}" ng-model="searchBy" id="searchbyId">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div ng-show="(subOrganizationGroupsArray | filter:{ GroupName: searchBy }).length === 0">
+                                <div class="billing-cominsoon">
+                                    <img src="img/no-data/no-settings.png" width="150">
+                                    <div class="msg">                                   
+                                        <p class="no-records-txt-line2">
+                                            {{ 'NODATAFOUND' | translate}}.....!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pro-list headermainscroll" ng-if="subOrganizationGroupsArray.length > 0" ng-style="heightBBG()" resize>
+                                <ul>
+
+                                    <li ng-repeat="roles in subOrganizationGroupsArray | filter:{'Active':'Y'}"
+                                        data-roleid="{{roles.RoleID}}"
+                                        data-groupname="{{roles.GroupName}}">
+                                        <h5 ng-bind="roles.RoleDesc"></h5>
+                                        <div class="pro-list-action">
+                                            <p ng-bind="roles.GroupName"></p>
+
+                                            <div class="pl-button" ng-show="SuperAdminAccess.ManageProfilesTabAccess">
+                                                <a href="javascript:;"
+                                                   class="i-edit"
+                                                   data-tooltip="Edit"
+                                                   ng-click="(roles.RoleID == 4 ||roles.RoleID == 43) && roles.GroupName == 'Administrator' ?angular.noop():editGroupProfile(roles)"
+                                                   ng-class="{'op-0-5 DisableDiv':(roles.RoleID == 4||roles.RoleID == 43) && roles.GroupName == 'Administrator'}"></a>
+
+
+                                                <a class="cur-poiter m-l-10" alt="delete" uib-tooltip="Delete" ng-click="confirmDeleteProfile(roles)">
+                                                    <img width="17" src="img/ico-delete-red.svg">
+                                                </a>
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- / -->
+                        </div>
+                    </div>
+                </div>
+               
+            </section>
+            <!--<section class="tile tile-shadow" ng-if="subOrganizationGroupsArray.length == 0">
+                <div class="tile-header">
+                    <h1>List Of Profile Roles</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="row" ng-if="subOrganizationGroupsArray.length == 0">
+                        <div class="col-lg-12">
+                            <div class="billing-cominsoon">
+                                <img src="img/no-data/no-settings.png" width="150">
+                                <div class="msg">
+                                    <p class="goback-text">No Profile Roles available</p>
+                                    <p class="no-records-txt-line2">
+                                        Try using a different criteria to view better results.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </section>-->
+            
+        </div>
+        <div class="col-md-9 pl-0">
+            <section class="tile tile-shadow">
+                <div class="tile-header">
+                    <h1 ng-if="!edit_status"> {{ 'ADDNEWPROFILE' | translate}}</h1>
+                    <h1 ng-if="edit_status">{{ 'UPDATEPROFILE' | translate}}</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form__group">
+                                <label>{{ 'ROLENAME' | translate}}</label>
+                                <select id="dropdownroleId"
+                                        data-ng-model="Groupobj.SelectedRoleId"
+                                        name="role"
+                                        ng-change="ChangeAccessRights(Groupobj.SelectedRoleId)">
+                                    <option value="">{{ 'SELECTROLE' | translate}}</option>
+                                    <option ng-repeat="roles in RoleList" value="{{roles.RoleId}}">{{roles.RoleName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form__group">
+                                <label> {{ 'GROUPNAME' | translate}}</label>
+                                <input type="text" name="group" ng-model="Groupobj.Name" placeholder="{{ 'EGDUTYDOCTOR' | translate}}">
+                            </div>
+                        </div>
+                        <div class="col-md-2 mt__18--">
+                            <button class="btn__lg-- btn__1d5558--f " ng-click="addUpdateGroupAccess(Groupobj.SelectedRoleId)" ng-if="!edit_status">{{ 'ADD' | translate}}</button>
+                            <!--<button class="action-primary pull-right " ng-if="edit_status" ng-click="addUpdateGroupAccess()">UPDATE</button>-->
+                            <button class="btn__lg-- btn__1d5558--f" ng-if="edit_status" ng-click="addUpdateGroupAccess(Groupobj.SelectedRoleId)">{{ 'UPDATE' | translate}}</button>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                </div>
+            </section>
+            <section class="tile tile-shadow m-b-0">
+                <div class="tile-header">
+                    <h1>{{ 'UPDATEPROFILE' | translate}}</h1>
+                    <ul class="controls">
+                        <li ng-if="selectAllRightsStatus">
+                            <a class="text-success fs-13 lin-hig-27" href="" ng-click="selectAllRights()">{{ 'SELECTALL' | translate}}</a>
+                        </li>
+                        <li ng-if="!selectAllRightsStatus">
+                            <a class="text-warning fs-13 lin-hig-27" href="" ng-click="deselectAllRights()">{{ 'DESELECTALL' | translate}}</a>
+                        </li>
+                        <li>
+                            <a class="text-info fs-13 lin-hig-27" href="" value="Reset" ng-click="resetRoleItems()">{{ 'RESET' | translate}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightBOO()" resize>
+                    <div class="row">
+                        <div class="col-md-4 access-list" ng-repeat="item in AccessrightsList track by $index">
+                            <div class="sel-settings">
+                                <div class="checkbox cn pull-left">
+                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                        <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="item.isAllCategoryItemsSelected"
+                                               ng-change="CheckAllCatergoryItems(item)">
+                                        <span class="lbl"></span>
+                                        <span class="fs__md-- fw__4-- tc__1D1D1D-- ws__nowrap--">{{item.MainAccessCategoryName}} - {{item.SubAccessCategoryName}}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <ul class="chec-list">
+                                
+                                <li class="clearfix" ng-repeat="subitem in item.AccessList track by $index">
+                                      <div class="checkbox cn pull-left">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input name="checkbox-2" type="checkbox" class="checkbox" ng-model="subitem.ActiveInd"
+                                                    ng-true-value="'Y'"
+                                                    ng-false-value="'N'"
+                                                    ng-change="CheckIndividualItem(subitem,item)" >
+                                                <span class="lbl"></span>
+                                                <span class="fs__md-- fw__4-- tc__656565--" ng-bind="subitem.AccessRightName"></span>
+                                            </label>
+                                      </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                    <div ng-if="AccessrightsList.length==0">
+                        <div class="clearfix"></div>
+                        <div class="row">
+                            <div class="col-lg-12 text-center">
+                                <div class="billing-cominsoon">
+                                    <img src="img/no-data/no-results.png" />
+                                    <div class="msg">
+                                        <p class="goback-text">{{ 'SELECTAROLETOVIEWDATA' | translate}}</p>
+                                        <p class="no-records-txt-line2">
+                                            {{ 'NODATAROLEAVAILBLEWITHSELECTEDDATES' | translate}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" ng-show="newDeleteRolepupop"></div>
+<div class="modal-common" ng-show="newDeleteRolepupop" id="chekin">
+    <div class="modal-common-dialog pup-500">
+        <div class="model-popup-header">
+            <h4 class="modal-title" id="myModalLabel">
+                <img src="images/warning-icon.png" class="warning-img">Warning
+            </h4>
+        </div>
+        <div class="chout-msg">
+            <p>You are now attempting to delete user role permanently from the system. As a result, the users assigned in this role will be unable to access the system.</p>
+        </div>
+        <div class="chout-msg">
+            <p class="pt-5">Are you sure you want to delete the role permanently ?</p>
+        </div>
+        <div class="text-center">
+            <a ng-click="newDeletepupopCancel()" class="btn warning-btn mb-10">No</a>
+            <a ng-click="newDeletepupopOk()" class="btn primary-btn mb-10">Yes</a>
+        </div>
+    </div>
+</div>

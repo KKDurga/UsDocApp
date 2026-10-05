@@ -1,0 +1,330 @@
+﻿<div class="modal-header bg__F5F5F5--">
+    <div class="d__f-- ai__c-- jc__sb-- width__100--">
+        <h3 class="modal-title fs__xl-- fw__6-- tc__1D1D1D-- m__0--">
+            <i class="icons__w20-- email-item-list mr__5--"></i>
+            Send Invoice via Email
+        </h3>
+        <a class="c__p--" ng-click="cancel()" tooltip-placement="left" uib-tooltip="Close">
+            <i class="icons__w20-- close__w20--o"></i>
+        </a>
+    </div>
+</div>
+
+<div class="modal-body p__15--">
+
+    <div class="d__f-- fd__c-- gap__15--y">
+
+        <!-- ══════════════ Section 1: Patient Info ══════════════ -->
+        <section class="section__style--4">
+            <div class="section__header--">
+                <h2>Patient Information</h2>
+            </div>
+            <div class="section__body--">
+                <div class="three-sections gap-y-20">
+
+                    <div class="vs__list--">
+                        <label class="fs__md-- fw__7-- tc__4A4A4A--">Patient Name</label>
+                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">
+                            {{InvoiceObj.PatientFirstName}} {{InvoiceObj.PatientLastName}}
+                        </span>
+                    </div>
+
+                    <div class="vs__list--">
+                        <label class="fs__md-- fw__7-- tc__4A4A4A--">MR No</label>
+                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{InvoiceObj.PatientMrNo}}</span>
+                    </div>
+
+                    <div class="vs__list--">
+                        <label class="fs__md-- fw__7-- tc__4A4A4A--">Mobile</label>
+                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{InvoiceObj.PatientPhone}}</span>
+                    </div>
+
+                    <!-- Email is editable -->
+                    <div class="vs__list-- width-100">
+                        <div class="form__group">
+                            <label class="fs__md-- fw__7-- tc__4A4A4A--">
+                                Patient Email <em class="tc__C71D27--">*</em>
+                            </label>
+                            <input type="email"
+                                   ng-model="InvoiceObj.PatientEmail"
+                                   placeholder="patient@example.com"
+                                   class="form__control"
+                                   ng-class="{'border__C71D27--': ValidationErrors.PatientEmail}" />
+                            <small ng-if="ValidationErrors.PatientEmail" class="tc__C71D27-- fs__sm--">
+                                {{ValidationErrors.PatientEmail}}
+                            </small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════ Section 2: Invoice Settings ══════════════ -->
+        <section class="section__style--4">
+            <div class="section__header--">
+                <h2>Invoice Settings</h2>
+            </div>
+            <div class="section__body--">
+                <div class="three-sections gap-y-20">
+
+                    <div class="vs__list--">
+                        <div class="form__group">
+                            <label class="fs__md-- fw__7-- tc__4A4A4A--">
+                                Payment Terms <em class="tc__C71D27--">*</em>
+                            </label>
+                            <select ng-model="InvoiceObj.PaymentTerms"
+                                    ng-options="opt.value as opt.label for opt in PaymentTermsOptions"
+                                    class="form__control">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="vs__list--">
+                        <div class="form__group">
+                            <label class="fs__md-- fw__7-- tc__4A4A4A--">Order Description</label>
+                            <input type="text"
+                                   ng-model="InvoiceObj.OrderDescription"
+                                   placeholder="Brief description for invoice"
+                                   maxlength="255"
+                                   class="form__control" />
+                        </div>
+                    </div>
+
+                    <div class="vs__list--">
+                        <label class="fs__md-- fw__7-- tc__4A4A4A--">Payment Methods Allowed</label>
+                        <div class="d__f-- gap__10--x mt__5--">
+                            <div class="checkbox cn m__0--">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-model="PaymentMethods.cc"
+                                           ng-change="UpdatePaymentMethods()">
+                                    <span class="checkbox-material"><span class="check"></span></span>
+                                    <small class="fs__md-- fw__5--">Credit Card</small>
+                                </label>
+                            </div>
+                            <div class="checkbox cn m__0--">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-model="PaymentMethods.ck"
+                                           ng-change="UpdatePaymentMethods()">
+                                    <span class="checkbox-material"><span class="check"></span></span>
+                                    <small class="fs__md-- fw__5--">Check</small>
+                                </label>
+                            </div>
+                            <div class="checkbox cn m__0--">
+                                <label>
+                                    <input type="checkbox"
+                                           ng-model="PaymentMethods.cs"
+                                           ng-change="UpdatePaymentMethods()">
+                                    <span class="checkbox-material"><span class="check"></span></span>
+                                    <small class="fs__md-- fw__5--">Cash</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════ Section 3: Line Items ══════════════ -->
+        <section class="section__style--4">
+            <div class="section__header--">
+                <h2>
+                    Line Items
+                    <span class="ml__5-- fs__md-- fw__5-- tc__656565--">
+                        ({{InvoiceObj.LineItems.length}})
+                    </span>
+                </h2>
+                <ul class="flex-flow-list mr-10">
+                    <li ng-if="AllowEditLineItems">
+                        <a class="dis-flex text-ehnote text-s12w500c000 dis-flex align-items-center grid-gap-5"
+                           ng-click="AddCustomLineItem()">
+                            <i class="icons__w16-- addbox__w16--o"></i>
+                            Add Custom Item
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="section__body--">
+
+                <table class="table__style--5" ng-if="InvoiceObj.LineItems.length > 0">
+                    <thead>
+                        <tr>
+                            <th width="4%"><label>S.No</label></th>
+                            <th width="16%"><label>{{SourceType == 'POS' ? 'Product Code' : 'CPT'}}</label></th>
+                            <th><label>Description</label></th>
+                            <th width="8%"><label>Qty</label></th>
+                            <th width="10%"><label>Unit Cost</label></th>
+                            <th width="10%"><label>Total</label></th>
+                            <th width="8%" ng-if="AllowEditLineItems"><label>Action</label></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="li in InvoiceObj.LineItems track by $index"
+                            ng-if="li.DeleteInd !== 'Y'">
+
+                            <td><span class="fs__lg-- fw__5-- tc__1D1D1D--">{{$index + 1}}</span></td>
+
+                            <td>
+                                <input ng-if="AllowEditLineItems"
+                                       type="text"
+                                       ng-model="li.ProductCode"
+                                       placeholder="Code"
+                                       class="form__control" />
+                                <span ng-if="!AllowEditLineItems" class="fs__lg-- fw__5-- tc__1D1D1D--">
+                                    {{li.ProductCode || li.CPTCode}}
+                                </span>
+                            </td>
+
+                            <td>
+                                <input ng-if="AllowEditLineItems"
+                                       type="text"
+                                       ng-model="li.ProductDescription"
+                                       placeholder="Description"
+                                       class="form__control" />
+                                <span ng-if="!AllowEditLineItems" class="fs__lg-- fw__5-- tc__1D1D1D--">
+                                    {{li.ProductDescription}}
+                                </span>
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       ng-model="li.Quantity"
+                                       numbers-only
+                                       maxlength="6"
+                                       ng-change="RecalculateLineItem(li)"
+                                       class="form__control text-center" />
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       ng-model="li.UnitCost"
+                                       numbersdots-only
+                                       validtwodecimal-number
+                                       maxlength="10"
+                                       ng-change="RecalculateLineItem(li)"
+                                       class="form__control" />
+                            </td>
+
+                            <td>
+                                <span class="fs__lg-- fw__6-- tc__1D1D1D--">
+                                    ${{(li.TotalAmount || 0) | number:2}}
+                                </span>
+                            </td>
+
+                            <td ng-if="AllowEditLineItems">
+                                <a ng-click="RemoveLineItem(li, $index)"
+                                   tooltip-placement="top" uib-tooltip="Remove">
+                                    <i class="icons__w16-- delete__w16--o"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="{{AllowEditLineItems ? 5 : 4}}" class="text-right">
+                                <b class="fs__lg-- fw__7-- tc__1D1D1D--">Subtotal:</b>
+                            </td>
+                            <td colspan="{{AllowEditLineItems ? 2 : 1}}">
+                                <span class="fs__lg-- fw__7-- tc__1D1D1D--">
+                                    ${{(InvoiceObj.SubTotalAmount || 0) | number:2}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr ng-if="InvoiceObj.TaxAmount > 0">
+                            <td colspan="{{AllowEditLineItems ? 5 : 4}}" class="text-right">
+                                <b class="fs__md-- fw__5-- tc__656565--">Tax:</b>
+                            </td>
+                            <td colspan="{{AllowEditLineItems ? 2 : 1}}">
+                                <span class="fs__md-- fw__5-- tc__656565--">
+                                    ${{(InvoiceObj.TaxAmount || 0) | number:2}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr ng-if="InvoiceObj.DiscountAmount > 0">
+                            <td colspan="{{AllowEditLineItems ? 5 : 4}}" class="text-right">
+                                <b class="fs__md-- fw__5-- tc__656565--">Discount:</b>
+                            </td>
+                            <td colspan="{{AllowEditLineItems ? 2 : 1}}">
+                                <span class="fs__md-- fw__5-- tc__656565--">
+                                    -${{(InvoiceObj.DiscountAmount || 0) | number:2}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="bg__1D55581A--">
+                            <td colspan="{{AllowEditLineItems ? 5 : 4}}" class="text-right">
+                                <b class="fs__xl-- fw__7-- tc__1D1D1D--">Total Invoice Amount:</b>
+                            </td>
+                            <td colspan="{{AllowEditLineItems ? 2 : 1}}">
+                                <span class="fs__xl-- fw__7-- tc__1D5558--">
+                                    ${{(InvoiceObj.InvoiceAmount || 0) | number:2}}
+                                </span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- Empty state -->
+                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y py__20--"
+                     ng-if="InvoiceObj.LineItems.length == 0">
+                    <a><i class="nodata__1-- e2__nodata--1"></i></a>
+                    <label class="fs__lg-- fw__5-- tc__4A4A4A--">No line items added</label>
+                    <button class="btn__lg-- btn__1d5558--o"
+                            ng-if="AllowEditLineItems"
+                            ng-click="AddCustomLineItem()">
+                        <i class="icons__w16-- add__w16--o"></i> Add Line Item
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ══════════════ Section 4: Notes (optional) ══════════════ -->
+        <section class="section__style--4">
+            <div class="section__header--">
+                <h2>Additional Notes</h2>
+            </div>
+            <div class="section__body--">
+                <div class="form__group">
+                    <textarea ng-model="InvoiceObj.Notes"
+                              placeholder="Optional notes that will appear on the invoice"
+                              rows="2"
+                              maxlength="500"
+                              class="form__control"></textarea>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+<div class="modal-footer bg__F5F5F5--">
+    <div class="d__f-- ai__c-- jc__sb-- width__100--">
+
+        <div class="d__f-- ai__c-- gap__10--">
+            <small class="tc__656565-- fs__sm--">
+                <i class="icons__w14-- info__w14--o"></i>
+                Patient will receive an email with a secure payment link
+            </small>
+        </div>
+
+        <div class="d__f-- ai__c-- gap__10--x">
+            <button class="btn__lg-- btn__C71D27--o"
+                    ng-click="cancel()"
+                    ng-disabled="IsSending">
+                Cancel
+            </button>
+            <button class="btn__lg-- btn__1d5558--f"
+                    ng-click="SendInvoice()"
+                    ng-disabled="IsSending || InvoiceObj.LineItems.length == 0">
+                <i class="icons__w16--"
+                   ng-class="IsSending ? 'spinner__w16--o' : 'email-item-list'"></i>
+                {{IsSending ? 'Sending...' : 'Send Invoice'}}
+            </button>
+        </div>
+
+    </div>
+</div>

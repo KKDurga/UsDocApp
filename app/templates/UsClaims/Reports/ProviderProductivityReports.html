@@ -1,0 +1,203 @@
+<div class="d__f-- fd__c-- gap__12-- height__100--" ng-controller="USProviderProductivityCtrl">
+
+    <ul class="tab__style--2">
+        <li ng-class="{'active': PPTab == 'daily'}"><a href="javascript:;" ng-click="switchPPTab('daily')">Daily</a></li>
+        <li ng-class="{'active': PPTab == 'weekly'}"><a href="javascript:;" ng-click="switchPPTab('weekly')">Weekly</a></li>
+        <li ng-class="{'active': PPTab == 'monthly'}"><a href="javascript:;" ng-click="switchPPTab('monthly')">Monthly</a></li>
+        <li ng-class="{'active': PPTab == 'scoreboard'}"><a href="javascript:;" ng-click="switchPPTab('scoreboard')">Scoreboard</a></li>
+    </ul>
+
+    <!-- filters -->
+    <div class="border__E4E4E4-- bradius__8-- p__10-- bg__FFFFFF--">
+        <div class="d__f-- ai__fe-- gap__10-- flex__wrap--">
+            <div class="form__group m__0--">
+                <label>From Date</label>
+                <input type="text" ng-model="PPFilterObj.FromDate" datepicker-manual-and-cal-selection />
+                <i class="icons__w16-- calender__w16--o position__absolute-- top-30 right-5"></i>
+            </div>
+            <div class="form__group m__0--">
+                <label>To Date</label>
+                <input type="text" ng-model="PPFilterObj.ToDate" datepicker-manual-and-cal-selection mindate="PPFilterObj.FromDate" />
+                <i class="icons__w16-- calender__w16--o position__absolute-- top-30 right-5"></i>
+            </div>
+
+            <div class="form__group m__0--">
+                <label>Provider Type</label>
+                <select id="pp__providerType--"
+                        ng-model="PPFilterObj.ProviderTypeId"
+                        ng-change="onPPProviderTypeChange()"
+                        ng-options="type.Id as type.Name for type in PPProviderTypeList">
+                    <option value="">All Provider Types</option>
+                </select>
+            </div>
+
+            <div class="form__group m__0--">
+                <label>Location</label>
+                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                    <button class="form__control text-left" type="button" id="pp__location--" data-toggle="dropdown" title="{{selectedPPLocationText}}">
+                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                        {{selectedPPLocationText}}
+                    </button>
+                    <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" ng-click="stopClosingDropDown($event)">
+                        <div class="p-5">
+                            <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="PPSearchLocation" />
+                        </div>
+                        <div class="drop-menu-Scroll apptsearchdroplist">
+                            <ul>
+                                <li class="border-right">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input type="checkbox" ng-model="PPAllLocationsCheck" ng-click="PPcheckAllLocations(PPAllLocationsCheck)">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small>All Locations</small>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li ng-repeat="item in PPLocationChecklist | filter:{'BranchName':PPSearchLocation}">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input type="checkbox" ng-model="item.IsChecked" ng-click="PPLocationToggle()">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small ng-bind="item.BranchName"></small>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form__group m__0--">
+                <label>{{ 'DOCTORS' | translate}}</label>
+                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                    <button class="form__control text-left" type="button" id="pp__doctor--" data-toggle="dropdown" title="{{selectedPPDoctorText}}">
+                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                        {{selectedPPDoctorText}}
+                    </button>
+                    <div class="dropdown-menu dr-drop-app right-0 overflow-hidden" role="menu" ng-click="stopClosingDropDown($event)">
+                        <div class="p-5">
+                            <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="PPSearchDoctor" />
+                        </div>
+                        <div class="drop-menu-Scroll apptsearchdroplist">
+                            <ul>
+                                <li class="border-right">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input type="checkbox" ng-model="PPAllDoctorsCheck" ng-click="PPcheckAllDoctors(PPAllDoctorsCheck)">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small>All Providers</small>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li ng-repeat="item in PPDoctorChecklist | filter:{'FullName':PPSearchDoctor} | filter:ppDoctorMatchesType">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input type="checkbox" ng-model="item.isChecked" ng-click="PPDoctorToggle()">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small ng-bind="item.FullName"></small>
+                                            <small class="tc__757575--"> ({{item.ProviderTypeName}})</small>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d__f-- ai__c-- gap__10--">
+                <button class="btn__xl-- btn__1d5558--f" ng-click="ApplyPPFilters()"><i class="action__icons--1 action__search--"></i>{{'SEARCH' | translate}}</button>
+                <button class="btn__xl-- btn__C71D27--o" ng-click="exportProviderProductivityToExcel()">Export to Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning m__0--" ng-show="PPSampleMode">
+        <b>Sample data.</b> Demo figures for reviewing the layout &mdash; not real productivity numbers. Click Search to load live data.
+    </div>
+
+    <!-- KPI tiles -->
+    <ul class="d__f-- ai__c-- gap__10-- list__unstyled-- m__0--">
+        <li class="width__100--" ng-repeat="kpi in PPKpis">
+            <div class="dashbord-box" ng-style="{'border-left': '5px solid #' + kpi.accent}">
+                <label class="fs__lg-- fw__6-- tc__757575-- lh__normal--">{{kpi.label}}</label>
+                <span class="fs__2l-- fw__7-- lh__normal--" ng-style="{'color': '#' + kpi.accent}">{{kpi.value}}</span>
+            </div>
+        </li>
+    </ul>
+
+    <div class="position__relative-- height__100--">
+        <div class="adjustable-position slim-scroll">
+            <div class="d__f-- fd__c-- gap__10--">
+
+                <!-- scoreboard cadence -->
+                <div class="section__style--5" ng-if="PPTab == 'scoreboard'">
+                    <div class="section__body-- d__f-- ai__c-- gap__10--">
+                        <label class="fs__lg-- fw__6-- tc__757575-- m__0--">Cadence</label>
+                        <button class="btn__lg--" ng-class="PPScoreboardCadence == 'day' ? 'btn__1d5558--f' : 'btn__1d5558--o'" ng-click="changePPScoreboardCadence('day')">Day</button>
+                        <button class="btn__lg--" ng-class="PPScoreboardCadence == 'week' ? 'btn__1d5558--f' : 'btn__1d5558--o'" ng-click="changePPScoreboardCadence('week')">Week</button>
+                        <button class="btn__lg--" ng-class="PPScoreboardCadence == 'month' ? 'btn__1d5558--f' : 'btn__1d5558--o'" ng-click="changePPScoreboardCadence('month')">Month</button>
+                        <span class="fs__lg-- tc__757575--" ng-if="PPScoreboardRangeText">Showing {{PPScoreboardRangeText}} &mdash; counted back from To Date; From Date is not used here</span>
+                    </div>
+                </div>
+
+                <!-- chart -->
+                <div class="section__style--5">
+                    <div class="section__body--">
+                        <div id="PPChart" style="width: 100%; height: 380px;"></div>
+                    </div>
+                </div>
+
+                <!-- grid -->
+                <div class="section__style--5">
+                    <div class="section__body--">
+                        <div id="PPGrid" class="ag-theme-alpine" style="width: 100%; height: 420px;"></div>
+                    </div>
+                </div>
+
+                <!-- weekly prospective view -->
+                <div class="section__style--5" ng-if="PPTab == 'weekly'">
+                    <div class="section__header-- py__5--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Coming Week &mdash; Scheduled Points</h1>
+                        <label class="c__p-- d__f-- ai__c-- gap__5-- m__0--">
+                            <input type="checkbox" ng-model="PPShowProspective"> <span class="fs__lg-- fw__5--">Show</span>
+                        </label>
+                    </div>
+                    <div class="section__body--" ng-show="PPShowProspective">
+                        <table class="table__style--7 w__mc-- min__width100-- max__wnone--">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Provider Type</th>
+                                    <th>Scheduled Encounters</th>
+                                    <th>Scheduled Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in PPWeeklyProspectiveData">
+                                    <td>{{row.ProviderName}}</td>
+                                    <td>{{row.ProviderTypeName}}</td>
+                                    <td>
+                                        <a class="cur-poiter" ng-if="row.ScheduledEncounterCount > 0" ng-click="showPPEncounterDetails(row, 'scheduled')">{{row.ScheduledEncounterCount}}</a>
+                                        <span ng-if="!(row.ScheduledEncounterCount > 0)">{{row.ScheduledEncounterCount}}</span>
+                                    </td>
+                                    <td>{{row.ScheduledPoints}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d__f-- jc__c-- py__10--" ng-show="!PPWeeklyProspectiveData.length">
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">Nothing booked for the coming week.</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEMPORARY: remove with loadPPSampleData once the productivity procs exist -->
+                <!--<div class="d__f-- jc__c-- py__10--" ng-show="!PPSampleMode && !PPDailyData.length && !PPWeeklyData.length && !PPMonthlyData.length && !PPScoreboardRows.length">
+                    <button class="btn__xl-- btn__C71D27--o" ng-click="loadPPSampleData()">Preview with sample data</button>
+                </div>-->
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,652 @@
+﻿<div class="setting-content h-100">
+    <div class="row h-100">
+        <div class="col-lg-12 h-100">
+            <div class="dis-flex flex-direction-column grid-gap-5 h-100">
+                <div class="tab-pane in fade active">
+                    <ul class="tab__style--2">
+                        <li ng-class="(consentSubTab == 1)?'active':''">
+                            <a class="m-t-0" id="tab_udocuments" ng-click="switchConsentSubTab(1)">{{ 'UPLOADDOCUMENTS' | translate}}</a>
+                        </li>
+                        <li ng-class="(consentSubTab == 5)?'active':''">
+                            <a class="m-t-0" id="tab_cformfileds" ng-click="switchConsentSubTab(5)">{{ 'CONSENTFORMFIELDS' | translate}}</a>
+                        </li>
+                        <li ng-class="(consentSubTab == 2)?'active':''">
+                            <a class="m-t-0" id="tab_cdocuments" ng-click="switchConsentSubTab(2)">{{ 'CONSENTDOCUMENTS' | translate}}</a>
+                        </li>
+                        <li ng-class="(consentSubTab == 7)?'active':''" ng-if="false">
+                            <a class="m-t-0" id="tab_cdocuments" ng-click="switchConsentSubTab(7)">New Consent Document</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="h-100" id="consentSubTab1" ng-if="consentSubTab==1">
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="dis-flex flex-direction-column grid-gap-10">
+                                <div class="section__style--2" ng-show="addedUploadConsentForm">
+                                    <div class="section__header--">
+                                        <h1>{{ 'UPLOADCONSENTFORM' | translate}}</h1>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row nocolpad">
+                                            <div class="col-lg-2 col-sm-2">
+                                                <div class="form__group">
+                                                    <label>{{ 'CONSENTTYPE' | translate}}</label>
+                                                    <select ng-model="ConsentFormsData.ConsentTypeId" id="select_consenttype" ng-change=ChangeValueConsent(ConsentFormsData.ConsentTypeId) ng-options="item.id as item.ConsentName for item in Names">
+                                                        <option value=""> {{ 'select' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2" ng-show="Consentid === 2">
+                                                <div class="form__group">
+                                                    <label>{{ 'SURGERYSPECIAL' | translate}}</label>
+                                                    <select ng-model="ConsentFormsData.ConsentSubTypeId" id="select_sspecial" ng-options="sitem.SurgerySpecializationId as sitem.Name for sitem in masterSurgerySpecializationArray">
+                                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2">
+                                                <div class="form__group">
+                                                    <label>{{ 'CONSENTFORMNAME' | translate}}</label>
+                                                    <input type="text" id="txt_ConsentFormSettings" name="ConsertFromName" placeholder="Enter Consent Form Name" data-ng-model="DoctorConsertFromName" maxlength="200" required>
+                                                    <span class="error-msg dis-block">{{errorupload}}</span>
+                                                    <p class="error-msg dis-block">{{errorsize}}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-6">
+                                                <div class="form__group">
+                                                    <label class="fs-11">{{ 'IMAGEUPLOAD5MB' | translate}}</label>
+                                                    <input type="file" class="p-5" value="" name="upload"
+                                                           ngf-select="onFileSelectConsentSettings($file,DoctorConsertFromName)"
+                                                           ngf-pattern="'image/*,application/pdf'"
+                                                           ngf-accept="'image/*,application/pdf'"
+                                                           ngf-max-size="5MB"
+                                                           id="chooseFile">
+                                                    <!--<div>
+                                                <div class="file-select-button" id="fileName">{{ 'CHOOSEFILES' | translate}}</div>
+                                                <div class="file-select-name" id="noFile">{{ 'NOFILECHOSEN' | translate}}...</div>
+                                                <input type="file" value="" name="upload"
+                                                       ngf-select="onFileSelectConsentSettings($file,DoctorConsertFromName)"
+                                                       ngf-pattern="'image/*,application/pdf'"
+                                                       ngf-accept="'image/*,application/pdf'"
+                                                       ngf-max-size="5MB"
+                                                       id="chooseFile">
+                                        </div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="dis-flex align-items-center grid-gap-10 justify-content-end">
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="uploadConsentfilesInSettings()" id="btn_upload"><i class="action__icons--1 action__upload--"></i>{{ 'UPLOAD' | translate}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--f" ng-click="closeUploadConsentForm()" id="btn_cancel"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="section__style--2" ng-hide="doctorConsentFormList.length == 0">
+                                    <div class="section__header--">
+                                        <h1>{{ 'CONSENTFORMLIST' | translate}}</h1>
+                                        <button class="btn__lg-- btn__1d5558--f" ng-click="addUploadConsentForm()" ng-disabled="addedUploadConsentForm"><i class="action__icons--1 action__add--"></i>Add New</button>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="overflow__auto--y">
+                                                    <table class="table__style--7" id="table_dcformlist">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    {{ 'CONSENTTYPE' | translate}}
+                                                                </th>
+
+                                                                <th>
+                                                                    {{ 'CONSENTFORMNAME' | translate}}
+                                                                </th>
+                                                                <th class="text-center">
+                                                                    {{ 'SELECT' | translate}}
+                                                                </th>
+                                                                <th class="text-center">
+                                                                    {{ 'ACTION' | translate}}
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in doctorConsentFormList" data-url="{{item.URL}}">
+                                                                <td>
+                                                                    <span>{{item.ConsentTypeName}}</span><br />
+                                                                    <span>{{item.ConsentSubTypeName}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="consent-form-img" ng-click="GetDoctorConsentInSettings(item.DocId,item.URL,item.FileExtension)">
+                                                                        <img alt="" ng-src="img/file.png" />
+                                                                        <span ng-bind="item.DocumentName"></span>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center column__sm">
+                                                                    <div class="checkbox">
+                                                                        <label>
+                                                                            <input type="checkbox" id="cnsntCheck{{$index}}" ng-model="selected[$index]" ng-checked="item.ActiveIND=='Y'" class="" ng-click="ChkDoctorConsertActive($index,selected[$index])">
+                                                                            <span class="checkbox-material">
+                                                                                <span class="check"></span>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d__f-- jc__c-- ai__c--">
+                                                                        <a class="cur-poiter" tooltip-placement="left" uib-tooltip="Delete" tooltip-append-to-body="true" ng-click="DeleteDoctorConsent(item)"><i class="ehr-delete aside-icon-ros"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="dis-flex justify-content-end mt-5">
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="addUpdateConsent()"><i class="action__icons--1 action__save--"></i>{{ 'SAVE' | translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane in fade active h-100" id="consentSubTab2" ng-if="consentSubTab==2">
+
+                    <div ng-include="'templates/UsNewConsultation/ConsentChild.html'" class="h-100"></div>
+
+                    <!--<section class="tile tile-shadow">
+            <div class="tile-header">
+                <h1> Add Consent Form </h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div>
+                            <label>Consent Type</label>
+                            <select class="form-control" ng-model="ConsentFormsDatareq.ConsentTypeId"
+                                    ng-change=PDFChangeValueConsent(ConsentFormsDatareq.ConsentTypeId)
+                                    ng-options="item.id as item.ConsentName for item in Names">
+                                <option value=""> Select</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3" ng-show="ConsentFormsDatareq.ConsentTypeId === 2">
+                        <label>Surgery Special</label>
+                        <select class="form-control" ng-model="ConsentFormsDatareq.ConsentSubTypeId"
+                                ng-options="sitem.SurgerySpecializationId as sitem.Name for sitem in masterSurgerySpecializationArray">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Consent Form Name</label>
+                            <input type="text" class="form-input" id="txt_ConsentFormSettings1"
+                                   name="ConsertFromName" placeholder="Enter Consent Form Name"
+                                   data-ng-model="ConsentFormsDatareq.ConsentName" maxlength="200" required>
+                            <div class="error-msg">{{errorupload}}</div>
+                            <div class="error-msg">{{errorsize}}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="ml-5">&nbsp;</label>
+                            <button class="btn primary-btn btn-block" ng-click="SaveConsentfilesInSettings()">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div text-angular="text-angular" name="htmlcontent" ng-change="changeconsenthtml()" ng-model="MainConsentObject.htmlcontent" ta-disabled='disabled'></div>
+
+
+
+                    </div>
+                    <div class="col-lg-12">
+                        <button class="btn btn-info" ng-click="PreviewHtmlConsent()">Preview</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="consentPreviewId">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </section>-->
+                </div>
+                <div class="tab-pane in fade active" id="consentSubTab3" ng-if="consentSubTab==3">
+
+
+                    <section class="tile tile-shadow">
+
+                        <div class="tile-header">
+                            <h1>
+                                Consent Form list
+                            </h1>
+                        </div>
+                        <div class="tile-body">
+                            <div class="tile-body">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <ul class="list-none h-225 over-scrol-y">
+                                            <li ng-repeat="item in Consentformlist">
+                                                <label class="control control--checkbox">
+                                                    <span>{{item.DocumentName}}</span>
+                                                    <input type="checkbox" ng-model="item.isChecked" ng-checked="item.isChecked" ng-click="changecontent(item)">
+                                                    <span class="control__indicator top-0"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+
+                                    <div class="col-lg-9">
+
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label>Consent Form Name</label>
+                                                    <input type="text" class="form-input" placeholder="Enter Consent Form Name"
+                                                           ng-model="contentobj.ContentName" maxlength="200" required>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <ul ng-show="contentobj.Contentlist.length>0">
+                                                        <li ng-repeat="item in contentobj.Contentlist track by $index">
+                                                            <p>{{item.DocumentName}}</p>
+
+                                                            <div id="ContentBody{{$index}}"></div>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <button class="text-right btn btn-save" ng-click="SavecontentData()">save</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </section>
+                </div>
+                <div class="tab-pane in fade active" id="consentSubTab4" ng-if="consentSubTab==4">
+                    <section class="eh-panel">
+                        <div class="eh-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="tile-header b-0">
+                                        <h1 class="text-ehnote">Create Consent Form</h1>
+                                    </div>
+                                    <div class="tile-body">
+
+
+
+
+
+
+
+
+
+
+                                        <div class="row">
+                                            <div class="col-lg-3  over-scrol-y">
+                                                <div class="form-group">
+
+                                                    <input type="text" class="form-input text-center" placeholder="Enter Consent Form Name"
+                                                           ng-model="contentobj.ContentName" maxlength="200" required>
+
+                                                </div>
+
+
+                                                <ul class="nav navbar-nav side-nav lazy-navigation m-t-5 fixed-side-nav m-b-5" style="width:100%">
+                                                    <li ng-repeat="catitem in mainConsentCreateDefaulArray" ng-class="activeclassFunction(catitem.MainItemName,catitem.MainItemId) ?'':'active'" ng-click="ActiveConsultaionSideBar(catitem.MainItemId)">
+                                                        <a>{{catitem.MainItemName}} <i class="fa fa-fw fa-angle-down pull-right click-link" ng-click="ActiveCollapsebar(catitem)"></i></a>
+                                                        <ul class="p-10 in collapse p-t-0 p-b-0" uib-collapse="catitem.IsActive">
+                                                            <li ng-repeat="subitem in catitem.SubItems">
+                                                                <div class="checkbox mr-0" ng-hide="subitem.SubItemId==7">
+                                                                    <label>
+                                                                        <input name="checkbox-2" type="checkbox" ng-model="subitem.IsSelected" ng-click="clickOnadd(subitem)" ng-change="CheckSubCategory(catitem,subitem)" />
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>{{subitem.SubItemName}}</small>
+                                                                    </label>
+                                                                </div>
+                                                                <a ng-show="subitem.SubItemId==7" ng-click="SubActiveCollapsebar(subitem)"> {{subitem.SubItemName}} <i class="fas fa-chevron-right pull-right"></i></a>
+
+                                                                <ul uib-collapse="subitem.IsActive" ng-if="subitem.SubItemId==7">
+
+                                                                    <li ng-repeat="invitem in subitem.ChildItems" style="list-style:none;">
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-12" type="checkbox" ng-model="invitem.IsSelected" ng-click="changecontentNew(invitem)" />
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small ng-bind="invitem.ChildItemName"></small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+
+
+
+
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+
+                                            </div>
+
+                                            <div class="col-lg-9">
+                                                <div id="printconsentpreviewId">
+                                                    <div class="row">
+                                                        <table style="width:100%">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+
+                                                                        <div class="col-lg-12" ng-repeat="catitem in mainConsentCreateDefaulArray">
+
+                                                                            <div class="row" id="mainitemId{{catitem.MainItemId}}" ng-show="catitem.MainItemId==1 && catitem.IsSelected">
+                                                                                <div class="col-lg-12" ng-repeat="subitem in catitem.SubItems">
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==1 && subitem.IsSelected">
+                                                                                        <div class="col-lg-12">
+                                                                                            <label style="float: right; margin-right: 10%;">Date : <span id="consentDateid"></span></label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==2 && subitem.IsSelected">
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Name : <span id="consentPNameid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Mrno : <span id="consentPMrnoid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==3 && subitem.IsSelected">
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Age : <span id="consentPAgeid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Gender : <span id="consentPGenderid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==4 && subitem.IsSelected">
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Mobile : <span id="consentPmobileid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Patient Email : <span id="consentPEmailid"></span></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+
+
+
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row" id="mainitemId{{catitem.MainItemId}}" ng-show="catitem.MainItemId==2">
+                                                                                <div class="col-lg-12" ng-repeat="subitem in catitem.SubItems">
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==6 && subitem.IsSelected">
+                                                                                        <div class="col-lg-12">
+                                                                                            <!--MainConsentObject.htmlconsentNew-->
+                                                                                            <!--<div ng-click="getCursorPosition()" text-angular="text-angular" id="htmlcontents" name="htmlcontents" ng-model="vm.content" ta-disabled='disabled'></div>-->
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="row" style="margin-top:5px;margin-bottom:5px;" ng-if="subitem.SubItemId==7">
+                                                                                        <div class="col-lg-12">
+                                                                                            <div class="form-group">
+                                                                                                <ul ng-show="contentobj.Contentlist.length>0">
+                                                                                                    <li ng-repeat="item in contentobj.Contentlist track by $index">
+
+                                                                                                        <!--<p>{{item.DocumentName}}</p>-->
+
+                                                                                                        <div id="ContentBodyNew{{$index}}"></div>
+                                                                                                    </li>
+                                                                                                </ul>
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="row" id="mainitemId{{catitem.MainItemId}}" style="margin-top:5px;margin-bottom:5px;" ng-if="catitem.MainItemId==3 && catitem.IsSelected">
+                                                                                <div class="col-lg-6" ng-repeat="subitem in catitem.SubItems" ng-if="subitem.IsSelected">
+                                                                                    <div class="form-group">
+                                                                                        <label>{{subitem.SubItemName}}</label>
+                                                                                        <textarea class="form-control" rows="4" style=" width: 80%;"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row">
+                                            <div class="col-lg-7">
+
+                                            </div>
+                                            <div class="col-lg-5 text-right">
+                                                <button class="btn btn-success" ng-click="saveEntireComeplete()">Save</button>
+                                                <button class="btn btn-danger" ng-click="previewCompleteConsent()">Preview</button>
+                                                <button class="btn btn-info">Clear</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div id="consentsamplePreviewId">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="h-100" id="consentSubTab5" ng-if="consentSubTab==5">
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="dis-flex flex-direction-column grid-gap-10 mt-10">
+                                <div class="section__style--2" ng-show="addedConsentFormFields">
+                                    <div class="section__header--">
+                                        <h1>{{ 'UPLOADCONSENTFORMFIELDS' | translate}}</h1>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row nocolpad">
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="form__group">
+                                                    <label>{{ 'CATEGORY' | translate}}</label>
+                                                    <select ng-model="ConsentFormFields.FieldCategoryId" id="select_category" ng-options="sitem.FieldCategoryId as sitem.FieldCategoryName for sitem in FieldCategoriesArray">
+                                                        <option value=""> {{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="form__group">
+                                                    <label>{{ 'FIELDNAME' | translate}}</label>
+                                                    <input type="text" id="input_fieldname" ng-model="ConsentFormFields.FieldName" placeholder="Enter Field Name" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="form__group">
+                                                    <label>{{ 'FIELDVARIABLE' | translate}}</label>
+                                                    <input type="text" id="input_fieldv" ng-model="ConsentFormFields.FieldVariable" placeholder="Enter Field Variable" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="form__group">
+                                                    <label>{{ 'TABLE' | translate}}</label>
+                                                    <select ng-model="ConsentFormFields.TableName" id="select_table" ng-options="titem.Name as titem.Name for titem in Alltables">
+                                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="form__group">
+                                                    <label>{{ 'FIELDTYPE' | translate}}</label>
+                                                    <select ng-model="ConsentFormFields.FieldTypeId" id="select_fieldtype" ng-options="sitem.FieldTypeId as sitem.FieldTypeName for sitem in FieldValuesArray" ng-change="ChangeConsentFields(ConsentFormFields.FieldTypeId)">
+                                                        <option value=""> {{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3" ng-show="ConsentFormFields.FieldTypeId == 1">
+                                                <div class="form__group">
+                                                    <label>{{ 'TABLEFIELDS' | translate}}</label>
+                                                    <select ng-model="ConsentFormFields.TableFields" id="select_tfields" ng-options="item.ColumnName as item.ColumnName for item in allColumnsData">
+                                                        <option value=""> {{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div ng-class="ConsentFormFields.FieldTypeId == 1 ? 'col-lg-6 col-sm-6' : 'col-lg-9 col-sm-9'">
+                                                <div class="dis-flex align-items-center grid-gap-10 justify-content-end m-t-23">
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveConsentFieldData()" id="btn_save"><i class="action__icons--1 action__save--"></i>{{ 'SAVE' | translate}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--o" ng-click="clearConsentFileData()" id="btn_clear"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--f" ng-click="closeConsentFormFields()" id="btn_cancel"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="section__style--2">
+                                    <div class="section__header--">
+                                        <h1>{{ 'FIELDSLIST' | translate}}</h1>
+                                        <button class="btn__lg-- btn__1d5558--f" ng-click="addConsentFormFields()" ng-disabled="addedConsentFormFields" id="btn_addnew"><i class="action__icons--1 action__add--"></i>Add New</button>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="overflow__auto-- slim-scroll">
+                                                    <table class="table__style--7 w__mc-- min__width100-- max__wnone--" id="table_consentfl">
+                                                        <thead ng-hide="consentFieldsListobj.Array.length==0">
+                                                            <tr>
+                                                                <th class="text-center">{{ 'SNO' | translate}}</th>
+                                                                <th>{{ 'FIELDCATEGORY' | translate}}</th>
+                                                                <th>{{ 'FILEDNAME' | translate}}</th>
+                                                                <th>{{ 'FIELDVARIABLE' | translate}}</th>
+                                                                <th>{{ 'FIELDSLIST' | translate}}</th>
+                                                                <th>{{ 'TABLECOLUMN' | translate}}</th>
+                                                                <th class="text-center table-sticky-column-right">{{ 'ACTIONS' | translate}}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr class="appointment-row" ng-repeat="cfitem in consentFieldsListobj.Array">
+                                                                <td class="column__sm text-center">{{$index + 1}}</td>
+                                                                <td>{{cfitem.FieldCategoryName}}</td>
+                                                                <td>{{cfitem.FieldName}}</td>
+                                                                <td>{{cfitem.FieldVariable}}</td>
+                                                                <td>{{cfitem.TableName}}</td>
+                                                                <td>
+                                                                    <span ng-show="cfitem.TableFields==''">N/A</span>
+                                                                    <span ng-hide="cfitem.TableFields==''">{{cfitem.TableFields}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d__f-- jc__c-- ai__c--">
+                                                                        <a class="cur-poiter" tooltip-placement="left" uib-tooltip="Delete" tooltip-append-to-body="true" ng-click="DeleteConsentField(cfitem)"><i class="ehr-delete aside-icon-ros"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                        <div class="row">
+                                            <div class="col-lg-12 text-center EH-pagination">
+                                                <uib-pagination total-items="consentFieldsListobj.Count"
+                                                                ng-model="consentFieldsListobj.PageNumber"
+                                                                ng-change="consentfieldpageChanged(consentFieldsListobj.PageNumber)"
+                                                                force-ellipses="true"
+                                                                boundary-links="true"
+                                                                max-size="consentFieldsListobj.PageSize"
+                                                                ng-show="consentFieldsListobj.Array.length > 0">
+                                                </uib-pagination>
+                                            </div>
+                                        </div>
+                                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="consentFieldsListobj.Array.length == 0">
+                                            <a><i class="nodata__1-- d3__nodata--1"></i></a>
+                                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No data added yet.</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane in fade active h-100"  ng-if="consentSubTab==7">
+                    <div ng-include="'templates/UsNewConsultation/ConsentNewEditor.html'" class="h-100"></div>                   
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">-->
+
+<script>
+    $('#chooseFile').bind('change', function () {
+        var filename = $("#chooseFile").val();
+        if (/^\s*$/.test(filename)) {
+            $(".file-upload").removeClass('active');
+            $("#noFile").text("No file chosen...");
+        }
+        else {
+            $(".file-upload").addClass('active');
+            $("#noFile").text(filename.replace("C:\\fakepath\\", ""));
+        }
+    });
+
+</script>

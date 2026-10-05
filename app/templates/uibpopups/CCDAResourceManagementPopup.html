@@ -1,0 +1,219 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title"> CCDA Template</h4>
+    <button type="button" class="btn btn-link" ng-click="closeuibpopup();"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body p-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="simpleDemo row">
+
+                <div class="col-lg-12 mb-10 ml-15">
+                    <label>Doctors List </label>   <a class="btn btn-link mr-15" style="float:right;"  ng-show="!showAddNew" ng-click="addNewCCDATemplate(showAddNew)">Create New Template</a>
+                    <select  style="width:95%" class="form-control" ng-options="item.DoctorID as item.UserFullName for item in AllDoctorList" ng-model="userSelectedDoctorId" ng-change="ChangeDoctor()">
+                        <option value="" disabled="disabled">Select</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-6 mb-10" ng-show="TemplatesList.length >0">
+                    <label>Templates List</label>
+                  
+                    <select style="width:95%" class="form-control" ng-options="item.TemplateId as item.NewTemplateName for item in TemplatesList" ng-model="userSelectedTemplateId" ng-change="ChangeExistingTemplate(userSelectedTemplateId, TemplatesList)">
+                        <option value="" disabled="disabled">Select</option>
+                    </select>
+                </div>
+
+                 
+                <div class="col-lg-6 mb-10" ng-show="showAddNew || TemplatesList.length == 0">
+                    <div class="form-group">
+                        <label>Template Name <em>*</em></label>
+                        <input type="text" style="width:95%" class="form-control" ng-model="TemplateName" ng-change="NewTemplateName(TemplateName)" />
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="panel-body">
+                        
+                        <div style="height: calc(100vh - 260px)" class="overflow-y-scroll overflow-x-hidden border-1">
+                            <ul dnd-list="configurationResourceArray">
+                                <li ng-repeat="item in configurationResourceArray"
+                                    dnd-draggable="item"
+                                    ng-model="item.ResourceName"
+                                    dnd-moved="configurationResourceArray.splice($index, 1)"
+                                    dnd-effect-allowed="move"
+                                    ng-class="{'selected': models.selected === item}"
+                                    dnd-selected="models.selected = item">
+                                    <label> {{item.Order}}. {{item.ResourceName}}</label>
+                                    <!--<i class="fas fa-times" ng-click="removeItemlist(item,selectedResourcesArray,$index)" style="float:right;color:red"></i>-->
+
+                                    <label class="switch" style="bottom:5px;float:right">
+                                        <input type="checkbox" id="togBtn{{$index}}" ng-model="item.IsShow" ng-change="changeActualResourceHideandShow(item)">
+                                        <div class="slider round">
+                                            <!--ADDED HTML -->
+                                            <span class="on">Show</span>
+                                            <span class="off">Hide</span>
+                                            <!--END-->
+                                        </div>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+      </div>
+</div>
+<div class="modal-footer">
+    <div class="row">
+        <div class="col-lg-7">
+            <label class="cur-poiter pull-right mr-25">
+                <input type="checkbox" class="checkbox" ng-model="addUpdateCCDATemplate.ActiveInd">
+                <span class="lbl"></span>
+                <span class="text-right usc-remarks">Set as Default</span>
+            </label>
+        </div>
+        <div class="col-lg-5 pull-right">
+            <button type="button" class="btn btn-danger p-l-25 p-r-25" ng-click="ClearDetails();"> Close</button>
+            <button class="btn btn-success p-l-25 p-r-25" ng-click="SaveUserCCDATemplate()">Save</button>
+            <!--<button class="btn btn-success p-l-25 p-r-25" ng-click="SaveUserCCDATemplate()">Save as New Template</button>-->
+        </div>
+    </div>
+</div>
+
+<style>
+       /**
+    * The dnd-list should always have a min-height,
+    * otherwise you can't drop to it once it's empty
+    */
+       .simpleDemo ul[dnd-list] {
+           min-height: 42px;
+           padding-left: 0px;
+       }
+
+           /**
+    * The dndDraggingSource class will be applied to
+    * the source element of a drag operation. It makes
+    * sense to hide it to give the user the feeling
+    * that he's actually moving it.
+    */
+           .simpleDemo ul[dnd-list] .dndDraggingSource {
+               display: none;
+           }
+
+           /**
+    * An element with .dndPlaceholder class will be
+    * added to the dnd-list while the user is dragging
+    * over it.
+    */
+           .simpleDemo ul[dnd-list] .dndPlaceholder {
+               background-color: #ddd;
+               display: block;
+               min-height: 42px;
+           }
+
+           .simpleDemo ul[dnd-list] li {
+               background-color: #fff;
+               border: 1px solid #ddd;
+               border-top-right-radius: 4px;
+               border-top-left-radius: 4px;
+               display: block;
+               padding: 10px 15px;
+               margin-bottom: -1px;
+           }
+
+               /**
+    * Show selected elements in green
+    */
+               .simpleDemo ul[dnd-list] li.selected {
+                   background-color: #dff0d8;
+                   color: #3c763d;
+               }
+</style>
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 90px;
+        height: 34px;
+    }
+
+        .switch input {
+            display: none;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ca2222;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2ab934;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(55px);
+        -ms-transform: translateX(55px);
+        transform: translateX(55px);
+    }
+
+    /*------ ADDED CSS ---------*/
+    .on {
+        display: none;
+    }
+
+    .on, .off {
+        color: white;
+        position: absolute;
+        transform: translate(-50%,-50%);
+        top: 50%;
+        left: 50%;
+        font-size: 10px;
+        font-family: Verdana, sans-serif;
+    }
+
+    input:checked + .slider .on {
+        display: block;
+    }
+
+    input:checked + .slider .off {
+        display: none;
+    }
+
+    /*--------- END --------*/
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+</style>
+

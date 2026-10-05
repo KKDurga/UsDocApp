@@ -1,0 +1,544 @@
+<div class="wrapper" ng-cloak ng-controller="EhnotePatientSearchCtrl">
+    <div class="container-fluid">
+        <div class="row">
+            <div ng-class="mainpatientScreen ?'col-lg-12' : 'col-lg-9'" class="pr-0 pl-0">
+                <section class="tile tile-shadow m-t-10">
+                    <div class="tile-header p-b-5">
+                        <h1>Patients : <span ng-bind="totalItems"></span></h1>
+                        <ul class="controls">
+                            <li>
+                                <fieldset class="text-center">
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="mrMobileId1" name="NewPatientSearch" ng-value="1"
+                                               ng-model="newPatSearchType" aria-invalid="false" ng-click="refreshSearch()">
+                                        <label for="mrMobileId1" class="radio-custom-label cur-poiter mb-0">MR No</label>
+                                    </div>
+                                    <div class="ml-15 dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="oldmrnoId1" name="NewPatientSearch" ng-value="3" ng-model="newPatSearchType" aria-invalid="false" ng-click="refreshSearch()">
+                                        <label for="oldmrnoId1" class="radio-custom-label cur-poiter mb-0">Old MR No</label>
+                                    </div>
+                                    <div class="ml-15 dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="NameId1" name="NewPatientSearch" ng-value="2" ng-model="newPatSearchType" aria-invalid="false" ng-click="refreshSearch()">
+                                        <label for="NameId1" class="radio-custom-label cur-poiter mb-0">Name / Mobile</label>
+                                    </div>
+                                </fieldset>
+                            </li>
+                            <li>
+                                <input type="text" class="form-control height-25" id="mrid1244jghhssdsdd" ng-if="newPatSearchType == 1" placeholder="Search Mr.No" ng-model="searchtype.searchPatientDisplayId" />
+                                <input type="text" class="form-control height-25" id="nameid56451244jghhssd" ng-if="newPatSearchType == 2" placeholder="Search Name / Mobile" ng-model="searchtype.SearchBy" />
+                                <!--<input type="text" class="form-control height-25" id="nameid56451244jghhssd" ng-if="newPatSearchType == 3" placeholder="Search Mobile" ng-model="searchtype.searchPatientMobile" ng-change="SearchByText(searchtype.searchPatientMobile)" />-->
+                                <input type="text" class="form-control height-25" id="nameid56451244jghhssd" ng-if="newPatSearchType == 3" placeholder="Search Old Mr.No" ng-model="searchtype.searchOldPatientMRNO" />
+                            </li>
+                            <li>
+                                <button class="btn btn-success" ng-click="searchAllPatient()">Search</button>
+                            </li>
+                            <!--<li class="pos-relative t-5" >
+                                <button ng-show="UserAccessRights.AllAccessRights.PatientRegistration" ng-click="searchWalkinNavigate()" class="btn btn-green btn-fill-horz-o">Register Patient</button>
+                                <button ng-show="UserAccessRights.AllAccessRights.APPListBookAppointment" class="btn btn-navy btn-fill-horz-o" ng-click="searchopenAppointmentPopup();">Book Appointment</button>
+                            </li>-->
+                            <li title="Filter Patient">
+                                <span class="ml-5 cur-poiter pos-relative  t-5" ng-click="FilterAppointments(mainpatientScreen);" role="button" tabindex="0">
+                                    <i class="fas fa-filter followup-icon text-Follwpink"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-12" ng-show="patients.length != 0">
+                                <div class="table-responsive patient-table mt-10">
+                                    <table class="table patient-listtable">
+                                        <thead>
+                                            <tr>
+                                                <th width="12%">Patient ID </th>
+                                                <th class="app-pa-name">Patient Name</th>
+                                                <th>Age</th>
+                                                <!-- <th>Gender</th> -->
+                                                <!--<th>SSN</th>-->
+                                                <th>Contact & SSN</th>
+                                                <th>E-Mail</th>
+                                                <!--<th>Location</th>-->
+                                                <th>Reg.Dt</th>
+                                                <th>Last Consult.Dt</th>
+                                                <th ng-if="showPatientListBilling">Due</th>
+                                                <th>Edit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="patientitem in patients">
+                                                <!--ng-click="NavToViewCaseHistory(patientitem)"-->
+                                                <td>
+
+                                                    <span ng-show="patientitem.patientdisplayid !== undefined && showBranchDropdown && patientitem.patientdisplayid !== 0">
+                                                        {{patientitem.patientdisplayid}}
+                                                    </span>
+                                                    <span ng-show="patientitem.familydisplayid !== undefined && patientitem.familydisplayid !=='NO_FAM_DISP_ID'">
+                                                        {{patientitem.familydisplayid}}
+                                                    </span>
+                                                </td>
+                                                <td class="app-pa-name pos-relative"  title="{{patientitem.FullName}}"><!--{{patientitem.Title}}.-->
+                                                    <a>
+                                                        <div class="profile-show">
+                                                            <div class="profile-avatar-image">
+                                                                <span ng-show="patientitem.S3URL ==''" style="background: {{patientitem.colors}}">
+                                                                    {{patientitem.FullName | limitTo:2}}
+                                                                </span>
+                                                                <div ng-show="patientitem.S3URL !==''" image-viewer isarraychanged="0">
+                                                                    <img ngf-thumbnail="patientitem.S3URL" class="img-responsive" width="50" height="50" />
+                                                                </div>
+                                                            </div>
+                                                            <span>{{patientitem.FullName | textUpperCase}}</span><!--{{(patientitem.Title.length > 0)? (patientitem.Title + '. '):""}}-->
+                                                        </div>
+                                                    </a>
+
+                                                    <div class="app-vip-research">
+                                                        <div class="vip-appt app-research-width vip-patient m-b-5" ng-if="patientitem.IsVIPInd">
+                                                            <label>VIP</label>
+                                                        </div>
+                                                        <div class="research-appt app-research-width research-patient" ng-if="patientitem.IsResearchInd">
+                                                            <label>Research</label>
+                                                        </div>
+                                                        <div class="highrisk-patient app-research-width" ng-if="patientitem.IsHighRiskInd">
+                                                            <label>HighRisk</label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <!--ng-click="NavToViewCaseHistory(patientitem)"-->
+                                                <td>
+                                                    <!--<span ng-hide="patientitem.AgeInYears == 0 && patientitem.AgeInMonths == 0">
+                                                        <span>{{patientitem.AgeInYears}}<span>Y</span></span>
+                                                        <span>{{patientitem.AgeInMonths}}<span>M</span></span>
+                                                    </span>
+                                                    <span ng-show="patientitem.AgeInYears == 0 && patientitem.AgeInMonths == 0">
+                                                        <span>{{patientitem.AgeInDays}}<span>Days</span></span>
+                                                    </span>-->
+                                                    <span ng-hide="patientitem.DOB ==''">
+                                                        <span> DOB :{{patientitem.DOB | date:'MM-dd-yyyy'}}</span>
+                                                    </span>
+                                                    <span>&nbsp; | &nbsp;</span>
+                                                    <span ng-bind="patientitem.Gender"></span>
+                                                    <p class="mb-0 error no-wrapappt" title="{{patientitem.ReferalSource}}">
+                                                        <span><b>Ref: &nbsp;</b></span>
+                                                        <span ng-bind="patientitem.ReferalSource"></span>
+                                                        <span ng-if="patientitem.ReferalSource === ''">--</span>
+                                                    </p>
+                                                </td>
+                                                <td class="tool-tip-l-auto">
+                                                    <p ng-if="!patientitem.PhoneNumber && !patientitem.EmailID">N/A</p>
+                                                    <span>
+                                                        <p title="Copy Contact" tooltip data-placement="bottom" class="mb-0 text-info">
+                                                            <!--copy-to-clipboard="{{patientitem.PhoneNumber}}"-->
+                                                            <i class="fas fa-mobile-alt"></i> <!--{{patientitem.TempPhNumber}}-->
+                                                            {{patientitem.PatientHomeCode}}-{{patientitem.HomeAreaCode}}-{{patientitem.PatientHomeNumber}}
+                                                        </p>
+                                                    </span>
+
+                                                    <span>
+                                                        <p title="{{patientitem.AlternatePhoneNo}}" class="mb-0 text-info" ng-if="patientitem.AlternatePhoneNo">
+                                                            <!-- ng-click="NavToViewCaseHistory(patientitem)"-->
+                                                            <i class="fas fa-mobile-alt"></i> {{patientitem.AlternatePhoneNo}}
+                                                        </p>
+                                                    </span>
+                                                    <span ng-bind="patientitem.SSN"></span>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 text-gray no-wrapappt m-w-150" title="{{patientitem.EmailID}}" ng-if="patientitem.EmailID">
+                                                        <!-- ng-click="NavToViewCaseHistory(patientitem)"-->
+                                                        <!--<i class="fas fa-envelope-square"></i>--> {{patientitem.EmailID}}
+                                                    </p>
+                                                    <span ng-if="patientitem.EmailID === ''">--</span>
+                                                </td>
+                                               
+                                                <!--<td>
+                                                    <span ng-if="patientitem.Area!=''" class="no-wrapappt" title="{{patientitem.Area}}">
+                                                        {{patientitem.Area}}
+                                                    </span>
+                                                    <span ng-if="patientitem.Area === ''">--</span>
+                                                </td>-->
+                                                <td><span ng-bind="patientitem.CreatedDt | date:'dd-MM-yyyy'"></span></td>
+                                                <!--ng-click="NavToViewCaseHistory(patientitem)"-->
+                                                <td>
+                                                    <div class="bill-lastvisit">
+                                                        <div class="patientlist-ltime">
+                                                            <!--<span ng-hide="patientitem.LastVisited == undefined"><strong>{{getLastVistedDate(patientitem.LastVisited)}}</strong></span>-->
+                                                            <span ng-hide="patientitem.LastVisited == undefined"><strong>{{patientitem.LastVisited | date:'dd-MM-yyyy'}}</strong></span>
+                                                            <span ng-if="patientitem.LastVisited === undefined">--</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td ng-if="showPatientListBilling">
+                                                    {{patientitem.Due?patientitem.Due:'--'}}
+                                                </td>
+
+
+                                                <td class="text-center">
+                                                    <!--<a title="Edit Patient" ng-click="editAppointmentPopup(patientitem)" ng-show="UserAccessRights.AllAccessRights.PatientEdit">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>-->
+                                                    <a title="Edit Patient" ng-click="navtoEditPatient(patientitem)" ng-show="UserAccessRights.AllAccessRights.PatientEdit">
+                                                        <i class="far fa-edit"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </section>
+                <div class="billing-cominsoon norecords-found-patients text-center" ng-show="patients.length == 0">
+                    <img src="img/no-data/no-patient-found.png">
+                    <div class="msg">
+                        <p class="goback-text">No results found</p>
+                        <p class="goback-text-line2">Try using a different criteria to view better results.</p>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+            <div ng-class="(mainpatientScreen)?'' : 'col-lg-3'" class="pr-0" ng-hide="mainpatientScreen">
+                <section class="tile tile-shadow">
+                    <div class="tile-header filter-header">
+                        <h1>Filters</h1>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-12 font-sizes">
+                                <form>
+                                    <!--<div class="col-lg-12 p-0">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                <h6><b>Specialization</b></h6>
+                                            </li>
+                                            <li>
+                                                <label class="control control--checkbox">
+                                                    <span>All</span>
+                                                    <input type="checkbox" ng-model="AllSpecializationCheck" ng-click="checkAllSpecialization(AllSpecializationCheck)">
+                                                    <div class="control__indicator top-0"></div>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in SpecilaizationFilterArray">
+                                                <label class="control control--checkbox">
+                                                    <span ng-bind="item.Name"></span>
+                                                    <input type="checkbox" ng-model="item.isChecked" ng-click="toggleSpecialization(item)">
+                                                    <div class="control__indicator top-0"></div>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>-->
+                                    <div class="col-lg-12 p-0">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                <h6><b>All Patients</b></h6>
+                                            </li>
+                                            <li>
+                                                <label class="control control--checkbox">
+                                                    <span>All</span>
+                                                    <input type="checkbox" ng-model="AllPatientCheck" ng-click="checkAllPatient(AllPatientCheck)">
+                                                    <div class="control__indicator top-0"></div>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in PatientFilterArray">
+                                                <label class="control control--checkbox">
+                                                    <span ng-bind="item.Name"></span>
+                                                    <input type="checkbox" ng-model="item.isChecked" ng-click="togglePatient(item)">
+                                                    <div class="control__indicator top-0"></div>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-12 p-0" ng-show="showBranchDropdown">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                <h6><b>Branch</b></h6>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-12 p-0 fixed-branch">
+                                        <div class="" ng-show="showBranchDropdown">
+                                            <ul>
+                                                <li>
+                                                    <label class="control control--checkbox">
+                                                        <span>All</span>
+                                                        <input type="checkbox" ng-model="Allbranchcheck" ng-click="checkAll(Allbranchcheck)" ng-checked="Allbranchcheck">
+                                                        <div class="control__indicator top-0"></div>
+                                                    </label>
+                                                </li>
+                                                <li ng-repeat="item in HospitalArray">
+                                                    <label class="control control--checkbox">
+                                                        <span>{{item.BranchName}}</span>
+                                                        <input type="checkbox" ng-model="item.isChecked" ng-checked="item.isChecked" ng-click="toggle(item)">
+                                                        <div class="control__indicator top-0"></div>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0 age-scale">
+                                        <h6 class="fs-14"><b>Age</b></h6>
+                                        <div class="form-group">
+                                            <input type="text" name="" ng-model="Frmage" ng-change="frmageChange(Frmage)" class="age-box width-20" placeholder="e.g. 0" numbers-only="numbers-only" aw-limit-length="3">
+                                            <div class="line-split">to</div>
+                                            <input type="text" name="" ng-model="Toage" ng-change="toageChange(Toage)" class="age-box width-20" placeholder="e.g. 10" numbers-only="numbers-only" aw-limit-length="3">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0">
+                                        <label>Gender</label>
+                                        <div class="form-check genderradio">
+                                            <label>
+                                                <input type="radio" id="radall" name="group" value="A" ng-checked="Gender =='All'" ng-click="Gender='A'" ng-model="Gender" autocomplete="off">
+                                                <span class="label-text">All</span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" id="radmale" name="group" value="M" ng-checked="Gender =='Male'" ng-click="Gender='M'" ng-model="Gender" autocomplete="off">
+                                                <span class="label-text">Male</span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" id="radfemale" name="group" value="F" ng-checked="Gender =='Female'" ng-click="Gender='F'" ng-model="Gender" autocomplete="off">
+                                                <span class="label-text">Female</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0">
+                                        <h6>Last Visited</h6>
+                                        <div class="dash-from col-lg-6 pl-0">
+                                            <label>Between</label>
+                                            <input class="form-control icons-calendar" datepickerregpatient ng-model="Fromdate" placeholder="DD/MM/YYYY" ng-change="chkLapsedTime()" readonly>
+                                        </div>
+                                        <div class="dash-from col-lg-6 pr-0">
+                                            <label>And</label>
+                                            <input type="text" name="" ng-model="Todate" datepickerregpatient class="form-control icons-calendar" placeholder="DD/MM/YYYY" ng-change="chkLapsedTime()" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0">
+                                        <h6><b>Date Of Birth</b></h6>
+                                        <div class="dash-from col-lg-6 pl-0">
+                                            <label>Born From</label>
+                                            <input class="form-control icons-calendar" datepickerregpatient ng-model="Fromdob" placeholder="DD/MM/YYYY" ng-change="chkLapsedTime()" readonly>
+                                        </div>
+                                        <div class="dash-from col-lg-6 pr-0">
+                                            <label>Till</label>
+                                            <input type="text" name="" ng-model="Todob" datepickerregpatient class="form-control icons-calendar" placeholder="DD/MM/YYYY" ng-change="chkLapsedTime()" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="row text-right">
+                                        <div class="col-lg-12">
+                                            <!--  <input type="submit" class="btn blue-btn mw-100" value="SUBMIT" ng-click="submit()" /> -->
+                                            <button value="SUBMIT" ng-click="submit()" class="btn btn-success mt-10 p-l-50 p-r-50">Submit </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            
+
+        </div>
+    </div>
+    <!--<div class="modal-overlay" ng-show="editPatientinfo"></div>-->
+
+
+
+
+
+
+
+
+
+
+    <div class="modal-overlay" ng-show="addAppointmentInfo"></div>
+    <div class="modal-common" ng-show="addAppointmentInfo" id="bkAppointment">
+        <div class="modal-common-dialog patientSearchdialog">
+            <div class="model-popup-header">
+                <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
+            </div>
+            <div class="pl-popup col-lg-12 bg-white">
+                <form name="patientform" class="css-form" novalidate>
+                    <div class="responsive patient-displayTable">
+                        <table class="table">
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>
+                                    Contact Number
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>{{(Title === undefinedFullName) ? FullName : Title + ". " + FullName}}</td>
+                                <td>{{Gender == 'M' ? 'Male': 'Female'}}</td>
+                                <td> {{((CurrentAge === undefined) ? '-' :(((CurrentAge.year > 0) ? CurrentAge.year + "y" : '' )+ ' ' + (((CurrentAge.month > 0) ? CurrentAge.month + "m" : ''))))}} </td>
+                                <td ng-show="PhoneNumber !== undefined || PhoneNumber.length > 0">
+                                    {{PhoneNumber.length < 6 ? "-": PhoneNumber}}
+                                </td>
+                                <td ng-hide="PhoneNumber !== undefined || PhoneNumber.length > 0">
+                                    --
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="clearfix clearfix-p">
+                        <p ng-show="(docTimeStatus == 'A')" class="clearfix-p">
+                            Your doctor may not be available in this time. <br />
+                            You can proceed with bookings anyway!
+                        </p>
+                        <div class="clearfix"></div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="AppointmentType" class="control-label">Appointment Type</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </span>
+                                        <select name="appointment_type" id="appointment_type" class="form-control select-dropdown" ng-model="appointment_type" ng-change="apptypechange(appointment_type)" required>
+                                            <option value="">Select Appointment Type</option>
+                                            <option ng-repeat="type in appointmentTypes" value="{{type.Id}}">{{type.Name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ">
+                                <label class="control-label">Select Branch</label>
+                                <div class="form-group">
+                                    <div class="input-group spinner">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-building-o" aria-hidden="true"></i>
+                                        </span>
+                                        <select class="form-control select-dropdown " name="docAddress" ng-model="hospitalid" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.HospitalName for hospitalData in hospitalDetails" ng-change="getDoctorInfoByHospitalId(hospitalid)">
+                                            <option value="">Select Branch</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ">
+                                <label for="Doctor" class="cols-sm-2 control-label">Doctor</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-user-md" aria-hidden="true"></i>
+                                        </span>
+                                        <select class="form-control select-dropdown" name="docID" ng-change="DocChange(SelectedDoctor)" ng-model="SelectedDoctor" ng-options="s.FullName for s in clinicDoctorList | filter:greaterThan('DoctorID',1)">
+                                            <option value="">Select Doctor</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 ">
+                                <label class="control-label">Date</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </span>
+                                        <input class="form-control icons-calendar feedback_btn1 bg-white" ng-model="referredappointmentdate" datepickerapnl ng-change="chgDate()" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="uppercase required field-label light-label">Start Time</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        </span>
+                                        <select class="form-control select-dropdown" name="patinet_appStarttime" id="patinet_appStarttime" ng-options="patinet_appStarttime.startTime for patinet_appStarttime in setValue" ng-model="patinet_appStarttime" ng-change="Endtimechange()">
+                                            <option value="">Select Start Time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ">
+                                <label class="cols-sm-2 control-label">End Time</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        </span>
+                                        <select class="form-control select-dropdown" ng-options="patinet_appEndtime.startTime for patinet_appEndtime in setEndValue" ng-model="EndtimeVAlue">
+                                            <option value="">Select End time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label class="cols-sm-2 control-label">Referral Source</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-medium" aria-hidden="true"></i>
+                                        </span>
+                                        <select name="Source" class="form-control select-dropdown" id="Source" ng-model="Source">
+                                            <option value="">Select Referral</option>
+                                            <option ng-repeat="Ref in ReferralList" value="{{Ref.ReferralID}}">{{Ref.ReferralTitle}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label class="cols-sm-2 control-label">Visit Reason</label>
+                                <div class="form-group">
+                                    <div class="col-lg-12 p-0">
+                                        <textarea rows="1" class="form-control p-r-50 headermainscroll resize-none" placeholder="Enter Visit Reason" ng-model="othervisitrsn" aw-limit-length="200" required=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label class="cols-sm-2 control-label ml-15">&nbsp</label>
+                                <div class="form-group">
+                                    <div class="col-lg-12">
+                                        <div class="clearfix float-checkbox margin-bottom-25">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-white text-right col-lg-12">
+                <button class="btn danger-btn" ng-click="closeAppointment()">Cancel</button>
+                <button class="btn primary-btn" ng-click="BookAppointment()">Confirm Appointment</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" ng-show="consultationStatuspopUp"></div>
+    <div class="modal-common" ng-show="consultationStatuspopUp">
+        <div class="modal-common-dialog book-app-popup w-540">
+            <div class="model-popup-header">
+                <h4 class="regtxtsuc text-center">Alert!</h4>
+                <a href="javascript:;" title="close" class="calender-popop-close" ng-click="closeConsultationStatuspopUp()">
+                    <i class="fa fa-times fa-lg text-white" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="eHnote-calender-popup">
+                <div class="col-lg-12 height-100">
+                    <h4 class="mar-5">There is an Active Consultation for the selected Patient today.<br />Would you like to continue that Consultation ? </h4>
+                </div>
+                <div class="col-lg-12 mb-10 text-center">
+                    <button class="btn Patient-button text-center fs-14" ng-click="continuetoConsultationAs('New')">Goto Appointments List</button>
+                    <button class="btn Patient-button text-white text-center fs-14" ng-click="continuetoConsultationAs('Existing')">Continue Consultation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<div class="p-5 p-t-0 p-r-0" ng-if="Showeditpatient">
+        <div ng-include="'templates/UsNewConsultation/uibpopup/EditPatientprofile.html'" ng-controller="EhnotePatientParentCtrl"></div>
+    </div>-->
+</div>

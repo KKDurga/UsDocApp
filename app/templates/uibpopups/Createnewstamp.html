@@ -1,0 +1,508 @@
+﻿<div class="modal-header">
+    <div class="dis-flex justify-space-between align-items-center">
+        <h1 class="fs-18 text-ehnote font-weight-700 m-0">Create New Stamp</h1>
+        <button class="btn btn-danger" ng-click="closeuib()">Close</button>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-12" ng-controller="UsfabricStampCreationCtrl">
+            <div class="two-sections">
+                <div class="p-6 bg-f2f2f2 bradius-6 flex">
+                    <div>
+                        <div class="pos-relative overflow__auto--y overflow__auto--x">
+
+                            <div id="canvas-wrapper" class="w-800">
+                                <canvas id="canvasStamp" width="800" height="500"></canvas>
+                            </div>
+                            <ul class="mb-0 button-drawpad pos-absolute right-10 bottom-10">
+                                <li ng-click="zoomoutCanvas()">
+                                    <i class="draw-zoom-out"></i>
+                                </li>
+                                <li ng-click="zoominCanvas()">
+                                    <i class="draw-zoom-in"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-f2f2f2 bradius-6 width-30">
+                    <div class="dis-flex align-items-center justify-space-between flex-direction-column overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 110px)">
+                        <!-- Select Stamp -->
+                        <div class="width-100 border-bottom p-b-6">
+
+                            <ul class="anterior-posterior-drawing-menu-switch width-100 m-b-5">
+                                <li ng-class="activeStampTab== 1 ?'active':''" class="flex">
+                                    <a href="javascript:;" ng-click="switchtoActiveStampTab(1)">
+                                        <label for="FindingsD">Create Stamp</label>
+                                        <!--<input type="radio" class="dis-none" id="FindingsD">-->
+                                    </a>
+                                </li>
+                                <li class="flex" ng-class="activeStampTab== 2 ?'active':''">
+                                    <a href="javascript:;" ng-click="switchtoActiveStampTab(2)">
+                                        <label for="StampsD">Set Position</label>
+                                        <!--<input type="radio" class="dis-none" id="StampsD">-->
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="" ng-if="activeStampTab==1">
+                                <div class="form-group">
+                                    <label>Body Part</label>
+                                    <select class="form-control" ng-model="newStampAddUpdateReqObj.FindingCategoryObj" ng-options="item as item.ExaminationCategoryName for item in mainExaminationArray" ng-change="changeStampExaminationCategory(newStampAddUpdateReqObj.FindingCategoryObj)">
+                                        <option value="" disabled="disabled">Select</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Stamp Name <em>*</em></label>
+                                    <input type="text" class="form-outline" ng-model="newStampAddUpdateReqObj.StampName" />
+                                </div>
+                                <div class="form-group">
+                                    Add Image :
+                                    <!--<input type="file" value="Upload BG Image" class="form-outline" />-->
+                                    <input type="file" id="imageInput" ng-model="selectedImage" value="Add Image" class="form-outline" accept="image/*" ngf-select="addImageToCanvas(selectedImage)">
+                                </div>
+
+                                <div class="form-group m-t-10">
+                                    <label class="cur-poiter">
+                                        <input type="checkbox" class="checkbox" ng-model="newStampAddUpdateReqObj.ConnectFindingValue" ng-change="changeAssignFinding(newStampAddUpdateReqObj.ConnectFindingValue)">
+                                        <span class="lbl"></span>
+                                        <span class="text-s12w600C000 fs-12">Assign to Finding</span>
+                                    </label>
+                                </div>
+                                <div class="form-group" ng-if="newStampAddUpdateReqObj.ConnectFindingValue">
+                                    <label>Finding Values</label>
+                                    <div class="search-2024">
+                                        <input type="text" placeholder="Search"
+                                               autocomplete="off"
+                                               name="searchFindings"
+                                               ng-model="newStampAddUpdateReqObj.FindingValueSearchObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               uib-typeahead="item as item.FindingValue+' ( '+item.FindingName+' )' for item in SearchExaminationCategoryFindingValues($viewValue)"
+                                               typeahead-on-select="onSelectFindingValues(newStampAddUpdateReqObj.FindingValueSearchObj)" />
+                                        <span class="search-2024-img">
+                                        </span>
+                                        <ul class="search-2024-ul" ng-show="newStampAddUpdateReqObj.FindingValueId!='' && newStampAddUpdateReqObj.FindingValueId!=0">
+                                            <li>
+                                                <label>{{newStampAddUpdateReqObj.FindingValue}} - {{newStampAddUpdateReqObj.InvestigationName}}</label>
+                                                <a href="javascript:;">
+                                                    <i class="fas fa-times" ng-click="deletefindingValueId(newStampAddUpdateReqObj)"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
+                                    <fieldset class="pos-relative">
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom width-0" id="organNameId" name="patSearchType" ng-value="1" ng-model="newStampAddUpdateReqObj.OrganId" value="1">
+                                            <label for="organNameId" class="radio-custom-label cur-poiter mb-0 text-label">OD</label>
+                                        </div>
+                                        <div class="dis-inline-block ml-5">
+                                            <input type="radio" class="radio-custom width-0" id="CalmrMobileId" name="patSearchType" ng-value="2" ng-model="newStampAddUpdateReqObj.OrganId" value="2">
+                                            <label for="CalmrMobileId" class="radio-custom-label cur-poiter mb-0 text-label">OS</label>
+                                        </div>
+
+
+                                    </fieldset>
+                                </div>
+
+
+                                <div id="drawing-mode-options" ng-show="getFreeDrawingMode()">
+                                    <label for="drawing-mode-selector">Mode:</label>
+                                    <select id="drawing-mode-selector" bind-value-to="drawingMode">
+                                        <option>Pencil</option>
+                                        <option>Circle</option>
+                                        <option>Spray</option>
+                                        <option>Pattern</option>
+
+                                        <option>hline</option>
+                                        <option>vline</option>
+                                        <option>square</option>
+                                        <option>diamond</option>
+                                        <option>texture</option>
+                                    </select>
+                                    <br>
+                                    <label for="drawing-line-width">Line width:</label>
+                                    <input type="range" value="30" min="0" max="150" bind-value-to="drawingLineWidth">
+                                    <br>
+                                    <label for="drawing-color">Line color:</label>
+                                    <input type="color" value="#005E7A" bind-value-to="drawingLineColor">
+
+                                </div>
+
+                                <div ng-if="cursorActiveTab==7">
+                                    <div>
+                                        <label for="canvas-background-picker">Fill Background:</label>
+                                        <input type="color" bind-value-to="canvasBgColor">
+                                    </div>
+                                    <div>
+                                        <label>Fill Selected:</label>
+                                        <input type="color" ng-model="selectedColor" ng-change="changeColor(selectedColor)" />
+                                    </div>
+                                </div>
+                                <ul class="drawing-pad-actions">
+                                    <li title="Cursor" ng-class="cursorActiveTab== 1 ?'active':''" ng-click="swiitchCursorActiveTab(1)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path d="M5.05999 12L0 0L12 4.96713L6.79364 6.69848L5.05999 12ZM1.44319 1.30786L4.98588 9.97048L6.23534 6.14299L10.005 4.89122L1.44319 1.30786Z" fill="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path d="M5.05999 12L0 0L12 4.96713L6.79364 6.69848L5.05999 12ZM1.44319 1.30786L4.98588 9.97048L6.23534 6.14299L10.005 4.89122L1.44319 1.30786Z" fill="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Rectangle" ng-class="cursorActiveTab== 2 ?'active':''" ng-click="swiitchCursorActiveTab(2)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="18" height="12" viewBox="0 0 18 12" fill="none">
+                                            <rect x="0.5" y="0.5" width="16.7933" height="11" stroke="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="18" height="12" viewBox="0 0 18 12" fill="none">
+                                            <rect x="0.5" y="0.5" width="16.7933" height="11" stroke="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Circle" ng-class="cursorActiveTab== 3 ?'active':''" ng-click="swiitchCursorActiveTab(3)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="20" height="12" viewBox="0 0 20 12" fill="none">
+                                            <path d="M19.3867 6C19.3867 7.41363 18.4347 8.77747 16.716 9.81454C15.0069 10.8459 12.6136 11.5 9.94333 11.5C7.2731 11.5 4.87981 10.8459 3.17066 9.81454C1.45199 8.77747 0.5 7.41363 0.5 6C0.5 4.58637 1.45199 3.22253 3.17066 2.18546C4.87981 1.15413 7.2731 0.5 9.94333 0.5C12.6136 0.5 15.0069 1.15413 16.716 2.18546C18.4347 3.22253 19.3867 4.58637 19.3867 6Z" fill="white" stroke="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="20" height="12" viewBox="0 0 20 12" fill="none">
+                                            <path d="M19.3867 6C19.3867 7.41363 18.4347 8.77747 16.716 9.81454C15.0069 10.8459 12.6136 11.5 9.94333 11.5C7.2731 11.5 4.87981 10.8459 3.17066 9.81454C1.45199 8.77747 0.5 7.41363 0.5 6C0.5 4.58637 1.45199 3.22253 3.17066 2.18546C4.87981 1.15413 7.2731 0.5 9.94333 0.5C12.6136 0.5 15.0069 1.15413 16.716 2.18546C18.4347 3.22253 19.3867 4.58637 19.3867 6Z" stroke="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Line" ng-class="cursorActiveTab== 4 ?'active':''" ng-click="swiitchCursorActiveTab(4)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="20" height="13" viewBox="0 0 20 13" fill="none">
+                                            <line y1="-0.5" x2="22.3371" y2="-0.5" transform="matrix(0.84344 -0.537223 0.572239 0.820087 0.680176 13)" stroke="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="20" height="13" viewBox="0 0 20 13" fill="none">
+                                            <line y1="-0.5" x2="22.3371" y2="-0.5" transform="matrix(0.84344 -0.537223 0.572239 0.820087 0.680176 13)" stroke="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Text" ng-class="cursorActiveTab== 5 ?'active':''" ng-click="swiitchCursorActiveTab(5)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none">
+                                            <path d="M7.99385 12H2.15954V11.5034C2.41615 11.4115 2.67508 11.3317 2.93769 11.2634C3.19985 11.1942 3.48231 11.1378 3.78554 11.0912V0.891231H1.57292L0.646615 3.34338H0.21C0.174923 3.11492 0.145846 2.85415 0.122308 2.56292C0.0987693 2.27262 0.0789231 1.97538 0.0609231 1.67123C0.0429231 1.37031 0.0290769 1.07123 0.018 0.780923C0.00600001 0.490615 0 0.228923 0 0H10.1538C10.1538 0.228923 10.1474 0.486923 10.1358 0.771692C10.1238 1.05738 10.1091 1.35185 10.0911 1.65462C10.0731 1.95738 10.0565 2.25462 10.0385 2.54631C10.0209 2.83754 9.99461 3.10431 9.95908 3.34385H9.49938L8.58092 0.891692H6.38585V11.0922C6.68862 11.1498 6.972 11.2066 7.23323 11.2643C7.49585 11.3211 7.74877 11.4005 7.99385 11.5043V12Z" fill="#030104" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none">
+                                            <path d="M7.99385 12H2.15954V11.5034C2.41615 11.4115 2.67508 11.3317 2.93769 11.2634C3.19985 11.1942 3.48231 11.1378 3.78554 11.0912V0.891231H1.57292L0.646615 3.34338H0.21C0.174923 3.11492 0.145846 2.85415 0.122308 2.56292C0.0987693 2.27262 0.0789231 1.97538 0.0609231 1.67123C0.0429231 1.37031 0.0290769 1.07123 0.018 0.780923C0.00600001 0.490615 0 0.228923 0 0H10.1538C10.1538 0.228923 10.1474 0.486923 10.1358 0.771692C10.1238 1.05738 10.1091 1.35185 10.0911 1.65462C10.0731 1.95738 10.0565 2.25462 10.0385 2.54631C10.0209 2.83754 9.99461 3.10431 9.95908 3.34385H9.49938L8.58092 0.891692H6.38585V11.0922C6.68862 11.1498 6.972 11.2066 7.23323 11.2643C7.49585 11.3211 7.74877 11.4005 7.99385 11.5043V12Z" fill="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Drawing Pencil" ng-class="cursorActiveTab== 6 ?'active':''" ng-click="swiitchCursorActiveTab(6)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path d="M11.6544 9.34604H8.36573C7.63401 9.34604 7.0388 9.94125 7.0388 10.673C7.0388 11.0229 6.75406 11.3076 6.40413 11.3076H1.32702C0.977003 11.3076 0.692353 11.0229 0.692353 10.673V10.2109C0.692353 9.86114 0.976911 9.57649 1.32666 9.57631L2.24159 9.57585C2.24186 9.57585 2.24223 9.57576 2.2425 9.57576C2.25294 9.57576 2.26338 9.57512 2.27391 9.5742C2.27821 9.57384 2.28242 9.5731 2.28672 9.57255C2.29121 9.57191 2.29579 9.57155 2.30027 9.57081L4.74347 9.14938C4.74475 9.1491 4.74594 9.14883 4.74713 9.14855C4.75098 9.14782 4.75473 9.147 4.75848 9.14617C4.76462 9.1448 4.77066 9.14343 4.77661 9.14169C4.78082 9.14059 4.78504 9.13931 4.78925 9.13802C4.79483 9.13619 4.80042 9.13427 4.806 9.13217C4.81003 9.13061 4.81415 9.12924 4.81818 9.12759C4.82678 9.12393 4.83521 9.12008 4.84354 9.11578C4.84684 9.11404 4.85013 9.11202 4.85343 9.11019C4.85929 9.1069 4.86506 9.1036 4.87073 9.09994C4.87421 9.09774 4.87769 9.09536 4.88117 9.09298C4.88666 9.08913 4.89216 9.0851 4.89747 9.08089C4.90031 9.0787 4.90323 9.0765 4.90607 9.07412C4.91413 9.06743 4.922 9.06048 4.92942 9.05297L11.1 2.8825C11.5948 2.38763 11.5948 1.58239 11.1 1.08743L10.3836 0.371183C9.88878 -0.123773 9.08345 -0.123682 8.58858 0.371183L2.41811 6.54166C2.4106 6.54907 2.40364 6.55704 2.39687 6.56509C2.39458 6.56784 2.39238 6.57068 2.39018 6.57352C2.38597 6.57892 2.38194 6.58441 2.3781 6.59C2.37572 6.59339 2.37334 6.59686 2.37114 6.60034C2.36757 6.60593 2.36427 6.61161 2.36107 6.61737C2.35896 6.62113 2.35676 6.62488 2.35475 6.62863C2.35072 6.6366 2.34706 6.64457 2.34358 6.65281C2.34184 6.65693 2.34038 6.66123 2.33873 6.66544C2.33681 6.67075 2.33488 6.67615 2.33314 6.68155C2.33177 6.68595 2.33049 6.69034 2.3293 6.69474C2.32774 6.70042 2.32637 6.70618 2.32509 6.71204C2.32417 6.71607 2.32325 6.7201 2.32252 6.72413C2.32225 6.72532 2.32197 6.72642 2.32179 6.72752L1.94979 8.88368L1.32629 8.88395C0.594936 8.88432 0 9.47962 0 10.2109V10.673C0 11.4047 0.595303 12 1.32702 12H6.40413C7.13585 12 7.73115 11.4047 7.73115 10.673C7.73115 10.323 8.0158 10.0383 8.36573 10.0383H11.6544C11.8455 10.0383 12.0005 9.88339 12.0005 9.69222C12.0005 9.50096 11.8455 9.34604 11.6544 9.34604ZM2.89045 7.50355L3.96752 8.58063L2.66595 8.80512L2.89045 7.50355ZM8.05398 1.8848L8.57531 2.40613L3.67372 7.30771L3.15239 6.78639L8.05398 1.8848ZM4.6846 8.31859L4.16327 7.79727L9.06495 2.89568L9.58628 3.417L4.6846 8.31859ZM9.07814 0.860646C9.30309 0.635782 9.66904 0.635782 9.89409 0.860646L10.6103 1.57699C10.8353 1.80194 10.8353 2.16799 10.6103 2.39294L10.0757 2.92754C10.0757 2.92745 10.0758 2.92754 10.0758 2.92754C10.0758 2.92754 10.0758 2.92754 10.0757 2.92754L8.54353 1.39525L9.07814 0.860646Z" fill="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path d="M11.6544 9.34604H8.36573C7.63401 9.34604 7.0388 9.94125 7.0388 10.673C7.0388 11.0229 6.75406 11.3076 6.40413 11.3076H1.32702C0.977003 11.3076 0.692353 11.0229 0.692353 10.673V10.2109C0.692353 9.86114 0.976911 9.57649 1.32666 9.57631L2.24159 9.57585C2.24186 9.57585 2.24223 9.57576 2.2425 9.57576C2.25294 9.57576 2.26338 9.57512 2.27391 9.5742C2.27821 9.57384 2.28242 9.5731 2.28672 9.57255C2.29121 9.57191 2.29579 9.57155 2.30027 9.57081L4.74347 9.14938C4.74475 9.1491 4.74594 9.14883 4.74713 9.14855C4.75098 9.14782 4.75473 9.147 4.75848 9.14617C4.76462 9.1448 4.77066 9.14343 4.77661 9.14169C4.78082 9.14059 4.78504 9.13931 4.78925 9.13802C4.79483 9.13619 4.80042 9.13427 4.806 9.13217C4.81003 9.13061 4.81415 9.12924 4.81818 9.12759C4.82678 9.12393 4.83521 9.12008 4.84354 9.11578C4.84684 9.11404 4.85013 9.11202 4.85343 9.11019C4.85929 9.1069 4.86506 9.1036 4.87073 9.09994C4.87421 9.09774 4.87769 9.09536 4.88117 9.09298C4.88666 9.08913 4.89216 9.0851 4.89747 9.08089C4.90031 9.0787 4.90323 9.0765 4.90607 9.07412C4.91413 9.06743 4.922 9.06048 4.92942 9.05297L11.1 2.8825C11.5948 2.38763 11.5948 1.58239 11.1 1.08743L10.3836 0.371183C9.88878 -0.123773 9.08345 -0.123682 8.58858 0.371183L2.41811 6.54166C2.4106 6.54907 2.40364 6.55704 2.39687 6.56509C2.39458 6.56784 2.39238 6.57068 2.39018 6.57352C2.38597 6.57892 2.38194 6.58441 2.3781 6.59C2.37572 6.59339 2.37334 6.59686 2.37114 6.60034C2.36757 6.60593 2.36427 6.61161 2.36107 6.61737C2.35896 6.62113 2.35676 6.62488 2.35475 6.62863C2.35072 6.6366 2.34706 6.64457 2.34358 6.65281C2.34184 6.65693 2.34038 6.66123 2.33873 6.66544C2.33681 6.67075 2.33488 6.67615 2.33314 6.68155C2.33177 6.68595 2.33049 6.69034 2.3293 6.69474C2.32774 6.70042 2.32637 6.70618 2.32509 6.71204C2.32417 6.71607 2.32325 6.7201 2.32252 6.72413C2.32225 6.72532 2.32197 6.72642 2.32179 6.72752L1.94979 8.88368L1.32629 8.88395C0.594936 8.88432 0 9.47962 0 10.2109V10.673C0 11.4047 0.595303 12 1.32702 12H6.40413C7.13585 12 7.73115 11.4047 7.73115 10.673C7.73115 10.323 8.0158 10.0383 8.36573 10.0383H11.6544C11.8455 10.0383 12.0005 9.88339 12.0005 9.69222C12.0005 9.50096 11.8455 9.34604 11.6544 9.34604ZM2.89045 7.50355L3.96752 8.58063L2.66595 8.80512L2.89045 7.50355ZM8.05398 1.8848L8.57531 2.40613L3.67372 7.30771L3.15239 6.78639L8.05398 1.8848ZM4.6846 8.31859L4.16327 7.79727L9.06495 2.89568L9.58628 3.417L4.6846 8.31859ZM9.07814 0.860646C9.30309 0.635782 9.66904 0.635782 9.89409 0.860646L10.6103 1.57699C10.8353 1.80194 10.8353 2.16799 10.6103 2.39294L10.0757 2.92754C10.0757 2.92745 10.0758 2.92754 10.0758 2.92754C10.0758 2.92754 10.0758 2.92754 10.0757 2.92754L8.54353 1.39525L9.07814 0.860646Z" fill="white" />
+                                        </svg>
+                                    </li>
+                                    <li title="Fill Color" ng-class="cursorActiveTab== 7 ?'active':''" ng-click="swiitchCursorActiveTab(7)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <mask id="mask0_1450_18509" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="12">
+                                                <path d="M0 0H12V12H0V0Z" fill="white" />
+                                            </mask>
+                                            <g mask="url(#mask0_1450_18509)">
+                                                <path d="M10.9458 10.4062C11.3341 10.4062 11.6489 10.0915 11.6489 9.70312C11.6489 9.57523 11.6148 9.45532 11.5551 9.35201L10.9458 8.29687L10.3365 9.35201C10.2768 9.45532 10.2427 9.57523 10.2427 9.70312C10.2427 10.0915 10.5575 10.4062 10.9458 10.4062Z" stroke="black" stroke-miterlimit="10" />
+                                                <path d="M4.53449 11.2335L0.557002 7.25602C0.282432 6.98145 0.282432 6.53623 0.557002 6.26166L5.55231 1.26638L11.0213 6.73541L9.52977 7.23259L5.52887 11.2335C5.25428 11.5081 4.80908 11.5081 4.53449 11.2335Z" stroke="black" stroke-miterlimit="10" />
+                                                <path d="M2.48389 4.33404V1.61719C2.48389 1.03469 2.95608 0.5625 3.53857 0.5625C4.12107 0.5625 4.59326 1.03469 4.59326 1.61719V6.53906" stroke="black" stroke-miterlimit="10" />
+                                            </g>
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <mask id="mask0_1450_18518" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="12">
+                                                <path d="M0 0H12V12H0V0Z" fill="white" />
+                                            </mask>
+                                            <g mask="url(#mask0_1450_18518)">
+                                                <path d="M10.9458 10.4062C11.3341 10.4062 11.6489 10.0915 11.6489 9.70312C11.6489 9.57523 11.6148 9.45532 11.5551 9.35201L10.9458 8.29687L10.3365 9.35201C10.2768 9.45532 10.2427 9.57523 10.2427 9.70312C10.2427 10.0915 10.5575 10.4062 10.9458 10.4062Z" stroke="white" stroke-miterlimit="10" />
+                                                <path d="M4.53449 11.2335L0.557002 7.25602C0.282432 6.98145 0.282432 6.53623 0.557002 6.26166L5.55231 1.26638L11.0213 6.73541L9.52977 7.23259L5.52887 11.2335C5.25428 11.5081 4.80908 11.5081 4.53449 11.2335Z" stroke="white" stroke-miterlimit="10" />
+                                                <path d="M2.48389 4.33404V1.61719C2.48389 1.03469 2.95608 0.5625 3.53857 0.5625C4.12107 0.5625 4.59326 1.03469 4.59326 1.61719V6.53906" stroke="white" stroke-miterlimit="10" />
+                                            </g>
+                                        </svg>
+                                    </li>
+                                    <li title="Triangle" ng-class="cursorActiveTab== 8 ?'active':''" ng-click="swiitchCursorActiveTab(8)" style="cursor:pointer">
+                                        <svg class="check-inactive" xmlns="http://www.w3.org/2000/svg" width="15" height="12" viewBox="0 0 15 12" fill="none">
+                                            <path d="M14.8781 12H0L7.43903 0L14.8781 12ZM1.10235 11.3862H13.7755L7.43903 1.16477L1.10235 11.3862Z" fill="black" />
+                                        </svg>
+                                        <svg class="check-active" xmlns="http://www.w3.org/2000/svg" width="15" height="12" viewBox="0 0 15 12" fill="none">
+                                            <path d="M14.8781 12H0L7.43903 0L14.8781 12ZM1.10235 11.3862H13.7755L7.43903 1.16477L1.10235 11.3862Z" fill="white" />
+                                        </svg>
+                                    </li>
+                                </ul>
+                                <div class="dis-flex align-items-center grid-gap-5">
+                                    <ul class="dis-flex align-items-center list-unstyled bg-white bradius-6 m-0">
+                                        <li title="Undo" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 9 ?'':''" ng-click="swiitchCursorActiveTab(9)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none">
+                                                <path d="M8.3335 5.3335C6.56683 5.3335 4.96683 5.9935 3.7335 7.06683L2.4735 5.80683C2.0535 5.38683 1.3335 5.68016 1.3335 6.2735V10.0002C1.3335 10.3668 1.6335 10.6668 2.00016 10.6668H5.72683C6.32016 10.6668 6.62016 9.94683 6.20016 9.52683L4.92683 8.2535C5.8535 7.48016 7.0335 7.00016 8.34016 7.00016C10.4468 7.00016 12.2668 8.22683 13.1335 10.0002C13.3135 10.3735 13.7402 10.5602 14.1335 10.4268C14.6068 10.2735 14.8468 9.7335 14.6335 9.28016C13.4868 6.94683 11.1002 5.3335 8.3335 5.3335Z" fill="#323232" />
+                                            </svg>
+                                        </li>
+                                        <li title="Redo" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 10 ?'':''" ng-click="swiitchCursorActiveTab(10)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none">
+                                                <path d="M7.6665 5.3335C9.43317 5.3335 11.0332 5.9935 12.2665 7.06683L13.5265 5.80683C13.9465 5.38683 14.6665 5.68016 14.6665 6.2735V10.0002C14.6665 10.3668 14.3665 10.6668 13.9998 10.6668H10.2732C9.67984 10.6668 9.37984 9.94683 9.79984 9.52683L11.0732 8.2535C10.1465 7.48016 8.9665 7.00016 7.65984 7.00016C5.55317 7.00016 3.73317 8.22683 2.8665 10.0002C2.6865 10.3735 2.25984 10.5602 1.8665 10.4268C1.39317 10.2735 1.15317 9.7335 1.3665 9.28016C2.51317 6.94683 4.89984 5.3335 7.6665 5.3335Z" fill="#323232" />
+                                            </svg>
+                                        </li>
+                                    </ul>
+                                    <ul class="dis-flex align-items-center list-unstyled bg-white bradius-6 m-0">
+                                        <li title="Bring to Front" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 11 ?'':''" ng-click="swiitchCursorActiveTab(11)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 12 12" fill="none">
+                                                <path d="M4 9.33333C3.63333 9.33333 3.31944 9.20278 3.05833 8.94167C2.79722 8.68056 2.66667 8.36667 2.66667 8V1.33333C2.66667 0.966667 2.79722 0.652778 3.05833 0.391667C3.31944 0.130556 3.63333 0 4 0H10.6667C11.0333 0 11.3472 0.130556 11.6083 0.391667C11.8694 0.652778 12 0.966667 12 1.33333V8C12 8.36667 11.8694 8.68056 11.6083 8.94167C11.3472 9.20278 11.0333 9.33333 10.6667 9.33333H4ZM4 8H10.6667V1.33333H4V8ZM1.33333 10.6667V12C0.966667 12 0.652778 11.8694 0.391667 11.6083C0.130556 11.3472 0 11.0333 0 10.6667H1.33333ZM0 9.33333V8H1.33333V9.33333H0ZM0 6.66667V5.33333H1.33333V6.66667H0ZM0 4V2.66667H1.33333V4H0ZM2.66667 12V10.6667H4V12H2.66667ZM5.33333 12V10.6667H6.66667V12H5.33333ZM8 12V10.6667H9.33333V12H8Z" fill="black" />
+                                            </svg>
+                                        </li>
+                                        <li title="Send to Back" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 12 ?'':''" ng-click="swiitchCursorActiveTab(12)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 12 12" fill="none">
+                                                <path d="M1.33333 12C0.966667 12 0.652778 11.8694 0.391667 11.6083C0.130556 11.3472 0 11.0333 0 10.6667V2.66667H1.33333V10.6667H9.33333V12H1.33333ZM4 8V9.33333C3.63333 9.33333 3.31944 9.20278 3.05833 8.94167C2.79722 8.68056 2.66667 8.36667 2.66667 8H4ZM2.66667 6.66667V5.33333H4V6.66667H2.66667ZM2.66667 4V2.66667H4V4H2.66667ZM4 1.33333H2.66667C2.66667 0.966667 2.79722 0.652778 3.05833 0.391667C3.31944 0.130556 3.63333 0 4 0V1.33333ZM5.33333 9.33333V8H6.66667V9.33333H5.33333ZM5.33333 1.33333V0H6.66667V1.33333H5.33333ZM8 1.33333V0H9.33333V1.33333H8ZM8 9.33333V8H9.33333V9.33333H8ZM10.6667 1.33333V0C11.0333 0 11.3472 0.130556 11.6083 0.391667C11.8694 0.652778 12 0.966667 12 1.33333H10.6667ZM10.6667 8H12C12 8.36667 11.8694 8.68056 11.6083 8.94167C11.3472 9.20278 11.0333 9.33333 10.6667 9.33333V8ZM10.6667 6.66667V5.33333H12V6.66667H10.6667ZM10.6667 4V2.66667H12V4H10.6667Z" fill="black" />
+                                            </svg>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="dis-flex align-items-center grid-gap-5 m-t-5">
+                                    <ul class="dis-flex align-items-center list-unstyled bg-white bradius-6 m-0">
+                                        <li title="Copy" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 13 ?'':''" ng-click="swiitchCursorActiveTab(13)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 13 12" fill="none">
+                                                <g clip-path="url(#clip0_1340_57252)">
+                                                    <path d="M7.52051 0.5H2.02051C1.47051 0.5 1.02051 0.95 1.02051 1.5V8C1.02051 8.275 1.24551 8.5 1.52051 8.5C1.79551 8.5 2.02051 8.275 2.02051 8V2C2.02051 1.725 2.24551 1.5 2.52051 1.5H7.52051C7.79551 1.5 8.02051 1.275 8.02051 1C8.02051 0.725 7.79551 0.5 7.52051 0.5ZM9.52051 2.5H4.02051C3.47051 2.5 3.02051 2.95 3.02051 3.5V10.5C3.02051 11.05 3.47051 11.5 4.02051 11.5H9.52051C10.0705 11.5 10.5205 11.05 10.5205 10.5V3.5C10.5205 2.95 10.0705 2.5 9.52051 2.5ZM9.02051 10.5H4.52051C4.24551 10.5 4.02051 10.275 4.02051 10V4C4.02051 3.725 4.24551 3.5 4.52051 3.5H9.02051C9.29551 3.5 9.52051 3.725 9.52051 4V10C9.52051 10.275 9.29551 10.5 9.02051 10.5Z" fill="black" />
+                                                </g>
+                                                <defs>
+                                                    <clipPath id="clip0_1340_57252">
+                                                        <rect width="12" height="12" fill="white" transform="translate(0.0205078)" />
+                                                    </clipPath>
+                                                </defs>
+                                            </svg>
+                                        </li>
+                                    </ul>
+
+                                    <ul class="dis-flex align-items-center list-unstyled bg-white bradius-6 m-0">
+                                        <li title="Clear Drawing" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-class="cursorActiveTab== 14 ?'':''" ng-click="swiitchCursorActiveTab(14)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19" fill="none">
+                                                <path d="M15.3546 2.6454C14.5215 1.80658 13.5305 1.14097 12.4389 0.68694C11.3473 0.23291 10.1766 -0.000556497 8.99437 9.96073e-07C4.01876 9.96073e-07 0 4.03002 0 9.00563C0 13.9812 4.01876 18.0113 8.99437 18.0113C13.1932 18.0113 16.6942 15.1407 17.6961 11.257H15.3546C14.8909 12.5736 14.03 13.7137 12.8908 14.5203C11.7516 15.3268 10.3902 15.7599 8.99437 15.7599C5.26829 15.7599 2.24015 12.7317 2.24015 9.00563C2.24015 5.27955 5.26829 2.25141 8.99437 2.25141C10.863 2.25141 12.5291 3.02814 13.7448 4.25516L10.1201 7.87993H18V9.96073e-07L15.3546 2.6454Z" fill="black" />
+                                            </svg>
+                                        </li>
+                                    </ul>
+                                    <ul class="dis-flex align-items-center list-unstyled bg-white bradius-6 m-0">
+                                        <li title="Clear Drawing" class="p-t-6 p-b-6 p-l-15 p-r-15 dis-flex cur-poiter" ng-click="removeSelected()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 22 24" fill="none">
+                                                <path d="M8.5 4H13.5C13.5 3.33696 13.2366 2.70107 12.7678 2.23223C12.2989 1.76339 11.663 1.5 11 1.5C10.337 1.5 9.70107 1.76339 9.23223 2.23223C8.76339 2.70107 8.5 3.33696 8.5 4ZM7 4C7 2.93913 7.42143 1.92172 8.17157 1.17157C8.92172 0.421427 9.93913 0 11 0C12.0609 0 13.0783 0.421427 13.8284 1.17157C14.5786 1.92172 15 2.93913 15 4H21.25C21.4489 4 21.6397 4.07902 21.7803 4.21967C21.921 4.36032 22 4.55109 22 4.75C22 4.94891 21.921 5.13968 21.7803 5.28033C21.6397 5.42098 21.4489 5.5 21.25 5.5H19.94L18.723 20.103C18.6345 21.1653 18.1499 22.1556 17.3655 22.8774C16.5811 23.5992 15.554 23.9999 14.488 24H7.512C6.44599 23.9999 5.41894 23.5992 4.6345 22.8774C3.85007 22.1556 3.36554 21.1653 3.277 20.103L2.06 5.5H0.75C0.551088 5.5 0.360322 5.42098 0.21967 5.28033C0.0790175 5.13968 0 4.94891 0 4.75C0 4.55109 0.0790175 4.36032 0.21967 4.21967C0.360322 4.07902 0.551088 4 0.75 4H7ZM9.5 9.75C9.5 9.55109 9.42098 9.36032 9.28033 9.21967C9.13968 9.07902 8.94891 9 8.75 9C8.55109 9 8.36032 9.07902 8.21967 9.21967C8.07902 9.36032 8 9.55109 8 9.75V18.25C8 18.4489 8.07902 18.6397 8.21967 18.7803C8.36032 18.921 8.55109 19 8.75 19C8.94891 19 9.13968 18.921 9.28033 18.7803C9.42098 18.6397 9.5 18.4489 9.5 18.25V9.75ZM13.25 9C13.0511 9 12.8603 9.07902 12.7197 9.21967C12.579 9.36032 12.5 9.55109 12.5 9.75V18.25C12.5 18.4489 12.579 18.6397 12.7197 18.7803C12.8603 18.921 13.0511 19 13.25 19C13.4489 19 13.6397 18.921 13.7803 18.7803C13.921 18.6397 14 18.4489 14 18.25V9.75C14 9.55109 13.921 9.36032 13.7803 9.21967C13.6397 9.07902 13.4489 9 13.25 9Z" fill="#F24E1E" />
+                                            </svg>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="" ng-if="activeStampTab==2">
+                                <div class="form-group">
+                                    <label>Body Part</label>
+                                    <select class="form-control" ng-model="newStampAddUpdateReqObj.FindingCategoryObj" ng-options="item as item.ExaminationCategoryName for item in mainExaminationArray" ng-change="changeStampPositionExaminationCategory(newStampAddUpdateReqObj.FindingCategoryObj)">
+                                        <option value="" disabled="disabled">Select</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Select Stamp</label>
+                                    <input type="text" placeholder="Search" class="form-outline"
+                                           autocomplete="off"
+                                           name="searchFindings"
+                                           ng-model="newStampAddUpdateReqObj.SelectedStampObj"
+                                           maxlength="100"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="item as item.StampName  for item in SearchOrganizationStamps($viewValue)"
+                                           typeahead-on-select="onSelectStamp(newStampAddUpdateReqObj.SelectedStampObj)" />
+
+                                </div>
+                                <!--<div class="form-group">
+                    <ul class="flex-flow-ulli-mb0">
+                        <li class="flex">
+                            <span class="text-s14w500c767575">X axis</span>
+                            <span class="text-s14w500c000"> {{selectedCanvasscaleX}}</span>
+                        </li>
+                        <li class="flex">
+                            <span class="text-s14w500c767575">Y axis</span>
+                            <span class="text-s14w500c000"> {{selectedCanvasscaleY}}</span>
+                        </li>
+                    </ul>
+                </div>-->
+                                <div class="dis-flex align-items-center grid-gap-15">
+                                    <button class="btn btn-primary flex" ng-click="saveCanvasPosition()">Save Position</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="width-100">
+                        <div class="dis-flex align-items-center grid-gap-15" ng-if="activeStampTab==1">
+                            <button class="btn btn-warning" ng-click="clearCanvasStamp()">Clear</button>
+                            <button class="btn btn-primary flex" ng-click="saveStamp()">Save</button>
+                        </div>
+                        <div class="dis-flex align-items-center grid-gap-15" ng-if="activeStampTab==2">
+                            <button class="btn btn-warning" ng-click="clearStampPosition()">Clear</button>
+                            <button class="btn btn-primary flex" ng-click="saveCanvasPosition()">Save Position</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    ul {
+        margin-left: 0;
+    }
+
+    label {
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    button.selected {
+        font-weight: bold;
+        vertical-align: top
+    }
+
+    textarea {
+        font-family: monospace;
+    }
+
+    input[type=color] {
+        width: 40px;
+        padding: 0;
+        margin: 0;
+        height: 20px;
+        position: relative;
+        top: 2px;
+    }
+
+    input[type=radio] {
+        margin-top: -3px;
+    }
+
+    .canvas-container {
+        margin: 0 auto;
+        border: 1px solid #aaa;
+    }
+
+    .svg-shapes {
+        overflow: hidden;
+        width: 450px;
+        margin-left: 0;
+    }
+
+        .svg-shapes li {
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+    .tabs li, .tabs li a {
+        display: inline-block;
+    }
+
+    .btn-lock {
+        margin-bottom: 3px;
+    }
+
+    #object-controls-pane {
+        width: 450px
+    }
+
+    #bd-wrapper {
+        overflow: hidden;
+        position: relative;
+    }
+
+    #fps {
+        position: absolute;
+        left: 1px;
+        top: 0;
+        background: rgb(200,200,200);
+        width: 70px;
+        z-index: 1000;
+    }
+
+    #commands {
+        float: left;
+        font-size: 14px;
+        margin-left: 15px;
+    }
+
+        #commands ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+    #complexity {
+        clear: both;
+        padding-top: 10px;
+    }
+
+    #color-opacity-controls {
+        margin-bottom: 5px;
+    }
+
+    #text-controls {
+        display: inline-block;
+        vertical-align: top;
+        border: 1px dotted #ccc;
+        padding: 10px;
+        width: 410px;
+    }
+
+        #text-controls textarea {
+            width: 300px;
+        }
+
+    #drawing-mode-options {
+        margin-top: 5px;
+        background: #ffc;
+        padding: 5px;
+        border: 1px solid #aaa;
+    }
+
+    #text {
+        position: relative;
+        width: 300px;
+        height: 200px;
+    }
+
+    #text-cmd-linethrough {
+        text-decoration: line-through;
+    }
+
+    #text-cmd-underline {
+        text-decoration: underline;
+    }
+
+    #text-cmd-overline {
+        text-decoration: overline;
+    }
+
+    #text-cmd-italic {
+        font-style: italic;
+    }
+
+    #text-cmd-shadow {
+        text-shadow: rgb(100,100,100) 1px 1px 3px;
+    }
+
+    #svg-console, #canvas-console, #json-console {
+        width: 430px;
+        height: 500px;
+        display: block;
+    }
+
+    #canvas-background {
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    #canvasStamp {
+        width: 800px !important;
+        height: 500px;
+    }
+
+    .canvas-container {
+        width: 800px !important;
+        height: 500px;
+    }
+
+    .upper-canvas {
+        width: 800px !important;
+        position: relative !important;
+        height: 500px;
+    }
+</style>
+

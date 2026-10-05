@@ -1,0 +1,141 @@
+﻿<div class="modal-body p-0 ng-scope">
+    <div class="row p-10">
+        <div class="col-lg-12">
+            <div class="dis-flex align-items-center justify-space-between border-bottom">
+                <div>
+                    <h1 class="text-ocularhist">Pre-Auth Instructions</h1>
+                </div>
+                <div class="asc-patient-profile">
+                    <ul>
+                        <li>
+                            <img image-viewer ng-if="ParentObject.S3URL != ''" src="{{ParentObject.S3URL}}" />
+                            <img ng-if="ParentObject.S3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                            <p class="text-capitalize" title="{{ParentObject.FullName}}">{{ParentObject.FullName}}</p>
+                        </li>
+                        <li>
+                            <span>MR No.:</span>
+                            <label>{{ParentObject.PatientDisplayId}}</label>
+                        </li>
+                        <li>
+                            <span>Sex:</span>
+                            <label>{{ParentObject.Gender}}</label>
+                        </li>
+                        <li>
+                            <span>Age:</span>
+                            <label>{{ParentObject.Age}}</label>
+                        </li>
+                        <li>
+                            <span>DOB:</span>
+                            <label>{{ParentObject.DOB | date:"MM-dd-yyyy"}}</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dis-flex align-items-center m-l-10">
+                    <button class="btn btn-discard-us m-r-5" ng-click="closeuib()">Close</button>
+                    <button class="btn btn-save-us" ng-click="SavePreAuth()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-body p-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table-layout-fix table tableno-padding tableno-bordered">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="ehr-input  pop-ehr-input">
+                                <label>Status</label>
+                                <select ng-model="PreAuthObj.StatusId"
+                                        ng-options="item.Id as item.Name for item in GetStatusList">
+                                    <option value="">Select</option>
+
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ehr-input  pop-ehr-input">
+                                <label>Authorization Number</label>
+                                <input type="text" ng-model="PreAuthObj.PreAuthorizationNumber" alpha-numeric maxlength="15"/>
+                               
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ehr-input  pop-ehr-input">
+                                <label>Expiry Date</label>
+                                <div class="ehr-input-group">
+                                    <input type="text" ng-model="PreAuthObj.EndDate" placeholder="MM-DD-YYYY" datepickerapnlus readonly />
+                                    <button><i class="far fa-calendar"></i></button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="ehr-input pop-ehr-input">
+                                <div class="ehr-input-group">
+                                    <input type="file" id="selectfile" value="Upload"
+                                           ngf-select="selectedFiles($files);"
+                                           name="file"
+                                           ngf-pattern="'image/*,application/pdf'"
+                                           ngf-accept="'image/*,application/pdf'"
+                                           multiple="multiple" />
+
+                                    <button for="selectfile" class="bg-07a0d4"><i class="fas fa-cloud-upload-alt"></i></button>
+                                </div>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div class="ehr-input  pop-ehr-input">
+                                <label>Notes</label>
+                                <textarea rows="2" placeholder="Enter Notes" maxlength="500" ng-model="PreAuthObj.Notes"></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td ng-repeat="item in PreAuthObj.PatientDocumentDetails | filter:{'DeleteInd':'N'} track by $index">
+                            <div class="dis-flex align-items-center justify-space-between flex Pre-Authorization-files">
+                                <label>Uploaded File both</label>
+                                <a href="javascript:;" ng-click="DeleteUploadedFile();">
+                                    <i class="eh-close eh-icon"></i>
+                                </a>
+                            </div>
+                        </td>
+                        
+                    </tr>
+                     
+                </tbody>
+            </table>
+            <table class="table table-consultation" image-viewer>
+                <tbody>
+                    <tr>
+                        <td ng-repeat="titem in PreAuthObj.TempDocuments">
+                            <button class="btn btn-link p-l-5 p-r-5 m-l-3 pos-absolute z-9999" style="top: 0px; right: 4px;" ng-click="removeImage(titem, PreAuthObj)"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+                            <img ngf-thumbnail="titem.file" class="img-thumbnail" width="50" height="50" />
+                        </td>
+                        <td ng-repeat="pitem in PreAuthObj.PatientDocumentDetails | filter : {DeleteInd : 'N'}">
+                            <button class="btn btn-link p-l-5 p-r-5 m-l-3 pos-absolute z-9999" style="top: 0px; right: 4px;" ng-click="removeImage(pitem, PreAuthObj)"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+                            <img ng-src="{{pitem.S3URL}}" class="img-thumbnail" width="50" height="50" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+

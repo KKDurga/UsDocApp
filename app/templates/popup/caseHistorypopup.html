@@ -1,0 +1,1796 @@
+
+    <div class="admission-panel p-t-0">
+        <div class="grid-Iheading">
+            <h1>Case History</h1>
+            <ul class="controls">
+                <li>
+                    <button class="btn btn-sm btn-default height-25">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="admission-body"></div>
+        <uib-accordion close-others="oneAtATime">
+            <div uib-accordion-group class="casehistory-accordion" is-open="false" ng-repeat="case in CaseHistory track by $index" ng-click="PreGetTreatMentPlan(case,$index)">
+                <uib-accordion-heading>
+                    <div class="row casehistory-acchead">
+                        <div class="col-lg-3">
+                            <label><i class="far fa-calendar-alt fa-lg"></i> Date</label>
+                            <p>{{case.AppointmentDate | date:'dd-MM-yyyy'}}</p>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><i class="fas fa-user-md fa-lg"></i> Doctor</label>
+                            <p>{{case.DoctorName}}</p>
+                        </div>
+                        <div class="col-lg-3">
+                            <label><i class="far fa-hospital fa-lg"></i> Branch</label>
+                            <p>{{case.HospitalName}}</p>
+                        </div>
+                    </div>
+                </uib-accordion-heading>
+                <div class="row m-b-10" ng-hide="treatmentArray.length == 0">
+                    <div class="col-lg-12">
+                        <ul class="list-diagnosis-li m-b-0 text-right" ng-repeat="plan in treatmentArray">
+                            <li>
+                                <div class="checkbox cn">
+                                    <label>
+                                        <input name="checkbox-1" type="checkbox" title="Send Email to Patient" ng-click="emailPopup(plan,'all')" data-toggle="modal" data-target="#email-body">
+                                        <span class="checkbox-material">
+                                            <span class="check"></span>
+                                        </span>
+                                        <small>Send Email</small>
+                                    </label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="patient-tick-tag">
+                                    <div class="tick-tag m-r-5 edit-consultation-bg">
+                                        <i class="fas fa-edit"></i> &nbsp;
+                                        <span ng-click="PreGoToNewConsultation('Edit',plan)">
+                                            Edit Consultation
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="patient-tick-tag">
+                                    <div class="tick-tag doc-active">
+                                        <i class="fas fa-print"></i> &nbsp;
+                                        <span ng-click="printViewCaseHistory('all',plan)" data-target="#printModuleCaseHistoryPopup" data-toggle="modal">
+                                            Print All
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <section class="tile tile-shadow m-b-1">
+                            <div class="tile-body bg-gray cons-border-tile">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <h4 class="text-black">Patient Details</h4>
+                                        <div class="table-responsive">
+                                            <table class="table tableno-bordered m-b-0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="30%">Patient Details</td>
+                                                        <td width="3%">:</td>
+                                                        <td><b>{{(selectedTreatmentplan.Title.length > 0)? (selectedTreatmentplan.Title + '. '):"Mr"}}{{selectedTreatmentplan.PatientName}}</b></td>
+                                                        <td rowspan="3">
+                                                            <div class="m-b-5 text-right"><span class="vip-patient patient-table-tag" ng-if="selectedTreatmentplan.IsVIPInd">VIP</span></div>
+                                                            <div class="m-b-5 text-right"><span class="research-patient patient-table-tag" ng-if="selectedTreatmentplan.IsResearchInd">Research</span></div>
+                                                            <div class="m-b-5 text-right"><span class="research-patient patient-table-tag" ng-if="selectedTreatmentplan.IsHighRiskInd">High Risk</span></div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="30%">
+                                                            Gender & Age
+                                                        </td>
+                                                        <td width="3%">:</td>
+                                                        <td><b>{{selectedTreatmentplan.Gender}} | {{selectedTreatmentplan.CurrentAge}}</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="30%">Category :</td>
+                                                        <td width="3%">:</td>
+                                                        <td><b>{{selectedTreatmentplan.PatientType}}</b></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-lg-6">
+                        <section class="tile tile-shadow m-b-1">
+                            <div class="tile-body bg-gray cons-border-tile">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <h4 class="text-black">Doctor Details</h4>
+                                        <div class="table-responsive">
+                                            <table class="table tableno-bordered m-b-0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="30%">Doctor Name :</td>
+                                                        <td width="3%">:</td>
+                                                        <td><b ng-bind="selectedTreatmentplan.DoctorName"></b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="30%">Branch :</td>
+                                                        <td width="3%">:</td>
+                                                        <td><b ng-bind="selectedTreatmentplan.HospitalName"></b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="30%">
+                                                            Noted Date & Time :
+                                                        </td>
+                                                        <td width="3%">:</td>
+                                                        <td><b>{{selectedTreatmentplan.NotifiedDate}}</b></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <!-- /Patient details and Doctor Details -->
+                <div class="row m-t-10">
+                    <div class="col-lg-12" ng-repeat="plan in treatmentArray">
+                        <!-- Patient History -->
+                        <section class="tile tile-shadow cons-border-tile" ng-hide="plan.MedicalConditions.length == 0 && plan.AllergyItems.length == 0 && cacheStorageItem.MedicalHistory.length==0 && cacheStorageItem.BirthHistory.length==0 && cacheStorageItem.FamilyHistory.length==0 && cacheStorageItem.NutritionalHistory.length==0 && cacheStorageItem.ImmunisationHistory.length==0 && cacheStorageItem.SurgicalHistory.length==0">
+                            <div class="tile-header">
+                                <h1>Patient History</h1>
+                            </div>
+
+                            <div class="tile-body">
+                                <div class="panel panel-default" ng-hide="plan.AllergyItems.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Allergies
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="alerg in plan.AllergyItems track by $index">
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <b>{{alerg.AllergyName}}</b>
+                                                                        <p class="m-b-0" ng-bind="alerg.Reaction"></p>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td width="10%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right"
+                                                                         uib-popover="by {{alerg.ModifiedBy}} on {{alerg.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default" ng-hide="cacheStorageItem.MedicalConditions.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Current Treatment
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="medhist in cacheStorageItem.MedicalConditions track by $index">
+                                                                <td width="70%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">{{medhist.MedicalConditionName}}</p>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right"
+                                                                         uib-popover="by {{medhist.ModifiedBy}} on {{medhist.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-hide="cacheStorageItem.MedicalHistory.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Medical History
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="medhist in cacheStorageItem.MedicalHistory track by $index">
+                                                                <td width="70%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">{{medhist.HistoryName}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="25%">
+                                                                    <div class="padd-tab-td text-right">
+                                                                        <span class="badge badge-primary pull-inital">5 Days</span>
+                                                                    </div>
+                                                                </td>-->
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right"
+                                                                         uib-popover="by {{medhist.ModifiedBy}} on {{medhist.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-show="cacheStorageItem.BirthHistory.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Birth History
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="comp in cacheStorageItem.BirthHistory">
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">{{comp.HistoryName}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="25%">
+                                                                    <div class="padd-tab-td text-right">
+                                                                        <b>Since :</b>
+                                                                        <span class="badge badge-primary pull-inital">03-MAR-2020</span>
+                                                                    </div>
+                                                                </td>-->
+                                                                <td width="10%" class="p-0 text-center">
+                                                                    <div class="doc-info-right" uib-popover="by {{comp.ModifiedBy}} on {{comp.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-show="cacheStorageItem.NutritionalHistory.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Nutritional History
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="comp in cacheStorageItem.NutritionalHistory">
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0"> {{comp.HistoryName}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="25%">
+                                                                    <div class="padd-tab-td text-right">
+                                                                        <b>Since :</b>
+                                                                        <span class="badge badge-primary pull-inital">03-MAR-2020</span>
+                                                                    </div>
+                                                                </td>-->
+                                                                <td width="10%" class="p-0 text-center">
+                                                                    <div class="doc-info-right" uib-popover="by {{comp.ModifiedBy}} on {{comp.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-show="cacheStorageItem.ImmunisationHistory.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Immunisation History
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="comp in cacheStorageItem.ImmunisationHistory">
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">{{comp.HistoryName}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="25%">
+                                                                    <div class="padd-tab-td text-right">
+                                                                        <b>Since :</b>
+                                                                        <span class="badge badge-primary pull-inital">03-MAR-2020</span>
+                                                                    </div>
+                                                                </td>-->
+                                                                <td width="10%" class="p-0 text-center">
+                                                                    <div class="doc-info-right" uib-popover="by {{comp.ModifiedBy}} on {{comp.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-show="cacheStorageItem.SurgicalHistory.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Surgical History
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="comp in cacheStorageItem.SurgicalHistory">
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0"> {{comp.HistoryName}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="25%">
+                                                                    <div class="padd-tab-td text-right">
+                                                                        <b>Since :</b>
+                                                                        <span class="badge badge-primary pull-inital">03-MAR-2020</span>
+                                                                    </div>
+                                                                </td>-->
+                                                                <td width="10%" class="p-0 text-center">
+                                                                    <div class="doc-info-right" uib-popover="by {{comp.ModifiedBy}} on {{comp.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                            </div>
+                        </section>
+                        <!-- /Patient History -->
+                        <section class="tile tile-shadow cons-border-tile" ng-show="plan.IsVitalsExist">
+                            <!-- / -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul>
+                                        <li class="pwColorSelector">
+                                            <div class="noleft-panel timeline-panel">
+                                                <div class="timeline-heading">
+                                                    <h3 class="timeline-title">Vitals</h3>
+                                                </div>
+                                                <div class="timeline-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 Floowup-Vitals">
+                                                            <ul class="Floowup-VitalsUL">
+                                                                <li ng-repeat="vital in NewAppointmentVital track by $index" ng-if="vital.Value!='' && vital.VitalID != 5">
+                                                                    <span ng-bind="vital.VitalDesc"></span>:
+                                                                    <b ng-bind="vital.Value"></b>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- /section -->
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-show="plan.ChiefComplaints.length !== 0">
+                            <div class="tile-header">
+                                <h1>Chief Complaints</h1>
+                                <!--<ul class="controls">
+                                    <li>
+                                        <div class="print-section">
+                                            <i class="fas fa-print"></i>
+                                        </div>
+                                    </li>
+                                </ul>-->
+                            </div>
+                            <div class="tile-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-consultation">
+                                                <tbody>
+                                                    <tr ng-repeat="comp in plan.ChiefComplaints">
+                                                        <td width="15%">
+                                                            <div class="padd-tab-td">
+                                                                <span class="badge bg-warning">OD</span>
+                                                            </div>
+                                                        </td>
+                                                        <td width="60%">
+                                                            <div class="padd-tab-td">
+                                                                <b>Cheif Complaint</b>
+                                                                <p class="m-b-0">{{comp.ChiefComplaintName}}</p>
+                                                            </div>
+                                                        </td>
+                                                        <td width="20%">
+                                                            <!--<span class="badge badge-primary pull-inital">20 Days</span>-->
+                                                            <span class="badge badge-primary pull-inital" ng-if="comp.Duration!=0">
+                                                                <b>
+                                                                    from
+                                                                    {{comp.Duration}}
+                                                                    <span>
+                                                                        {{comp.DurationType === 'Y' ? 'Year(s)' : (comp.DurationType === 'W' ? 'Week(s)' : (comp.DurationType === 'M' ? 'Month(s)' : (comp.DurationType === 'D' ? 'Day(s)' : "")))}}
+                                                                    </span>
+                                                                </b>
+                                                            </span>
+                                                        </td>
+                                                        <td width="5%" class="p-0 text-center pos-relative ">
+                                                            <div class="doc-info-right" uib-popover="by {{comp.ModifiedBy}} on {{comp.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                 popover-trigger="mouseenter"
+                                                                 popover-append-to-body="true" popover-placement="auto right-top">
+                                                                <i class="fas fa-info"></i>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /row -->
+                            </div>
+                        </section>
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-show="plan.Observations.length !== 0">
+                            <div class="tile-header">
+                                <h1>Observations</h1>
+                                <!--<ul class="controls">
+                                    <li>
+                                        <div class="print-section">
+                                            <i class="fas fa-print"></i>
+                                        </div>
+                                    </li>
+                                </ul>-->
+                            </div>
+                            <div class="tile-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-consultation">
+                                                <tbody>
+                                                    <tr ng-repeat="obs in plan.Observations">
+                                                        <td width="95%">
+                                                            <div class="padd-tab-td">
+                                                                <!--<b>Lorem Ipsum is simply dummy</b>-->
+                                                                <p class="m-b-0">{{obs.Notes}}</p>
+                                                            </div>
+                                                        </td>
+                                                        <td width="5%" class="p-0 text-center pos-relative ">
+                                                            <div class="doc-info-right" uib-popover="by {{obs.ModifiedBy}} on {{obs.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                 popover-trigger="mouseenter"
+                                                                 popover-append-to-body="true" popover-placement="auto right-top">
+                                                                <i class="fas fa-info"></i>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /row -->
+                            </div>
+                        </section>
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-if="UnaidedArray.length>0 || glassArray.length>0 || RefractionArray.length>0 || AcceptenceArray.length>0 || KeretometerArray.length>0 || OcularDominanceArray.length>0 || PinholeArray.length>0 || LCVArray.length>0 || BinocularArray.length>0 || ArRefractionArray.length>0">
+                            <div class="tile-header">
+                                <h1>Refraction</h1>
+                            </div>
+                            <div class="tile-body">
+                                <div class="row" ng-if="UnaidedArray.length>0">
+                                    <div class="col-lg-12">
+                                        <div class="grid-Iheading p-l-0">
+                                            <h1>Vision</h1>
+                                        </div>
+                                        <div class="grid-Ibody">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered m-b-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th colspan="2">
+                                                                        Distance Vision
+                                                                    </th>
+                                                                    <th colspan="2">
+                                                                        Near Vision
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <th>
+                                                                        OD
+                                                                    </th>
+                                                                    <th>
+                                                                        OS
+                                                                    </th>
+                                                                    <th>
+                                                                        OD
+                                                                    </th>
+                                                                    <th>
+                                                                        OS
+                                                                    </th>
+                                                                </tr>
+                                                                <tr ng-repeat="item in UnaidedArray">
+                                                                    <td>{{item.InvestigationId === 4 ?'Unaided':(item.InvestigationId===9?'BCVA':(item.InvestigationId === 5 ?'With GL':''))}}</td>
+                                                                    <td>{{item.InvestigationDetails.DVrightEye}}</td>
+                                                                    <td>{{item.InvestigationDetails.DVleftEye}}</td>
+                                                                    <td>{{item.InvestigationDetails.NVrightEye}}</td>
+                                                                    <td>{{item.InvestigationDetails.NVleftEye}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- / -->
+                                <!-- / -->
+                                <div class="row" ng-if="(RefractionArray[0].RightEye.RSpherical !=null && RefractionArray[0].RightEye.RSpherical !='')|| (RefractionArray[0].RightEye.RCylindrical !=null && RefractionArray[0].RightEye.RCylindrical !='') ||(RefractionArray[0].RightEye.RAxis !=null && RefractionArray[0].RightEye.RAxis !='')||(RefractionArray[0].RightEye.RAdition !=null && RefractionArray[0].RightEye.RAdition !='')||(RefractionArray[0].RightEye.RBCVA !=null && RefractionArray[0].RightEye.RBCVA !='')||(RefractionArray[0].RightEye.RBCNVA !=null && RefractionArray[0].RightEye.RBCNVA !='')|| (RefractionArray[0].LeftEye.RSpherical !=null&&RefractionArray[0].LeftEye.RSpherical !='')|| (RefractionArray[0].LeftEye.RCylindrical !=null && RefractionArray[0].LeftEye.RCylindrical !='') ||(RefractionArray[0].LeftEye.RAxis !=null && RefractionArray[0].LeftEye.RAxis !='')||(RefractionArray[0].LeftEye.RAdition !=null && RefractionArray[0].LeftEye.RAdition !='')||(RefractionArray[0].LeftEye.RBCVA !=null && RefractionArray[0].LeftEye.RBCVA !='')||(RefractionArray[0].LeftEye.RBCNVA !=null && RefractionArray[0].LeftEye.RBCNVA !='' ||RefractionArray[0].RightEye.ISbinaclurDone)">
+                                    <div class="col-lg-12">
+                                        <div class="grid-Iheading p-l-0">
+                                            <h1>Subjective Refraction</h1>
+                                        </div>
+                                        <div class="grid-Ibody">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered m-b-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Eyes</th>
+                                                                    <th>SPH</th>
+                                                                    <th>CYL</th>
+                                                                    <th>Axis</th>
+                                                                    <th>ADD</th>
+                                                                    <th>BCVA</th>
+                                                                    <th>BCNVA</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>OD</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RSpherical}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RCylindrical}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RAxis}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RAdition}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RBCVA}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.RBCNVA}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>OS</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RSpherical}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RCylindrical}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RAxis}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RAdition}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RBCVA}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.RBCNVA}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- / -->
+                                <div class="row" ng-if="(RefractionArray[0].RightEye.CRSpherical !=null && RefractionArray[0].RightEye.CRSpherical !='')||
+ (RefractionArray[0].RightEye.CRCylindrical !=null && RefractionArray[0].RightEye.CRCylindrical !='') ||
+(RefractionArray[0].RightEye.CRAxis !=null && RefractionArray[0].RightEye.CRAxis !='')||
+(RefractionArray[0].RightEye.CRBCVA !=null && RefractionArray[0].RightEye.CRBCVA !='')||
+(RefractionArray[0].LeftEye.CRSpherical !=null&&RefractionArray[0].LeftEye.CRSpherical !='')||
+(RefractionArray[0].LeftEye.CRCylindrical !=null && RefractionArray[0].LeftEye.CRCylindrical !='') ||
+(RefractionArray[0].LeftEye.CRAxis !=null && RefractionArray[0].LeftEye.CRAxis !='')||
+(RefractionArray[0].LeftEye.CRBCVA !=null && RefractionArray[0].LeftEye.CRBCVA !='')||(
+cacheStorageItem.RefractionArray[0].RightEye.SolutionUsed !=null &&
+cacheStorageItem.RefractionArray[0].RightEye.SolutionUsed !='')">
+                                    <div class="col-lg-12">
+                                        <div class="grid-Iheading p-l-0">
+                                            <h1>Cycloplegic Refraction</h1>
+                                        </div>
+                                        <div class="grid-Ibody">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered m-b-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Eyes</th>
+                                                                    <th>SPH</th>
+                                                                    <th>CYL</th>
+                                                                    <th>Axis</th>
+                                                                    <th>BCVA</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>OD</td>
+                                                                    <td>{{RefractionArray[0].RightEye.CRSpherical}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.CRCylindrical}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.CRAxis}}</td>
+                                                                    <td>{{RefractionArray[0].RightEye.CRBCVA}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>OS</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.CRSpherical}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.CRCylindrical}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.CRAxis}}</td>
+                                                                    <td>{{RefractionArray[0].LeftEye.CRBCVA}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-if="plan.InvestigationDetails.Findings != undefined || AnteriorSegmentArray.length>0 || PosteriorSegmentArray.length>0 || GonioscopyArray.length>0">
+                            <div class="tile-header">
+                                <h1>Examination</h1>
+                            </div>
+                            <div class="tile-body">
+                                <div class="row" ng-repeat="item in plan.InvestigationDetails.Findings">
+                                    <div class="col-lg-12" ng-if="item.CategoryID == 4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading bg-info">Tonometry Test</div>
+                                            <div class="panel-body">
+                                                <div class="row m-t-5">
+                                                    <div class="col-lg-12">
+                                                        <section class="tile  bright-1 bg-gray m-b-0" ng-if="item.CategoryID == 4">
+                                                            <div class="tile-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12 summary-Investigation">
+                                                                        <div class="table-responsive mt-10">
+                                                                            <table class="table table-bordered">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th rowspan="2" class="valign-middle">Tonometry Tests</th>
+                                                                                        <th colspan="3" class="text-center">Before Dilation</th>
+                                                                                        <th colspan="3" class="text-center">After Dilation</th>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <th>OD</th>
+                                                                                        <th>OS</th>
+                                                                                        <th>Time</th>
+                                                                                        <th>OD</th>
+                                                                                        <th>OS</th>
+                                                                                        <th>Time</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody ng-repeat="item1 in item.CategoryConditions">
+                                                                                    <tr ng-show="item1.InvestigationId == 19">
+                                                                                        <th ng-bind="item1.InvestigationDesc"></th>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.Time"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.Time"></span></td>
+                                                                                    </tr>
+                                                                                    <tr ng-show="item1.InvestigationId == 20">
+                                                                                        <th ng-bind="item1.InvestigationDesc"></th>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.Time"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.Time"></span></td>
+                                                                                    </tr>
+                                                                                    <tr ng-show="item1.InvestigationId == 21">
+                                                                                        <th ng-bind="item1.InvestigationDesc"></th>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.BeforeDilation.Time"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.RightEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.LeftEye"></span></td>
+                                                                                        <td><span ng-bind="item1.AfterDilation.Time"></span></td>
+                                                                                    </tr>
+                                                                                    <tr ng-show="item1.InvestigationId == 22">
+                                                                                        <th ng-bind="item1.InvestigationDesc"></th>
+                                                                                        <td colspan="3" class="text-center"><span ng-bind="item1.BeforeDilationValue"></span></td>
+                                                                                        <td colspan="3" class="text-center"><span ng-bind="item1.AfterDilationValue"></span></td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" ng-if="item.CategoryID == 2">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading bg-info">
+                                                Color Vision Test
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row" ng-repeat="subitem in item.CategoryConditions" ng-if="subitem.InvestigationId==14">
+                                                    <div class="col-lg-12">
+                                                        <section class="tile bright-1">
+                                                            <div class="tile-header p-t-5 p-b-5">
+                                                                <h1 class="fs-12" ng-bind="subitem.InvestigationDesc"></h1>
+                                                            </div>
+                                                            <div class="tile-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <div class="form-group">
+                                                                            <label>OD Notes</label>
+                                                                            <p class="m-b-0" ng-bind="subitem.InvestigationNote"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="form-group">
+                                                                            <label>OS Notes</label>
+                                                                            <p class="m-b-0" ng-bind="subitem.LeftEyeInvestigationNote"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                                <!-- /row -->
+                                                <div class="row" ng-repeat="subitem in item.CategoryConditions" ng-if="subitem.InvestigationId==15">
+                                                    <div class="col-lg-12">
+                                                        <section class="tile bg-gray bright-1">
+                                                            <div class="tile-header p-t-5 p-b-5">
+                                                                <h1 class="fs-12" ng-bind="subitem.InvestigationDesc"></h1>
+                                                            </div>
+                                                            <div class="tile-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <label>Remarks</label>
+                                                                            <p class="m-b-0" ng-bind="subitem.LeftEyeInvestigationNote"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                                <!-- /row -->
+                                                <div class="row" ng-repeat="subitem in item.CategoryConditions" ng-if="subitem.InvestigationId==16">
+                                                    <div class="col-lg-12">
+                                                        <section class="tile bg-gray">
+                                                            <div class="tile-header p-t-5 p-b-5">
+                                                                <h1 class="fs-12" ng-bind="subitem.InvestigationDesc"></h1>
+                                                            </div>
+                                                            <div class="tile-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <label>Enter Notes</label>
+                                                                            <p class="m-b-0" ng-bind="subitem.LeftEyeInvestigationNote"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                                <!-- /row -->
+                                                <div class="row" ng-repeat="subitem in item.CategoryConditions" ng-if="subitem.InvestigationId==17">
+                                                    <div class="col-lg-12">
+                                                        <section class="tile bg-gray">
+                                                            <div class="tile-header p-t-5 p-b-5">
+                                                                <h1 class="fs-12" ng-bind="subitem.InvestigationDesc"></h1>
+                                                            </div>
+                                                            <div class="tile-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <label>Enter Notes</label>
+                                                                            <p class="m-b-0" ng-bind="subitem.LeftEyeInvestigationNote"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                                <!-- /row -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" ng-if="AnteriorSegmentArray.length>0">
+                                    <div class="col-lg-12">
+                                        <section class="tile tile-shadow">
+                                            <div class="tile-header p-t-5 p-b-5">
+                                                <h1 class="fs-12">Anterior Segment</h1>
+                                            </div>
+                                            <div class="tile-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="table-responsive">
+                                                            <table class="table tableno-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th width="20%"></th>
+                                                                        <th width="40%">OD</th>
+                                                                        <th width="40%">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in AnteriorSegmentArray" ng-if="item.InvestigationDetails.RightEyeImage.length>0 || item.InvestigationDetails.LeftEyeImage.length>0 || item.InvestigationDetails.RightEye!='' || item.InvestigationDetails.LeftEye!=''">
+                                                                        <td class="valign-middle">
+                                                                            <b ng-bind="item.InvestigationDesc"></b>
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <div class="dis-flex align-items-center">
+                                                                                <div class="width-75 valign-middle" ng-bind="item.InvestigationDetails.RightEye">
+                                                                                </div>
+                                                                                <div class="width-5"></div>
+                                                                            </div>
+                                                                            <ul image-viewer isarraychanged="0" timeout="500"
+                                                                                ng-if="item.InvestigationDetails.RightEyeImage.length != 0">
+                                                                                <li ng-repeat="img in item.InvestigationDetails.RightEyeImage"
+                                                                                    ng-show="$index == 0">
+                                                                                    <img ng-src="{{img.url}}" class="width-100" />
+                                                                                </li>
+                                                                            </ul>
+
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="dis-flex align-items-center">
+                                                                                <div class="width-75 valign-middle" ng-bind="item.InvestigationDetails.LeftEye">
+
+                                                                                </div>
+                                                                                <div class="width-5"></div>
+
+                                                                                <ul image-viewer isarraychanged="0" timeout="500"
+                                                                                    ng-if="item.InvestigationDetails.LeftEyeImage.length != 0">
+                                                                                    <li ng-repeat="img in item.InvestigationDetails.LeftEyeImage"
+                                                                                        ng-show="$index == 0">
+                                                                                        <img ng-src="{{img.url}}" class="width-100" />
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                                <!-- /row -->
+                                <div class="row" ng-if="PosteriorSegmentArray.length>0">
+                                    <div class="col-lg-12">
+                                        <section class="tile tile-shadow">
+                                            <div class="tile-header p-t-5 p-b-5">
+                                                <h1 class="fs-12">Posterior Segment</h1>
+                                            </div>
+                                            <div class="tile-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="table-responsive">
+                                                            <table class="table tableno-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th width="20%"></th>
+                                                                        <th width="40%">OD</th>
+                                                                        <th width="40%">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in PosteriorSegmentArray">
+                                                                        <td class="valign-middle">
+                                                                            <b ng-bind="item.InvestigationDesc"></b>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="dis-flex">
+                                                                                <div class="width-75 align-items-center" ng-bind="item.InvestigationDetails.RightEye">
+
+                                                                                </div>
+                                                                                <div class="width-5"></div>
+                                                                                <ul image-viewer isarraychanged="0" timeout="500"
+                                                                                    ng-if="item.InvestigationDetails.RightEyeImage.length != 0">
+                                                                                    <li ng-repeat="img in item.InvestigationDetails.RightEyeImage"
+                                                                                        ng-show="$index == 0">
+                                                                                        <img ng-src="{{img.url}}" class="width-100" />
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="dis-flex">
+                                                                                <div class="width-75 align-items-center" ng-bind="item.InvestigationDetails.LeftEye">
+
+                                                                                </div>
+                                                                                <div class="width-5"></div>
+                                                                                <ul image-viewer isarraychanged="0" timeout="500"
+                                                                                    ng-if="item.InvestigationDetails.LeftEyeImage.length != 0">
+                                                                                    <li ng-repeat="img in item.InvestigationDetails.LeftEyeImage"
+                                                                                        ng-show="$index == 0">
+                                                                                        <img ng-src="{{img.url}}" class="width-100" />
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+
+                                <section class="tile tile-shadow" ng-if="GonioscopyArray.length>0">
+                                    <div class="tile-header">
+                                        <h1>Gonioscopy</h1>
+                                    </div>
+                                    <div class="row" ng-repeat="inv in GonioscopyArray" ng-if="inv.InvestigationId===1902">
+                                        <div class="tile-header">
+                                            <h1>Gonioscopy</h1>
+                                        </div>
+                                        <div class="tile-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered m-b-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="50%">
+                                                                        OD
+                                                                    </th>
+                                                                    <th width="50%">
+                                                                        OS
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="pos-relative">
+                                                                        <div class="gynoscopy-img gynoscopy-summary">
+                                                                            <div class="gynoscopy-flex">
+                                                                                <label class="gyno-top">{{GonioscopyArray[0].RightEye.TopValue}}</label>
+                                                                                <label class="gyno-left">{{GonioscopyArray[0].RightEye.LeftValue}}</label>
+                                                                                <label class="gyno-right">{{GonioscopyArray[0].RightEye.RightValue}}</label>
+                                                                                <label class="gyno-bottom">{{GonioscopyArray[0].RightEye.BottomValue}}</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="pos-relative">
+                                                                        <div class="gynoscopy-img gynoscopy-summary">
+                                                                            <div class="gynoscopy-flex">
+                                                                                <label class="gyno-top">{{GonioscopyArray[0].LeftEye.TopValue}}</label>
+                                                                                <label class="gyno-left">{{GonioscopyArray[0].LeftEye.LeftValue}}</label>
+                                                                                <label class="gyno-right">{{GonioscopyArray[0].LeftEye.RightValue}}</label>
+                                                                                <label class="gyno-bottom">{{GonioscopyArray[0].LeftEye.BottomValue}}</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div ng-if="(GonioscopyArray[0].RightEyeRemarks!='' && GonioscopyArray[0].RightEyeRemarks!=undefined) && GonioscopyArray.length>0">
+                                                <span>
+                                                    <b>OD Notes : </b>
+                                                    <span ng-bind="GonioscopyArray[0].RightEyeRemarks"></span>
+                                                </span>
+                                            </div>
+                                            <div ng-if="(GonioscopyArray[0].LeftEyeRemarks!='' && GonioscopyArray[0].LeftEyeRemarks!=undefined) && GonioscopyArray.length>0">
+                                                <span>
+                                                    <b>OS Notes : </b>
+                                                    <span ng-bind="GonioscopyArray[0].LeftEyeRemarks"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="tile-body">
+                                            <div class="row">
+                                                <div class="summary-label col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Gonioscopy</th>
+                                                                    <th width="32%">OD</th>
+                                                                    <th width="100" class="text-center">Image</th>
+                                                                    <th width="32%">OS</th>
+                                                                    <th width="100" class="text-center">Image</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="item in GonioscopyArray" ng-if="inv.InvestigationId===1978 || inv.InvestigationId===1979 || inv.InvestigationId===1980 || inv.InvestigationId===1981 || inv.InvestigationId===1982 || inv.InvestigationId===1983 || inv.InvestigationId===1984 || inv.InvestigationDetailsRightEyeImage.length>0 || inv.InvestigationDetails.LeftEyeImage.length>0 || inv.InvestigationDetails.RightEye!=='' || inv.InvestigationDetails.LeftEye!==''">
+                                                                    <th ng-bind="item.InvestigationDesc"></th>
+                                                                    <td>
+                                                                        <p ng-hide="item.InvestigationDetails.RightEyeCdRatio ==''">
+                                                                            <b>CD Ratio: </b>
+                                                                            <span ng-bind="item.InvestigationDetails.RightEyeCdRatio"></span>
+                                                                        </p>
+                                                                        <p ng-hide="item.InvestigationDetails.RightEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.RightEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                        <p ng-hide="item.InvestigationDetails.RightEye ==''"><span ng-bind="item.InvestigationDetails.RightEye"></span> </p>
+                                                                    </td>
+                                                                    <td class="text-center">
+
+                                                                        <ul image-viewer isarraychanged="0" timeout="500"
+                                                                            ng-if="item.InvestigationDetails.RightEyeImage.length != 0">
+                                                                            <li ng-repeat="img in item.InvestigationDetails.RightEyeImage"
+                                                                                ng-show="$index == 0">
+                                                                                <img ng-src="{{img.url}}" class="width-100" />
+                                                                            </li>
+                                                                        </ul>
+                                                                        <span ng-show="item.InvestigationDetails.RightEyeImage.length == 0">N/A</span>
+
+
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <p ng-hide="item.InvestigationDetails.LeftEyeCdRatio ==''">
+                                                                            <b>CD Ratio: </b>
+                                                                            <span ng-bind="item.InvestigationDetails.LeftEyeCdRatio"></span>
+                                                                        </p>
+                                                                        <p ng-hide="item.InvestigationDetails.LeftEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.LeftEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                        <p ng-hide="item.InvestigationDetails.LeftEye ==''"><span ng-bind="item.InvestigationDetails.LeftEye"></span> </p>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <ul image-viewer isarraychanged="0" timeout="500"
+                                                                            ng-if="item.InvestigationDetails.LeftEyeImage.length != 0">
+                                                                            <li ng-repeat="img in item.InvestigationDetails.LeftEyeImage"
+                                                                                ng-show="$index == 0">
+                                                                                <img ng-src="{{img.url}}" class="width-100" />
+                                                                            </li>
+                                                                        </ul>
+                                                                        <span ng-show="item.InvestigationDetails.LeftEyeImage.length == 0">N/A</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <!-- /row -->
+                            </div>
+                        </section>
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-hide="plan.PatientInvestigations.length==0 && plan.Treatment.length == 0 && plan.Prescription.length == 0 && plan.SurgeryData.length == 0 && plan.FollowUpDetails.length==0 && plan.InvestigationDetails.Findings==undefined && (plan.Diagnosis |  filter:{ 'DiagnosisTypeId': 3}).length == 0">
+                            <div class="tile-header">
+                                <h1>Plan of Care</h1>
+                            </div>
+                            <div class="tile-body">
+                                <div class="panel panel-default" ng-show="plan.PatientInvestigations.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Investigations
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="inv in plan.PatientInvestigations">
+                                                                <td width="75%">
+                                                                    <div class="padd-tab-td">
+                                                                        <b>Investigation</b>
+                                                                        <p class="m-b-0" ng-bind="inv.InvestigationName"></p>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="20%">
+                                                                    <div class="padd-tab-td">
+                                                                        <span ng-show="inv.StatusId=='1'" class="badge badge-primary">Advised</span>
+                                                                        <span ng-show="inv.StatusId=='2'" class="badge badge-primary">Accepted</span>
+                                                                        <span ng-show="inv.StatusId=='4'" class="badge badge-primary">Completed</span>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <div class="panel panel-default" ng-repeat="item in plan.InvestigationDetails.Findings" ng-if="item.CategoryID == 7 && item.CategoryConditions.length >0">
+                                    <div class="panel-heading bg-info">
+                                        Additional Details
+                                    </div>
+                                    <div class="panel-body p-t-0">
+
+                                        <div class="row" ng-if="(item.CategoryConditions| glassfilter:'new':'attrib') || (item.CategoryConditions | glassfilter:'new':'type') || (item.CategoryConditions | glassfilter:'new':'coat') || (item.CategoryConditions | glassfilter:'new':'Remarks') || (item.CategoryConditions | glassfilter:'new':'IPD')"
+                                             ng-repeat="inv in item.CategoryConditions | filter:{'InvestigationId':43}">
+                                            <div class="col-lg-12">
+                                                <div class="grid-Iheading p-l-0">
+                                                    <h1>New Glass</h1>
+                                                </div>
+                                                <div class="grid-Ibody">
+                                                    <div class="row" ng-if="(item.CategoryConditions | glassfilter:'new':'attrib')">
+                                                        <div class="col-lg-12">
+                                                            <div class="table-responsive pl-10 pr-10">
+                                                                <table class="table table-bordered mb-0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <th class="text-left">Glasses</th>
+                                                                            <th class="text-center">UCVA</th>
+                                                                            <th class="text-center">Sph</th>
+                                                                            <th class="text-center">Cyl</th>
+                                                                            <th class="text-center">Axis</th>
+                                                                            <th class="text-center">ADD</th>
+                                                                            <th class="text-center">BCDVA</th>
+                                                                            <th class="text-center">BCNVA</th>
+                                                                            <th class="text-center">Prism</th>
+                                                                            <th class="text-center">Base</th>
+                                                                        </tr>
+                                                                        <tr class="text-center">
+                                                                            <th class="text-left">OD</th>
+                                                                            <td ng-bind="inv.Attributes.RUVa"></td>
+                                                                            <td ng-bind="inv.Attributes.RSphere"></td>
+                                                                            <td ng-bind="inv.Attributes.RCylinder"></td>
+                                                                            <td ng-bind="inv.Attributes.RAxis"></td>
+                                                                            <td ng-bind="inv.Attributes.RAdd"></td>
+                                                                            <td ng-bind="inv.Attributes.RVa"></td>
+                                                                            <td ng-bind="inv.Attributes.RBcva"></td>
+                                                                            <td ng-bind="inv.Attributes.RPrism"></td>
+                                                                            <td ng-bind="inv.Attributes.RBase"></td>
+                                                                        </tr>
+                                                                        <tr class="text-center">
+                                                                            <th class="text-left">OS</th>
+                                                                            <td ng-bind="inv.Attributes.LUVa"></td>
+                                                                            <td ng-bind="inv.Attributes.LSphere"></td>
+                                                                            <td ng-bind="inv.Attributes.LCylinder"></td>
+                                                                            <td ng-bind="inv.Attributes.LAxis"></td>
+                                                                            <td ng-bind="inv.Attributes.LAdd"></td>
+                                                                            <td ng-bind="inv.Attributes.LVa"></td>
+                                                                            <td ng-bind="inv.Attributes.LBcva"></td>
+                                                                            <td ng-bind="inv.Attributes.LPrism"></td>
+                                                                            <td ng-bind="inv.Attributes.LBase"></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" ng-if="(item.CategoryConditions | glassfilter:'new':'type') || (item.CategoryConditions | glassfilter:'new':'coat')">
+                                                        <div class="col-lg-12">
+                                                            <div class="col-lg-6" ng-if="(item.CategoryConditions | glassfilter:'new':'type')">
+                                                                <p><b>New Glass Lens type : </b> <span ng-repeat="item in inv.LensType | filter:{'IsActive':true }:true ">{{item.Name}} <span ng-if="!$last"> , </span><span ng-if="$last"> .</span></span></p>
+                                                            </div>
+                                                            <div class="col-lg-6" ng-if="(item.CategoryConditions | glassfilter:'new':'coat')">
+                                                                <p><b>New Glass Lens coating : </b> <span ng-repeat="item in inv.LensCoating | filter:{'IsActive':true }:true ">{{item.Name}} <span ng-if="!$last"> , </span><span ng-show="$last"> .</span> </span></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" ng-if="(item.CategoryConditions | glassfilter:'new':'Remarks') || (item.CategoryConditions | glassfilter:'new':'IPD')">
+                                                        <p ng-if="(item.CategoryConditions | glassfilter:'new':'Remarks')" class="ml-15"><b>New Glass Notes : </b>{{inv.Remarks}}</p>
+                                                        <p ng-if="(item.CategoryConditions | glassfilter:'new':'IPD')" class="ml-15"><b>New Glass IPD : </b>{{inv.IPD}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-hide="plan.Treatment.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Treatments
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody ng-repeat="treat in plan.Treatment track by $index">
+                                                            <tr>
+                                                                <td width="75%">
+                                                                    <div class="padd-tab-td">
+                                                                        <b ng-bind="treat.TreatmentName"></b>
+                                                                        <p class="m-b-0" ng-bind="treat.TreatmentNotes"></p>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="20%">
+                                                                    <span ng-if="treat.StatusId==1" class="badge badge-primary">Advised</span>
+                                                                    <span ng-if="treat.StatusId==2" class="badge badge-primary">Accepted</span>
+                                                                    <span ng-if="treat.StatusId==3" class="badge badge-primary">In Progress</span>
+                                                                    <span ng-if="treat.StatusId==4" class="badge badge-primary">Completed</span>
+                                                                </td>
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right" uib-popover="by {{treat.ModifiedBy}} on {{treat.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-hide="plan.SurgeryData.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Surgery Details
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="item in plan.SurgeryData track by $index">
+                                                                <td width="100%">
+                                                                    <div class="padd-tab-td">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <b ng-bind="item.SurgeryName"></b>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray">Package Name</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="item.OrganId == '1'?'OD':item.OrganId == '2'?'OS':item.OrganId == '3'?'OU': item.OrganId=='5'?'Hair':item.OrganId=='6'? 'Skin':item.OrganId=='7'? 'Laser':''"></h6>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="item.SurgerySuggestedDate | date:'dd-MM-yyyy'"></h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <div class="form-group m-b-0">
+                                                                                    <h6 class="m-0 br-1 p-7 br-5 bg-gray">
+                                                                                        <b>IOL : </b>
+                                                                                        <span>{{item.IolPower}}</span>
+                                                                                    </h6>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="item.SurgeryDoctorName"></h6>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="item.SurgeryAnesthesiaDoctorName"></h6>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="item.SurgeryCounselor"></h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <div class="form-group m-b-0">
+                                                                                    <p class="m-b-0" ng-bind="item.SurgeryInstructions"></p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-hide="plan.Prescription.length == 0">
+                                    <div class="panel-heading bg-info">
+                                        Prescription
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row m-t-10">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="pre in plan.Prescription track by $index">
+                                                                <td width="95%">
+                                                                    <div class="padd-tab-td">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <b ng-bind="pre.Name"></b>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5">
+                                                                                <div class="dis-flex">
+                                                                                    <div class="width-45">
+                                                                                        <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="pre.Dosage"></h6>
+                                                                                    </div>
+                                                                                    <div class="width-10 text-center">
+
+                                                                                    </div>
+                                                                                    <div class="width-45" ng-show="pre.Frequency == ''">
+                                                                                        <!--<h6 class="m-0 br-1 p-7 br-5 bg-gray">1-1-1</h6>-->
+                                                                                        <h6 class="m-0 br-1 p-7 br-5 bg-gray">{{pre.Dosage1}}-{{pre.Dosage2}}-{{pre.Dosage3}}</h6>
+                                                                                    </div>
+                                                                                    <div class="width-45" ng-show="pre.Frequency!= ''">
+                                                                                        <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="pre.Frequency"></h6>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-3">
+                                                                                <h6 class="m-0 br-1 p-7 br-5 bg-gray" ng-bind="pre.Intake == 0?'After Meal': (pre.Intake == 1 ?'Before Meal':'')" ng-show="pre.DurationType != 'L'&&pre.DurationType != 'C'">After Meal</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <span class="badge badge-primary pull-inital" ng-show="pre.DurationType != 'L'&&pre.DurationType != 'C'">{{pre.Duration}} {{pre.DurationType == 'D'?'Day(s)':pre.DurationType == 'M'?'Month(s)':pre.DurationType == 'Y'?'Year(s)':pre.DurationType == 'C'?'To Be continued':pre.DurationType == 'W'?'Week(s)':pre.DurationType == 'L'?'Life Time':''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- /row -->
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <div class="form-group m-b-0">
+                                                                                    <p class="m-b-0" ng-bind="pre.Instructions"></p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right" uib-popover="by {{pre.ModifiedBy}} on {{pre.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default" ng-show="(plan.Diagnosis |  filter:{ 'DiagnosisTypeId': 3}).length != 0">
+                                    <div class="panel-heading bg-info">
+                                        Diagnosis
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="diag in plan.Diagnosis| filter:{'DiagnosisTypeId':3}">
+                                                                <td width="95%">
+                                                                    <div class="padd-tab-td">
+                                                                        <span ng-if="diag.OrganId!== 4">
+                                                                            <b ng-if="diag.OrganId == 1">OD : </b>
+                                                                            <b ng-if="diag.OrganId == 2">OS : </b>
+                                                                            <b ng-if="diag.OrganId == 3">OU : </b>
+                                                                            <b ng-if="diag.OrganId == 5">Hair : </b>
+                                                                            <b ng-if="diag.OrganId == 6">Skin : </b>
+                                                                            <b ng-if="diag.OrganId == 7">Laser : </b>
+                                                                        </span>
+                                                                        <b>{{diag.DiagnosisName}}</b>
+                                                                        <p class="m-b-0" ng-bind="diag.DiagnosisNotes"></p>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right" uib-popover="by {{diag.ModifiedBy}} on {{diag.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-show="plan.FollowUpDetails.length!=0">
+                                    <div class="panel-heading bg-info">
+                                        Follow Up
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row m-t-10">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="follow in plan.FollowUpDetails">
+                                                                <td width="30%">
+                                                                    <div class="padd-tab-td">
+                                                                        <span class="badge bg-primary">10 Years</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="65%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">{{follow.FollowUpDesc}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- /Plan of Care -->
+                        <!-- Notes -->
+                        <section class="tile tile-shadow cons-border-tile" ng-show="plan.ClinicalNotes.length !== 0">
+                            <div class="tile-header">
+                                <h1>Notes</h1>
+                                <ul class="controls">
+                                    <li>
+                                        <div class="print-section">
+                                            <i class="fas fa-print"></i> Print
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tile-body">
+                                <div class="panel panel-default" ng-show="plan.ClinicalNotes.length !== 0">
+                                    <div class="panel-heading bg-info">
+                                        Clinical Notes
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row m-t-10">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="clinic in plan.ClinicalNotes">
+                                                                <td width="95%">
+                                                                    <div class="padd-tab-td">
+                                                                        <b><span ng-bind="clinic.OrganId == '1'?'OD':clinic.OrganId == '2'?'OS':clinic.OrganId == '3'?'OU':''"></span></b>
+                                                                        <p class="m-b-0"> {{clinic.Notes}}</p>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right" uib-popover="by {{clinic.ModifiedBy}} on {{clinic.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                                         popover-trigger="mouseenter"
+                                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /row -->
+                                    </div>
+                                </div>
+                                <!-- /Panel -->
+                                <!--<div class="panel panel-default">
+                                    <div class="panel-heading bg-info">
+                                        Doctor Notes
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row m-t-10">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table tableno-bordered m-b-0 table-consultation">
+                                                        <tbody>
+                                                            <tr ng-repeat="i in [1,2,3]">
+                                                                <td width="95%">
+                                                                    <div class="padd-tab-td">
+                                                                        <p class="m-b-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took</p>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="5%" class="p-0 text-center pos-relative ">
+                                                                    <div class="doc-info-right">
+                                                                        <i class="fas fa-info"></i>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>-->
+                            </div>
+                        </section>
+                        <!-- /Notes -->
+                        <!-- /section -->
+                        <section class="tile tile-shadow cons-border-tile" ng-hide="generalPdfUploads.length == 0 &&
+generalImgUploads.length == 0 && PreTreatmentImgUploads.length == 0 &&
+PreTreatmentPdfUploads.length == 0 && PostTreatmentImgUploads.length ==0
+&& PostTreatmentPdfUploads.length == 0">
+                            <div class=" tile-header">
+                                <h1>File Uploads</h1>
+                            </div>
+                            <div class="tile-body">
+                                <div class="panel m-t-10" ng-if="generalPdfUploads.length > 0 || generalImgUploads.length > 0 ">
+                                    <div class="panel-heading bg-info">
+                                        General
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody image-viewer isarraychanged="0" timeout="500">
+                                                            <tr ng-repeat="genimgitem in generalImgUploads">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <img ng-src="{{genimgitem.DocURL}}" class="file-consonts-img" />
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label ng-bind="genimgitem.docNameDisplay"></label>
+                                                                        <p class="m-b-0" ng-bind="genimgitem.Remarks"></p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="cur-poiter" ng-repeat="genpdfitem in generalPdfUploads" ng-if="generalPdfUploads.length > 0">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <a class="pull-left" ng-click="openPdfFileUploads(genpdfitem.DocURL)">
+                                                                            <i class="far fa-file-pdf text-reed fs-40" aria-hidden="true"></i>
+                                                                        </a>
+
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label ng-bind="genpdfitem.docNameDisplay"></label>
+                                                                        <p class="m-b-0" ng-bind="genpdfitem.Remarks"></p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-if="PreTreatmentImgUploads.length > 0 || PreTreatmentPdfUploads.length > 0 ">
+                                    <div class="panel-heading bg-info">Pre Treatment</div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody image-viewer isarraychanged="0" timeout="500">
+                                                            <tr ng-repeat="preimgitem in PreTreatmentImgUploads">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <img ng-src="{{preimgitem.DocURL}}" class="file-consonts-img" />
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label>{{preimgitem.docNameDisplay}}</label>
+                                                                        <p class="m-b-0">{{preimgitem.Remarks}}</p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr ng-repeat="prepdfitem in PreTreatmentPdfUploads">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <a class="pull-left" ng-click="openPdfFileUploads(prepdfitem.DocURL)">
+                                                                            <i class="far fa-file-pdf text-reed fs-40" aria-hidden="true"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label>{{prepdfitem.docNameDisplay}}</label>
+                                                                        <p class="m-b-0">{{prepdfitem.Remarks}}</p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                                <div class="panel panel-default" ng-if="PostTreatmentImgUploads.length > 0 || PostTreatmentPdfUploads.length > 0">
+                                    <div class="panel-heading bg-info">Post Treatment</div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation">
+                                                        <tbody image-viewer isarraychanged="0" timeout="500">
+                                                            <tr ng-repeat="postimgitem in PostTreatmentImgUploads">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <img ng-src="{{postimgitem.DocURL}}" class="file-consonts-img" />
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label>{{postimgitem.docNameDisplay}}</label>
+                                                                        <p class="m-b-0">{{postimgitem.Remarks}}</p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr ng-repeat="postpdfitem in PostTreatmentPdfUploads">
+                                                                <td width="5%">
+                                                                    <div class="padd-tab-td text-center">
+                                                                        <a class="pull-left" ng-click="openPdfFileUploads(postpdfitem.DocURL)">
+                                                                            <i class="far fa-file-pdf text-reed fs-40" aria-hidden="true"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td width="90%">
+                                                                    <div class="padd-tab-td">
+                                                                        <label>{{postpdfitem.docNameDisplay}}</label>
+                                                                        <p class="m-b-0">{{postpdfitem.Remarks}}</p>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /panel -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="row" ng-show="treatmentArray.length == 0 && generalPdfUploads.length == 0 && generalImgUploads.length == 0 && PreTreatmentImgUploads.length == 0 && PreTreatmentPdfUploads.length == 0 && PostTreatmentImgUploads.length ==0 && PostTreatmentPdfUploads.length == 0 && ConsentImgUploads.length == 0 && ConsentPdfUploads.length == 0 && AppointmentVital.length==0  && cacheStorageItem.MedicalHistory.length==0 && cacheStorageItem.BirthHistory.length==0 && cacheStorageItem.FamilyHistory.length==0 && cacheStorageItem.NutritionalHistory.length==0 && cacheStorageItem.ImmunisationHistory.length==0 && cacheStorageItem.SurgicalHistory.length==0">
+                    <div class="col-lg-12 text-center">
+                        <div class="billing-cominsoon">
+                            <img src="img/no-data/no-results.png" />
+                            <div class="msg">
+                                <p class="goback-text">No Data Added for the Consultation</p>
+                                <p class="no-records-txt-line2">
+                                    No Consultation Data Added availble with selected dates !!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </uib-accordion>
+
+        <div>
+            <button class="btn btn-danger btn-block" ng-click="ClosePopup();">Close</button>
+        </div>
+    </div>

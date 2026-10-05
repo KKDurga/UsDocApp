@@ -1,0 +1,1241 @@
+﻿<div ng-cloak ng-controller="UsAscPreAuthorizationCtrl" class="h-100 dis-flex flex-direction-column ">
+    <!-- / -->
+    <div class="row" ng-hide="true">
+        <div class="col-lg-12 p-l-0 p-r-0">
+            <div class="table-responsive">
+                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                    <tbody>
+                        <tr>
+                            <td class="w-300">
+                                <div class="form-group">
+                                    <fieldset>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom width-0" id="newNameId" name="newpatientSearch" ng-value="2" ng-model="surgeryListGetObj.NewpatSearchType" aria-invalid="false" ng-change="ChangeSearch(surgeryListGetObj)">
+                                            <label for="newNameId" class="radio-custom-label cur-poiter mb-0">Name</label>
+                                        </div>
+                                        <div class="dis-inline-block ml-15">
+                                            <input type="radio" class="radio-custom width-0" id="newmrMobileId" name="newpatientSearch" ng-value="1" ng-model="surgeryListGetObj.NewpatSearchType" aria-invalid="false" ng-change="ChangeSearch(surgeryListGetObj)">
+                                            <label for="newmrMobileId" class="radio-custom-label cur-poiter mb-0">MR No.</label>
+                                        </div>
+
+                                        <div class="dis-inline-block ml-5">
+                                            <input type="radio" class="radio-custom width-0" id="DOBinc" name="newpatientSearch" ng-model="surgeryListGetObj.NewpatSearchType" ng-value="4" ng-click="ChangeSearch(surgeryListGetObj)" value="4">
+                                            <label for="DOBinc" class="radio-custom-label cur-poiter mb-0 fs-12">{{ 'DOB' | translate}}</label>
+                                        </div>
+                                    </fieldset>
+                                    <div class="inner-addon left-addon">
+                                        <button class="btn p-0 btn-link pos-absolute right-10" ng-click="clearpatientData()" ng-show="surgeryListGetObj.PatientDisplayId !='' || surgeryListGetObj.firstname !=''|| surgeryListGetObj.OldPatientDisplayId !=''|| surgeryListGetObj.DOB !=''"><b class="error"><i class="fas fa-times-circle fa-lg"></i></b></button>
+
+                                        <input type="text" class="form-control" ng-show="surgeryListGetObj.NewpatSearchType==1" ng-change="onChangeSearchAppt(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)"
+                                               ng-model="surgeryListGetObj.PatientDisplayId" placeholder="Search Mr.No">
+                                        <input type="text" class="form-control" ng-show="surgeryListGetObj.NewpatSearchType==2" ng-change="onChangeSearchAppt(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)"
+                                               ng-model="surgeryListGetObj.firstname" placeholder="Search Patient /Mobile">
+                                        <input type="text" class="form-control" ng-model="surgeryListGetObj.firstname" ng-change="onChangeSearchAppt(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)"
+                                               ng-show="surgeryListGetObj.NewpatSearchType==4" dob-format placeholder="MM-DD-YYYY" maxlength="10" />
+
+                                    </div>
+
+                                    <div class="m-l-10">
+                                        <button type="button" class="btn-search btn" ng-show="surgeryListGetObj.NewpatSearchType === 1" ng-click="changePatientApptSearchText(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                                        <button type="button" class="btn-search btn" ng-show="surgeryListGetObj.NewpatSearchType === 2" ng-click="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                                        <button type="button" class="btn-search btn" ng-show="surgeryListGetObj.NewpatSearchType === 4" ng-click="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label>From Date</label>
+                                    <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                        <input class="form-control icons-calendar bg-white cur-default" ng-model="surgeryListGetObj.FromDate" datepickerforapplist readonly>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label>To Date</label>
+                                    <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                        <input class="form-control icons-calendar bg-white cur-default" ng-model="surgeryListGetObj.ToDate" datepickerforapplist readonly>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group select-ui-match custom-select-width">
+
+
+                                    <div class="dropdown dropdown-scroll width-100">
+                                        <label>Hospital/Clinic</label>
+                                        <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown" disabled>
+                                            {{surgeryListGetObj.HospitalObj.BranchName}}
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospitalTxt" />
+                                            </div>
+                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                <ul>
+                                                    <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospitalTxt}" ng-click="ChangeHospitalNew(item)">
+                                                        <a href="javascript:;" ng-bind="item.BranchName"></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group select-ui-match custom-select-width">
+                                    <!--<label>Surgeon</label>
+                                    <ui-select ng-model="surgeryListGetObj" theme="bootstrap" on-select="ChangeHospitalNew(surgeryListGetObj)">
+                                        <ui-select-match placeholder="select">{{surgeryListGetObj.DoctorObj.FullName}}</ui-select-match>
+                                        <ui-select-choices repeat="item in BranchDoctorsList | filter: $select.search">
+                                            <span ng-bind-html="item.FullName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>-->
+
+                                    <div class="sel-doc-box width-100">
+                                        <div class="dropdown dropdown-scroll width-100">
+                                            <label>Surgeon</label>
+                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">{{surgeryListGetObj.DoctorObj.FullName}}</button>
+                                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                    <span class="input-group-addon">
+                                                        <span class="mainsearch-App">
+                                                            <i class="fas fa-search"></i>
+                                                        </span>
+                                                    </span>
+                                                    <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchDoctorTxt" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li role="presentation" ng-repeat="item in BranchDoctorsList | filter:{'FullName':searchDoctorTxt}" ng-click="ChangeDoctor(item)">
+                                                            <a href="javascript:;" ng-bind="item.FullName"></a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group select-ui-match custom-select-width">
+
+                                    <div class="sel-doc-box width-100">
+                                        <div class="dropdown dropdown-scroll width-100">
+                                            <label>Counsellor</label>
+                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">{{surgeryListGetObj.CounselorObj.FullName}}</button>
+                                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                    <span class="input-group-addon">
+                                                        <span class="mainsearch-App">
+                                                            <i class="fas fa-search"></i>
+                                                        </span>
+                                                    </span>
+                                                    <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchCounselorTxt" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li role="presentation" ng-repeat="item in AllCounselorsList | filter:{'FullName':searchCounselorTxt}" ng-click="ChangeCounsel(item)">
+                                                            <a href="javascript:;" ng-bind="item.FullName"></a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label>Cou.. Status</label>
+                                    <select class="form-control p-4-2" ng-model="surgeryListGetObj.CounselorStatusId">
+                                        <option value="0">All</option>
+                                        <option value="4">Completed</option>
+                                        <option value="5">InComplete</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="valign-bottom">
+                                <div class="form-group">
+                                    <button class="btn btn-green btn-fill-horz-o btn-sm btn-block" ng-click="SearchSurgeryList()">Search</button>
+
+                                    <!--Remove this a tag this is only for static popup-->
+                                    <a ng-click="openPreauthInfoPopup()">Pre-Authorization Information</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- /Row -->
+    <div ng-if="NavObj.IsApptSelectedInfoInd" ng-hide="true">
+        <div class="row" ng-if="PreAuthAppointmentsList.length > 0">
+            <div class="col-lg-12 p-l-0 p-r-0">
+                <table class="asc-table">
+                    <thead>
+                        <tr>
+                            <th class="w-40 text-center">S No.</th>
+                            <th class="w-100">Adm No&Date</th>
+                            <th>Patient Name</th>
+                            <th>Surgeries</th>
+                            <th class="w-80">Surgery Time</th>
+                            <th class="w-50">Eye</th>
+                            <th class="w-80">Bill Type</th>
+                            <th class="w-120">Insurance</th>
+                            <th class="w-80">Status</th>
+                            <th class="w-80">Auth No.</th>
+                            <th class="w-100">Expiry Date</th>
+                            <th class="w-80">Updated By</th>
+                            <th>Notes</th>
+                            <th class="w-40"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in PreAuthAppointmentsList track by $index">
+                            <td class="w-40 text-center">
+                                <span class="text-s12wnormlc000 text-center">{{$index+1}}</span>
+                            </td>
+                            <td class="w-100">
+                                <span class="text-s12wnormlc000">{{item.AdmissionNumber}}</span>
+                                <span class="text-s12wnormlc000 dis-block">{{item.ConsultationDate}}</span>
+                            </td>
+                            <td>
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-35 m-b-0">
+                                        <img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                        <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" class="img-profile-thumb" />
+                                    </li>
+                                    <li class="flex m-b-0">
+                                        <span class="text-s12w500c000 text-capitalize">{{item.Patient.FullName}}</span>
+                                        <span class="text-s12wnormlc000 dis-block">{{item.Patient.PatientDisplayId}}</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <span class="text-s12w500c000" ng-repeat="sitem in item.SurgeryList">
+                                    {{sitem.SurgeryName}} <span ng-hide="$last"> ,</span>
+                                </span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000 text-center">{{item.ConvertDateStartTime}}</span>
+                            </td>
+                            <td class="w-50">
+                                <span class="text-s12w500c000" ng-repeat="sitem in item.SurgeryList">
+                                    <span class="eh-od" ng-show="sitem.OrganId ==1">OD</span>
+                                    <span class="eh-os" ng-show="sitem.OrganId ==2">OS</span>
+                                    <span class="eh-ou" ng-show="sitem.OrganId ==3">OU</span>
+                                </span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12w500c3f5fb0">{{item.PaymentType}}</span>
+                            </td>
+                            <td class="w-120">
+                                <span class="text-s12wnormlc000 dis-block">{{item.AppointmentInsuranceList[0].PayorName}}</span>
+                                <!--<span class="text-s12w500c000">09/09/23</span>-->
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 1">(Active)</span>
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 2">(Expired)</span>
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 3">(Inactive)</span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 1">Request Raised</span>
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 2">Pending</span>
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 3">Approved</span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s8w500c15898f fs-12">{{item.PreAuthDetails.PreAuthorizationNumber}}</span>
+                            </td>
+                            <td class="w-80">
+                                <!--<span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate !== '1900-01-01T00:00:00'">{{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}</span>
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate == '1900-01-01T00:00:00'"></span>-->
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate !== ''">{{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}</span>
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate == ''"></span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000">{{item.PreAuthDetails.ModifiedBy}}</span>
+                            </td>
+                            <td>
+                                <span class="text-s12wnormlc000 fs-10 dis-block">
+                                    {{item.PreAuthDetails.Notes}}
+                                </span>
+                            </td>
+                            <td class="w-40">
+                                <button class="btn btn-save-us p-5" ng-click="clickpreauthpopup(item)">
+                                    <i class="edit-white-icon sprite-sheet-icon"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row" ng-hide="PreAuthAppointmentsList.length>0">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table tableno-bordered mb-0 headermainscroll" ng-style="otappts()" resize>
+                        <tbody>
+                            <tr>
+                                <td class="valign-middle">
+                                    <div class="row">
+                                        <div class="col-lg-12 text-center">
+                                            <div class="billing-cominsoon">
+                                                <img src="img/no-data/no-results-appointment.png" />
+                                                <div class="msg">
+                                                    <p class="goback-text">No Surgeries Found</p>
+                                                    <p class="no-records-txt-line2">
+                                                        No Surgeries available with selected dates.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="!NavObj.IsApptSelectedInfoInd" ng-hide="true">
+        <div class="row" ng-if="PreAuthAppointmentArray.length > 0">
+            <div class="col-lg-12 p-l-0 p-r-0">
+                <table class="asc-table">
+                    <thead>
+                        <tr>
+                            <th class="w-40 text-center">S No.</th>
+                            <th class="w-100">Adm No&Date</th>
+                            <th>Patient Name</th>
+                            <th>Surgeries</th>
+                            <th class="w-80">Surgery Time</th>
+                            <th class="w-50">Eye</th>
+                            <th class="w-80">Bill Type</th>
+                            <th class="w-120">Insurance</th>
+                            <th class="w-80">Status</th>
+                            <th class="w-80">Auth No.</th>
+                            <th class="w-100">Expiry Date</th>
+                            <th class="w-80">Updated By</th>
+                            <th>Notes</th>
+                            <th class="w-40"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in PreAuthAppointmentArray track by $index">
+                            <td class="w-40 text-center">
+                                <span class="text-s12wnormlc000 text-center">{{$index+1}}</span>
+                            </td>
+                            <td class="w-100">
+                                <span class="text-s12wnormlc000">{{item.AdmissionNumber}}</span>
+                                <span class="text-s12wnormlc000 dis-block">{{item.ConsultationDate}}</span>
+                            </td>
+                            <td>
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-35 m-b-0">
+                                        <img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                        <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" class="img-profile-thumb" />
+                                    </li>
+                                    <li class="flex m-b-0">
+                                        <span class="text-s12w500c000">{{item.Patient.FullName}}</span>
+                                        <span class="text-s12wnormlc000 dis-block">{{item.Patient.PatientDisplayId}}</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <span class="text-s12w500c000" ng-repeat="sitem in item.SurgeryList">
+                                    {{sitem.SurgeryName}} <span ng-hide="$last"> ,</span>
+                                </span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000 text-center">{{item.ConvertDateStartTime}}</span>
+                            </td>
+                            <td class="w-50">
+                                <span class="text-s12w500c000" ng-repeat="sitem in item.SurgeryList">
+                                    <span class="eh-od" ng-show="sitem.OrganId ==1">OD</span>
+                                    <span class="eh-os" ng-show="sitem.OrganId ==2">OS</span>
+                                    <span class="eh-ou" ng-show="sitem.OrganId ==3">OU</span>
+                                </span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12w500c3f5fb0">{{item.PaymentType}}</span>
+                            </td>
+                            <td class="w-120">
+                                <span class="text-s12wnormlc000 dis-block">{{item.AppointmentInsuranceList[0].PayorName}}</span>
+                                <!--<span class="text-s12w500c000">09/09/23</span>-->
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 1">(Active)</span>
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 2">(Expired)</span>
+                                <span class="text-s12w500c1caf71" ng-if="item.AppointmentInsuranceList[0].StatusId == 3">(Inactive)</span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 1">Request Raised</span>
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 2">Pending</span>
+                                <span class="text-s12wnormlc000" ng-if="item.PreAuthDetails.StatusId == 3">Approved</span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s8w500c15898f fs-12">{{item.PreAuthDetails.PreAuthorizationNumber}}</span>
+                            </td>
+                            <td class="w-80">
+                                <!--<span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate !== '1900-01-01T00:00:00'">{{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}</span>
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate == '1900-01-01T00:00:00'"></span>-->
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate !== ''">{{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}</span>
+                                <span class="text-s12w500c000" ng-if="item.PreAuthDetails.EndDate == ''"></span>
+                            </td>
+                            <td class="w-80">
+                                <span class="text-s12wnormlc000">{{item.PreAuthDetails.ModifiedBy}}</span>
+                            </td>
+                            <td>
+                                <span class="text-s12wnormlc000 fs-10 dis-block">
+                                    {{item.PreAuthDetails.Notes}}
+                                </span>
+                            </td>
+                            <td class="w-40">
+                                <button class="btn btn-save-us p-5" ng-click="clickpreauthpopup(item)">
+                                    <i class="edit-white-icon sprite-sheet-icon"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row" ng-hide="PreAuthAppointmentArray.length>0">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table tableno-bordered mb-0 headermainscroll" ng-style="otappts()" resize>
+                        <tbody>
+                            <tr>
+                                <td class="valign-middle">
+                                    <div class="row">
+                                        <div class="col-lg-12 text-center">
+                                            <div class="billing-cominsoon">
+                                                <img src="img/no-data/no-results-appointment.png" />
+                                                <div class="msg">
+                                                    <p class="goback-text">No Surgeries Found</p>
+                                                    <p class="no-records-txt-line2">
+                                                        No Surgeries available with selected dates.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Design Wiring start Date:- 05/11/2024-->
+    <div class="dis-flex flex-direction-column grid-gap-10 h-100">
+        <div class="bb__DDD--">
+            <div class="row nocolpad px__10-- py__5-- ">
+                <div class="col-lg-6 col-md-6 ">
+                    <div class="d__f-- ai__c-- gap__5--x ">
+                        <fieldset>
+                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0" id="newNameId" name="newpatientSearch" ng-value="2" ng-model="surgeryListGetObj.NewpatSearchType" aria-invalid="false" ng-change="ChangeSearch(surgeryListGetObj)">
+                                <label for="newNameId" class="radio-custom-label cur-poiter mb-0">Name</label>
+                            </div>
+                            <div class="dis-inline-block ml-15">
+                                <input type="radio" class="radio-custom width-0" id="newmrMobileId" name="newpatientSearch" ng-value="1" ng-model="surgeryListGetObj.NewpatSearchType" aria-invalid="false" ng-change="ChangeSearch(surgeryListGetObj)">
+                                <label for="newmrMobileId" class="radio-custom-label cur-poiter mb-0">MR No.</label>
+                            </div>
+
+                            <div class="dis-inline-block ml-5">
+                                <input type="radio" class="radio-custom width-0" id="DOBinc" name="newpatientSearch" ng-model="surgeryListGetObj.NewpatSearchType" ng-value="4" ng-click="ChangeSearch(surgeryListGetObj)" value="4">
+                                <label for="DOBinc" class="radio-custom-label cur-poiter mb-0 fs-12">{{ 'DOB' | translate}}</label>
+                            </div>
+                        </fieldset>
+                        <div class="dis-flex align-items-center">
+                            <div class="m-r-10 dis-flex">
+                                <input class="icons-search input__style--1" type="search" ng-show="surgeryListGetObj.NewpatSearchType==1" ng-change="onChangeSearchAppt(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)" ng-model="surgeryListGetObj.PatientDisplayId" placeholder="Search Mr.No" />
+                                <input class="icons-search input__style--1" type="search" ng-show="surgeryListGetObj.NewpatSearchType==2" ng-change="onChangeSearchAppt(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-model="surgeryListGetObj.firstname" placeholder="Search Patient /Mobile" />
+                                <input class="icons-search input__style--1" type="search" ng-show="surgeryListGetObj.NewpatSearchType==4" ng-change="onChangeSearchAppt(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-enter="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)" ng-model="surgeryListGetObj.firstname" dob-format placeholder="MM-DD-YYYY" maxlength="10" />
+                                <button class="btn p-0 btn-link" ng-click="clearpatientData()" ng-show="surgeryListGetObj.PatientDisplayId !='' || surgeryListGetObj.firstname !=''|| surgeryListGetObj.OldPatientDisplayId !=''|| surgeryListGetObj.DOB !=''"><b class="error"><i class="fas fa-times-circle fa-lg"></i></b></button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn__lg-- btn__1d5558--o" ng-show="surgeryListGetObj.NewpatSearchType === 1" ng-click="changePatientApptSearchText(surgeryListGetObj.PatientDisplayId,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                                <button type="button" class="btn__lg-- btn__1d5558--o" ng-show="surgeryListGetObj.NewpatSearchType === 2" ng-click="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                                <button type="button" class="btn__lg-- btn__1d5558--o" ng-show="surgeryListGetObj.NewpatSearchType === 4" ng-click="changePatientApptSearchText(surgeryListGetObj.firstname,surgeryListGetObj.NewpatSearchType)">{{ 'SEARCH' | translate}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="d__f-- ai__c-- jc__c-- gap__5--x ">
+                        <div class="form__group width__100--">
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar" ng-model="surgeryListGetObj.FromDate" datepickerpreauthpatient readonly />
+                        </div>
+                        <div class="form__group width__100--">
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{selectedDoctors}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheck" ng-click="checkAllDoctor(AllDoctorsObj.AllDoctorCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Doctors</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in BranchDoctorsList | filter:{'FullName':searchtxtb.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.SecondUserFullName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group width__100--">
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <!--ng-disabled="userLoginDetails.RoleID === 1 && userLoginDetails.SuffixId != 13 && !connectedUserObj.Available"-->
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedSuthStatus}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{selectedSuthStatus}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllAuthstatusCheck" ng-click="checkAllPreAuthStatus(AllDoctorsObj.AllAuthstatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Preauth Status</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in GetStatusList | filter:{'Name':searchtxtb.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="PreauthStatusToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.Name"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d__f-- ai__c-- jc__c-- gap__5--x">
+                            <button class="btn__lg-- btn__2D2D47--f" ng-click="SearchSurgeryList()">Apply</button>
+
+                            <button class="btn__lg-- btn__C71D27--o" ng-click="ClearPreauthscreen()">clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row h-100">
+            <div class="col-lg-12  h-100">
+                <div class="pos-relative h-100">
+                    <div class="adjustable-position slim-scroll">
+                        <!-- New Design Wiring start Date:- 26/11/2024-->
+                        <div class="d__f-- fd__c-- height__100-- px__5-- pb__5--" ng-if="NavObj.IsApptSelectedInfoInd">
+                            <table class="table__style--5" ng-if="PreAuthAppointmentsList.length>0">
+                                <thead>
+                                    <tr>
+                                        <th width="4%"><label>S.No</label></th>
+
+                                        <th width="16%"><label>Patient Details</label></th>
+                                        <th width="13%"><label>Appt Date&Time</label></th>
+                                        <th width="13%"><label>Doctor&Surgery</label></th>
+                                        <th width="4%"><label>Eye</label></th>
+                                        <th width="15%"><label>Insurance</label></th>
+                                        <th width="19%"><label>Auth.No,Start & Expiry Date</label></th>
+                                        <th width="19%"><label>Primary Ins.PreAuth Status</label></th>
+                                        <th width="9%"><label>Updated By</label></th>
+                                        <!--<th width="4%"></th>-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in PreAuthAppointmentsList track by $index">
+                                        <td ng-click="NavToPatientProfile(item)"><label>{{$index+1}}</label></td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div class="flex-row grid-gap-10">
+                                                <!--<img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                        <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" />-->
+                                                <div>
+                                                    <!--<p>{{item.Patient.FullName}}</p>-->
+                                                    <div class="d__f-- ai__c-- gap__x--4 mw__0--  show__popover--">
+                                                        <label class="fs__xl-- fw__8-- tc__537ACF-- lh__normal-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{item.Patient.FullName}}">{{item.Patient.FullName | textUpperCase}}</label>
+                                                        <div popover-template="'templates/UIBPopovers/UspatientProfileBasicPopover.html'" popover-data="item.Patient" popover-class="opprofile__popover" dynamic-us-patient-profile-basic-popover>
+                                                            <a>
+                                                                <i class="icons__w16-- drawarrow__w16--o"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <span>{{item.Patient.PatientDisplayId}}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div>
+                                                <p>{{item.SurgeryDate| date:"MM-dd-yyyy"}}</p>
+                                                <span>{{item.ConvertDateStartTime}}</span>
+                                            </div>
+                                        </td>
+
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div>
+                                                <p>{{item.DoctorFullName}}</p>
+                                                <span ng-repeat="sitem in item.SurgeryList" title="{{sitem.SurgeryName}}">{{sitem.SurgeryName}}  <span ng-hide="$last"> ,</span></span>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <span ng-repeat="sitem in item.SurgeryList" ng-class="{'od-bg': sitem.OrganId ==1,'os-bg': sitem.OrganId ==2,'ou-bg': sitem.OrganId ==3 }">
+                                                {{ sitem.OrganId== 1 ? 'OD' : (sitem.OrganId==2 ? 'OS' : (sitem.OrganId == 3 ? 'OU' : '')) }}
+                                            </span>
+                                        </td>
+                                        <td ng-if="item.PreauthDetails.length>0" ng-click="NavToPatientProfile(item)">
+                                            <div ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <p>{{insitem.PayorName}}</p>
+                                                <!--<p>{{insitem.PreAuthorizationNumber}}</p>-->
+                                                <p>{{insitem.PlanName}}</p>
+                                                <!--<p>{{item.PreAuthDetails.PreAuthorizationNumber}}</p>-->
+                                                <span class="dis-flex flex-row grid-gap-5" ng-show="item.PreauthDetails.length >1">
+                                                    <span popover-class="popover-custom-1 m-0"
+                                                          popover-placement="right auto"
+                                                          uib-popover-template="'NewPreAuthPopover.html'"
+                                                          ng-click="OpenNewPreAuthPopover(item.PreauthDetails)"
+                                                          popover-trigger="outsideClick" popover-append-to-body="true">
+                                                        + {{item.PreauthDetails.length -1}} Insurance
+                                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M6 1C3.25 1 1 3.25 1 6C1 8.75 3.25 11 6 11C8.75 11 11 8.75 11 6C11 3.25 8.75 1 6 1Z" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                            <path d="M6 8V5.5" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                            <path d="M6.00391 4H5.99942" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td ng-if="item.PreauthDetails.length==0" ng-click="NavToPatientProfile(item)">
+
+                                            <div ng-repeat="insitem in item.PatientInsuranceList track by $index" ng-if="insitem.IdentifierId==1">
+                                                <p>{{insitem.PayorName}}</p>
+                                                <!--<p>{{insitem.PreAuthorizationNumber}}</p>-->
+                                                <p>{{insitem.PlanName}}</p>
+                                                <!--<p>{{item.PreAuthDetails.PreAuthorizationNumber}}</p>-->
+                                                <!--<span class="dis-flex flex-row grid-gap-5" ng-show="item.PreauthDetails.length >1">
+                            <span popover-class="popover-custom-1 m-0"
+                                  popover-placement="right auto"
+                                  uib-popover-template="'NewPreAuthPopover.html'"
+                                  ng-click="OpenNewPreAuthPopover(item.PreauthDetails)"
+                                  popover-trigger="outsideClick" popover-append-to-body="true">
+                                + {{item.PreauthDetails.length -1}} Insurance
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 1C3.25 1 1 3.25 1 6C1 8.75 3.25 11 6 11C8.75 11 11 8.75 11 6C11 3.25 8.75 1 6 1Z" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6 8V5.5" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6.00391 4H5.99942" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </span>-->
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <span ng-if="insitem.PreAuthorizationNumber!= '' "> PreAuth No : {{insitem.PreAuthorizationNumber}}</span>
+                                                <span ng-if="insitem.StartDate!= null ">Start : {{insitem.StartDate | date: "MM-dd-yyyy"}}</span>
+                                                <span ng-if="insitem.EndDate!=null ">Exp : {{insitem.EndDate | date: "MM-dd-yyyy"}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <ul ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <li ng-class="{'status__denied': insitem.StatusId == 1,'status__pending': insitem.StatusId == 2,'status__sucess': insitem.StatusId == 3}">
+                                                    <span></span>
+                                                    {{ insitem.StatusId ==1 ? 'Denied' : (insitem.StatusId==2 ? 'Pending' : (insitem.StatusId == 3 ? 'Approved' : '')) }}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <p ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1" title="{{insitem.ModifiedUserName}}    ">{{insitem.ModifiedUserName}}</p>
+                                        </td>
+                                        <!--<td>-->
+                                        <!--commented Because of Ba(Nimeshika ) team told 28tNov @024-->
+                                        <!--<div class="dis-flex align-items-center grid-gap-10 justify-content">
+                    <a ng-click="clickpreauthpopup(item)">
+                        <i class="ehr-edit aside-icon-ros"></i>
+                    </a>
+                </div>-->
+                                        <!--</td>-->
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                            <table class="table__style--5 height__100--" ng-hide="PreAuthAppointmentsList.length>0">
+                                <thead>
+                                    <tr>
+                                        <th width="4%"><label>S.No</label></th>
+
+                                        <th width="16%"><label>Patient Details</label></th>
+                                        <th width="13%"><label>Appt Date&Time</label></th>
+                                        <th width="13%"><label>Doctor&Surgery</label></th>
+                                        <th width="4%"><label>Eye</label></th>
+                                        <th width="15%"><label>Insurance</label></th>
+                                        <th width="19%"><label>Auth.No,Start & Expiry Date</label></th>
+                                        <th width="19%"><label>Primary Ins.PreAuth Status</label></th>
+                                        <th width="9%"><label>Updated By</label></th>
+                                        <!--<th width="4%"></th>-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="bg__none--" colspan="9">
+                                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" >
+                                                <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Patients Found</h1>
+                                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                               
+                        </div>
+                        <div class="d__f-- fd__c-- height__100-- pb__5--" ng-if="!NavObj.IsApptSelectedInfoInd">
+                            <table class="table__style--5" ng-if="PreAuthAppointmentArray.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th width="3%"><label>S.No</label></th>
+                                        <th width="11%"><label>Appt Date & Time</label></th>
+                                        <th width="15%"><label>Patient Name & MR no</label></th>
+                                        <th width="14%"><label>Doctor & Surgery</label></th>
+                                        <th width="4%"><label>Eye</label></th>
+                                        <th width="15%"><label>Insurance</label></th>
+                                        <th width="15%"><label>Auth.No,Start & Expiry Date</label></th>
+                                        <th width="15%"><label>Primary Ins.PreAuth Status</label></th>
+                                        <th width="8%"><label>Updated By</label></th>
+                                        <!--<th width="4%"></th>-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in PreAuthAppointmentArray track by $index">
+                                        <td ng-click="NavToPatientProfile(item)"><label>{{$index+1}}</label></td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div>
+                                                <p>{{item.SurgeryDate| date:"MM-dd-yyyy"}}</p>
+                                                <span>{{item.ConvertDateStartTime}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div class="flex-row grid-gap-10">
+                                                <!--<img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                        <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" />-->
+                                                <div>
+                                                    <div class="d__f-- ai__c-- gap__x--4 mw__0--  show__popover--">
+                                                        <label class="fs__xl-- fw__8-- tc__537ACF-- lh__normal-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{item.Patient.FullName}}">{{item.Patient.FullName | textUpperCase}}</label>
+                                                        <div popover-template="'templates/UIBPopovers/UspatientProfileBasicPopover.html'" popover-data="item.Patient" popover-class="opprofile__popover" dynamic-us-patient-profile-basic-popover>
+                                                            <a>
+                                                                <i class="icons__w16-- drawarrow__w16--o"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <span>{{item.Patient.PatientDisplayId}}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div>
+                                                <p>{{item.DoctorFullName}}</p>
+                                                <span ng-repeat="sitem in item.SurgeryList" title="{{sitem.SurgeryName}}">{{sitem.SurgeryName}}  <span ng-hide="$last"> ,</span></span>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <span ng-repeat="sitem in item.SurgeryList" ng-class="{'od-bg': sitem.OrganId ==1,'os-bg': sitem.OrganId ==2,'ou-bg': sitem.OrganId ==3 }">
+                                                {{ sitem.OrganId== 1 ? 'OD' : (sitem.OrganId==2 ? 'OS' : (sitem.OrganId == 3 ? 'OU' : '')) }}
+                                            </span>
+                                        </td>
+                                        <td ng-if="item.PreauthDetails.length>0" ng-click="NavToPatientProfile(item)">
+                                            <div ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <p>{{insitem.PayorName}}</p>
+                                                <!--<p>{{insitem.PreAuthorizationNumber}}</p>-->
+                                                <p>{{insitem.PlanName}}</p>
+                                                <!--<p>{{item.PreAuthDetails.PreAuthorizationNumber}}</p>-->
+                                                <span class="dis-flex flex-row grid-gap-5" ng-show="item.PreauthDetails.length >1">
+                                                    <span popover-class="popover-custom-1 m-0"
+                                                          popover-placement="right auto"
+                                                          uib-popover-template="'NewPreAuthPopover.html'"
+                                                          ng-click="OpenNewPreAuthPopover(item.PreauthDetails)"
+                                                          popover-trigger="outsideClick" popover-append-to-body="true">
+                                                        + {{item.PreauthDetails.length -1}} Insurance
+                                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M6 1C3.25 1 1 3.25 1 6C1 8.75 3.25 11 6 11C8.75 11 11 8.75 11 6C11 3.25 8.75 1 6 1Z" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                            <path d="M6 8V5.5" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                            <path d="M6.00391 4H5.99942" stroke="#1D5558" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td ng-if="item.PreauthDetails.length==0" ng-click="NavToPatientProfile(item)">
+
+                                            <div ng-repeat="insitem in item.PatientInsuranceList track by $index" ng-if="insitem.IdentifierId==1">
+                                                <p>{{insitem.PayorName}}</p>
+
+                                                <p>{{insitem.PlanName}}</p>
+
+
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <div ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <span ng-if="insitem.PreAuthorizationNumber!= '' "> PreAuth No : {{insitem.PreAuthorizationNumber}}</span>
+                                                <span ng-if="insitem.StartDate!= null ">Start : {{insitem.StartDate | date: "MM-dd-yyyy"}}</span>
+                                                <span ng-if="insitem.EndDate!=null ">Exp : {{insitem.EndDate | date: "MM-dd-yyyy"}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <ul ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1">
+                                                <li ng-class="{'status__denied': insitem.StatusId == 1,'status__pending': insitem.StatusId == 2,'status__sucess': insitem.StatusId == 3}">
+                                                    <span></span>
+                                                    {{ insitem.StatusId ==1 ? 'Denied' : (insitem.StatusId==2 ? 'Pending' : (insitem.StatusId == 3 ? 'Approved' : '')) }}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td ng-click="NavToPatientProfile(item)">
+                                            <p ng-repeat="insitem in item.PreauthDetails track by $index" ng-if="insitem.IdentifierId==1" title="{{insitem.ModifiedUserName}}    ">{{insitem.ModifiedUserName}}</p>
+                                        </td>
+                                        <!--<td>
+                    <div class="dis-flex align-items-center grid-gap-10 justify-content">
+                        <a ng-click="clickpreauthpopup(item)">
+                            <i class="ehr-edit aside-icon-ros"></i>
+                        </a>
+                    </div>
+                </td>-->
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table__style--5 height__100--"  ng-hide="PreAuthAppointmentArray.length>0">
+                                <thead>
+                                    <tr>
+                                        <th width="3%"><label>S.No</label></th>
+                                        <th width="11%"><label>Appt Date & Time</label></th>
+                                        <th width="15%"><label>Patient Name & MR no</label></th>
+                                        <th width="14%"><label>Doctor & Surgery</label></th>
+                                        <th width="4%"><label>Eye</label></th>
+                                        <th width="15%"><label>Insurance</label></th>
+                                        <th width="15%"><label>Auth.No,Start & Expiry Date</label></th>
+                                        <th width="15%"><label>Primary Ins.PreAuth Status</label></th>
+                                        <th width="8%"><label>Updated By</label></th>
+                                        <!--<th width="4%"></th>-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="bg__none--" colspan="9">
+                                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--">
+                                                <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Patients Found</h1>
+                                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--Old Design-->
+                        <div ng-if="false">
+                            <div class="row" ng-if="NavObj.IsApptSelectedInfoInd">
+                                <div class="col-lg-12">
+                                    <div class="bg-white">
+                                        <table class=" table__style--0 table__detailsstyles--1">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%"><p>S.No</p></th>
+                                                    <th width="10%"><p>Date & Time</p></th>
+                                                    <th width="20%"><p>Patient Name</p></th>
+                                                    <th width="20%"><p>Surgeries/Doctor Name</p></th>
+                                                    <th width="5%"><p>Eye</p></th>
+                                                    <th width="12%"><p>Insurance</p></th>
+                                                    <th width="12%"><p>Authorization Details</p></th>
+                                                    <th width="12%"><p>Updated by</p></th>
+                                                    <th width="7%"><p>Actions</p></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in PreAuthAppointmentsList track by $index">
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p class="text-center">{{$index+1}}</p>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p>
+                                                            {{item.SurgeryDate| date:"MM-dd-yyyy"}}dssddsasddsadsa
+                                                        </p>
+                                                        <label class="text-s12w400C000 text-4A4A4A">
+                                                            {{item.ConvertDateStartTime}}
+                                                        </label>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <div>
+                                                            <img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                                            <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" />
+                                                            <div>
+                                                                <p>{{item.Patient.FullName}}</p>
+                                                                <span>{{item.Patient.PatientDisplayId}}</span>
+                                                                <label>{{item.USMobileNo}} |{{item.Patient.DOB|date:'MM-dd-yyyy'}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p ng-repeat="sitem in item.SurgeryList" class="no-wrapappt" title="{{sitem.SurgeryName}}">{{sitem.SurgeryName}}  <span ng-hide="$last"> ,</span> </p>
+                                                        <p ng-if="item.DoctorFullName!=''" class="no-wrapappt">{{item.DoctorFullName}}</p>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)" class="text-center">
+                                                        <span ng-repeat="sitem in item.SurgeryList" ng-class="{'od-bg': sitem.OrganId ==1,'os-bg': sitem.OrganId ==2,'ou-bg': sitem.OrganId ==3 }">
+                                                            <span> {{ sitem.OrganId== 1 ? 'OD' : (sitem.OrganId==2 ? 'OS' : (sitem.OrganId == 3 ? 'OU' : '')) }}</span>
+                                                        </span>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <ul class="m-b-4 flex-flow-list flex-direction-column align-flex-start grid-gap-0">
+                                                            <li>
+                                                                <span>{{item.AppointmentInsuranceList[0].PayorName}}</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>{{item.AppointmentInsuranceList[0].PlanName}}</span>
+                                                            </li>
+                                                        </ul>
+                                                        <!--   <p class="m-0">{{ item.AppointmentInsuranceList[0].StatusId == 1 ? '(Active)' : (item.AppointmentInsuranceList[0].StatusId == 2 ? '(Expired)' : (item.AppointmentInsuranceList[0].StatusId==3 ? '(Inactive)' : '')) }}</p>-->
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p>
+                                                            <span ng-if="item.PreAuthDetails.PreAuthorizationNumber!=''">Auth. No:</span>
+                                                            {{item.PreAuthDetails.PreAuthorizationNumber}}
+                                                        </p>
+                                                        <p>
+                                                            <span ng-if="item.PreAuthDetails.StatusId!=0">Status :</span>
+                                                            <span> {{ item.PreAuthDetails.StatusId ==1 ? 'Denied' : (item.PreAuthDetails.StatusId==2 ? 'Pending' : (item.PreAuthDetails.StatusId == 3 ? 'Approved' : '')) }}</span>
+                                                        </p>
+                                                        <p ng-if="item.PreAuthDetails.StartDate!=''">
+                                                            <span>Start  :</span>
+                                                            {{item.PreAuthDetails.StartDate | date: "MM-dd-yyyy"}}
+                                                        </p>
+                                                        <p ng-if="item.PreAuthDetails.EndDate!=''">
+                                                            <span>Expiry :</span>
+                                                            {{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}
+                                                        </p>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <div class="dis-flex align-items-center grid-gap-5 min-w-0" ng-if="item.PreAuthLogs.length>0 || item.PreAuthDetails.ModifiedBy!=''">
+                                                            <p class="text-s12w500c000 m-0">{{item.PreAuthDetails.ModifiedBy}}</p>
+
+                                                            <!--<a class="l-h-0" uib-popover-template="'PreAuthpopover-template.html'" ng-if="item.PreAuthLogs.length>0"
+                                                           popover-placement="auto"
+                                                           popover-trigger="outsideClick"
+                                                           popover-class="mt-0 popover-custom-1"
+                                                           ng-click="openPopover(item)"
+                                                           >
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M8 1.5C6.71442 1.5 5.45772 1.88122 4.3888 2.59545C3.31988 3.30968 2.48676 4.32484 1.99479 5.51256C1.50282 6.70028 1.37409 8.00721 1.6249 9.26809C1.8757 10.529 2.49477 11.6872 3.40381 12.5962C4.31285 13.5052 5.47104 14.1243 6.73192 14.3751C7.99279 14.6259 9.29973 14.4972 10.4874 14.0052C11.6752 13.5132 12.6903 12.6801 13.4046 11.6112C14.1188 10.5423 14.5 9.28558 14.5 8C14.4982 6.27665 13.8128 4.62441 12.5942 3.40582C11.3756 2.18722 9.72335 1.50182 8 1.5ZM8 13.5C6.91221 13.5 5.84884 13.1774 4.94437 12.5731C4.0399 11.9687 3.33495 11.1098 2.91867 10.1048C2.50238 9.09977 2.39347 7.9939 2.60568 6.927C2.8179 5.86011 3.34173 4.8801 4.11092 4.11091C4.8801 3.34172 5.86011 2.8179 6.92701 2.60568C7.9939 2.39346 9.09977 2.50238 10.1048 2.91866C11.1098 3.33494 11.9687 4.03989 12.5731 4.94436C13.1774 5.84883 13.5 6.9122 13.5 8C13.4983 9.45818 12.9184 10.8562 11.8873 11.8873C10.8562 12.9184 9.45819 13.4983 8 13.5ZM9 11C9 11.1326 8.94732 11.2598 8.85356 11.3536C8.75979 11.4473 8.63261 11.5 8.5 11.5C8.23479 11.5 7.98043 11.3946 7.7929 11.2071C7.60536 11.0196 7.5 10.7652 7.5 10.5V8C7.36739 8 7.24022 7.94732 7.14645 7.85355C7.05268 7.75979 7 7.63261 7 7.5C7 7.36739 7.05268 7.24021 7.14645 7.14645C7.24022 7.05268 7.36739 7 7.5 7C7.76522 7 8.01957 7.10536 8.20711 7.29289C8.39465 7.48043 8.5 7.73478 8.5 8V10.5C8.63261 10.5 8.75979 10.5527 8.85356 10.6464C8.94732 10.7402 9 10.8674 9 11ZM7 5.25C7 5.10166 7.04399 4.95666 7.1264 4.83332C7.20881 4.70999 7.32595 4.61386 7.46299 4.55709C7.60003 4.50032 7.75083 4.48547 7.89632 4.51441C8.04181 4.54335 8.17544 4.61478 8.28033 4.71967C8.38522 4.82456 8.45665 4.9582 8.48559 5.10368C8.51453 5.24917 8.49968 5.39997 8.44291 5.53701C8.38615 5.67406 8.29002 5.79119 8.16668 5.8736C8.04334 5.95601 7.89834 6 7.75 6C7.55109 6 7.36032 5.92098 7.21967 5.78033C7.07902 5.63968 7 5.44891 7 5.25Z" fill="black" />
+                                                            </svg>
+                                                        </a>-->
+                                                        </div>
+                                                        <div ng-if="item.PreAuthLogs.length==0 && item.PreAuthDetails.ModifiedBy==''">
+                                                            -
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dis-flex align-items-center grid-gap-10 justify-content">
+                                                            <a ng-click="clickpreauthpopup(item)">
+                                                                <i class="ehr-edit aside-icon-ros"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row" ng-hide="PreAuthAppointmentsList.length>0">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="table tableno-bordered mb-0 headermainscroll" ng-style="otappts()" resize>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="valign-middle">
+                                                            <div class="row">
+                                                                <div class="col-lg-12 text-center">
+                                                                    <div class="billing-cominsoon">
+                                                                        <img src="img/no-data/no-results-appointment.png" />
+                                                                        <div class="msg">
+                                                                            <p class="goback-text">No Patient found</p>
+                                                                            <p class="no-records-txt-line2">
+                                                                                No Surgeries available with selected dates.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" ng-if="!NavObj.IsApptSelectedInfoInd">
+                                <div class="col-lg-12" ng-if="PreAuthAppointmentArray.length > 0">
+                                    <div class="bg-white">
+                                        <table class=" table__style--0 table__detailsstyles--1">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%"><p>S.No</p></th>
+                                                    <th width="10%"><p>Date & Time</p></th>
+                                                    <th width="20%"><p>Patient Name</p></th>
+                                                    <th width="20%"><p>Surgeries/Doctor Name</p></th>
+                                                    <th width="5%"><p>Eye</p></th>
+                                                    <th width="12%"><p>Insurance</p></th>
+                                                    <th width="12%"><p>Authorization Details</p></th>
+                                                    <th width="12%"><p>Updated by</p></th>
+                                                    <th width="7%"><p>Actions</p></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in PreAuthAppointmentArray track by $index">
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p class="text-center">{{$index+1}}</p>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p>
+                                                            {{item.SurgeryDate| date:"MM-dd-yyyy"}}
+                                                        </p>
+                                                        <label class="text-s12w400C000 text-4A4A4A">
+                                                            {{item.ConvertDateStartTime}}
+                                                        </label>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <div>
+                                                            <img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                                            <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" />
+                                                            <div>
+                                                                <p>{{item.Patient.FullName}}</p>
+                                                                <span>{{item.Patient.PatientDisplayId}}</span>
+                                                                <label>{{item.USMobileNo}} |{{item.Patient.DOB|date:'MM-dd-yyyy'}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p ng-repeat="sitem in item.SurgeryList" class="no-wrapappt" title="{{sitem.SurgeryName}}">{{sitem.SurgeryName}}  <span ng-hide="$last"> ,</span> </p>
+                                                        <p ng-if="item.DoctorFullName!=''" class="no-wrapappt">{{item.DoctorFullName}}</p>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span ng-repeat="sitem in item.SurgeryList" ng-class="{'od-bg': sitem.OrganId ==1,'os-bg': sitem.OrganId ==2,'ou-bg': sitem.OrganId ==3 }">
+                                                            <span> {{ sitem.OrganId== 1 ? 'OD' : (sitem.OrganId==2 ? 'OS' : (sitem.OrganId == 3 ? 'OU' : '')) }}</span>
+                                                        </span>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <ul class="m-b-4 flex-flow-list flex-direction-column align-flex-start grid-gap-0">
+                                                            <li>
+                                                                <span>{{item.AppointmentInsuranceList[0].PayorName}}</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>{{item.AppointmentInsuranceList[0].PlanName}}</span>
+                                                            </li>
+                                                        </ul>
+                                                        <!--   <p class="m-0">{{ item.AppointmentInsuranceList[0].StatusId == 1 ? '(Active)' : (item.AppointmentInsuranceList[0].StatusId == 2 ? '(Expired)' : (item.AppointmentInsuranceList[0].StatusId==3 ? '(Inactive)' : '')) }}</p>-->
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <p>
+                                                            <span ng-if="item.PreAuthDetails.PreAuthorizationNumber!=''">Auth. No:</span>
+                                                            {{item.PreAuthDetails.PreAuthorizationNumber}}
+                                                        </p>
+                                                        <p>
+                                                            <span ng-if="item.PreAuthDetails.StatusId!=0">Status :</span>
+                                                            <span> {{ item.PreAuthDetails.StatusId ==1 ? 'Denied' : (item.PreAuthDetails.StatusId==2 ? 'Pending' : (item.PreAuthDetails.StatusId == 3 ? 'Approved' : '')) }}</span>
+                                                        </p>
+                                                        <p ng-if="item.PreAuthDetails.StartDate!=''">
+                                                            <span>Start  :</span>
+                                                            {{item.PreAuthDetails.StartDate | date: "MM-dd-yyyy"}}
+                                                        </p>
+                                                        <p ng-if="item.PreAuthDetails.EndDate!=''">
+                                                            <span>Expiry :</span>
+                                                            {{item.PreAuthDetails.EndDate | date: "MM-dd-yyyy"}}
+                                                        </p>
+                                                    </td>
+                                                    <td ng-click="NavToPatientProfile(item)">
+                                                        <div class="dis-flex align-items-center grid-gap-5 min-w-0" ng-if="item.PreAuthLogs.length>0 || item.PreAuthDetails.ModifiedBy!=''">
+                                                            <p class="text-s12w500c000 m-0">{{item.PreAuthDetails.ModifiedBy}}</p>
+
+                                                            <!--<a class="l-h-0" uib-popover-template="'PreAuthpopover-template.html'" ng-if="item.PreAuthLogs.length>0"
+                                                           popover-placement="auto"
+                                                           popover-trigger="outsideClick"
+                                                           popover-class="mt-0 popover-custom-1"
+                                                           ng-click="openPopover(item)">
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M8 1.5C6.71442 1.5 5.45772 1.88122 4.3888 2.59545C3.31988 3.30968 2.48676 4.32484 1.99479 5.51256C1.50282 6.70028 1.37409 8.00721 1.6249 9.26809C1.8757 10.529 2.49477 11.6872 3.40381 12.5962C4.31285 13.5052 5.47104 14.1243 6.73192 14.3751C7.99279 14.6259 9.29973 14.4972 10.4874 14.0052C11.6752 13.5132 12.6903 12.6801 13.4046 11.6112C14.1188 10.5423 14.5 9.28558 14.5 8C14.4982 6.27665 13.8128 4.62441 12.5942 3.40582C11.3756 2.18722 9.72335 1.50182 8 1.5ZM8 13.5C6.91221 13.5 5.84884 13.1774 4.94437 12.5731C4.0399 11.9687 3.33495 11.1098 2.91867 10.1048C2.50238 9.09977 2.39347 7.9939 2.60568 6.927C2.8179 5.86011 3.34173 4.8801 4.11092 4.11091C4.8801 3.34172 5.86011 2.8179 6.92701 2.60568C7.9939 2.39346 9.09977 2.50238 10.1048 2.91866C11.1098 3.33494 11.9687 4.03989 12.5731 4.94436C13.1774 5.84883 13.5 6.9122 13.5 8C13.4983 9.45818 12.9184 10.8562 11.8873 11.8873C10.8562 12.9184 9.45819 13.4983 8 13.5ZM9 11C9 11.1326 8.94732 11.2598 8.85356 11.3536C8.75979 11.4473 8.63261 11.5 8.5 11.5C8.23479 11.5 7.98043 11.3946 7.7929 11.2071C7.60536 11.0196 7.5 10.7652 7.5 10.5V8C7.36739 8 7.24022 7.94732 7.14645 7.85355C7.05268 7.75979 7 7.63261 7 7.5C7 7.36739 7.05268 7.24021 7.14645 7.14645C7.24022 7.05268 7.36739 7 7.5 7C7.76522 7 8.01957 7.10536 8.20711 7.29289C8.39465 7.48043 8.5 7.73478 8.5 8V10.5C8.63261 10.5 8.75979 10.5527 8.85356 10.6464C8.94732 10.7402 9 10.8674 9 11ZM7 5.25C7 5.10166 7.04399 4.95666 7.1264 4.83332C7.20881 4.70999 7.32595 4.61386 7.46299 4.55709C7.60003 4.50032 7.75083 4.48547 7.89632 4.51441C8.04181 4.54335 8.17544 4.61478 8.28033 4.71967C8.38522 4.82456 8.45665 4.9582 8.48559 5.10368C8.51453 5.24917 8.49968 5.39997 8.44291 5.53701C8.38615 5.67406 8.29002 5.79119 8.16668 5.8736C8.04334 5.95601 7.89834 6 7.75 6C7.55109 6 7.36032 5.92098 7.21967 5.78033C7.07902 5.63968 7 5.44891 7 5.25Z" fill="black" />
+                                                            </svg>
+                                                        </a>-->
+                                                        </div>
+                                                        <div ng-if="item.PreAuthLogs.length==0 && item.PreAuthDetails.ModifiedBy==''">
+                                                            -
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dis-flex align-items-center grid-gap-10 justify-content">
+                                                            <a ng-click="clickpreauthpopup(item)">
+                                                                <i class="ehr-edit aside-icon-ros"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row" ng-hide="PreAuthAppointmentArray.length>0">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="table tableno-bordered mb-0 headermainscroll" ng-style="otappts()" resize>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="valign-middle">
+                                                            <div class="row">
+                                                                <div class="col-lg-12 text-center">
+                                                                    <div class="billing-cominsoon">
+                                                                        <img src="img/no-data/no-results-appointment.png" />
+                                                                        <div class="msg">
+                                                                            <p class="goback-text">No Patient found</p>
+                                                                            <p class="no-records-txt-line2">
+                                                                                No Surgeries available with selected dates.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- New Design Wiring end-->
+
+
+</div>
+<script type="text/ng-template" id="PreAuthpopover-template.html">
+    <div ng-if="item.PreAuthLogs.length>0">
+        <table class="table__style--7 table-layout-fix">
+            <thead>
+                <tr>
+                    <th>
+                        User
+                    </th>
+                    <th width="26%">
+                        Date & Time
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th width="26%">
+                        Notes
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="i in item.PreAuthLogs">
+                    <td>{{i.ModifiedUserName}} </td>
+                    <td>{{i.ModifiedDt|date:'MM-dd-yyyy h:mm a'}} </td>
+                    <td>
+                        {{ i.StatusId == 1 ? 'Denied' : (i.StatusId == 2 ? 'Pending' : (i.StatusId == 3 ? 'Approved' : '')) }}
+                    </td>
+                    <td>
+                        <p class="no-wrapappt m-0" title="{{i.Notes}}">{{i.Notes}}</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="NewPreAuthPopover.html">
+    <div class="row nocolpad">
+        <div class="col-lg-12">
+            <div class="dis-flex flex-direction-column grid-gap-10" >
+                <div class="bg-light bradius-8 p-8" ng-repeat="Nitem in PatientInsuranceList track by $index" ng-if="Nitem.IdentifierId!=1">
+                    <div class="dis-flex flex-direction-column grid-gap-10">
+                        <div class="dis-flex align-items-center justify-space-between">
+
+                            <div class="vertical__list">
+                                <span> {{Nitem.PayorName}}</span>
+                                
+                            </div>
+                            <ul class="flex-flow-list">
+                                <li>
+                                    <span>{{ Nitem.StatusId ==1 ? 'Denied' : (Nitem.StatusId==2 ? 'Pending' : (Nitem.StatusId == 3 ? 'Approved' : '')) }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dis-flex align-items-center justify-space-between">
+                            <div class="vertical__list">
+                                <span> {{Nitem.PlanName}} </span>
+                                <label>Coverage Plan</label>
+                            </div>
+                        </div>
+                        <div class="dis-flex align-items-center justify-space-between">
+                            <div class="vertical__list">
+                                <span> {{Nitem.ModifiedUserName}} </span>
+                                <label>Updated by</label>
+                            </div>
+                            <div class="vertical__list">
+                                <label ng-show="Nitem.PreAuthorizationNumber !== ''"> PreAuth No. :  {{Nitem.PreAuthorizationNumber}}</label>
+                                <label ng-show="Nitem.StartDate !== null"> Start : {{Nitem.StartDate | date: "MM-dd-yyyy"}} </label>
+                                <label ng-show="Nitem.EndDate !== null"> Exp : {{Nitem.EndDate | date: "MM-dd-yyyy"}} </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,481 @@
+﻿<!DOCTYPE html>
+<!--
+    THROWAWAY LAYOUT PREVIEW -- Phase 2 static mock. Not wired into the app, not routed,
+    safe to delete. Open directly in a browser from the app/ folder.
+
+    Purpose: prove the Doctor -> Branch nested column header before any API wiring.
+
+    FullCalendar Scheduler 5.11.2 cannot nest resources in a vertical resource view --
+    flattenResources() hardcodes groupSpecs:[] and maxDepth:1, and ResourceDayHeader
+    emits flat colSpan:1 cells. So `parentId` / `resourceGroupField` are ignored here.
+    The doctor row is therefore built as a real <tr> of colspan cells inserted above
+    FullCalendar's own resource row, and re-applied whenever preact re-renders the head.
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>OP Calendar - Doctor / Branch columns (static mock)</title>
+    <link rel="stylesheet" href="css/dxhtmlCalendar/main.min.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f4f6f8;
+            color: #1d1d1d;
+        }
+
+        .mock-bar {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            padding: 12px 18px;
+            background: #1d5558;
+            color: #fff;
+        }
+
+        .mock-bar h1 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .mock-bar .note {
+            font-size: 12px;
+            opacity: .75;
+        }
+
+        .mock-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+        }
+
+        .mock-group strong {
+            font-weight: 600;
+            opacity: .85;
+        }
+
+        .mock-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, .12);
+            padding: 3px 9px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .mock-group label:hover { background: rgba(255, 255, 255, .22); }
+
+        .wrap { padding: 16px; }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e2e6ea;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        /* ---- the injected doctor header row ---------------------------------- */
+        .ehn-doctor-row > th {
+            background: #eef4f4;
+            border-bottom: 1px solid #d6dfe0;
+            padding: 7px 4px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #10484b;
+            vertical-align: middle;
+        }
+
+        .ehn-doctor-row > th.ehn-axis {
+            background: #fff;
+            border-bottom: 1px solid #d6dfe0;
+        }
+
+        /* separator between one doctor's block of branches and the next */
+        .ehn-doctor-row > th.ehn-group-end,
+        .fc .fc-col-header-cell.ehn-group-end,
+        .fc .fc-timegrid-col.ehn-group-end {
+            border-right: 2px solid #1d5558;
+        }
+
+        .fc .fc-col-header-cell.ehn-branch-cell {
+            background: #f8fafa;
+            font-size: 11.5px;
+            font-weight: 500;
+        }
+
+        .fc .fc-col-header-cell.ehn-branch-cell .fc-col-header-cell-cushion {
+            padding: 5px 4px;
+            color: #444;
+            line-height: 1.25;
+        }
+
+        .fc-event { font-size: 11px; }
+
+        .legend {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .legend code {
+            background: #eceff1;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mock-bar">
+        <h1>OP Calendar &mdash; Doctor / Branch columns</h1>
+        <div class="mock-group">
+            <strong>Doctors</strong>
+            <label><input type="checkbox" class="doc-cb" value="101" checked> Dr. Miguel A Santiago Garcia MD</label>
+            <label><input type="checkbox" class="doc-cb" value="102" checked> Dr. ASC Tim Ehn MD</label>
+        </div>
+        <div class="mock-group">
+            <strong>Locations</strong>
+            <label><input type="checkbox" class="br-cb" value="11" checked> Grupo ASC</label>
+            <label><input type="checkbox" class="br-cb" value="12" checked> Ojos de Puerto Rico</label>
+        </div>
+        <div class="mock-group">
+            <label><input type="checkbox" id="legacy"> legacy mode (one plain resource per doctor)</label>
+        </div>
+        <span class="note">static data &mdash; no API</span>
+    </div>
+
+    <div class="wrap">
+        <div class="card"><div id="calendar"></div></div>
+        <div class="legend">
+            Tick/untick above to check the three cases from the spec: 1 doctor &times; 2 branches,
+            2 doctors &times; 1 branch, and 2 doctors &times; 2 branches. Only real
+            doctor&times;branch pairs get a column &mdash; a doctor who does not work at a selected
+            branch simply has no column there.
+            Resource ids are <code>&lt;DoctorID&gt;_&lt;UserBranchId&gt;</code>.
+        </div>
+    </div>
+
+    <script src="css/dxhtmlCalendar/main.min.js"></script>
+    <script>
+        // ---------------------------------------------------------------------
+        // Static fixture standing in for the API. Shapes mirror what the real
+        // payload already carries: every schedule row and every appointment is
+        // keyed by DoctorId AND UserBranchId.
+        // ---------------------------------------------------------------------
+        var DATE = '2026-09-23';
+
+        var DOCTORS = [
+            { DoctorID: 101, name: 'Dr. Miguel A Santiago Garcia MD' },
+            { DoctorID: 102, name: 'Dr. ASC Tim Ehn MD' }
+        ];
+
+        var BRANCHES = [
+            { UserBranchId: 11, name: 'INSTITUTO DE OJOS Y PIEL GRUPO ASC' },
+            { UserBranchId: 12, name: 'Instituto de Ojos de Puerto Rico' }
+        ];
+
+        // one row per doctor per branch -- the pairing the app currently collapses
+        // with _.uniq(..., p => p.DoctorID)
+        var SCHEDULES = [
+            { DoctorId: 101, UserBranchId: 11, StartTime: '13:00', EndTime: '19:00' },
+            { DoctorId: 101, UserBranchId: 12, StartTime: '08:00', EndTime: '16:00' },
+            { DoctorId: 102, UserBranchId: 11, StartTime: '13:00', EndTime: '19:00' },
+            { DoctorId: 102, UserBranchId: 12, StartTime: '09:00', EndTime: '13:00' }
+        ];
+
+        var APPTS = [
+            // Grupo ASC
+            { d: 101, b: 11, s: '13:30', e: '14:00', t: 'Test Durga 102 Reddy K', r: '11-Visita Inicial Retina', c: '#3aa76d' },
+            { d: 102, b: 11, s: '13:30', e: '14:00', t: 'Test Durga 102 Reddy K', r: '11-Visita Inicial Retina', c: '#3aa76d' },
+            { d: 102, b: 11, s: '17:30', e: '18:00', t: 'Carmen Tomassini Tarria', r: '11-Visita Inicial', c: '#5b9bd5' },
+            { d: 102, b: 11, s: '17:30', e: '18:00', t: 'Miguel Coto Rios', r: '11-Visita Inicial', c: '#5b9bd5' },
+            { d: 101, b: 11, s: '18:00', e: '18:30', t: 'Augustine Irrizary Rivera', r: '16E-Inyeccion Eylea', c: '#2f9e44' },
+            // Ojos de Puerto Rico
+            { d: 102, b: 12, s: '10:30', e: '10:45', t: 'Test Harry Potter', r: '001-CVA Nuevo', c: '#e64980' },
+            { d: 102, b: 12, s: '10:45', e: '11:00', t: 'Test Tom Riddle', r: '001-CVA Nuevo', c: '#e64980' },
+            { d: 102, b: 12, s: '11:00', e: '11:15', t: 'Test Lilly R Johnson', r: '001-CVA Nuevo', c: '#e64980' },
+            { d: 101, b: 12, s: '14:50', e: '15:05', t: 'Daisy Alvarez Colon', r: '44-Yag Cap', c: '#868e96' },
+            { d: 101, b: 12, s: '15:00', e: '15:15', t: 'Sonia Fernandez Granados', r: '44-Yag Cap', c: '#868e96' },
+            { d: 101, b: 12, s: '15:10', e: '15:25', t: 'Carmen M Medina Santos', r: '44-Yag Cap', c: '#868e96' },
+            { d: 101, b: 12, s: '15:30', e: '15:45', t: 'Carmen L Diaz Solano', r: '44-Yag Cap', c: '#868e96' }
+        ];
+
+        // ---------------------------------------------------------------------
+        // Composite resources: one column per REAL doctor x branch pair, ordered
+        // so a doctor's branches sit next to each other (the injected header can
+        // only span columns that are already adjacent).
+        // ---------------------------------------------------------------------
+        function resourceId(doctorId, branchId) { return doctorId + '_' + branchId; }
+
+        // same accessor the controller now uses -- tolerates a plain numeric id
+        function resDoctorId(resourceOrId) {
+            if (resourceOrId === null || resourceOrId === undefined) { return null; }
+            var ext = resourceOrId.extendedProps;
+            if (ext && ext.DoctorID !== undefined && ext.DoctorID !== null) { return parseInt(ext.DoctorID, 10); }
+            if (typeof resourceOrId === 'object' && resourceOrId.DoctorID !== undefined) {
+                return parseInt(resourceOrId.DoctorID, 10);
+            }
+            var raw = (typeof resourceOrId === 'object') ? resourceOrId.id : resourceOrId;
+            if (raw === null || raw === undefined) { return null; }
+            var n = parseInt(String(raw).split('_')[0], 10);
+            return isNaN(n) ? null : n;
+        }
+
+        // reproduces TODAY's shape: one plain resource per doctor, id = DoctorID,
+        // no branch dimension. Used to prove the injected row stays inert.
+        function buildLegacyResources(docIds) {
+            return DOCTORS.filter(function (d) { return docIds.indexOf(d.DoctorID) !== -1; })
+                .map(function (d) {
+                    return { id: String(d.DoctorID), title: d.name, DoctorID: d.DoctorID };
+                });
+        }
+
+        function buildResources(docIds, branchIds) {
+            var out = [];
+            DOCTORS.forEach(function (doc) {
+                if (docIds.indexOf(doc.DoctorID) === -1) { return; }
+                BRANCHES.forEach(function (br) {
+                    if (branchIds.indexOf(br.UserBranchId) === -1) { return; }
+                    var sched = SCHEDULES.filter(function (s) {
+                        return s.DoctorId === doc.DoctorID && s.UserBranchId === br.UserBranchId;
+                    });
+                    // every selected branch gets a column even with no schedule
+                    out.push({
+                        id: resourceId(doc.DoctorID, br.UserBranchId),
+                        title: br.name,                  // column header = branch
+                        DoctorID: doc.DoctorID,
+                        UserBranchId: br.UserBranchId,
+                        doctorName: doc.name,            // spanning row above = doctor
+                        businessHours: sched.length ? { startTime: sched[0].StartTime, endTime: sched[0].EndTime } : { startTime: '23:59', endTime: '24:00' }
+                    });
+                });
+            });
+            return out;
+        }
+
+        function buildEvents(docIds, branchIds) {
+            return APPTS.filter(function (a) {
+                return docIds.indexOf(a.d) !== -1 && branchIds.indexOf(a.b) !== -1;
+            }).map(function (a, i) {
+                return {
+                    id: 'e' + i,
+                    resourceId: resourceId(a.d, a.b),
+                    title: a.t + ' - (' + a.r + ')',
+                    start: DATE + 'T' + a.s + ':00',
+                    end: DATE + 'T' + a.e + ':00',
+                    backgroundColor: a.c,
+                    borderColor: a.c,
+                    textColor: '#fff'
+                };
+            });
+        }
+
+        // ---------------------------------------------------------------------
+        // The doctor header row.
+        //
+        // FullCalendar renders the head with preact, so a <tr> we insert is not in
+        // its vdom and gets dropped on the next re-render. Rather than fight that,
+        // the row is cheap to rebuild and a MutationObserver puts it back whenever
+        // it goes missing. `building` guards the observer against our own writes.
+        // ---------------------------------------------------------------------
+        var building = false;
+
+        function decorateHeader(rootEl, resources) {
+            if (building) { return; }
+            var thead = rootEl.querySelector('.fc-col-header thead');
+            if (!thead) { return; }
+
+            var resourceRow = thead.querySelector('tr:not(.ehn-doctor-row)');
+            if (!resourceRow) { return; }
+
+            building = true;
+            try {
+                var byId = {};
+                resources.forEach(function (r) { byId[r.id] = r; });
+
+                var old = thead.querySelector('tr.ehn-doctor-row');
+                if (old) { old.parentNode.removeChild(old); }
+
+                // ---- identical algorithm to decorateDoctorHeader() in
+                // ---- UsDayDoctorTimeLineFullCalendarCtl.js. Keep the two in step.
+                var cells = Array.prototype.slice.call(resourceRow.children);
+
+                var lead = 0;
+                var i = 0;
+                while (i < cells.length && !cells[i].hasAttribute('data-resource-id')) { lead++; i++; }
+
+                var groups = [];
+                while (i < cells.length) {
+                    var res = byId[cells[i].getAttribute('data-resource-id')];
+                    if (!res) { i++; continue; }
+                    var docId = resDoctorId(res);
+                    var group = { label: res.doctorName || res.title, span: 0, cells: [] };
+                    while (i < cells.length) {
+                        var next = byId[cells[i].getAttribute('data-resource-id')];
+                        if (!next || resDoctorId(next) !== docId) { break; }
+                        group.cells.push(cells[i]);
+                        group.span++;
+                        i++;
+                    }
+                    groups.push(group);
+                }
+
+                cells.forEach(function (c) {
+                    c.classList.remove('ehn-branch-cell');
+                    c.classList.remove('ehn-group-end');
+                });
+
+                // one column per doctor means there is nothing to group -- this is
+                // the guard that keeps the shipped code inert on today's data
+                var hasGrouping = false;
+                groups.forEach(function (g) { if (g.span > 1) { hasGrouping = true; } });
+                if (!hasGrouping) { return; }
+
+                var tr = document.createElement('tr');
+                tr.className = 'ehn-doctor-row';
+                tr.setAttribute('role', 'row');
+
+                if (lead) {
+                    var axis = document.createElement('th');
+                    axis.className = 'ehn-axis';
+                    axis.colSpan = lead;
+                    tr.appendChild(axis);
+                }
+
+                groups.forEach(function (g, gi) {
+                    var th = document.createElement('th');
+                    th.className = 'ehn-doctor-cell';
+                    th.colSpan = g.span;
+                    th.textContent = g.label;
+                    g.cells.forEach(function (c) { c.classList.add('ehn-branch-cell'); });
+                    if (gi < groups.length - 1) {
+                        th.classList.add('ehn-group-end');
+                        var lastCell = g.cells[g.cells.length - 1];
+                        if (lastCell) {
+                            lastCell.classList.add('ehn-group-end');
+                            var rid = lastCell.getAttribute('data-resource-id');
+                            var col = rootEl.querySelector('.fc-timegrid-col[data-resource-id="' + rid + '"]');
+                            if (col) { col.classList.add('ehn-group-end'); }
+                        }
+                    }
+                    tr.appendChild(th);
+                });
+
+                thead.insertBefore(tr, resourceRow);
+            } finally {
+                building = false;
+            }
+        }
+
+        // matching separator down the time grid, on the last branch column of a doctor
+        function markBodyColumn(rootEl, doctorId, byId, resources) {
+            var mine = resources.filter(function (r) { return r.DoctorID === doctorId; });
+            if (!mine.length) { return; }
+            var lastId = mine[mine.length - 1].id;
+            var col = rootEl.querySelector('.fc-timegrid-col[data-resource-id="' + lastId + '"]');
+            if (col) { col.classList.add('ehn-group-end'); }
+        }
+
+        // ---------------------------------------------------------------------
+        var calendarEl = document.getElementById('calendar');
+        var calendar;
+        var currentResources = [];
+
+        function selectedDocs() {
+            return Array.prototype.slice.call(document.querySelectorAll('.doc-cb:checked'))
+                .map(function (c) { return parseInt(c.value, 10); });
+        }
+        function selectedBranches() {
+            return Array.prototype.slice.call(document.querySelectorAll('.br-cb:checked'))
+                .map(function (c) { return parseInt(c.value, 10); });
+        }
+
+        function render() {
+            var docs = selectedDocs();
+            var brs = selectedBranches();
+            var legacy = document.getElementById('legacy').checked;
+            currentResources = legacy ? buildLegacyResources(docs) : buildResources(docs, brs);
+
+            if (calendar) { calendar.destroy(); }
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                initialView: 'resourceTimeGridDay',
+                initialDate: DATE,
+                headerToolbar: { left: '', center: '', right: '' },
+                height: 'auto',
+                allDaySlot: false,
+                nowIndicator: false,
+                slotMinTime: '06:00:00',
+                slotDuration: '00:15:00',
+                slotLabelInterval: '00:30:00',
+                dayMinWidth: 180,
+                slotEventOverlap: false,
+                selectable: true,
+                editable: true,
+                resources: currentResources,
+                events: legacy
+                    ? buildEvents(docs, brs).map(function (e) {
+                          e.resourceId = String(resDoctorId(e.resourceId));
+                          return e;
+                      })
+                    : buildEvents(docs, brs),
+                // demo-only: proves the composite id round-trips back to doctor + branch
+                select: function (info) {
+                    var r = info.resource;
+                    console.log('slot selected ->',
+                        'DoctorID=' + r.extendedProps.DoctorID,
+                        'UserBranchId=' + r.extendedProps.UserBranchId,
+                        info.startStr, info.endStr);
+                },
+                datesSet: function () { decorateHeader(calendarEl, currentResources); },
+                resourcesSet: function () { decorateHeader(calendarEl, currentResources); },
+                viewDidMount: function () { decorateHeader(calendarEl, currentResources); }
+            });
+
+            calendar.render();
+            decorateHeader(calendarEl, currentResources);
+
+            // preact re-renders the head on resize/scroll sync -- put the row back
+            var thead = calendarEl.querySelector('.fc-col-header thead');
+            if (thead) {
+                new MutationObserver(function () {
+                    if (!building && !thead.querySelector('tr.ehn-doctor-row')) {
+                        decorateHeader(calendarEl, currentResources);
+                    }
+                }).observe(thead, { childList: true });
+            }
+        }
+
+        document.querySelectorAll('.doc-cb, .br-cb, #legacy').forEach(function (cb) {
+            cb.addEventListener('change', render);
+        });
+
+        // optional deep-link for checking a specific case, e.g.
+        //   ?docs=101&branches=11,12     one doctor, two branches
+        //   ?docs=101,102&branches=11    two doctors, one branch
+        (function applyQuery() {
+            var q = new URLSearchParams(location.search);
+            function apply(sel, raw) {
+                if (raw === null) { return; }
+                var want = raw.split(',');
+                document.querySelectorAll(sel).forEach(function (cb) {
+                    cb.checked = want.indexOf(cb.value) !== -1;
+                });
+            }
+            apply('.doc-cb', q.get('docs'));
+            apply('.br-cb', q.get('branches'));
+            if (q.get('legacy') === '1') { document.getElementById('legacy').checked = true; }
+        })();
+
+        render();
+    </script>
+</body>
+</html>
+

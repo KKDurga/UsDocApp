@@ -1,0 +1,67 @@
+<!-- Task 13 - Order Given By details for medication timings, protected by the Given By user's passcode.
+     Included inside ng-repeat="kitem in item.DropTimings" with ng-init="dtCfg = {...}" describing the section:
+       GivenByList      - name of the scope list shown in the Given By dropdown, e.g. 'MedicationGivenByNurseArray'
+       OnTime(kitem, item, Type)          - the section's existing "set current time" handler
+       OnDelete(item, kitem, DeleteType)  - the section's existing delete-timing handler
+       OnGivenByChange(kitem)             - optional ng-change handler for the Given By dropdown
+       HideTimeBeforeCheckin              - optional, hides the time field until the patient is checked in
+     Row handlers (ValidateDropGivenBy, EditDropGivenBy, ...) come from DropTimingGivenByService.attach($scope).
+     The $$ fields are UI-only and are dropped from the save payload.
+     Edit on a validated timing opens it locked; the previous Given By user's passcode unlocks it for changes. -->
+<ul class="facesheet-list-label jc__e--" style="flex-wrap:nowrap;">
+    <li ng-show="!kitem.IsEditview" style="flex:0 0 60px;">
+        <div class="form__group">
+            <input type="text" placeholder="Dosage" id="input_givenbydosage" special-only maxlength="10" ng-model="kitem.MedicationDosage" ng-focus="item.IsDosageFocus" ng-disabled="kitem.$$IsLocked" style="width:60px;" />
+        </div>
+    </li>
+    <li ng-show="!kitem.IsEditview" style="flex:0 0 115px;">
+        <div class="form__group">
+            <input type="text" class="icons-time" id="input_givenbytime" placeholder="Time" ng-model="kitem.MedicationTime" ng-disabled="kitem.$$IsLocked" style="width:115px;"
+                   ng-hide="dtCfg.HideTimeBeforeCheckin && (cacheStorageItem.CheckinStatusId==1||cacheStorageItem.CheckinStatusId==0)"
+                   ng-click="kitem.$$IsLocked || dtCfg.OnTime(kitem,item,dtCfg.Type)" />
+        </div>
+    </li>
+    <li ng-show="!kitem.IsEditview" style="flex:0 0 170px;">
+        <div class="form__group">
+            <select ng-model="kitem.GivenBy" style="width:170px;" id="select_givenby" ng-disabled="kitem.$$IsLocked" ng-change="dtCfg.OnGivenByChange && dtCfg.OnGivenByChange(kitem)"
+                    ng-options="nitem.DoctorID as nitem.FullName for nitem in GetDropGivenByList(dtCfg.GivenByList)">
+                <option value="" disabled>Given By:</option>
+            </select>
+        </div>
+    </li>
+    <li ng-show="!kitem.IsEditview" style="flex:0 0 120px;">
+        <div class="form__group" tooltip-placement="top" uib-tooltip="{{kitem.$$IsLocked ? 'Enter ' + kitem.$$PrevGivenByName + ' password to edit' : 'Enter Given By password'}}">
+            <input type="password" masked-code class="pos-relative" id="input_givenbypasscode" autocomplete="new-password" ng-model="kitem.$$GivenByPassword" placeholder="Enter Password" style="z-index:1; width:120px;" />
+        </div>
+    </li>
+    <li ng-show="!kitem.IsEditview" style="flex:0 0 auto;">
+        <button class="btn btn-ehnote" id="btn_givenbyvalidate" ng-click="kitem.$$IsLocked ? ValidatePrevGivenBy(kitem) : ValidateDropGivenBy(kitem)">Validate</button>
+    </li>
+    <li ng-show="kitem.IsEditview" style="min-width:0;">
+        <label class="text-transform-initial" ng-if="kitem.MedicationDosage != ''">{{kitem.MedicationDosage}} </label>
+        <span ng-if="kitem.MedicationDosage != ''">at</span>
+        <label ng-if="kitem.MedicationTime != ''">{{kitem.MedicationTime}}</label>
+        <span ng-if="kitem.GivenByname != ''">@</span>
+        <label ng-if="kitem.GivenByname != ''"> {{kitem.GivenByname}}</label>
+        <label ng-show="kitem.LicenseNumber !==''&& kitem.LicenseNumber !==null">,Lic: {{kitem.LicenseNumber}}</label>
+        <p ng-if="kitem.Remarks != ''" class="mb__0--"><b>Remarks:</b>{{kitem.Remarks}}</p>
+        <span ng-hide="$last">,</span>
+    </li>
+    <li>
+        <a tooltip-placement="top" uib-tooltip="Notes" id="a_givenbynotes" ng-click="kitem.shownotes = !kitem.shownotes"> <i class="icons__w16-- notes__w16--o"></i></a>
+    </li>
+    <li class="d__f-- ai__c-- gap__5--x">
+        <a tooltip-placement="top" uib-tooltip="Edit" id="a_givenbyedit" ng-show="kitem.IsEditview" ng-click="EditDropGivenBy(kitem)">
+            <i class="fas fa-pen text-muted"></i>
+        </a>
+        <a tooltip-placement="top" uib-tooltip="Cancel Edit" id="a_givenbycanceledit" ng-show="!kitem.IsEditview && kitem.$$IsEditMode" ng-click="CancelEditDropGivenBy(kitem)">
+            <i class="fas fa-undo text-muted"></i>
+        </a>
+        <a tooltip-placement="top" uib-tooltip="Cancel" id="a_givenbydelete" ng-click="dtCfg.OnDelete(item,kitem,dtCfg.DeleteType)" ng-show="(kitem.IsEditDrop||!kitem.IsEditview) && !kitem.$$IsEditMode">
+            <i class="icons__w16-- cancel__w16--o"></i>
+        </a>
+    </li>
+</ul>
+<div class="form-group" ng-if="kitem.shownotes">
+    <textarea class="form-outline msd-elastic: \n;" id="textarea_givenbynotes" ng-model="kitem.Remarks" ng-focus="kitem.shownotes" ng-disabled="kitem.IsEditview || kitem.$$IsLocked" rows="2"></textarea>
+</div>

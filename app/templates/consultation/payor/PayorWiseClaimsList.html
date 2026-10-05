@@ -1,0 +1,383 @@
+﻿
+<section class="section-ehnote">
+    <div class="ehnote-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table tableno-bordered m-b-0 apptFilterTable">
+                        <tbody>
+                            <tr>
+
+                                <td class="w-200">
+                                    <div class="form-group">
+                                        <label>From Date</label>
+                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="SearchClaimObj.FromDate" ng-change="changeFromDate(SearchObj.FromDate)" datepickerforinventory readonly />
+                                    </div>
+                                </td>
+                                <td class="w-200">
+                                    <div class="form-group">
+                                        <label>To Date</label>
+                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="SearchClaimObj.ToDate" ng-change="changeToDate(SearchObj.ToDate)" datepickerforinventory readonly />
+                                    </div>
+                                </td>
+
+                                <td class="w-200">
+                                    <div class="form-group">
+                                        <label>Payors</label>
+                                        <input type="text"
+                                               autocomplete="off"
+                                               class="form-control"
+                                               name="InsurancePayor"
+                                               placeholder="select Insurance Payor"
+                                               ng-model="SearchClaimObj.PayorObj"
+                                               typeahead-min-length="0"
+                                               typeahead-on-select="ChangePayor(SearchClaimObj.PayorObj,SearchClaimObj)"
+                                               uib-typeahead="item as item.PayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+
+
+
+                                        <!--<select class="form-control"
+                                                ng-model="SearchClaimObj.PayorObj"
+                                                ng-options="list as list.PayorName for list in PayorAllListArray"
+                                                ng-change="ChangePayor(SearchClaimObj.PayorObj,SearchClaimObj)">
+                                            <option value=""> select</option>
+                                        </select>-->
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <button class="btn btn-success m-t-25" ng-click="SearchPayorClaimlist()">Search</button>
+                                    </div>
+                                </td>
+                                <td width="25%" class="text-right">
+                                    <button class="btn btn-primary m-t-25" ng-click="showDeposit();"> Select Deposit</button>
+                                    <!--<button class="btn btn-info m-t-25" ng-click="switchClaimSubTab(3)"> Add Deposit</button>-->
+                                    <button class="btn btn-info m-t-25" ng-click="GoToAddDeposite();"> Add Deposit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+</section>
+
+<div class="row m-t-10" ng-if="SelectDepositListArray.length > 0">
+    <div class="col-lg-12">
+        <section class="tile tile-shadow">
+            <div class="tile-header">
+                <h1>Selected Deposit</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-11">
+                        </div>
+                        <div class="col-lg-1">
+                            <div class="form-group">
+                                <button class="btn btn-link" ng-click="cleardeposit();"> clear </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table tableAccordion">
+                                <thead>
+                                    <tr>
+                                        <th>Deposit Date.</th>
+                                        <th>Payor</th>
+                                        <th>Deposit No</th>
+                                        <th>Deposit Amount</th>
+                                        <th>Billed Amount</th>
+                                        <th>UnBilled Amount</th>
+                                        <th>Deposited By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>                      
+                                   
+                                    <tr class="accotab-head" ng-repeat="item in SelectDepositListArray">
+                                        <td ng-bind="item.DepositDate | date:'dd-MM-yyyy'"></td>
+                                        <td ng-bind="item.PayorName"></td>
+                                        <td ng-bind="item.ReceiptNo"></td>
+                                        <td ng-bind="item.DepositAmount"></td>
+                                        <td ng-bind="item.BilledAmount"></td>
+                                        <td ng-bind="item.UnBilledAmount"></td>
+                                        <td ng-bind="item.DepositedBy"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+
+<div class="row m-t-10">
+    <div class="col-lg-12">
+        <section class="tile tile-shadow">
+            <div class="tile-header">
+                <h1>Claims List</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive" ng-show="PayorAcceptedClaimList.length !==0">
+                            <table class="table tableAccordion">
+                                <thead>
+                                    <tr>
+                                        <th width="4%">S.No</th>
+                                        <th width="8%">Claim No.</th>
+                                        <th>Payor Name</th>
+                                        <th>Patient Name</th>
+                                        <th>Claim Date</th>
+                                        <th>TotalBillAmount</th>
+                                        <th>Claimed.Amt</th>
+                                        <th>Received.Amt</th>
+                                        <th>Balance.Amt</th>
+                                        <th>Added By</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="mitem in  PayorAcceptedClaimList">
+                                    <tr class="accotab-head">
+                                        <td>{{$index+1}}</td>
+                                        <td> {{mitem.PatientClaimNo}} </td>
+                                        <td> {{mitem.PayorName}} </td>
+                                        <td> {{mitem.PatientName}} </td>
+                                        <td ng-bind="mitem.ClaimDate | date:'MM-dd-yyyy'"></td>
+                                        <td> {{mitem.TotalBillAmount}} </td>
+                                        <td> {{mitem.TotalInsuranceAmount}} </td>
+                                        <td> {{mitem.TotalInsurancePaid}} </td>
+                                        <td> {{mitem.TotalBalance}} </td>
+                                        <!--<td> {{mitem.DueFromInsurance}} </td>-->
+                                        <td> {{mitem.ClaimAddedBy}} </td>
+                                        <td>
+                                            <button class="btn btn-new" ng-click="ContentShow=!ContentShow">
+                                                <i class="fas fa-chevron-down" ng-if="!ContentShow"></i>
+                                                <i class="fas fa-chevron-up" ng-if="ContentShow"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="accotab-body" ng-if="ContentShow">
+                                        <td colspan="11">
+                                            <div>
+                                                <section class="section-ehnote">
+                                                    <div class="section-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="table-responsive responsive-text">
+                                                                    <table class="table tableno-bordered m-b-0">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Line</th>
+                                                                                <th>Service</th>
+                                                                                <th>Entered</th>
+                                                                                <th>Description</th>
+                                                                                <th>Charges</th>
+                                                                                <!--<th>Amount</th>-->
+                                                                                <th>Ins.Amt1</th>
+                                                                                <th>Ins1 Payments</th>
+                                                                                <th>Ins.Amt2</th>
+                                                                                <th>Ins2 Payments</th>
+                                                                                <!--<th>Ins.Amt</th>-->
+                                                                                <th>Ins.Balance</th>
+                                                                                <th>PatientCopay</th>
+                                                                                <th>Staff</th>
+                                                                                <th>Provider</th>
+                                                                                <th>Comments</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr ng-repeat="item in  mitem.BillingDetails track by $index">
+                                                                                <td>{{$index+1}}</td>
+                                                                                <td ng-bind="item.Service | date:'dd-MM-yyyy'"></td>
+                                                                                <td ng-bind="item.Thru | date:'dd-MM-yyyy'"></td>
+                                                                                <td>{{item.ProcedureCode!=''? item.ProcedureCode + ',':''}}{{item.ProcedureName}}</td>
+                                                                                <td>{{item.ProcedureCost | number:2}}</td>
+                                                                                <!--<td> {{item.Balance | number:2}} </td>-->
+                                                                                <td>{{item.InsuranceAmount1}} </td>
+                                                                                <td>
+                                                                                    <div class="form-group">
+                                                                                        <input type="text" class="form-control" ng-model="item.BilledCost1"
+                                                                                               ng-change="AddPayment(item,mitem)"
+                                                                                               ng-disabled="(SelectDepositListArray[0].PayorId !== item.PayorId1)" />
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td>{{item.InsuranceAmount2}} </td>
+                                                                                <td>
+                                                                                    <div class="form-group">
+                                                                                        <input type="text" class="form-control" ng-model="item.BilledCost2"
+                                                                                               ng-change="AddPayment(item,mitem)"
+                                                                                               ng-disabled="(SelectDepositListArray[0].PayorId !== item.PayorId2)" />
+                                                                                    </div>
+                                                                                </td>
+                                                                                <!--<td>{{item.InsuranceAmount}} </td>-->
+
+
+                                                                                <td> {{item.InsuranceBalance}}</td>
+                                                                                <td> {{item.PatientCoPay}} </td>
+                                                                                <td>- </td>
+                                                                                <td>{{item.AppointmentDoctorName}}</td>
+                                                                                <td>- </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <div class="EH-pagination text-center">
+                            <uib-pagination total-items="PayorAcceptedClaimListCount"
+                                            ng-model="SearchClaimObj.PageNumber"
+                                            ng-change="changePageNumber(SearchClaimObj.PageNumber)"
+                                            ng-show="PayorAcceptedClaimList.length > 0"
+                                            max-size="SearchClaimObj.PageSize"
+                                            class=""
+                                            boundary-link-numbers="true"
+                                            rotate="false"></uib-pagination>
+                        </div>
+                        <div class="EH-pagination text-right">
+                            <div>
+                                <button type="button" class="btn primary-btn w-100" ng-click="SavePayorClaim()">Save</button>
+                                <!--<button type="button" class="btn btn-danger" ng-click="ClearPayorDeposit()">Clear</button>-->
+                            </div>
+                        </div>
+                        <div class="row" ng-if="PayorAcceptedClaimList.length === 0">
+                            <div class="col-lg-12">
+                                <div class="billing-cominsoon text-center">
+                                    <img src="img/no-data/no-results.png">
+                                    <div class="msg">
+                                        <p class="goback-text">No Results Found</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+</div>
+
+<script id="showDepositPopUp.html" type="text/ng-template">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            Show Claims
+        </h4>
+        <button type="button" class="close m-r-10 m-b-3 pos-absolute" ng-click="closeShowClaimPopup()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+        <div class="modal-body p-5 h-scroll" ng-style="heightBAO()" resize>
+            <div class="row">
+                <div class="col-lg-4 m-b-5">
+                    <div>
+                        <label>Payors</label>
+                        <input type="text"
+                               autocomplete="off"
+                               class="form-control"
+                               name="InsurancePayor"
+                               placeholder="select"
+                               ng-model="SelectPayorListObj"
+                               typeahead-min-length="0"
+                               typeahead-on-select="changePayorListObj(SelectPayorListObj)"
+                               uib-typeahead="item as item.PayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+
+
+
+                        <!--<select class="form-control" ng-model="SelectPayorListObj" ng-options="item as item.PayorName for item in PayorAllLIstArray" ng-change="changePayorListObj(SelectPayorListObj);">
+                            <option value="">Select</option>
+                        </select>-->
+                    </div>
+                </div>
+                <!--<div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable">
+                            <tbody>
+                                <tr>
+                                    <td class="w-200">
+                                        <div class="form-group">
+                                            <label>Payors</label>
+                                            <select class="form-control" ng-model="SelectPayorListObj" ng-repeat="item as item.PayorName for item in PayorAllLIstArray" ng-change="changePayorListObj(SelectPayorListObj);">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>-->
+                <div class="col-lg-12" ng-if="ShowPayorListArray.length > 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered m-b-5 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Choose</th>
+                                            <th>Deposit Date</th>
+                                            <th>Deposit No.</th>
+                                            <th>Deposit Amount</th>
+                                            <th>Billed Amount</th>
+                                            <th>Unbilled Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in ShowPayorListArray track by $index">
+                                            <td>
+                                                <!--<input type="radio" class="form-control" id="selctedpator{{item.PayorDepositId}}" name="selected{{item.PayorDepositId}}" value="true" ng-model="item.isSelected" />
+        <label for="selctedpator{{PayorDepositId}}"></label>-->
+                                                <input type="radio" class="form-control" id="selctedpator{{PayorDepositId}}" name="selected{{PayorDepositId}}" ng-value="item.PayorDepositId" ng-model="isSelected" ng-change="changedepositselection(item.PayorDepositId)" />
+                                                <label for="selctedpator{{PayorDepositId}}"></label>
+                                            </td>
+                                            <td ng-bind="item.DepositDate | date:'dd-MM-yyyy'"></td>
+                                         
+                                            <td ng-bind="item.ReceiptNo"></td>
+                                            <td ng-bind="item.DepositAmount"></td>
+                                            <td ng-bind="item.BilledAmount"></td>
+                                            <td ng-bind="item.UnBilledAmount"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" ng-click="closeShowClaimPopup()">Close</button>
+        <button type="button" class="btn primary-btn w-100" ng-click="ShowPayorWiseClaims(ShowPayorListArray, isSelected)">Save</button>
+    </div>
+</script>
+
+

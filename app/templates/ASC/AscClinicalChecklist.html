@@ -1,0 +1,247 @@
+﻿<div class="h-100 p-0 dis-flex flex-direction-column">
+    <div class="asc-model-header">
+        <h1>Check List</h1>
+        <div class="asc-patient-profile">
+            <ul>
+                <li>
+                    <img image-viewer ng-if="cacheStorageItem.PatientImageS3URL != ''" src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                    <p title="{{cacheStorageItem.PatientName}}">{{cacheStorageItem.PatientName}}</p>
+                </li>
+                <li>
+                    <span>MR No.:</span>
+                    <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                </li>
+                <li>
+                    <span>Sex:</span>
+                    <label>{{cacheStorageItem.Gender}}</label>
+                </li>
+                <li>
+                    <span>Age:</span>
+                    <label>{{cacheStorageItem.Age}}</label>
+                </li>
+                <li>
+                    <span>DOB:</span>
+                    <label>{{cacheStorageItem.PatientDOB | date:"MM-dd-yyyy"}}</label>
+                </li>
+            </ul>
+        </div>
+        <ul>
+            <li>
+                <button class="btn-d" type="button" ng-click="closeuib()">Close</button>
+            </li>
+            <li>
+                <button class="btn-s" type="button" ng-show="UserAccessRights.AllAccessRights.ASCPreadmissionChecklistSave" ng-click="SaveClinicalChecklistData()">Save</button>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <div class="asc-model-body h-100">
+            <div class="adjustable-position p-8">
+                <div class="dis-flex flex-direction-column">
+                    <div class="asc-section">
+                        <div class="asc-section-header">
+                            <h2>Clinical Checklist</h2>
+                        </div>
+                        <div class="asc-section-body">
+                            <div class="asc-templates-view m-b-10">
+                                <span>All</span>
+                                <ul>
+                                    <li ng-class="ClinicalChecklistObj.IsAllClinicalCheckListChecked == 'Yes'?'active':''">
+                                        <a ng-click="OnSelectAllClinicalChecklist('Yes');">Yes</a>
+                                    </li>
+                                    <li ng-class="ClinicalChecklistObj.IsAllClinicalCheckListChecked == 'No'?'active':''">
+                                        <a ng-click="OnSelectAllClinicalChecklist('No');">No</a>
+                                    </li>
+                                    <li ng-class="ClinicalChecklistObj.IsAllClinicalCheckListChecked == 'NA'?'active':''">
+                                        <a ng-click="OnSelectAllClinicalChecklist('NA');">N/A</a>
+                                    </li>
+                                </ul>
+                                <select class="form-outline w-350" ng-model="ClinicalChecklistObj.SelectedClinicalChecklistTemplate" ng-options="item as item.TemplateName for item in ClinicalChecklistObj.ClinicalChecklistTemplates" ng-change="OnSelectChecklistTemplate(ClinicalChecklistObj.SelectedClinicalChecklistTemplate,1);">
+                                    <option value="">Select Template</option>
+                                </select>
+                                <!--<a class="white-nowrap" ng-click="AddChecklistTemplate(1);">Add Template</a>-->
+                                <a class="white-nowrap"
+                                   popover-class="popover-auto ros-popover-width popover-width-300"
+                                   popover-trigger="outsideClick"
+                                   popover-is-open="IsOpenCheckList == true"
+                                   ng-click="IsOpenCheckListTemp()"
+                                   ng popover-placement="bottom-right"
+                                   uib-popover-template="FollowUptemplateover.templateUrl">Add Template</a>
+                            </div>
+                            <div class="width-70" ng-repeat="item in ClinicalChecklistObj.ClinicalChecklist | filter:{'CheckListCategoryId':1} track by $index">
+                                <ul class="flex-flow-ulli">
+                                    <li class="flex">
+                                        <label class="text-s12w400C000">{{item.CheckListName}}</label>
+                                    </li>
+                                    <li>
+                                        <ul class="asc-templates-check">
+                                            <li ng-class="kitem.IsChecked?'active':''" ng-repeat="kitem in item.OrganizationCheckListDetails track by $index">
+                                                <a ng-click="OnChecklistSelect(kitem,item);">{{kitem.Value}}</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li ng-show="item.IsChecked">
+                                        <input type="text" class="icons-calendar form-outline" ng-model="item.ChecklistDate" datepickerforapplist readonly ng-hide="item.Value=='N/A'||item.Value=='No'||item.Value=='Not'" />
+                                    </li>
+                                    <li ng-show="item.IsChecked">
+                                        <a href="javascript:;" ng-click="item.ShowNotesInd=!item.ShowNotesInd">{{ item.ShowNotesInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                    </li>
+                                </ul>
+                                <div ng-show="item.ShowNotesInd" class="form-group">
+                                    <textarea class="form-outline msd-elastic: \n;" placeholder="Notes" rows="2" ng-model="item.Remarks" ng-focus="item.ShowNotesInd" maxlength="100"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row" ng-repeat="item in ClinicalChecklistObj.ClinicalChecklist | filter:{'CheckListCategoryId':1} track by $index">
+                                <div class="col-lg-12">
+                                    <div class="asc-templates-view pull-right" ng-if="$last">
+                                        <a class="white-nowrap" ng-click="AddNewChecklist(item);">+ Add New Item</a>
+                                    </div>
+                                    <ul class="flex-flow-ulli-mb0" ng-if="item.IsshowAdd">
+                                        <li class="flex">
+                                            <div class="pop-ehr-input ehr-input">
+                                                <input type="text" ng-model="ClinicalChecklistObj.NewChecklistName" />
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <fieldset class="pos-relative">
+                                                <div class="dis-inline-block">
+                                                    <input type="radio" class="radio-custom width-0" id="yesno4" ng-value="1" aria-invalid="false" ng-model="ClinicalChecklistObj.ChecklistValueType" value="1">
+                                                    <label for="yesno4" class="radio-custom-label cur-poiter mb-0 text-label">Yes/No/NA</label>
+                                                </div>
+                                                <div class="dis-inline-block m-l-5">
+                                                    <input type="radio" class="radio-custom width-0" id="yesno5" ng-value="2" aria-invalid="false" ng-model="ClinicalChecklistObj.ChecklistValueType" value="2">
+                                                    <label for="yesno5" class="radio-custom-label cur-poiter mb-0 text-label">Done/Not/NA</label>
+                                                </div>
+                                                <div class="dis-inline-block m-l-5">
+                                                    <input type="radio" class="radio-custom width-0" id="yesno6" ng-value="3" aria-invalid="false" ng-model="ClinicalChecklistObj.ChecklistValueType" value="3">
+                                                    <label for="yesno6" class="radio-custom-label cur-poiter mb-0 text-label">Reviewed/Not/NA</label>
+                                                </div>
+                                            </fieldset>
+                                        </li>
+                                        <li>
+                                            <div class="dis-flex align-items-center grid-gap-5">
+                                                <button class="btn btn-save-us" ng-click="AddNewChecklistData(item);">+Add</button>
+                                                <button class="btn btn-outline-danger" ng-click="CloseChecklistData(item);">Close</button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="two-sections">
+                        <div class="asc-section">
+                            <div class="asc-section-header">
+                                <h2>Image Uploads</h2>
+                            </div>
+                            <div class="asc-section-body">
+
+                                <ul class="flex-flow-ulli-mb0 m-t-5">
+                                    <li>
+                                        <div class="ehr-input">
+                                            <input type="file" class="docsfilechoose height-36" name="upload" ng-model="files" ngf-select="selectedImgschecklist($files)" ngf-pattern="'image/*,application/pdf'" ngf-accept="'image/*,application/pdf'" id="chooseFile" multiple="multiple" title="Choose a file to upload" accept="image/*,application/pdf">
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span>-OR-</span>
+                                    </li>
+                                    <li>
+                                        <button class="btn-scan w-100" ng-click="scanFiles(1);">Scan</button>
+                                    </li>
+                                </ul>
+                                <ul class="flex-flow-ulli">
+                                    <li class="pos-relative" ng-repeat="img in ChecklistFilesObj.SaveTempImagesArray | filter:{'FileTypeId': 29} track by $index">
+                                        <img ng-if="img.FileId != 0 && img.FileExt != 'pdf' && img.FileExt !== 'application/pdf'" class="img-thumbnail height-50" width="50" height="50" ng-src="{{img.S3URL}}" image-viewer>
+                                        <a href="{{img.S3URL}}" target="_blank" ng-if="img.FileId != 0 && (img.FileExt == 'pdf' || img.FileExt == 'application/pdf')">
+                                            <img src="img/billing/pdf-img.png" class="img-thumbnail height-60 w-60">
+                                        </a>
+                                        <a class="pos-absolute right-0 top-0" href="javascript:;" ng-click="DeletePreadminClinicalCheckListDocumentGetlist(img,$index,ChecklistFilesObj);">
+                                            <img src="img/close-round.svg" width="17" class="bg-white p-2" />
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="asc-section-body" ng-hide="ChecklistFilesObj.TempImagesArray.length == 0">
+                                <table class="table tableno-bordered apptFilterTable">
+                                    <tbody>
+                                        <tr class="bg-f2f2f2">
+                                            <td colspan="3">
+                                                <ul class="flex-flow-ulli drawingpad-img-show">
+                                                    <li ng-repeat="imgitem in ChecklistFilesObj.TempImagesArray | filter:{'DeleteInd':'N'} track by $index">
+                                                        <div>
+                                                            <img ngf-thumbnail="imgitem.file" class="b-lazy img-responsive img-thumbnail cur-poiter w-125 height-100" image-viewer ng-if="(imgitem.FileExt !== 'application/pdf' && imgitem.FileExt !== 'pdf')&&imgitem.DocumentID==0" />
+                                                            <img ng-src="{{imgitem.DocURL}}" class="b-lazy img-responsive img-thumbnail cur-poiter w-125 height-100" image-viewer ng-if="(imgitem.FileExt !== 'application/pdf' && imgitem.FileExt !== 'pdf')&&imgitem.DocumentID!=0" />
+                                                            <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="CheckListDeleteUploadedFileNew(imgitem,$index,ChecklistFilesObj);">
+                                                                <img src="img/close-round.svg" width="17" />
+                                                            </a>
+                                                            <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="{{imgitem.DocURL}}" target="_blank" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') && imgitem.DocumentID!=0">
+                                                                <img src="img/pdf.png" height="60" class="m-b-10" />
+                                                            </a>
+                                                            <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') && imgitem.DocumentID==0">
+                                                                <img src="img/pdf.png" height="60" class="m-b-10" />
+                                                            </a>
+                                                            <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="{{imgitem.DocURL}}" target="_blank" ng-if="imgitem.FileExt == 'tiff' || imgitem.FileExt == 'tif' || imgitem.FileExt=='image/tiff'">
+                                                                <img height="60" src="img/appt-list/tifficon.png" />
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="asc-section">
+                            <div class="asc-section-body">
+                                <ul class="flex-flow-ulli">
+                                    <li>
+                                        <span class="text-s12w400C000">Reviewed By:</span>
+                                    </li>
+                                    <li>
+                                        <select class="form-outline w-250" ng-model="ClinicalChecklistObj.ChecklistReviewedBy" ng-options="item.DoctorID as item.FullName for item in ChecklistArray" ng-change="ChangeChecklistReviewedby(ClinicalChecklistObj.ChecklistReviewedBy)">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        Signature
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="asc-section">
+                        <div class="asc-section-body">
+                            <!--<a href="javascript:;" ng-click="ClinicalChecklistObj.AdmissionRemarksInd = !ClinicalChecklistObj.AdmissionRemarksInd"> {{ ClinicalChecklistObj.AdmissionRemarksInd ? '- Hide Notes' : '+ Add Notes' }}</a>-->
+                            <label>Add Notes</label>
+                            <!--ng-if="ClinicalChecklistObj.AdmissionRemarksInd"-->
+                            <textarea class="asc-notes m-y-10 msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="ClinicalChecklistObj.AdmissionRemarks" ng-focus="ClinicalChecklistObj.AdmissionRemarksInd" maxlength="1000"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+     
+
+    <!--<div ng-if="!ClinicalChecklistObj.IsShowAddScreen" class="h-100">
+        <div ng-include="'templates/ASC/UsOverallPreAdmSummary.html'" class="h-100"></div>
+    </div>-->
+
+
+
+<script type="text/ng-template" id="ChecklistTemplatSave.html">
+    <div ng-if="IsOpenCheckList">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.ChecklistTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddChecklistTemplate(1)">Save Template</button>
+    </div>
+</script>
+
+ 

@@ -1,0 +1,501 @@
+﻿<div class="d__f-- fd__c-- gap__10-- p__12-- height__100-- bg__FFFFFF--" ng-controller="UsOPAuditController">
+    <div class="py__4-- d__f-- ai__c-- gap__12--">
+        <div class="p__8-- bg__EBEBEB-- bradius__4-- c__p--" uib-tooltip="Back" ng-click="finishAudit()">
+            <i svg-icon="icon__arrowLeft--3" size="18" style="color: #1D1D1D"></i>
+        </div>
+        <span class="fs__6l-- fw__6-- tc__1D1D1D--">Status List</span>
+        <span class="px__6-- py__4-- bradius__9-- bg__1D5558-- fs__lg-- fw__6-- tc__FFFFFF-- lh__normal--">{{mainBookedAppointmentListCount}}</span>
+    </div>
+    <table class="tableno-bordered m__0-- tableno-padding">
+        <tbody>
+            <tr>
+                <td width="18%">
+                    <div class="d__f-- ai__c-- gap__12--">
+                        <div class="radio__style--2">
+                            <input type="radio" id="CalNameId" name="patSearchType" ng-model="StatusListFilterObj.SearchType" ng-value="1">
+                            <label for="CalNameId" class="cur-poiter mb__0-- tc__1D1D1D--">Name</label>
+                        </div>
+                        <div class="radio__style--2">
+                            <input type="radio" id="CalmrMobileId" name="patSearchType" ng-model="StatusListFilterObj.SearchType" ng-value="2">
+                            <label for="CalmrMobileId" class="cur-poiter mb__0-- tc__1D1D1D--">MR.No</label>
+                        </div>
+                        <div class="radio__style--2">
+                            <input type="radio" id="DOBinc" name="patSearchType" ng-model="StatusListFilterObj.SearchType" ng-value="4">
+                            <label for="DOBinc" class="cur-poiter mb__0-- tc__1D1D1D--">DOB</label>
+                        </div>
+                    </div>
+                    <div class="flex pt__4--">
+                        <div class="position__relative--">
+                            <!--<input type="text" class="icons-search input__style--1 text-capitalize" placeholder="Search  here">-->
+                            <input type="text" id="SearchByName" class="input__style--10 text-capitalize" placeholder="Search by Name" ng-show="StatusListFilterObj.SearchType === 1" ng-model="StatusListFilterObj.SearchText" ng-enter="ApplySearch()">
+                            <input type="text" id="SearchByMRNo" class="input__style--10 text-capitalize" placeholder="Search by MR No" ng-show="StatusListFilterObj.SearchType === 2" ng-model="StatusListFilterObj.SearchText" ng-enter="ApplySearch()">
+                            <input type="text" id="SearchByDOB" class="input__style--10 text-capitalize" ng-model="StatusListFilterObj.SearchText" autocomplete="off" ng-show="StatusListFilterObj.SearchType === 4" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-enter="ApplySearch()" />
+                            <a class="position__absolute-- top-6 right-5 b__0--" id="ClearPatientSearchType" ng-show="StatusListFilterObj.SearchText" ng-click="ClearSearch()" role="button" tabindex="0"><i class="icons__w16-- cancel__w16--o"></i></a>
+                        </div>
+                    </div>
+                </td>
+                <td width="13%">
+                    <div class="form__group">
+                        <label>Status</label>
+                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                            <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                {{SelectedStatus.Name}}
+                            </button>
+                            <div class="dropdown-menu dr-drop-app overflow-hidden max__w150-- min__w150-- bradius__6--" role="menu" aria-labelledby="dropdownMenu3">
+                                <div class="drop-menu-Scroll">
+                                    <ul class="d__f-- fd__c-- list__unstyled-- bg__FFFFFF-- m__0-- p__4--">
+                                        <li class="p__8-- d__f-- ai__c-- hover__1D55581A--bg-t c__p--" ng-repeat="item in StatusMaster" ng-click="SelectStatus(item)">
+                                            <label class="fs__normal-- fs__lg-- fw__4-- tc__656565-- c__p--"> {{item.Name}}</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="13%" class="visible-lg">
+                    <div class="form__group">
+                        <label>Location</label>
+                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                            <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                {{LocationTypeObj.SelectLocationString}}
+                            </button>
+                            <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                <div class="p-5">
+                                    <input type="text" class="form-control input-sm bg-inputy" placeholder="SEARCH" ng-model="LocationTypeObj.Name" />
+                                </div>
+                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                    <ul class="d__f-- fd__c-- list__unstyled-- m__0-- p__5--">
+                                        <li class="px__12-- py__6-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-repeat="item in AllBranchesList | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                            <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranch(item,true,'list')">
+                                                <span class="lbl"></span>
+                                                <span class="fs__normal-- fs__md-- fw__5-- tc__656565--" ng-bind="item.BranchName"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="13%" class="visible-lg">
+                    <div class="form__group">
+                        <label>Visit Reason</label>
+                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                            <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                {{selectedVisitReason}}
+                            </button>
+                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                <div class="p-5">
+                                    <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.visitRsnName" />
+                                </div>
+                                <div class="apptsearchdroplist">
+                                    <ul>
+                                        <li>
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="AllDoctorsObj.AllVisitReasonsCheck" ng-click="checkAllVisitReasons(AllDoctorsObj.AllVisitReasonsCheck)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ALLVISITREASONS' | translate}}</span>
+                                            </label>
+                                        </li>
+                                        <li ng-repeat="item in Visitreasons | filter:{'AppointmentVisitReason':searchHospital.visitRsnName}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggle(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.AppointmentVisitReason"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="13%">
+                    <div class="form__group">
+                        <label>Doctor</label>
+                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                            <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}" ng-disabled="userLoginDetails.RoleID === 1 && (!connectedUserObj.Available || connectedUserObj.Users.length == 0)">
+                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                {{selectedDoctors}}
+                            </button>
+                            <div class="dropdown-menu dr-drop-app right-0 " role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                <div class="p-5">
+                                    <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                </div>
+                                <div class=" apptsearchdroplist">
+                                    <ul>
+                                        <li>
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="AllDoctorsObj.AllDoctorCheck" ng-click="checkAllDoctor(AllDoctorsObj.AllDoctorCheck)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                            </label>
+                                        </li>
+                                        <li ng-repeat="item in MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtb.txt1}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td width="13%">
+                    <div class="form__group">
+                        <label>From Date</label>
+                        <div class="form__group ai__c-- gap__5-- border__DDD-- bradius__5--">
+                            <input type="text" class="icons-calendar border__none--" ng-model="StatusListFilterObj.FromDate" datepickerforapplist readonly date-format-input />
+
+                        </div>
+                    </div>
+                </td>
+                <td width="13%">
+                    <div class="form__group">
+                        <label>To Date</label>
+                        <div class="form__group ai__c-- gap__5-- border__DDD-- bradius__5--">
+                            <input type="text" class="icons-calendar border__none--" ng-model="StatusListFilterObj.ToDate" datepickerforapplist readonly date-format-input />
+                        </div>
+                    </div>
+                </td>
+                <td class="visible-md">
+                    <div class="d__f-- ai__c-- gap__5-- mt__18--">
+                        <button class="btn__lg-- btn__1d5558--o"
+                                popover-placement="bottom-right"
+                                popover-class="m-0 popover__style--1"
+                                uib-popover-template="filterPopover.templateUrl"
+                                popover-trigger="outsideClick"
+                                popover-is-open="isPopoverOpen"
+                                ng-click="togglePopover()">
+                            <i class="icons__w16-- filter__w16--o"></i>Filter
+                        </button>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5-- mt__18-- b-0">
+                        <button class="btn__lg-- btn__1d5558--f" ng-click="ApplyFilter()">{{ 'APPLY' | translate}}</button>
+                        <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" ng-click="RefreshAppointments()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="position__relative-- height__100--">
+        <div class="adjustable-position slim-scroll" id="divStatusScroll">
+            <table class="table__style--5 border__E4E4E4--" ng-class="OpAuditlBookedAppointmentList.length == 0 ? ' height__100--' : ''">
+                <thead>
+                    <tr>
+                        <th width="4%" class="p__5-- bg__E8EEEE--"><label class="fs__md-- fw__7-- tc__1D1D1D-- text-center">S.No</label></th>
+                        <th width="19%" class="p__5-- bg__E8EEEE--"><label class="fs__md-- fw__7-- tc__1D1D1D--">Patient Details</label></th>
+                        <th width="20%" class="p__5-- bg__E8EEEE--"><label class="fs__md-- fw__7-- tc__1D1D1D--">Appt, Visit Reason & Type</label></th>
+                        <th width="18%" class="py__5-- bg__E8EEEE--"><label class="fs__md-- fw__7-- tc__1D1D1D--">Doctor/ Opht, Location, Facility</label></th>
+                        <th class="p__5-- bg__E8EEEE--">Check In</th>
+                        <th class="p__5-- bg__E8EEEE--">Status</th>
+                        <th width="19%" class="p__5-- bg__E8EEEE-- px__10--">Action</th>
+                    </tr>
+                </thead>
+                <tbody ng-show="OpAuditlBookedAppointmentList.length > 0">
+                    <tr class="cur-pointer" ng-repeat="row in OpAuditlBookedAppointmentList track by $index">
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- ai__c--">
+                                <label class="fs__md-- fw__5-- tc__4A4A4A--">{{row.Sno}}</label>
+                                <div>
+                                    <img src="img/appt-list/app-walkin.svg" height="13" ng-if="row.BookingTypeId===1" />
+                                    <img src="img/appt-list/Waiting-logo.svg" height="13" title="Waiting" ng-if="row.BookingTypeId===2" />
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- gap__y--4">
+                                <div class="d__f-- ai__c-- gap__x--4 mw__0--  show__popover--">
+                                    <label class="fs__md-- fw__6-- tc__1D1D1D-- lh__normal-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{row.Patient.FullName}}">{{row.Patient.FullName}}</label>
+                                    <div popover-template="'templates/UIBPopovers/opprofilepopover.html'" ng-click="ShowPatientDetailsPopup(row)" on-click="handlePopoverActions(action, row, extra, visitReason, attenderName ,index)" popover-data="row" popover-class="opprofile__popover" dynamic-us-patient-profile-basic-popover>
+                                        <a>
+                                            <i class="icons__w16-- drawarrow__w16--o"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <label class="fs__md-- fw__5-- tc__4A4A4A-- lh__normal--" title="{{row.Patient.PatientDisplayId}}">{{row.Patient.PatientDisplayId}} | <span class="fs__md-- fw__4-- tc__4A4A4A-- lh__normal--">{{row.Patient.MobileNo}}</span></label>
+                                <div class="d__f-- ai__c-- gap__5-- fd__r--">
+                                    <span class="fs__md-- fw__5-- tc__4A4A4A-- lh__normal--">{{row.Patient.DOB |date:'MM-dd-yyyy'}}</span>
+                                    <ul class="flex-flow-list gap__x--4">
+                                        <li ng-class="{'patient-tags-custom': item.HospitalEquipmentId == 17 || item.HospitalEquipmentId == 18}" ng-repeat="item in row.PatientTagList track by $index" ng-if="item.HospitalEquipmentId !== 17 && item.HospitalEquipmentId !== 18">
+                                            <i class="icons__w16-- wheelchair__w16--" ng-if="item.HospitalEquipmentId===1 || item.HospitalEquipmentId===25" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- autism__w16--" ng-if="item.HospitalEquipmentId===2" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- hearing__w16--" ng-if="item.HospitalEquipmentId===3" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- oneeye__w16--" ng-if="item.HospitalEquipmentId===4" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- heartdisease__w16--" ng-if="item.HospitalEquipmentId===5" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- anxiety__w16--" ng-if="item.HospitalEquipmentId===6" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- vip__w16--" ng-if="item.HospitalEquipmentId===7 || item.HospitalEquipmentId=== 24" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- epllepsy__w16--" ng-if="item.HospitalEquipmentId===8" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- emotional__w16--" ng-if="item.HospitalEquipmentId===9" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- alzheimer__w16--" ng-if="item.HospitalEquipmentId===10" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- blood__w16--" ng-if="item.HospitalEquipmentId===11" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- supportstick__w16--" ng-if="item.HospitalEquipmentId===12" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- boat__w16--" ng-if="item.HospitalEquipmentId===13" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- newborn__w16--" ng-if="item.HospitalEquipmentId===14" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- oxygenmask__w16--" ng-if="item.HospitalEquipmentId===15" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- publictransport__w16--" ng-if="item.HospitalEquipmentId===16" title="{{item.HospitalEquipmentName}}"></i>
+                                            <i class="icons__w16-- hep__w16--" ng-if="item.HospitalEquipmentId===26" title="{{item.HospitalEquipmentName}}"></i>
+                                            <span class="px__6-- br__100-- text-center bg__A5884F-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="item.HospitalEquipmentId===19" title="{{item.HospitalEquipmentName}}">{{item.HospitalEquipmentName}}</span>
+                                            <span class="px__6-- br__100-- text-center bg__9D9D4D-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="item.HospitalEquipmentId===20" title="{{item.HospitalEquipmentName}}">{{item.HospitalEquipmentName}}</span>
+                                            <span class="px__6-- br__100-- text-center bg__537ACF-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="item.HospitalEquipmentId===21">ICL</span>
+                                            <span class="px__6--  fs__sm-- lh__16-- br__100-- text-center bg__D35DE7-- tc__FFFFFF--" ng-if="item.HospitalEquipmentId===22">Durysta</span>
+                                            <span class="px__6--  fs__sm-- lh__16-- br__100-- text-center bg__71585B-- tc__FFFFFF--" ng-if="item.HospitalEquipmentId===23">LASIK</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- gap__y--6">
+                                <div class="d__f-- ai__c-- gap__5-- fd__r--">
+                                    <label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--">Appt - <span class="fw__5--">{{row.ConsultationDt | date:'MM-dd-yyyy'}}, {{row.ConvertedStartTime}}</span></label>
+                                    <!--<label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--">Chk In - <span class="fw__5--">{{row.WalkInTime}}</span></label>-->
+                                </div>
+                                <span class="fs__md-- fw__5-- tc__4A4A4A-- lh__normal--" title="{{row.VisitReason}}">{{row.VisitReason}}</span>
+                                <span class="fs__md-- fw__5-- tc__4A4A4A-- lh__normal--">{{row.AppointmentType}}</span>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- gap__y--6">
+                                <label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--">{{row.SecondUserFullName}}</label>
+                                <label class="fs__md-- fw__5-- tc__4A4A4A-- lh__normal--">{{row.BranchName}}</label>
+                                <label class="fs__md-- fw__4-- tc__4A4A4A-- lh__normal--" ng-if="row.Patient.LanguageName">Pref Language : <span class="fw__5--">{{row.Patient.LanguageName}}</span></label>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- gap__y--2">
+                                <label class="status__red--dot fs__lg-- fw__5-- tc__C71D27-- lh__normal--" ng-show="row.AppointmentStatusId == 4">Express Check Out</label>
+                                <label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--" ng-if="row.AppointmentStatusId == 4"><span class="fw__5--">{{row.ExpressCheckOutTime}}</span></label>
+                                <label class="status__green--dot fs__lg-- fw__5-- tc__059669-- lh__normal--" ng-if="row.AppointmentStatusId == 2">Check In</label>
+                                <label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--" ng-if="row.AppointmentStatusId == 2"><span class="fw__5--">{{row.WalkInTime}}</span></label>
+                                <label class="status__red--dot fs__lg-- fw__5-- tc__C71D27-- lh__normal--" ng-show="row.AppointmentStatusId == 3">Checked Out</label>
+                                <label class="fs__md-- fw__6-- tc__4A4A4A-- lh__normal--" ng-if="row.AppointmentStatusId == 3"><span class="fw__5--">{{row.WalkOutTime}}</span></label>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- fd__c-- gap__y--10">
+                                <div ng-if="row.ApptSign == 'Signed'" class="d__f-- ai__c-- gap__5--x">
+                                    <span class="fs__lg-- fw__5-- tc__3BAC66-- bg__0596691A-- br__15-- py__4-- px__8-- lh__normal--">
+                                        Signed
+                                    </span>
+                                    <span>
+                                        <a popover-placement="auto" popover-trigger="outsideClick" uib-popover-template="SignoffPopover.templateUrl" popover-class="signoff__popover" ng-click="setPopoverData(row)"><i class="icons__w16-- info__w16--o"></i></a>
+                                    </span>
+                                </div>
+                                <div ng-if="row.ApptSign == 'NotSigned'">
+                                    <span class="fs__lg-- fw__5-- tc__C71D27-- bg__DC26261A-- br__15-- py__4-- px__8-- lh__normal--">
+                                        Not Signed
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px__5-- py__10--">
+                            <div class="d__f-- ai__c-- fd__r-- gap__5--">
+                                <button class="bc__E4E4E4-- bg__D9D9D933-- tc__1D1D1D-- fw__5-- fs__lg-- bs__s-- br__4-- bw__1-- p__6--" ng-disabled="row.VisitStatus == 'B'" ng-click="viewVisitSummary(row)">
+                                    Visit Summary
+                                </button>
+                                <button class="bc__E4E4E4-- bg__D9D9D933-- tc__1D1D1D-- fw__5-- fs__lg-- bs__s-- br__4-- bw__1-- p__6--" ng-if="row.ApptSign == 'NotSigned'" ng-disabled="row.VisitStatus == 'B'" ng-click="ContinueSignOffpassword('SignOff',row)">
+                                    Sign-Off
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody class="height__100--" ng-show="OpAuditlBookedAppointmentList.length == 0">
+                    <tr class="height__100--">
+                        <td class="height__100-- bg__none--" colspan="7">
+                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Patients Found</h1>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="consultationSummaryPopup.html">
+        <div class="modal__style--1">
+            <div class="modal__header-- py__7-- px__11--">
+                <span class="fs__xl-- fw__6-- tc__1D1D1D--">Consultation Summary</span>
+                <div class="d__f-- ai__c-- gap__8--">
+                    <button class="btn__lg-- btn__C71D27--f" ng-if="VisitSummaryObj.ApptSign == 'NotSigned'" ng-click="ContinueSignOffpassword('SignOff',VisitSummaryObj)">Sign Off</button>
+                    <a class="btn__close--2" ng-click="uibclose()">
+                        <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="modal__body-- d__f-- fd__c-- gap__12-- p__12--">
+                <div class="p__8-- bradius__8-- border__E4E4E4-- bg__F9F9F9-- d__f-- ai__c-- gap__12--">
+                    <!--<img src="" width="48" height="48" class="bradius__50--per border__D0D0D0--" />-->
+                    <img class="bradius__50--per border__D0D0D0--" ng-show="VisitSummaryObj.S3URL ==''" src="img/sprite-sheet/user-square.svg" width="48" height="48" aria-hidden="false" />
+                    <img class="bradius__50--per border__D0D0D0--" image-viewer ng-show="VisitSummaryObj.S3URL !==''" src="{{VisitSummaryObj.S3URL}}" width="48" height="48" aria-hidden="false" />
+                    <div class="d__f-- fd__c-- gap__4--">
+                        <span class="fs__xl-- fw__6-- tc__000-- lh__22--">{{VisitSummaryObj.PatientFullName}}</span>
+                        <div class="d__f-- ai__c-- gap__12-- fw__w--">
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">MR No:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.PatientDisplayID}}</span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">Gender:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.PatientGender}}</span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">Age:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-if="VisitSummaryObj.ageinYears">{{VisitSummaryObj.ageinYears}} Y<span ng-if="VisitSummaryObj.ageinMonths">{{VisitSummaryObj.ageinMonths}} M</span></span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">DOB:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.PatientDOB}}</span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">Mobile:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.PatientMobileNumber}}</span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">Provider:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.DoctorFullName}}</span>
+                            </div>
+                            <div class="d__f-- ai__c-- gap__5--">
+                                <span class="fs__lg-- fw__4-- tc__656565--">Location:</span>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{VisitSummaryObj.BranchName}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="height__100--" ng-init="hideVisitHeader = true" ng-include="'templates/UsNewConsultation/UsPatientVisitMain.html'"></div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="SignoffPopover.html">
+        <div class="modal__style--1">
+            <div class="modal__body--">
+                <span class="fs__lg-- fw__6-- tc__1D1D1D-- fs__normal--">
+                    Signed By :
+                </span>
+
+                <span ng-show="popoverData.LastSignOffUserDetails[0].SuffixId == 10 || popoverData.LastSignOffUserDetails[0].SuffixId == 13">
+                    Dr.
+                </span>
+
+                <span>
+                    {{popoverData.LastSignOffUserDetails[0].SignOffUserName}}
+                    {{popoverData.LastSignOffUserDetails[0].SuffixName}}
+                </span>
+
+                <span ng-show="popoverData.LastSignOffUserDetails[0].LicenseNumber">
+                    , Lic: {{popoverData.LastSignOffUserDetails[0].LicenseNumber}}
+                </span>
+
+                <span>
+                    , {{popoverData.LastSignOffUserDetails[0].Date | date:'MM/dd/yyyy'}}
+                    {{popoverData.LastSignOffUserDetails[0].Date | date:'hh:mm a'}}
+                </span>
+            </div>
+        </div>
+        <div ng-if="!popoverData.LastSignOffUserDetails.length">
+            No Sign Off Details
+        </div>
+    </script>
+
+    <!--Filter Popover-->
+    <script type="text/ng-template" id="filterPopoverOpAudit.html">
+        <div class="d__f-- fd__c-- height__100--">
+            <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                <div class="d__f-- ai__c-- gap__15--">
+                    <button class="btn__lg-- btn__1d5558--f d-web-none" ng-click="ApplyFilter()">{{ 'APPLY' | translate}}</button>
+                    <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558-- d-web-none" ng-click="RefreshAppointments()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                    <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                </div>                
+            </div>
+            <div class="two-sections height__100--">
+                <div class="tab-content-one width__40-- br__DDD-- px__8-- py__3--">
+                    <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'visitReason'">
+                        <li data-target="#visitReason" data-toggle="tab" ng-click="activeTab = 'visitReason'" ng-hide="SpecializationId===2">
+                            <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'visitReason' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                <span class="fs__lg--">{{ 'VISITTYPE' | translate}}</span>
+                                <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                            </div>
+                        </li>
+                        <li data-target="#locationName" data-toggle="tab" ng-click="activeTab = 'locationName'">
+                            <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'locationName' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                <span class="fs__lg--">Location</span>
+                                <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content flex p__8-- height__100--">
+                    <div class="tab-pane fade in active height__100--" id="visitReason">
+                        <div class="d__f-- fd__c-- gap__5-- height__100--">
+                            <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.visitRsnName">
+                            <div class="section__style--4 d__f-- fd__c-- height__100--">
+                                <div class="section__header-- px__10--">
+                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                        <input type="checkbox" class="checkbox" ng-model="AllDoctorsObj.AllVisitReasonsCheck" ng-click="checkAllVisitReasons(AllDoctorsObj.AllVisitReasonsCheck)">
+                                        <span class="lbl"></span>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ALLVISITREASONS' | translate}}</span>
+                                    </label>
+                                    <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"> <span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(Visitreasons | filter:{'AppointmentVisitReason':searchHospital.visitRsnName}).length"></span>Results Found</label>
+                                </div>
+                                <div class="section__body-- height__100--">
+                                    <div class="position__relative-- height__90--">
+                                        <ul class="list-unstyled d__f-- fd__c-- gap__y--8 adjustable-position overflow__auto--y slim-scroll">
+                                            <li ng-repeat="item in Visitreasons | filter:{'AppointmentVisitReason':searchHospital.visitRsnName}">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggle(item);">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.AppointmentVisitReason"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade height__100--" id="locationName">
+                        <div class="d__f-- fd__c-- gap__5-- height__100--">
+                            <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name">
+                            <div class="section__style--4 d__f-- fd__c-- height__100--">
+                                <div class="section__body-- height__100--">
+                                    <div class="position__relative-- height__90--">
+                                        <ul class="list-unstyled d__f-- fd__c-- gap__y--8 adjustable-position overflow__auto--y slim-scroll">
+                                            <li ng-repeat="item in AllBranchesList | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranch(item,true,'list')">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5-- d-none-tab">
+                <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" ng-click="RefreshAppointments()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="ApplyFilter()">{{ 'APPLY' | translate}}</button>
+            </div>
+        </div>
+    </script>
+</div>

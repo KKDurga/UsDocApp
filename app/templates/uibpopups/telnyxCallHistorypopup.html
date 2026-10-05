@@ -1,0 +1,1871 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Call Center</h1>
+        <button class="btn__xl-- btn__C71D27--o" href="javascript:;" ng-click="uibclose()">Close</button>
+    </div>
+
+    <div class="modal__body-- p__0--">
+        <!-- history panel now shows always, no ng-if tab gate -->
+        <div class="ehnote-callhistory-panel">
+
+
+            <div class="ehnote-ch-stats">
+                <div class="ehnote-ch-stat stat-total">
+                    <span class="ehnote-ch-stat-icon"><i class="fa fa-phone"></i></span>
+                    <div class="ehnote-ch-stat-body">
+                        <div class="ehnote-ch-stat-label">Total Calls</div>
+                        <div class="ehnote-ch-stat-value">{{ callStats.Total || 0 }}</div>
+                    </div>
+                </div>
+                <div class="ehnote-ch-stat stat-answered">
+                    <span class="ehnote-ch-stat-icon"><i class="fa fa-check"></i></span>
+                    <div class="ehnote-ch-stat-body">
+                        <div class="ehnote-ch-stat-label">Answered</div>
+                        <div class="ehnote-ch-stat-value">
+                            {{ callStats.Answered || 0 }}
+                            <span class="ehnote-ch-stat-meta" ng-if="callStats.Total">
+                                {{ (callStats.Answered / callStats.Total * 100) | number:0 }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ehnote-ch-stat stat-missed">
+                    <span class="ehnote-ch-stat-icon"><i class="fa fa-phone"></i></span>
+                    <div class="ehnote-ch-stat-body">
+                        <div class="ehnote-ch-stat-label">Missed</div>
+                        <div class="ehnote-ch-stat-value">
+                            {{ callStats.Missed || 0 }}
+                            <span class="ehnote-ch-stat-meta" ng-if="callStats.Total">
+                                {{ (callStats.Missed / callStats.Total * 100) | number:0 }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Total, not average: what was asked for. The proc still returns
+                     AvgTalkText, so putting the average back is one card. -->
+                <div class="ehnote-ch-stat stat-talk">
+                    <span class="ehnote-ch-stat-icon"><i class="fa fa-clock"></i></span>
+                    <div class="ehnote-ch-stat-body">
+                        <div class="ehnote-ch-stat-label">Total Talk Time</div>
+                        <div class="ehnote-ch-stat-value">{{ callStats.TotalTalkText || '0s' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ehnote-ch-filters">
+                <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+                    <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+                        <tbody>
+                            <tr>
+                                <!-- Search -->
+                                <td width="40%">
+                                    <label>Phone Number</label>
+                                    <div class="form__group inner-addon left-addon flex">
+                                        <input type="text" placeholder="Search number"
+                                               ng-class="gettelnyxHistoryReqobj.Search =='' ? 'icons-search' : ''"
+                                               ng-model="gettelnyxHistoryReqobj.Search" />
+                                        <a class="position__absolute-- top-6 right-5 b__0--"
+                                           ng-hide="gettelnyxHistoryReqobj.Search ==''"
+                                           ng-click="gettelnyxHistoryReqobj.Search=''" role="button" tabindex="0">
+                                            <i class="icons__w16-- cancel__w16--o"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                                <!-- Date Range: one range control instead of two independent
+                                     pickers, same as the patient Call History tab - it greys out
+                                     the days that would invert the range, so a To Date earlier
+                                     than the From Date cannot be picked at all. -->
+                                <td width="40%">
+                                    <div class="form__group--1 ehnote-ch-daterange">
+                                        <label>Date Range</label>
+                                        <div id="ch__dateRange" class="input__fromTo-- c__p--"
+                                             popover-trigger="outsideClick"
+                                             popover-class="date-range-popover drp__popover--"
+                                             popover-is-open="callCenterDrpOpen"
+                                             popover-placement="bottom-left"
+                                             popover-append-to-body="true"
+                                             uib-popover-template="'templates/UIBPopovers/fromToCalender.html'"
+                                             from-to-date-picker
+                                             from-date="gettelnyxHistoryReqobj.FromDate"
+                                             to-date="gettelnyxHistoryReqobj.ToDate"
+                                             block-future>
+                                            <input id="input__chfromdate" type="text" placeholder="From Date"
+                                                   ng-value="gettelnyxHistoryReqobj.FromDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                                            <span class="arrow">&rarr;</span>
+                                            <input id="input__chtodate" type="text" placeholder="To Date"
+                                                   ng-value="gettelnyxHistoryReqobj.ToDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                                            <label class="icon-box">
+                                                <i svg-icon="icon__calender--" size="13" class="tc__1D5558--"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Apply + Reset + Dial -->
+                                <td class="valign-bottom">
+                                    <div class="dis-flex align-items-center grid-gap-10 m-b-2">
+                                        <button class="btn__xl-- btn__2D2D47--f" id="button__chapply"
+                                                ng-click="applyHistoryFilter()">
+                                            Apply
+                                        </button>
+                                        <button class="b-0" id="button__chreload"
+                                                ng-click="clearHistoryFilter()">
+                                            <i class="reload-icon"></i>
+                                        </button>
+                                         
+                                        <button class="ehnote-ch-dialbtn" ng-click="toggleFloatingDialer()"
+                                                title="Open dialpad">
+                                            <i class="fa fa-th"></i> Dial
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="ehnote-ch-tabs">
+                    <button ng-class="{ active: gettelnyxHistoryReqobj.FilterKey === 'all' }"
+                            ng-click="setCallFilter('all')">
+                        All
+                    </button>
+                    <button ng-class="{ active: gettelnyxHistoryReqobj.FilterKey === 'incoming' }"
+                            ng-click="setCallFilter('incoming')">
+                        Incoming
+                    </button>
+                    <button ng-class="{ active: gettelnyxHistoryReqobj.FilterKey === 'outgoing' }"
+                            ng-click="setCallFilter('outgoing')">
+                        Outgoing
+                    </button>
+                    <button ng-class="{ active: gettelnyxHistoryReqobj.FilterKey === 'answered' }"
+                            ng-click="setCallFilter('answered')">
+                        Answered
+                    </button>
+                    <button ng-class="{ active: gettelnyxHistoryReqobj.FilterKey === 'missed' }"
+                            ng-click="setCallFilter('missed')">
+                        Missed
+                    </button>
+                </div>
+
+
+            </div>
+
+
+            <div class="ehnote-ch-table">
+                <div class="ehnote-ch-thead">
+                    <span class="ch-col-icon"></span>
+                    <span class="ch-col-caller">Caller</span>
+                    <span class="ch-col-time">Date &amp; Time</span>
+                    <span class="ch-col-dur">Duration</span>
+                    <span class="ch-col-by">Answered By</span>
+                    <span class="ch-col-status">Status</span>
+                    <span class="ch-col-action">Action</span>
+                </div>
+
+                <div class="ehnote-ch-row" ng-repeat-start="c in callHistory">
+                    <span class="ch-col-icon">
+                        <span class="ehnote-ch-dot" ng-class="chDotClass(c)">
+                            <i class="fa" ng-class="chDotIcon(c)"></i>
+                        </span>
+                    </span>
+
+                    <span class="ch-col-caller">
+                        <div class="ehnote-ch-name">
+                            <!-- direction arrow -->
+                            <i class="fa ehnote-ch-dir"
+                               ng-class="c.Direction === 'outgoing' ? 'fa-arrow-up ch-dir-out' : 'fa-arrow-down ch-dir-in'"
+                               title="{{ c.Direction === 'outgoing' ? 'Outgoing' : 'Incoming' }}"></i>
+                            <span ng-if="c.PatientName!=''"> {{ c.PatientName }}</span>
+                            <span ng-if="c.PatientName==''"> Unknown caller</span>
+                            <span class="ehnote-dnc-tag" ng-if="isDnc(c)"
+                                  title="On the Do Not Call list{{ c.DncReason ? ' — ' + c.DncReason : '' }}">
+                                <i class="fa fa-ban"></i> DNC
+                            </span>
+                        </div>
+                        <div class="ehnote-ch-sub">
+                            {{ fmtPhone(callNumberOf(c)) }}<span ng-if="c.PatientMRN"> · MR No: {{ c.PatientMRN }}</span>
+                            <span ng-if="c.PatientDOB"> · DOB : {{ c.PatientDOB }}</span>
+                        </div>
+                    
+                    </span>
+
+                    <span class="ch-col-time">{{ c.StartTime | date:'MMM d, h:mm a' }}</span>
+                    <span class="ch-col-dur">{{ c.CallStatusId === 2 ? c.DurationText : '—' }}</span>
+
+                    <!-- "Answered By" = who picked up (inbound) OR who placed it (outbound) -->
+                    <span class="ch-col-by">{{ c.AgentName || c.AnsweredByName || '—' }}</span>
+
+                    <span class="ch-col-status">
+                        <span class="ehnote-ch-badge" ng-class="chBadgeClass(c)">
+                            {{ c.CallStatusName }}
+                        </span>
+                    </span>
+
+                    <span class="ch-col-action">
+                        <div class="ehnote-dl-actions">
+                            <button class="ehnote-dl-callbtn" ng-disabled="telnyxCallState"
+                                    ng-click="dialFromRecent(c)" title="Call back">
+                                <i class="fa fa-phone"></i>
+                            </button>
+                            <button class="ehnote-dl-recbtn" ng-if="c.CallStatusId === 2"
+                                    ng-class="{ 'is-open': c.showRec }"
+                                    ng-click="toggleRecording(c)" title="Call recording">
+                                <i class="fa fa-microphone"></i>
+                            </button>
+                            <div class="ehnote-dl-more" uib-dropdown dropdown-flip>
+                                <button class="ehnote-dl-morebtn" uib-dropdown-toggle
+                                        ng-click="checkDropDirection($event)">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <ul uib-dropdown-menu class="ehnote-dl-menu dropdown-menu-right" role="menu">
+
+                                    <!-- Call back — always available -->
+                                    <li role="menuitem">
+                                        <a ng-click="dialFromRecent(c)"><i class="fa fa-phone"></i> Call back</a>
+                                    </li>
+                                    <li role="menuitem" ng-if="c.CallStatusId === 2">
+                                        <a ng-click="toggleRecording(c)"><i class="fa fa-microphone"></i> Play recording</a>
+                                    </li>
+
+                                    <!-- Open patient — only if a patient is linked -->
+                                    <li role="menuitem" ng-if="UserAccessRights.AllAccessRights.CRMReminderViewPatientProfile &&c.MatchedPatientId">
+                                        <a ng-click="openPatientFromCall(c)"><i class="fa fa-user"></i> Open patient</a>
+                                    </li>
+                                    <li role="menuitem" ng-if="c.MatchedPatientId">
+                                        <a ng-click="openAddNewLogPopup(c)"><i class="fa fa-user"></i> Add Log</a>
+                                    </li>
+                                    <li role="menuitem" ng-if="!c.MatchedPatientId">
+                                        <a ng-click="linkCallToPatient(c)"><i class="fa fa-link"></i> Link to patient</a>
+                                    </li>
+                                    <!-- Mark as handled — only for UNHANDLED missed calls -->
+                                    <li role="menuitem" ng-if="c.Direction === 'incoming' && c.CallStatusId === 3 && !c.IsHandled">
+                                        <a ng-click="markHandled(c)"><i class="fa fa-check"></i> Mark as handled</a>
+                                    </li>
+
+                                    <li class="divider"></li>
+
+                                    <!-- Add / remove flips on the row's current DNC state -->
+                                    <li role="menuitem" ng-if="!isDnc(c)">
+                                        <a ng-click="addToDnc(c)" class="text-danger">
+                                            <i class="fa fa-ban"></i> Add to Do Not Call
+                                        </a>
+                                    </li>
+                                    <li role="menuitem" ng-if="isDnc(c)">
+                                        <a ng-click="removeFromDnc(c)">
+                                            <i class="fa fa-undo"></i> Remove from Do Not Call
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </span>
+                </div>
+                <div class="ehnote-ch-rec" ng-repeat-end ng-if="c.showRec">
+                    <span class="ehnote-ch-rec-msg" ng-if="c.recState === 'loading'">
+                        <i class="fa fa-spinner fa-spin"></i> Loading recording…
+                    </span>
+                    <span class="ehnote-ch-rec-msg" ng-if="c.recState === 'none'">
+                        <i class="fa fa-microphone-slash"></i> No recording saved for this call.
+                    </span>
+                    <span class="ehnote-ch-rec-msg text-danger" ng-if="c.recState === 'error'">
+                        <i class="fa fa-exclamation-circle"></i> Couldn't load the recording. Try again.
+                    </span>
+                    <div class="ehnote-ch-rec-item" ng-if="c.recState === 'ready'" ng-repeat="r in c.recordings">
+                        <i class="fa fa-microphone"></i>
+                        <audio controls preload="none" ng-src="{{ r.PlayUrl | trustAsResourceUrl }}"></audio>
+                        <span class="ehnote-ch-sub">Saved {{ r.SavedAtUtc | date:'MMM d, h:mm a' }}</span>
+                    </div>
+                </div>
+
+                <!-- Two different nothings: nothing matches the filters, or nothing
+                     matches the number that was searched for. The second one is what
+                     the user just typed, so it is worth saying back to them. The term
+                     shown is the one that was applied, not what is currently in the
+                     box - otherwise the message would change as they type the next
+                     search. -->
+                <div class="ehnote-ch-empty"
+                     ng-if="!callHistory.length && !callHistoryAppliedSearch">
+                    No calls found for this filter.
+                </div>
+                <div class="ehnote-ch-empty"
+                     ng-if="!callHistory.length && callHistoryAppliedSearch">
+                    No records found for "{{ callHistoryAppliedSearch }}" - no patient or
+                    call matches that number in this date range.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal__footer--" ng-if="ccTab === 'history'">
+        <div class="row" ng-show="callHistory.length > 0">
+            <div class="col-lg-12 text-center EH-pagination">
+                <uib-pagination total-items="callTotalCount"
+                                ng-model="gettelnyxHistoryReqobj.PageNumber"
+                                ng-change="callHistoryPageChanged(gettelnyxHistoryReqobj.PageNumber)"
+                                items-per-page="gettelnyxHistoryReqobj.PageSize"
+                                max-size="5"
+                                boundary-link-numbers="true"
+                                rotate="false"></uib-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ehnote-dnc-overlay" ng-if="dncModal.show" ng-click="closeDncModal()">
+    <div class="ehnote-dnc-modal" ng-click="$event.stopPropagation()">
+        <div class="ehnote-dnc-head">
+            <span><i class="fa fa-ban text-danger"></i> Add to Do Not Call</span>
+            <a ng-click="closeDncModal()" role="button">&times;</a>
+        </div>
+
+        <div class="ehnote-dnc-body">
+            <div class="ehnote-dnc-num">
+                {{ fmtPhone(dncModal.number) }}
+                <span class="ehnote-dnc-patient" ng-if="dncModal.patientName">{{ dncModal.patientName }}</span>
+                <span class="ehnote-dnc-patient" ng-if="!dncModal.patientName">Not linked to a patient</span>
+            </div>
+
+            <label>Reason <span class="req">*</span></label>
+            <select ng-model="dncModal.reasonId" class="ehnote-dnc-select">
+                <option value="" disabled>Select a reason…</option>
+                <option ng-repeat="r in dncReasons" value="{{ r.ReasonId }}">{{ r.ReasonName }}</option>
+            </select>
+
+            <label>Notes (optional)</label>
+            <textarea ng-model="dncModal.notes" class="ehnote-dnc-textarea"
+                      rows="3" maxlength="500" placeholder="Any additional detail…"></textarea>
+        </div>
+
+        <div class="ehnote-dnc-foot">
+            <button class="btn__lg-- btn__2D2D47--o" ng-click="closeDncModal()">Cancel</button>
+            <button class="btn__lg-- btn__C71D27--f" ng-click="confirmAddDnc()"
+                    ng-disabled="!dncModal.reasonId">
+                <i class="fa fa-ban"></i> Add to Do Not Call
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- The Remove from Do Not Call modal lives in index.html, not here: it is also
+     reached from the patient Communication tab and from the call-blocked dialog,
+     and a second copy in this template would render twice on the shared scope. -->
+
+<style>
+
+
+    .ehnote-callhistory-panel {
+        background: #fff;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ehnote-ch-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .ehnote-ch-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111;
+    }
+
+    .ehnote-ch-close {
+        border: 1px solid #dc2626;
+        color: #dc2626;
+        background: #fff;
+        padding: 5px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .ehnote-ch-stats {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    /* Stat cards: white card, colored icon tile, accent strip on the left.
+       Each variant sets --stat-accent / --stat-tint and everything follows. */
+    .ehnote-ch-stat {
+        --stat-accent: #2D2D47;
+        --stat-tint: #2D2D4714;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px 16px 14px 18px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(16,24,40,.04);
+        transition: box-shadow .15s, transform .15s;
+    }
+
+        .ehnote-ch-stat::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--stat-accent);
+        }
+
+        .ehnote-ch-stat:hover {
+            box-shadow: 0 6px 16px rgba(16,24,40,.08);
+            transform: translateY(-1px);
+        }
+
+    .stat-total { --stat-accent: #2D2D47; --stat-tint: #2D2D4714; }
+    .stat-answered { --stat-accent: #16a34a; --stat-tint: #16a34a1a; }
+    .stat-missed { --stat-accent: #dc2626; --stat-tint: #dc26261a; }
+    .stat-talk { --stat-accent: #F7981C; --stat-tint: #F7981C1f; }
+
+    .ehnote-ch-stat-icon {
+        flex: 0 0 auto;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        background: var(--stat-tint);
+        color: var(--stat-accent);
+    }
+
+    /* missed = handset turned down */
+    .stat-missed .ehnote-ch-stat-icon i {
+        transform: rotate(135deg);
+    }
+
+    .ehnote-ch-stat-body {
+        min-width: 0;
+    }
+
+    .ehnote-ch-stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ehnote-ch-stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.15;
+        color: #111827;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .ehnote-ch-stat-meta {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 1px 7px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        vertical-align: middle;
+        background: var(--stat-tint);
+        color: var(--stat-accent);
+    }
+
+    @media (max-width: 900px) {
+        .ehnote-ch-stats {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+    .ehnote-ch-green {
+        color: #16a34a;
+    }
+
+    .ehnote-ch-red {
+        color: #dc2626;
+    }
+
+    .ehnote-ch-filters {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px 12px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    /* The range control sizes itself through .input__fromTo--; the filter cell
+       only has to stop it collapsing in the table layout. */
+    .ehnote-ch-daterange {
+        margin-bottom: 0;
+        min-width: 260px;
+    }
+
+    .ehnote-ch-tabs button {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #6b7280;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 6px;
+        font-weight: 600;
+    }
+
+        .ehnote-ch-tabs button.active {
+            background: #ecfdf5;
+            color: #16a34a;
+            border-color: #16a34a;
+        }
+
+    .ehnote-ch-search input {
+        padding: 6px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin-left: 8px;
+    }
+
+    .ehnote-ch-table {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 20px 12px;
+    }
+
+    .ehnote-ch-thead, .ehnote-ch-row {
+        display: grid;
+        grid-template-columns: 48px 2fr 1.2fr 1fr 1.2fr 1fr 0.8fr;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 8px;
+    }
+
+    .ehnote-ch-thead {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        background: #fff;
+    }
+
+    .ehnote-ch-row {
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .ehnote-ch-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dot-answered {
+        background: #ecfdf5;
+        color: #16a34a;
+    }
+
+    .dot-missed {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .ehnote-ch-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #111;
+    }
+
+    .ehnote-ch-sub {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .ehnote-ch-badge {
+        font-size: 12px;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .badge-answered {
+        background: #ecfdf5;
+        color: #16a34a;
+    }
+
+    .badge-missed {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .ehnote-ch-empty {
+        text-align: center;
+        color: #6b7280;
+        padding: 40px;
+    }
+
+
+
+    .ehnote-ch-daterange {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 8px;
+    }
+
+        .ehnote-ch-daterange label {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .ehnote-ch-daterange input[type="date"] {
+            padding: 5px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+    .ehnote-ch-apply {
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-left: 6px;
+    }
+
+        .ehnote-ch-apply:hover {
+            background: #15803d;
+        }
+
+    .ehnote-ch-clear {
+        background: #fff;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-left: 6px;
+    }
+
+        .ehnote-ch-clear:hover {
+            background: #f3f4f6;
+        }
+
+    
+
+        /* header — fixed, never scrolls */
+        .modal__style--1 .modal__header-- {
+            flex: 0 0 auto;
+        }
+
+        /* body — takes remaining space, holds the panel */
+        .modal__style--1 .modal__body-- {
+            flex: 1 1 auto;
+            min-height: 0; /* CRITICAL: lets the flex child shrink so inner scroll works */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* footer (pagination) — fixed at bottom, never scrolls */
+        .modal__style--1 .modal__footer-- {
+            flex: 0 0 auto;
+            border-top: 1px solid #e5e7eb;
+            padding: 10px;
+        }
+
+    /* the panel fills the body and is itself a flex column */
+    .ehnote-callhistory-panel {
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0; /* CRITICAL for the same reason */
+        width: 100%;
+    }
+
+    /* stats + filters stay fixed height */
+    .ehnote-ch-stats,
+    .ehnote-ch-filters {
+        flex: 0 0 auto;
+    }
+
+    /* the TABLE is the only scrolling region */
+    .ehnote-ch-table {
+        flex: 1 1 auto;
+        min-height: 0; /* CRITICAL: enables the overflow scroll */
+        overflow-y: auto;
+        padding: 0 20px 12px;
+    }
+
+    .ehnote-ch-filter-btn {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .ehnote-ch-popover {
+        min-width: 220px;
+    }
+
+    .ehnote-ch-pop-field {
+        margin-bottom: 10px;
+    }
+
+        .ehnote-ch-pop-field label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .ehnote-ch-pop-field input[type="date"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+    .ehnote-ch-pop-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .ehnote-ch-filter-wrap {
+        position: relative;
+        display: inline-block;
+        margin-left: 8px;
+    }
+
+    .ehnote-ch-filter-btn {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .ehnote-ch-filter-panel {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 6px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        padding: 14px;
+        z-index: 1000;
+        min-width: 230px;
+    }
+
+    .ehnote-ch-pop-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .ehnote-ch-pop-field {
+        margin-bottom: 10px;
+    }
+
+        .ehnote-ch-pop-field label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .ehnote-ch-pop-field input[type="date"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+    .ehnote-ch-pop-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .ehnote-ch-apply {
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .ehnote-ch-clear {
+        background: #fff;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .ehnote-ch-stat-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+
+    .ehnote-ch-filter-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
+    .ehnote-ch-filter-icon {
+        background: transparent;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+
+        .ehnote-ch-filter-icon:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+    .ehnote-ch-filter-panel {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 6px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        padding: 14px;
+        z-index: 1000;
+        min-width: 220px;
+        text-align: left;
+    }
+
+    .ehnote-ch-pop-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    .ehnote-ch-pop-field {
+        margin-bottom: 10px;
+    }
+
+        .ehnote-ch-pop-field label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .ehnote-ch-pop-field input[type="date"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+    .ehnote-ch-pop-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .ehnote-ch-pop-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .ehnote-ch-pop-title {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .ehnote-ch-pop-close {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        line-height: 1;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+        .ehnote-ch-pop-close:hover {
+            color: #374151;
+        }
+
+    /* ══════════════ TABS ══════════════ */
+    .ehnote-cc-tabs {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 4px;
+        padding: 0 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+        .ehnote-cc-tabs button {
+            border: none;
+            background: none;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+            .ehnote-cc-tabs button i {
+                margin-right: 6px;
+            }
+
+            .ehnote-cc-tabs button:hover {
+                color: #374151;
+            }
+
+            .ehnote-cc-tabs button.active {
+                color: #111;
+                border-bottom-color: #F7981C;
+            }
+
+    /* ══════════════ DIALER ══════════════ */
+    .ehnote-dl-wrap {
+        flex: 1 1 auto;
+        min-height: 0; /* keeps the inner scroll working */
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 16px;
+        padding: 16px 20px;
+    }
+
+    .ehnote-dl-recents {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .ehnote-dl-panelhead {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .ehnote-dl-list {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .ehnote-dl-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+        .ehnote-dl-item:hover {
+            background: #fafafa;
+        }
+
+    .ehnote-dl-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+        .ehnote-dl-body .ehnote-ch-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ehnote-dl-body .ehnote-ch-sub i {
+            font-size: 10px;
+            margin-right: 3px;
+        }
+
+    .dot-out {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .ehnote-dl-callbtn {
+        width: 34px;
+        height: 34px;
+        border: none;
+        border-radius: 50%;
+        background: #F7981C1A;
+        color: #F7981C;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+        .ehnote-dl-callbtn:hover:not(:disabled) {
+            background: #F7981C;
+            color: #fff;
+        }
+
+        .ehnote-dl-callbtn:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+
+    .ehnote-dl-from {
+        text-align: center;
+        margin-bottom: 14px;
+    }
+
+        .ehnote-dl-from .lbl {
+            display: block;
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .ehnote-dl-from .num {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+
+
+
+    .ehnote-dl-back {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .ehnote-dl-results {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        margin-bottom: 10px;
+    }
+
+
+    .ehnote-dl-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #2D2D47;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    /* .ehnote-dl-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        align-self: center;
+        background: #F7981C1A;
+        color: #b45309;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+        .ehnote-dl-chip a {
+            color: inherit;
+            font-size: 16px;
+            line-height: 1;
+        }*/
+
+    .ehnote-dl-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .ehnote-dl-key {
+        height: 52px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: .12s;
+    }
+
+        .ehnote-dl-key:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .ehnote-dl-key:active {
+            background: #f3f4f6;
+            transform: scale(.96);
+        }
+
+        .ehnote-dl-key .d {
+            font-size: 19px;
+            font-weight: 500;
+            color: #111;
+            line-height: 1;
+        }
+
+        .ehnote-dl-key .l {
+            font-size: 9px;
+            color: #9ca3af;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+    .ehnote-dl-call {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: auto;
+        height: 46px;
+        border: none;
+        border-radius: 8px;
+        background: #16a34a;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .ehnote-dl-call i {
+            margin-right: 6px;
+        }
+
+        .ehnote-dl-call:hover:not(:disabled) {
+            background: #15803d;
+        }
+
+        .ehnote-dl-call:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+    .ehnote-dl-hint {
+        text-align: center;
+        font-size: 12px;
+        color: #dc2626;
+        margin-top: 8px;
+    }
+
+    .ehnote-dl-pad {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden; /* the middle scrolls, not the pad */
+    }
+
+    /* TOP — fixed */
+    .ehnote-dl-top {
+        flex: 0 0 auto;
+        padding: 16px 18px 10px;
+    }
+
+    .ehnote-dl-from {
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+        .ehnote-dl-from .lbl {
+            display: block;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .ehnote-dl-from .num {
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+    .ehnote-dl-inputwrap {
+        position: relative;
+    }
+
+    .ehnote-dl-input {
+        width: 100%;
+        padding: 11px 46px 11px 14px;
+        font-size: 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        outline: none;
+    }
+
+        .ehnote-dl-input:focus {
+            border-color: #F7981C;
+        }
+
+    .ehnote-dl-inlinecall {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: #F7981C1A;
+        color: #F7981C;
+        font-size: 14px;
+    }
+
+        .ehnote-dl-inlinecall:hover:not(:disabled) {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .ehnote-dl-inlinecall:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+    /* MIDDLE — scrolls */
+    .ehnote-dl-middle {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px 10px;
+    }
+
+    .ehnote-dl-presult {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .ehnote-dl-presult:hover {
+            background: #f9fafb;
+        }
+
+    .ehnote-dl-presult-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ehnote-dl-presult-call {
+        color: #16a34a;
+        opacity: 0;
+    }
+
+    .ehnote-dl-presult:hover .ehnote-dl-presult-call {
+        opacity: 1;
+    }
+
+    /* BOTTOM — fixed */
+    .ehnote-dl-bottom {
+        flex: 0 0 auto;
+        padding: 10px 18px 16px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .ehnote-dl-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 7px 14px;
+        background: #F7981C1A;
+        color: #b45309;
+        border-radius: 999px;
+        font-size: 14px; /* ⬅️ bump up */
+        font-weight: 600;
+    }
+
+        .ehnote-dl-chip i {
+            font-size: 13px;
+        }
+
+        .ehnote-dl-chip a {
+            color: inherit;
+            font-size: 18px; /* ⬅️ bigger × */
+            line-height: 1;
+            cursor: pointer;
+            margin-left: 2px;
+        }
+
+    .ehnote-ch-empty.sm {
+        padding: 16px;
+        font-size: 13px;
+    }
+
+    .ehnote-ac {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+        gap: 4px;
+        text-align: center;
+        background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+    }
+
+        .ehnote-ac.ac-connected {
+            background: linear-gradient(180deg, #f0fdf4 0%, #fff 100%);
+        }
+
+        .ehnote-ac.ac-failed {
+            background: linear-gradient(180deg, #fef2f2 0%, #fff 100%);
+        }
+
+    .ehnote-ac-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #c2185b;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        box-shadow: 0 0 0 0 rgba(194,24,91,.4);
+    }
+
+    .ac-connected .ehnote-ac-avatar {
+        background: #16a34a;
+        animation: none;
+    }
+
+    .ehnote-ac:not(.ac-connected):not(.ac-failed) .ehnote-ac-avatar {
+        animation: acRing 1.6s ease-out infinite;
+    }
+
+    @keyframes acRing {
+        0% {
+            box-shadow: 0 0 0 0 rgba(194,24,91,.35);
+        }
+
+        70% {
+            box-shadow: 0 0 0 18px rgba(194,24,91,0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(194,24,91,0);
+        }
+    }
+
+    .ehnote-ac-name {
+        font-size: 21px;
+        font-weight: 600;
+        color: #111;
+    }
+
+    .ehnote-ac-num {
+        font-size: 15px;
+        color: #6b7280;
+    }
+
+    .ehnote-ac-status {
+        margin-top: 10px;
+        height: 26px;
+    }
+
+    .ac-pulse {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+        animation: acBlink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes acBlink {
+        0%,100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .4;
+        }
+    }
+
+    .ac-timer {
+        font-size: 24px;
+        font-weight: 600;
+        color: #16a34a;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ac-fail {
+        font-size: 15px;
+        font-weight: 700;
+        color: #dc2626;
+    }
+
+    .ehnote-ac-controls {
+        display: flex;
+        gap: 28px;
+        margin: 26px 0 8px;
+    }
+
+    .ehnote-ac-cbtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+        .ehnote-ac-cbtn i {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            transition: .15s;
+        }
+
+        .ehnote-ac-cbtn.is-on i {
+            background: #2D2D47;
+            color: #fff;
+        }
+
+        .ehnote-ac-cbtn:hover i {
+            background: #e5e7eb;
+        }
+
+        .ehnote-ac-cbtn.is-on:hover i {
+            background: #1f1f38;
+        }
+
+    .ehnote-ac-dtmf {
+        display: grid;
+        grid-template-columns: repeat(3, 46px);
+        gap: 8px;
+        margin: 14px 0;
+    }
+
+        .ehnote-ac-dtmf button {
+            height: 42px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            color: #111;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+            .ehnote-ac-dtmf button:active {
+                background: #f3f4f6;
+            }
+
+    .ehnote-ac-hangup {
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: #dc2626;
+        color: #fff;
+        font-size: 22px;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(220,38,38,.35);
+        transition: .15s;
+    }
+
+        .ehnote-ac-hangup:hover {
+            background: #b91c1c;
+            transform: scale(1.05);
+        }
+
+        .ehnote-ac-hangup i {
+            transform: rotate(135deg);
+        }
+
+    .ehnote-ac-endlbl {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 6px;
+    }
+
+    .ehnote-dl-idle {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ehnote-dl-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .ehnote-dl-morebtn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+    }
+
+        .ehnote-dl-morebtn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+    .ehnote-dl-menu {
+        min-width: 180px;
+    }
+
+        .ehnote-dl-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+            .ehnote-dl-menu a i {
+                width: 16px;
+                color: #6b7280;
+            }
+
+            .ehnote-dl-menu a:hover {
+                background: #f9fafb;
+            }
+
+        .ehnote-dl-menu .text-danger i {
+            color: #dc2626;
+        }
+
+    .ehnote-ch-dialbtn {
+        border: 1px solid #2D2D47;
+        background: #fff;
+        color: #2D2D47;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .ehnote-ch-dialbtn:hover {
+            background: #2D2D47;
+            color: #fff;
+        }
+
+        .ehnote-ch-dialbtn i {
+            margin-right: 5px;
+        }
+
+    .ehnote-ch-dir {
+        font-size: 10px;
+        margin-right: 6px;
+    }
+
+    .ch-dir-out {
+        color: #2563eb;
+    }
+    /* outgoing = blue up-arrow */
+    .ch-dir-in {
+        color: #16a34a;
+    }
+    /* incoming = green down-arrow */
+
+    .dot-out {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .dot-noanswer {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .badge-noanswer {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    /* Busy and Cancelled read differently to Failed - one is theirs, one is ours */
+    .dot-busy {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-busy {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .dot-cancelled {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .badge-cancelled {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .ehnote-dnc-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 4000;
+        background: rgba(0,0,0,.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ehnote-dnc-modal {
+        width: 400px;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+
+    .ehnote-dnc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+        .ehnote-dnc-head a {
+            color: #9ca3af;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+    .ehnote-dnc-body {
+        padding: 18px;
+    }
+
+    .ehnote-dnc-num {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111;
+        background: #f9fafb;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
+    .ehnote-dnc-patient {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: #6B7280;
+        margin-top: 2px;
+    }
+
+    /* DNC badge on a call-history row, next to the caller name */
+    .ehnote-dnc-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 6px;
+        padding: 1px 7px;
+        border: 1px solid #F3C2C4;
+        background: #FDECEC;
+        color: #C71D27;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        vertical-align: middle;
+        cursor: default;
+    }
+
+    .ehnote-dnc-note {
+        font-size: 13px;
+        color: #374151;
+        margin-bottom: 10px;
+    }
+
+    .ehnote-dnc-warn {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #92400E;
+        background: #FFF8E6;
+        border: 1px solid #FCE3A8;
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin: 0 0 4px;
+    }
+
+    .ehnote-dnc-body label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin: 12px 0 6px;
+    }
+
+    .ehnote-dnc-body .req {
+        color: #dc2626;
+    }
+
+    .ehnote-dnc-select, .ehnote-dnc-textarea {
+        width: 100%;
+        padding: 9px 12px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        outline: none;
+    }
+
+        .ehnote-dnc-select:focus, .ehnote-dnc-textarea:focus {
+            border-color: #F7981C;
+        }
+
+    .ehnote-dnc-textarea {
+        resize: vertical;
+    }
+
+    /* ══════════════ CALL RECORDING ══════════════ */
+    .ehnote-dl-recbtn {
+        width: 34px;
+        height: 34px;
+        border: none;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #2563eb;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+        .ehnote-dl-recbtn:hover, .ehnote-dl-recbtn.is-open {
+            background: #2563eb;
+            color: #fff;
+        }
+
+    .ehnote-ch-rec {
+        padding: 10px 8px 12px 68px;
+        background: #f9fafb;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .ehnote-ch-rec-msg {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+        .ehnote-ch-rec-msg i {
+            margin-right: 6px;
+        }
+
+    .ehnote-ch-rec-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .ehnote-ch-rec-item > i {
+            color: #2563eb;
+        }
+
+        .ehnote-ch-rec-item audio {
+            height: 36px;
+            width: 360px;
+            max-width: 100%;
+        }
+
+    .ehnote-dnc-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 14px 18px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    
+</style>

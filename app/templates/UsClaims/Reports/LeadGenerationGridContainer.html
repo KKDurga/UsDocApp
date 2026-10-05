@@ -1,0 +1,179 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1 ng-if="InSubTab=='MonthlyReport'">Monthly Report <span class=" ml__10--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--">{{MonthlyReportCount}}</span></h1>
+        <h1 ng-if="InSubTab=='SurgeryDetails'">{{MetricLabel}} - {{CellInfo.doctorName}} ({{BucketLabel}}) <span class=" ml__10--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--">{{SurgeryDetailsCount}}</span></h1>
+        <ul class="tab__style--1 pl__5--" ng-if="InSubTab=='SurgeryDetails'">
+            <!-- the metric key is what the api filters on and what CellInfo
+                 holds, so both the highlight and the click use tab.key -->
+            <li ng-repeat="tab in MetricTabs" ng-class="{'active': CellInfo.metric === tab.key}">
+                <a ng-click="LoadLeadDetails(tab.key)">{{tab.label}}</a>
+            </li>
+        </ul>
+        <div class="d__f-- ai__c-- gap__10--x">
+            <!--<div class="position__relative-- p__2--">
+                <a class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" ng-click="excelExports()"><i svg-icon="icon__download--" size="14" style="color: #6A7282"></i></a>
+                <span class="p__3-- top_ bg__C71D27-- bradius__10-- position__absolute-- top__0-- right__0--"></span>
+            </div>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="ClickForExceldData()">Export Excel</button>-->
+            <a class="btn__close--2" id="link__encounterclose" ng-click="close()">
+                <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'"></i>
+            </a>
+        </div>
+    </div>
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- mb__10--" ng-if="InSubTab=='MonthlyReport'">
+        <table class="table m-0 tableno-bordered tableno-padding table-layout-fix">
+
+            <tbody>
+                <tr>
+
+                    <td>
+                        <div class="form__group">
+                            <label>Date</label>
+                            <select ng-model="MainPobj.DateRangeId" id="select_daterange"
+                                    ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                    ng-change="setInsuranceCheckDateRange(MainPobj.DateRangeId)">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="MainPobj.DateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.PaymentFromDate"
+                                   date-range-one-year="MainPobj.PaymentToDate"
+                                   readonly>
+
+                        </div>
+                    </td>
+
+                    <td ng-if="MainPobj.DateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.PaymentToDate"
+                                   date-range-one-year
+                                   readonly>
+                        </div>
+                    </td>
+
+
+
+                    <!--<td width="12%">
+                        <div class="form__group flex">
+                            <label>Location</label>
+                            <div class="dropdown cstm-dropdown width-100">
+                                <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                                    {{LocationTypeObj.SelectLocationString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in MainPobj.AllBranchesList | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranch(item)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>-->
+                    <td width="15%">
+                        <div class="form__group ">
+                            <label>{{ 'DOCTORS' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100">
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDashBoardDoctor}}">
+                                    {{MainPobj.SelectUserStatusString}}
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchDoctorInDashBoard.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li class="border-right">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="MainPobj.AllDoctorCheck" ng-click="checkAllLeadUser(MainPobj.AllDoctorCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Doctors</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MainPobj.AllDoctorList | filter:{'FullName':searchDoctorInDashBoard.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="LeadUserToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+
+
+                    <td>
+                        <div class="d__f-- ai__c-- gap__5-- mt__20--">
+                            <button class="btn__lg-- btn__2D2D47--f" ng-click="pageload()">Apply</button>
+                            <button class=" b-0" id="btn_clear" ng-click="ClearInsuranceFilters()">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+    <div class="modal__body--" ng-if="InSubTab=='MonthlyReport'">
+        <div class="p__10-- adjustable-position" id="myGridContainer">
+
+            <div id="InspopupAgGrid" dragScroll
+                 class="ag-theme-alpine"
+                 style="height:100%;width:100%">
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal__body--" ng-if="InSubTab=='SurgeryDetails'">
+        <div class="p__10-- adjustable-position" id="myGridContainer">
+
+            <div id="LeadDetailsAgGrid" dragScroll
+                 class="ag-theme-alpine"
+                 style="height:100%;width:100%">
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+

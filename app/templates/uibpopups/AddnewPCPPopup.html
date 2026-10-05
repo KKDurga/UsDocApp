@@ -1,0 +1,316 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Add  PCP / Referral / Hospital</h1>
+        <ul class="us-controls">
+            <li>
+                <button class="btn__lg-- btn__C71D27--o" ng-click="ClearPCPPopup()">Clear</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="AddReferalPCPDoctor()">Save</button>
+            </li>
+            <li>
+                <a class="btn__close--2" ng-click="ClosePCPPopup()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <div class="adjustable-position">
+            <div class="dis-flex flex-direction-column grid-gap-10 p-5">
+                <div class="section__style--4">
+                    <div class="section__header--">
+                        <h1>Basic Information</h1>
+                    </div>
+                    <div class="section__body-- grid-gap-10 p-10">
+                        <div class="row nocolpad dis-flex align-items-center gap-y-10 flex-wrap">
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Referral Doctor <em>*</em></label>
+                                    <select class="" ng-model="PCPObj.RefaralTypeId"
+                                            ng-options="ditem.RefaralTypeId as ditem.RefaralTypeName for ditem in Refaraldoctorlist"
+                                            ng-change="changeRefaralTypeId();">
+                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-hide="PCPObj.RefaralTypeId==4">
+                                <div class="form__group">
+                                    <label>Employee ID</label>
+                                    <input type="text" class="" required ng-model="PCPObj.EmployeeId" placeholder="{{ 'ENTEREMPLOYEEID' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-if="PCPObj.RefaralTypeId!=4">
+                                <div class="form__group">
+                                    <label>First Name <em>*</em></label>
+                                    <input type="text" name="RefDocName" class="" required ng-model="PCPObj.FirstName" placeholder="{{ 'ENTERFIRSTNAME' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-if="PCPObj.RefaralTypeId != 4">
+                                <div class="form__group">
+                                    <label>Last Name <em>*</em></label>
+                                    <input type="text" name="RefDocName" class="" ng-model="PCPObj.LastName" placeholder="{{ 'ENTERLASTNAME' | translate}} " />
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-if="PCPObj.RefaralTypeId!=4">
+                                <div class="form__group">
+                                    <label>Suffix</label>
+                                    <select class="" ng-model="PCPObj.SuffixId"
+                                            ng-options="pitem.Id as pitem.Name for pitem in SuffixList"
+                                            ng-change="changeSuffix(PCPObj.SuffixId);">
+                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Gender</label>
+                                    <select class=" " ng-model="PCPObj.Gender">
+                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                        <option value="Male">{{ 'MALE' | translate}}</option>
+                                        <option value="Female">{{ 'FEMALE' | translate}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Age</label>
+                                    <input type="text" name="RefDocName" class="" maxlength="2" numbers-only="numbers-only" ng-model="PCPObj.Age" placeholder="{{ 'ENTERAGE' | translate}} " />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>NPI <em>*</em></label>
+                                    <input type="text" name="RefDocName" class="" ng-model="PCPObj.NPI" maxlength="10" numbers-only placeholder="{{ 'ENTERNPI' | translate}} " />
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-if="PCPObj.RefaralTypeId!=4">
+                                <div class="form__group">
+                                    <label>Clia ID</label>
+                                    <input type="text" class="" ng-model="PCPObj.CLIAID" maxlength="12" alpha-numeric placeholder="{{ 'ENTERCLIAID' | translate}} " />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Specialty</label>
+                                    <select class="" name="speciality" ng-model="PCPObj.SpecializationId"
+                                            ng-options="value.Id as value.Name for value in Specialitylist" required>
+                                        <option class="text-success" value="">{{ 'SELECT' | translate}}</option>
+                                    </select>
+                                    <div class="RequiredErrCls" ng-show="ReferalForm.speciality.$error.required && ReferalForm.$submitted"><span>Enter Speciality </span></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="dropdown  width-100">
+                                    <label>{{ 'USERSUBSPECIALITIES' | translate}} </label>
+                                    <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                        {{selectedDoctors || 'Select Sub Specialities'}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                        <div class="position__relative--">
+                                            <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}} " ng-model="PCPObj.PCPSubSpecializations.SubSpecializationId" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li ng-show="PCPMainBranchSubSpecializationList.length > 0">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllDoctorCheck" ng-click="checkAllDoctor(AllDoctorCheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>{{ 'ALL' | translate}}</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="item in PCPMainBranchSubSpecializationList | filter:{'SubSpecializationName':PCPObj.PCPUserSubSpecializations.SubSpecializationId}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.SubSpecializationName"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Taxonomy ID</label>
+                                    <input type="text" name="Taxonomy Id" class="" ng-model="PCPObj.TaxonomyId" maxlength="12" alpha-numeric placeholder="{{ 'ENTERTAXONOMYID' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3" ng-if="PCPObj.RefaralTypeId!=4">
+                                <div class="form__group">
+                                    <label>LIC</label>
+                                    <input type="text" class="" ng-model="PCPObj.LIC" placeholder="{{ 'ENTERLIC' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>PCP Organization</label>
+                                    <input type="text" class="" ng-model="PCPObj.PCPOrganization" placeholder="{{ 'ENTERPCPORGANIZATION' | translate}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section__style--4">
+                    <div class="section__header--">
+                        <h1>Contact Information</h1>
+                    </div>
+                    <div class="section__body-- grid-gap-10 p-10">
+                        <div class="row nocolpad dis-flex align-items-center gap-y-10 flex-wrap">
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Email Address</label>
+                                    <input type="text" class="" ng-model="PCPObj.EmailId" ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" placeholder="{{ 'ENTEREMAILID' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>Website</label>
+                                    <input type="text" class="" ng-model="PCPObj.WWW" placeholder="{{ 'ENTERWEBSITE' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>{{ 'CONTACTNUMBER' | translate}}</label>
+                                    <div class="dis-flex">
+                                        <div class="width-25 form__group">
+                                            <select class="" ng-model="PCPObj.Contactcountrycode"
+                                                    ng-options="item.InternationalDialing as item.InternationalDialing for item in Allcountries">
+                                                <option value="">{{ 'SELECT' | translate}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="width-75  m-l-5">
+                                            <input name="MobileNumber" numeric-duration ng-change="changePhoneNumber(PCPObj.MobileNo)" maxlength="14" class="form__control" ng-model="PCPObj.MobileNo" required placeholder="{{ 'ENTERCONTACTNO' | translate}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row nocolpad dis-flex align-items-center gap-y-10 flex-wrap">
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>{{ 'ALTERNATENUMBER' | translate}}</label>
+                                    <div class="dis-flex">
+                                        <div class="width-25">
+                                            <select class="form__control" ng-model="PCPObj.Alternatecountrycode"
+                                                    ng-options="item.InternationalDialing as item.InternationalDialing for item in Allcountries">
+                                                <option class="text-success" value="">{{ 'SELECT' | translate}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="width-75">
+                                            <input name="AlternateMobileNumber" numeric-duration ng-change="changeAlternateNumber(PCPObj.AlternateMobileNo)" maxlength="14" class="form__control" ng-model="PCPObj.AlternateMobileNo" placeholder="{{ 'ENTERALTERNATECONTACTNO' | translate}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group">
+                                    <label>{{ 'FAX' | translate}}</label>
+                                    <div class="dis-flex">
+                                        <div class="width-25t">
+                                            <select class="form__control" ng-model="PCPObj.Faxcountrycode"
+                                                    ng-options="item.InternationalDialing as item.InternationalDialing for item in Allcountries">
+                                                <option class="text-success" value="">{{ 'SELECT' | translate}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="width-75 m-l-5">
+                                            <input name="Fax Number" numeric-duration ng-change="changeFaxNumber(PCPObj.Fax)" maxlength="14" ng-model="PCPObj.Fax"   placeholder="(123) 456-7890" class="form__control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="section__style--4">
+                    <div class="section__header--">
+                        <h1>Address Details</h1>
+                    </div>
+                    <div class="section__body-- grid-gap-10 p-10">
+                        <div class="row nocolpad dis-flex align-items-center gap-y-10 flex-wrap">
+
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label>Address Line 1</label>
+                                    <input type="text" class="" ng-model="PCPObj.Address1" maxlength="100" placeholder="{{ 'ENTERADDRESSLINE1' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label>Enter Address Line 2</label>
+                                    <input type="text" name="" class="" ng-model="PCPObj.Address2" maxlength="100" placeholder="{{ 'ENTERADDRESSLINE2' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group" typehead-dropdown-direction>
+                                    <label>Zipcode</label>
+                                    <input type="text" name="" class=""
+                                           autocomplete="off"
+                                           ng-model="PCPObj.ZipCode"
+                                           typeahead-min-length="0"
+                                           maxlength="5"
+                                           required
+                                           ng-change="changeZipcodetoProcedure(PCPObj.ZipCode)" placeholder="{{ 'ENTERZIPCODE' | translate}}" numbers-only />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group" typehead-dropdown-direction>
+                                    <label>City</label>
+                                    <input type="text" name="" class="" ng-model="PCPObj.CityName"
+                                           ng-change="changeCity(PCPObj.CityName)"
+                                           uib-typeahead="city.CityName for city in getAddedCities($viewValue)"
+                                           typeahead-on-select="OnCity($item)" maxlength="15" placeholder="{{ 'ENTERCITYNAME' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group" typehead-dropdown-direction>
+                                    <label>State</label>
+                                    <input type="text" name="" class="" ng-model="PCPObj.StateName"
+                                           ng-change="changeState(PCPObj.StateName)"
+                                           uib-typeahead="item.Name for item in states | filter:$viewValue"
+                                           enter-directive typeahead-on-select="ONchangeState($item,'Mailing')" maxlength="8" placeholder="{{ 'ENTERSTATENAME' | translate}}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form__group" typehead-dropdown-direction>
+                                    <label>Country</label>
+                                    <input type="text" class="form-admission" name="county "
+                                           ng-model="PCPObj.CountryName"
+                                           uib-typeahead="item.CountyId as item.CountyName for item in countyCodesArray"
+                                           typeahead-on-select="ONchangeCounty($item,'Refer')"
+                                           ng-change="ChangeCounty(PCPObj.countrycode)" placeholder="{{ 'ENTERCOUNTYNAME' | translate}}" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section__style--4">
+                    <div class="section__header--">
+                        <h1>Notes</h1>
+                    </div>
+                    <div class="section__body-- grid-gap-10 p-10">
+                        <div class="row nocolpad dis-flex align-items-center gap-y-10 flex-wrap">
+                            <div class="col-lg-12">
+                                <div class="form__group">
+                                    <textarea rows="2" class="msd-elastic: \n" ng-model="PCPObj.PCPNotes" maxlength="500" placeholder="{{ 'ENTERNOTES' | translate}}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

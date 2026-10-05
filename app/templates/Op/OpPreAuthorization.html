@@ -1,0 +1,327 @@
+﻿<div ng-controller="UsPreAuthorizationCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                    <tbody>
+                                        <tr>
+                                            <td class="w-70">
+                                                <div class="form-group">
+                                                    <label>{{ 'FROMDATE' | translate}}</label>
+                                                    <input class="form-control icons-calendar cur-default bg-white"
+                                                           ng-model="GetListObj.FromDate" datepickerforapplist readonly />
+                                                </div>
+                                            </td>
+                                            <td class="w-70">
+                                                <div class="form-group">
+                                                    <label>{{ 'TODATE' | translate}}</label>
+                                                    <input class="form-control icons-calendar cur-default bg-white"
+                                                           ng-model="GetListObj.ToDate" datepickerforapplist readonly />
+                                                </div>
+                                            </td>
+                                            <td class="w-120">
+                                                    <div class="form-group dropdown cstm-dropdown width-100 m-0">
+                                                        <fieldset class="pos-relative bottom-2">
+                                                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0" id="PatientInsName" name="PatientInsName" ng-value="1" aria-invalid="false" ng-model="GetSearchPatient.TypeId" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                                <label for="PatientInsName" class="radio-custom-label cur-poiter mb-0">{{ 'NAME' | translate}} </label>
+                                                            </div>
+                                                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0" id="PatientInsMrNo" name="PatientInsMrNo" ng-value="2" aria-invalid="false" ng-model="GetSearchPatient.TypeId" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                                <label for="PatientInsMrNo" class="radio-custom-label cur-poiter mb-0">{{ 'MRNO' | translate}} </label>
+                                                            </div>
+                                                        </fieldset>
+
+                                                        <div class="btn-group select-form-uib dropdown open">
+                                <input type="text" class="form-control pl-15" placeholder="Search By Name" ng-if="GetSearchPatient.TypeId == 1" ng-model="GetSearchPatient.SearchText" ng-change="LoadPatientSearch(GetSearchPatient.SearchText,GetSearchPatient.TypeId, 'pre')">
+
+                                <input type="text" class="form-control pl-15" placeholder="Search By MR.No" ng-if="GetSearchPatient.TypeId == 2" ng-model="GetSearchPatient.SearchText" ng-change="LoadPatientSearch(GetSearchPatient.SearchText,GetSearchPatient.TypeId, 'pre')">
+
+                                                            <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="GetPatientsList.length > 0">
+                                                                <li class="list-group-item text-dark cur-poiter"
+                                                                    ng-repeat="patientitem in GetPatientsList" ng-click="SelectedPatient(patientitem)">
+                                                                    <span class="badge badge-primary">{{patientitem.HomeCountryCode}}-{{patientitem.HomeAreaCode}}-{{patientitem.HomeNumber}}</span>
+                                                                    {{patientitem.fullname}}
+                                                                    <b>{{patientitem.PatientDisplayId}}</b>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                            </td>
+                                            <td class="w-70">
+                                                <div class="form-group">
+                                                    <label>{{ 'STATUS' | translate}}</label>
+                                                    <select class="form-control" ng-model="GetListObj.Status"
+                                                            ng-options="sitem.Id as sitem.Name for sitem in StatusList">
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="w-150">
+                                                <div class="form-group">
+                                                    <button class="btn btn-success m-t-25" ng-click="GetPreAuthorization(1);">{{ 'APPLY' | translate}}</button>
+                                                    <button class="btn btn-warning m-t-25" ng-click="ClearPreAuthorization();">{{ 'CLEAR' | translate}}</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- /row -->
+                </div>
+            </section>
+
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button class="btn btn-info pull-right" ng-click="NewPreAuthorization()"><i class="fa fa-check"></i>{{ 'ADDNEWPREAUTHORIZATION' | translate}}</button>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="GetPreAuthorizationArray.length > 0">
+                        <div class="col-lg-12">
+                            <div class="table-responsive over-scrol-y">
+                                <table class="table patient-listtable">
+                                    <thead>
+                                        <tr>
+                                            <th width="4%">{{ 'SNO' | translate}}</th>
+                                            <th width="10%">{{ 'PATIENT' | translate}}</th>
+                                            <th>{{ 'AUTHORIZATIONNUMBER' | translate}}</th>
+                                            <th>{{ 'PAYOR' | translate}}</th>
+                                            <th>{{ 'PROCEDURECODE' | translate}}</th>
+                                            <th width="10%">{{ 'STARTDATE' | translate}}</th>
+                                            <th width="10%">{{ 'ENDDATE' | translate}}</th>
+                                            <th>{{ 'VISITSAPPROVED' | translate}}</th>
+                                            <th>{{ 'VISITSREAMINING' | translate}}</th>
+                                            <th>{{ 'STATUS' | translate}}</th>
+                                            <th></th>
+                                            <th>Action{{ 'ACTION' | translate}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="item in GetPreAuthorizationArray track by $index">
+                                        <tr>
+                                            <td>{{$index+1}}</td>
+                                            <td>{{item.PatientFullName}}</td>
+                                            <td>{{item.PreAuthorizationNumber}}</td>
+                                            <td>{{item.PayorName}}</td>
+                                            <td>{{item.ServicesTypeName}}</td>
+                                            <td>{{item.StartDate | date:'dd-MMM-yyyy'}}</td>
+                                            <td>{{item.EndDate | date:'dd-MMM-yyyy'}}</td>
+                                            <td>{{item.VisitsApproved}}</td>
+                                            <td>{{item.VisitsRemaining}}</td>
+                                            <td>{{item.Status}}</td>
+                                            <!--<td>
+                                                    <div class="m-r-5 dis-flex dis-row-wrap" image-viewer isarraychanged="item.patientDocumentDetails.length">
+                                                        <div class="hist-timeline-img m-b-5" ng-repeat="img in item.patientDocumentDetails">
+                                                            <a href="" class="thumbnail m-b-0" ng-show="$first">
+                                                                <i class="fa fa-eye"></i>
+                                                                <img ng-src="{{img.S3URL}}" title="{{img.DocumentName}}" width="70" height="70" style="display:none" />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+   
+                                                </td>-->
+                                            <td image-viewer1 isarraychanged="item.patientDocumentDetails.length">
+                                                <div class="file-image pr-0" ng-repeat="img in item.patientDocumentDetails">
+                                                    <!--<img ng-show="$first" class="img-responsive img-thumbnail cur-poiter w-25" src="img/us-consultation/eye-icon.png"  />-->
+                                                    <img ng-show="$first" class="b-lazy img-responsive img-thumbnail cur-poiter w-25" src="img/us-consultation/eye-icon.png" alt={{img.S3URL}}>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a class="cur-poiter">
+                                                    <img width="17" src="img/ehnote-edit.svg" alt="edit" ng-click="EditPreAuthorization(item);" data-tooltip="Edit">
+                                                </a>
+                                                <a class="cur-poiter">
+                                                    <img width="17" src="img/ico-delete-red.svg" alt="delete" data-tooltip="Delete" ng-click="DeletePreAuthorization(item);">
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="EH-pagination text-center" ng-show="GetPreAuthorizationArray.length > 0">
+                                <uib-pagination total-items="GetListPageCount"
+                                                ng-model="GetListObj.PageNumber"
+                                                ng-change="GetPreAuthorization(GetListObj.PageNumber)"
+                                                max-size="GetListObj.PageSize"
+                                                class=""
+                                                boundary-link-numbers="true"
+                                                rotate="false"></uib-pagination>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="GetPreAuthorizationArray.length === 0">
+                        <div class="billing-cominsoon text-center fs-15">
+                            <img src="img/no-data/no-results.png">
+                            <div class="msg">
+                                <p class="goback-text">No Results found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/ng-template" id="AddNewPreAuthorization.html">
+    <div class="modal-header border-rr-lr billing-table-bg p-15">
+        <h4 class="modal-title text-black fs-16">Add Pre Authorization</h4>
+        <!--<button type="button" class="close pos-absolute m-r-10" ng-click="ClosePreAuthorization();">
+            <i class="fas fa-times text-danger"></i>
+        </button>-->
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-4 p-r-0">
+                <div class="btn-group select-form-uib dropdown open form-group">
+                    <label>Patient</label><em>*</em>
+                    <input type="text" class="form-control" ng-model="SearchPatient.SearchText" ng-change="LoadPatientSearch(SearchPatient.SearchText, 1, 'popup');" placeholder="Select Patient" ng-disabled="AddPreAuthorizationObj.PatientPreAuthorizationId != 0" />
+                    <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="PatientsList.length > 0">
+                        <li class="list-group-item text-dark cur-poiter"
+                            ng-repeat="patientitem in PatientsList" ng-click="onSelectPatient(patientitem)">
+                            <span class="badge badge-primary">
+                                <!--{{patientitem.MobileNo}}-->
+                                <span ng-if="patientitem.HomeCountryCode != '' && patientitem.HomeCountryCode != null">
+                                    {{patientitem.HomeCountryCode}}
+                                </span>
+                                <span ng-if="patientitem.HomeAreaCode != '' && patientitem.HomeAreaCode != null">
+                                    -{{patientitem.HomeAreaCode}}
+                                </span>
+                                <span ng-if="patientitem.HomeNumber != '' && patientitem.HomeNumber != null">
+                                    -{{patientitem.HomeNumber}}
+                                </span>
+                            </span>
+                            {{patientitem.fullname}}
+                            <b>{{patientitem.PatientDisplayId}}</b>
+                        </li>
+                        <!--<li class="list-group-item text-dark cur-poiter" ng-if="PatientsList.length===0">
+                        <div class="billing-cominsoon">
+                            <img src="img/no-data/no-patient-found.png">
+                            <div class="msg">
+                                <p class="goback-text">No Patient Found</p>
+                                <p class="no-records-txt-line2">
+                                    Please Search with Different Name
+                                </p>
+                            </div>
+                        </div>
+                    </li>-->
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 p-r-0">
+                <div class="form-group">
+                    <label>Payor</label><em>*</em>
+                    <!--<input type="text" class="form-control" ng-model="AddPreAuthorizationObj.PayorObj"
+                placeholder="Select Payor"
+                typeahead-min-length="0"
+                typeahead-on-select="onSelectPayor(AddPreAuthorizationObj)"
+                uib-typeahead="item as item.PayorName for item in GetOrganizationNewPayorAllList($viewValue)"
+                ng-change="ChangePayor(AddPreAuthorizationObj);" />-->
+                    <select class="form-control" ng-model="AddPreAuthorizationObj.PayorId"
+                            ng-options="sitem.PayorId as sitem.PayorName for sitem in OrganizationPayorList">
+                        <option value="" selected>Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Authorization Number</label><em>*</em>
+                    <input type="text" class="form-control" ng-model="AddPreAuthorizationObj.PreAuthorizationNumber" placeholder="Enter Authorization Number" alpha-numeric />
+                </div>
+            </div>
+            <div class="col-lg-4 p-r-0">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="text" class="form-control" ng-model="AddPreAuthorizationObj.StartDate" datepickerforinventoryus readonly />
+                </div>
+            </div>
+            <div class="col-lg-4 p-r-0">
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="text" class="form-control" ng-model="AddPreAuthorizationObj.EndDate" datepickerforapplist readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Number Of Visit</label>
+                    <input type="text" class="form-control" ng-model="AddPreAuthorizationObj.NumberOfVisits" />
+                </div>
+            </div>
+            <div class="col-lg-4 p-r-0">
+                <div class="form-group">
+                    <label>Service Type</label><em>*</em>
+                    <ui-select ng-model="AddPreAuthorizationObj.ServiceTypeobj" theme="bootstrap" on-select="changeTOSCode(AddPreAuthorizationObj)" style="width:100%;">
+                        <ui-select-match placeholder="select">
+                            {{AddPreAuthorizationObj.ServiceTypeobj.ServicesTypeName ? AddPreAuthorizationObj.ServiceTypeobj.ServicesTypeName :"Select Service"}}
+                        </ui-select-match>
+                        <ui-select-choices repeat="item in OrgTOSCODESArray | filter: {ServicesTypeName :$select.search}" null-option="EmptySelect" loose-null>
+                            <span ng-bind-html="item.ServiceCode | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <label> Notes</label>
+                    <textarea type="text" class="form-control" ng-model="AddPreAuthorizationObj.Notes"></textarea>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label> File Upload</label>
+                    <input type="file" id="PreAuthorizationfileuploaad" value="Upload"
+                           ngf-select="selectedFiles($files);"
+                           name="file"
+                           ngf-pattern="'image/*,application/pdf'"
+                           ngf-accept="'image/*,application/pdf'"
+                           multiple="multiple" />
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <div class="table-responsive">
+                        <table class="table table-consultation" image-viewer>
+                            <tbody>
+                                <tr>
+                                    <td ng-repeat="titem in AddPreAuthorizationObj.TempDocuments">
+                                        <button class="btn btn-link p-l-5 p-r-5 m-l-3 pos-absolute z-9999" style="top: 0px; right: 4px;" ng-click="removeImage(titem, AddPreAuthorizationObj)"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+                                        <img ngf-thumbnail="titem.file" class="img-thumbnail" width="50" height="50" />
+                                    </td>
+                                    <td ng-repeat="pitem in AddPreAuthorizationObj.patientDocumentDetails | filter : {DeleteInd : 'N'}">
+                                        <button class="btn btn-link p-l-5 p-r-5 m-l-3 pos-absolute z-9999" style="top: 0px; right: 4px;" ng-click="removeImage(pitem, AddPreAuthorizationObj)"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+                                        <img ng-src="{{pitem.S3URL}}" class="img-thumbnail" width="50" height="50" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer p-10">
+        <div class="row">
+            <div class="col-lg-12 text-right">
+                <div class="form-group">
+                    <button class="btn btn-danger" ng-click="ClosePreAuthorization();">Close</button>
+                    <button class="btn btn-success" ng-click="AppointmentPreAuthDataSave();">{{AddPreAuthorizationObj.PatientPreAuthorizationId != 0 ? 'Update':'Save'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

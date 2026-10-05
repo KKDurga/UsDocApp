@@ -1,0 +1,910 @@
+﻿<div style="min-height: 280px;">
+    <div class="p-10 p-b-0">
+        <div class="eh-header">
+            <h1>ROS (Review of Systems)</h1>
+            <div ng-show="RosObj.Type=='Allergies'" class="dropdown flex m-l-60 m-r-150">
+                <div ng-show="ROSHistoriesObj.IsRcopia ==false">
+                    <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                           placeholder="Enter Allergies"
+                           autocomplete="off"
+                           maxlength="100"
+                           ng-enter="addAllergy(obj.SelectedAllergyItem)"
+                           ng-model="obj.SelectedAllergyItem"
+                           typeahead-min-length="0"
+                           ng-disabled="cacheStorageItem.AllergyItems.length>5"
+                           typeahead-focus-on-select="false"
+                           ng-blur="showAddAllergy(obj); changefocusOption();"
+                           typeahead-on-select="onAllergySelect(obj.SelectedAllergyItem)"
+                           uib-typeahead="item as item.AllergyName for item in GetAllergyList($viewValue)" />
+                    <i class="fas fa-times-circle" ng-click="obj.SelectedAllergyItem='';" ng-hide="obj.SelectedAllergyItem=='';"></i>
+                    <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddAllergyshow" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                        <li><a ng-click="addAllergy(obj.SelectedAllergyItem)">Add new</a></li>
+                    </ul>
+                </div>
+                <div ng-show="ROSHistoriesObj.IsRcopia !==false">
+                    <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                           placeholder="Enter Rcopia Allergies"
+                           autocomplete="off"
+                           maxlength="100"
+                           ng-enter="addAllergy(obj.SelectedAllergyItem)"
+                           ng-model="obj.SelectedAllergyItem"
+                           typeahead-min-length="2"
+                           ng-disabled="cacheStorageItem.AllergyItems.length>5"
+                           typeahead-focus-on-select="false"
+                           ng-blur="showAddAllergy(obj); changefocusOption();"
+                           typeahead-on-select="onAllergyRcopiaSelect(obj.SelectedAllergyItem)"
+                           uib-typeahead="item as item.BrandName for item in GetAllergyListFromRcopia($viewValue)" />
+                   
+                </div>
+                <div class="">
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" 
+                                   ng-model="ROSHistoriesObj.IsRcopia" />
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small>Is Rcopia</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="RosObj.Type=='Current Medication'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Current Medication"
+                       autocomplete="off"
+                       ng-enter="addMedicalCondition(obj.SelectedCurrentTreatmentItem)"
+                       ng-model="obj.SelectedCurrentTreatmentItem"
+                       ng-blur="showAddCurrent(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-on-select="onRosMedicalconditionItemSelect(obj.SelectedCurrentTreatmentItem)"
+                       uib-typeahead="item as item.MedicalConditionName for item in GetMedicalConditionArray($viewValue)"
+                       typeahead-focus-on-select="false"
+                       typeahead-min-length="0" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedCurrentTreatmentItem='';" ng-hide="obj.SelectedCurrentTreatmentItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.showhideMedAddBtn" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="addMedicalCondition(obj.SelectedCurrentTreatmentItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Birth History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Birth History"
+                       autocomplete="off"
+                       ng-enter="AddNewBirthHistory(obj.SelectedBirthHistoryItem)"
+                       ng-model="obj.SelectedBirthHistoryItem"
+                       ng-blur="showAddBirth(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterBirthHistory($viewValue,6)"
+                       typeahead-on-select="OnRosBirthHistoryBlurChange(obj.SelectedBirthHistoryItem)" />
+
+                <i class="fas fa-times-circle" ng-click="obj.SelectedBirthHistoryItem='';ROSHistoriesObj.AddBirthHistory=false;" ng-hide="obj.SelectedBirthHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddBirthHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewBirthHistory(obj.SelectedBirthHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Surgical History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Surgical History"
+                       autocomplete="off"
+                       ng-enter="AddNewSurgicalHistory(obj.SelectedSurgeryItem)"
+                       rows="2"
+                       maxlength="100"
+                       ng-model="obj.SelectedSurgeryItem"
+                       ng-blur="showAddSurgical(obj); changefocusOption();"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterSurgicalHistory($viewValue,5)"
+                       typeahead-on-select="onRosSurgicalHistoryBlurChange(obj.SelectedSurgeryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedSurgeryItem='';ROSHistoriesObj.AddSurgicalHistory=false;" ng-hide="obj.SelectedSurgeryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddSurgicalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewSurgicalHistory(obj.SelectedSurgeryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Family History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Family Condition"
+                       autocomplete="off"
+                       ng-enter="AddNewFamilyHistory(obj.SelectedFamilyHistoryItem)"
+                       ng-model="obj.SelectedFamilyHistoryItem"
+                       ng-blur="showAddFamily(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterFamilyHistory($viewValue,2)"
+                       typeahead-on-select="onRosFamilyHistoryBlurChange(obj.SelectedFamilyHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedFamilyHistoryItem='';ROSHistoriesObj.AddFamilyHistory=false;" ng-hide="obj.SelectedFamilyHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddFamilyHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewFamilyHistory(obj.SelectedFamilyHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Ocular History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       ng-focus="FocusObj.OcularHistoryFocus === true"
+                       placeholder="Enter Ocular History"
+                       autocomplete="off"
+                       ng-enter="AddNewOccularHistory(obj.SelectedOcularHistoryItem)"
+                       ng-model="obj.SelectedOcularHistoryItem"
+                       ng-blur="showAddOcular(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterOccularHistory($viewValue,2)"
+                       typeahead-on-select="onRosOccularHistoryBlurChange(obj.SelectedOcularHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedOcularHistoryItem='';" ng-hide="obj.SelectedOcularHistoryItem==''"></i>
+                <ul class="dropdown-menu dropdown pos-absolute" ng-show="ROSHistoriesObj.AddOccularHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewOccularHistory(obj.SelectedOcularHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+
+            <div ng-show="RosObj.Type=='Lifestyle History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Life History"
+                       autocomplete="off"
+                       ng-enter="AddNewLifeStyleHistory(obj.SelectedLifeStyleHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedLifeStyleHistoryItem"
+                       ng-blur="showAddLife(obj); changefocusOption();"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterLifeStyleHistory($viewValue,3)"
+                       typeahead-on-select="onRosLifeStyleHistoryBlurChange(obj.SelectedLifeStyleHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedLifeStyleHistoryItem='';ROSHistoriesObj.AddLifeStyleHistory=false;" ng-hide="obj.SelectedLifeStyleHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddLifeStyleHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewLifeStyleHistory(obj.SelectedLifeStyleHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Systemic History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Systemic History"
+                       autocomplete="off"
+                       ng-enter="AddNewSystemicHistory(obj.SelectedSystemicHistoryItem)"
+                       ng-model="obj.SelectedSystemicHistoryItem"
+                       ng-blur="showAddBirth(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterSystemicHistory($viewValue,6)"
+                       typeahead-on-select="onRosSystemicHistoryBlurChange(obj.SelectedSystemicHistoryItem)" />
+
+                <i class="fas fa-times-circle" ng-click="obj.SelectedSystemicHistoryItem='';ROSHistoriesObj.AddSystemicHistory=false;" ng-hide="obj.SelectedSystemicHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddSystemicHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewSystemicHistory(obj.SelectedSystemicHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Vaccination History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Vaccination History"
+                       autocomplete="off"
+                       ng-enter="AddNewVaccinationHistory(obj.SelectedVaccinationHistoryItem)"
+                       ng-model="obj.SelectedVaccinationHistoryItem"
+                       ng-blur="showAddBirth(obj); changefocusOption();"
+                       maxlength="100"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterVaccinationHistory($viewValue,6)"
+                       typeahead-on-select="onRosVaccinationHistoryBlurChange(obj.SelectedVaccinationHistoryItem)" />
+
+                <i class="fas fa-times-circle" ng-click="obj.SelectedVaccinationHistoryItem='';ROSHistoriesObj.AddVaccinationHistory=false;" ng-hide="obj.SelectedVaccinationHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddVaccinationHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewVaccinationHistory(obj.SelectedVaccinationHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Nutritional History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Nutritional History"
+                       autocomplete="off"
+                       ng-enter="AddNewNutritionalHistory(obj.SelectedNutritionalHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedNutritionalHistoryItem"
+                       ng-blur="showAddNutritional(obj); changefocusOption();"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterNutritionalHistory($viewValue,3)"
+                       typeahead-on-select="onRosNutritionalHistoryBlurChange(obj.SelectedNutritionalHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedNutritionalHistoryItem='';ROSHistoriesObj.AddNutritionalHistory=false;" ng-hide="obj.SelectedNutritionalHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddNutritionalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewNutritionalHistory(obj.SelectedNutritionalHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Menstrual History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Menstrual History"
+                       autocomplete="off"
+                       ng-enter="AddNewMenstrualHistory(obj.SelectedMenstrualHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedMenstrualHistoryItem"
+                       ng-blur="showAddMenstrual(obj); changefocusOption();"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterMenstrualHistory($viewValue,3)"
+                       typeahead-on-select="onRosMenstrualHistoryBlurChange(obj.SelectedMenstrualHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedMenstrualHistoryItem='';ROSHistoriesObj.AddMenstrualHistory=false;" ng-hide="obj.SelectedMenstrualHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddMenstrualHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewMenstrualHistory(obj.SelectedMenstrualHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+
+            <div ng-show="RosObj.Type=='FunctionalStatus History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter FunctionalStatus History"
+                       autocomplete="off"
+                       ng-enter="AddNewFunctionalStatus(obj.SelectedFunctionalStatusHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedFunctionalStatusHistoryItem"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterFunctionalstatus($viewValue)"
+                       typeahead-on-select="onRosFunctionalStatusHistoryBlurChange(obj.SelectedFunctionalStatusHistoryItem)" />
+                <!--ng-blur="showAddMenstrual(obj); changefocusOption();"-->
+                <i class="fas fa-times-circle" ng-click="obj.SelectedFunctionalStatusHistoryItem='';ROSHistoriesObj.AddFunctionalStatusHistory=false;" ng-hide="obj.SelectedFunctionalStatusHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddFunctionalStatusHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewFunctionalStatus(obj.SelectedFunctionalStatusHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Ocular Surgical History'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Ocular Surgical History"
+                       autocomplete="off"
+                       ng-enter="AddNewOcularSurgical(obj.SelectedOcularSurgicalHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedOcularSurgicalHistoryItem"
+                       ng-blur="showAddOcularSurgical(obj); changefocusOption();"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterOcularSurgical($viewValue)"
+                       typeahead-on-select="onRosOcularSurgicalHistoryBlurChange(obj.SelectedOcularSurgicalHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedOcularSurgicalHistoryItem='';ROSHistoriesObj.AddOcularSurgicalHistory=false;" ng-hide="obj.SelectedOcularSurgicalHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddOcularSurgicalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewOcularSurgical(obj.SelectedOcularSurgicalHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+            <div ng-show="RosObj.Type=='Current Systemic Medications'" class="dropdown flex m-l-60 m-r-150">
+                <input type="text" class="icons-search consultation-input p-l-10 width-100"
+                       placeholder="Enter Current Systemic Medications"
+                       autocomplete="off"
+                       ng-enter="AddNewCurrentSystemicMedications(obj.SelectedCurrentSystemicMedicationsHistoryItem)"
+                       typeahead-min-length="0"
+                       maxlength="100"
+                       ng-model="obj.SelectedCurrentSystemicMedicationsHistoryItem"
+                       ng-blur="showAddCurrentSystemicMedications(obj); changefocusOption();"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.HistoryName for item in GetMasterCurrentSystemicMedications($viewValue)"
+                       typeahead-on-select="onRosCurrentSystemicMedicationsHistoryBlurChange(obj.SelectedCurrentSystemicMedicationsHistoryItem)" />
+                <i class="fas fa-times-circle" ng-click="obj.SelectedCurrentSystemicMedicationsHistoryItem='';ROSHistoriesObj.AddCurrentSystemicMedicationsHistory=false;"
+                   ng-hide="obj.SelectedCurrentSystemicMedicationsHistoryItem==''"></i>
+                <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddCurrentSystemicMedicationsHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                    <li><a ng-click="AddNewCurrentSystemicMedications(obj.SelectedCurrentSystemicMedicationsHistoryItem)">Add new</a></li>
+                </ul>
+            </div>
+
+            <ul class="us-controls">
+                <li>
+                    <button class="btn btn-discard-us" ng-click="closerosadddetailspopup()">Close</button>
+                </li>
+                <li>
+                    <button class="btn btn-save-us" ng-click="SaveRosData()">Save</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="eh-body">
+        <div class="ros-disply">
+            <div class="w-250 bg-f6f6f6">
+                 
+                <ul class="ros-ulliist">
+
+                    <li class="" ng-class="nitem.SubCategoryName==RosObj.Type?'active':''" ng-repeat="nitem in CategoryDetails"
+                        ng-show="nitem.SubCategoryId !=5&&nitem.SubCategoryId !=10">
+                        <a href="javascript:;" ng-click="ChangeRositem(nitem.SubCategoryName)" ng-show="nitem.IsSubCategoryChecked">
+                            {{nitem.SubCategoryName}}
+
+                            <i class="feather-chevron-down care-icons" ng-if="nitem.SubCategoryName==RosObj.Type"></i>
+                            <i class="plusicon care-icons" ng-if="nitem.SubCategoryName!==RosObj.Type"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex p-10">
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Allergies' && cacheStorageItem.AllergyItems.length !== 0">
+                    <h3 class="text-ocularhist">Allergies</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Allergy in cacheStorageItem.AllergyItems track by $index">
+                            <tr>
+                                <th>
+                                    {{Allergy.AllergyName}}
+                                </th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Allergy.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Allergy.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveAllergiesPopup($index)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Allergy.Reaction"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Current Medication'&&cacheStorageItem.MedicalConditions.length !== 0">
+                    <h3 class="text-ocularhist">Current Medication</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="treat in cacheStorageItem.MedicalConditions | filter:{'ActiveIND':'Y'} track by $index">
+                            <tr>
+                                <th>{{treat.MedicalConditionName}}</th>
+                                <td width="23%">
+                                    <fieldset>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="1">
+                                            <label for="selectedCurTHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Right Eye" tooltip-append-to-body="true"> OD</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="2">
+                                            <label for="selectedCurTHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Left Eye" tooltip-append-to-body="true">OS</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="3">
+                                            <label for="selectedCurTHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Both Eyes" tooltip-append-to-body="true">OU</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="4">
+                                            <label for="selectedCurTHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="General" tooltip-append-to-body="true">Gen.</label>
+                                        </div>
+                                    </fieldset>
+                                </td>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="treat.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="treat.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveMedicalConditionPopup(treat)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="treat.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Birth History' && cacheStorageItem.BirthHistory.length !== 0">
+                    <h3 class="text-ocularhist">Birth History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Birhis in cacheStorageItem.BirthHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Birhis.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Birhis.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Birhis.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveBirthHistoryPopup(Birhis)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Birhis.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Ocular History'&&(cacheStorageItem.OccularHistory| filter:{'ActiveInd':true}).length !==0">
+                    <h3 class="text-ocularhist">Ocular History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Occudhis in cacheStorageItem.OccularHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Occudhis.HistoryName}}</th>
+                                <td width="23%">
+                                    <fieldset>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom width-0" id="selectedOccudhisHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" ng-model="Occudhis.OrganId" value="1">
+                                            <label for="selectedOccudhisHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label cur-poiter mb-0 text-black fs-12">OD</label>
+                                        </div>
+                                        <div class="dis-inline-block ml-5">
+                                            <input type="radio" class="radio-custom width-0" id="selectedOccudhisHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" ng-model="Occudhis.OrganId" value="2">
+                                            <label for="selectedOccudhisHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label cur-poiter mb-0 text-black fs-12">OS</label>
+                                        </div>
+                                        <div class="dis-inline-block ml-5">
+                                            <input type="radio" class="radio-custom width-0" id="selectedOccudhisHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" ng-model="Occudhis.OrganId" value="3">
+                                            <label for="selectedOccudhisHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label cur-poiter mb-0 text-black fs-12">OU</label>
+                                        </div>
+
+                                        <div class="dis-inline-block ml-5">
+                                            <input type="radio" class="radio-custom width-0" id="selectedOccudhisHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" ng-model="Occudhis.OrganId" value="4">
+                                            <label for="selectedOccudhisHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label cur-poiter mb-0 text-black fs-12" uib-tooltip="General">Gen.</label>
+                                        </div>
+                                    </fieldset>
+                                </td>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Occudhis.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Occudhis.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveOccularHistoryPopup(Occudhis)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Occudhis.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Surgical History'&&cacheStorageItem.SurgicalHistory.length !== 0">
+                    <h3 class="text-ocularhist">Surgical Medication</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Surgery in cacheStorageItem.SurgicalHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Surgery.HistoryName}}</th>
+                                <td width="23%">
+                                    <fieldset>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedSurgHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" ng-model="Surgery.OrganId" value="1">
+                                            <label for="selectedSurgHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Right Eye" tooltip-append-to-body="true"> OD</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedSurgHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" ng-model="Surgery.OrganId" value="2">
+                                            <label for="selectedSurgHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Left Eye" tooltip-append-to-body="true">OS</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedSurgHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" ng-model="Surgery.OrganId" value="3">
+                                            <label for="selectedSurgHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Both Eyes" tooltip-append-to-body="true">OU</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedSurgHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" ng-model="Surgery.OrganId" value="4">
+                                            <label for="selectedSurgHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="General" tooltip-append-to-body="true">Gen.</label>
+                                        </div>
+                                    </fieldset>
+                                </td>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Surgery.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Surgery.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveSurgicalHistoryPopup(Surgery)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Surgery.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Family History'&&cacheStorageItem.FamilyHistory.length !== 0">
+                    <h3 class="text-ocularhist">Family History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="family in cacheStorageItem.FamilyHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{family.HistoryName}}</th>
+
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <select class="form-control"
+                                                ng-model="family.RelationShipId"
+                                                ng-options="i.RelationId as i.RelationName for i in RelationShipTypeList"
+                                                ng-change="ChangeFamilyHistory(family)">
+                                            <option value="" selected>Select</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveFamilyHistoryPopup(family)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="family.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Lifestyle History'&&cacheStorageItem.LifestyleHistory.length !== 0">
+                    <!--<h3 class="text-ocularhist">Lifestyle History</h3>-->
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="lifeitem in cacheStorageItem.LifestyleHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{lifeitem.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="lifeitem.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="lifeitem.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <!--<td width="20%">
+                                    <div class="dis-flex">
+                                        <select class="register-select flex ros-select"
+                                               ng-options="item.HistoryHabitsID as item.HistoryHabitsName for item in MasterHabitslist"
+                                              ng-model="lifeitem.LifestyleHabitId" ng-change="ChangeHabits(lifeitem)">
+                                            <option value="">Select</option>
+                                        </select>
+
+                                    </div>
+                                </td>-->
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveLifeStyleHistoryPopup(lifeitem)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="lifeitem.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Menstrual History'&&cacheStorageItem.MenstrualHistory.length !== 0">
+                    <h3 class="text-ocularhist">Menstrual History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="mesnItem in cacheStorageItem.MenstrualHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{mesnItem.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="mesnItem.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="mesnItem.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveMenstrualHistoryPopup(mesnItem)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="mesnItem.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Systemic History'&&(cacheStorageItem.SystemicHistory| filter:{'ActiveInd':true}).length !== 0">
+                    <h3 class="text-ocularhist">Systemic History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="System in cacheStorageItem.SystemicHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{System.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="System.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="System.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveSystemicHistoryPopup(System)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="System.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Vaccination History'&&cacheStorageItem.VaccinationHistory.length !== 0">
+                    <h3 class="text-ocularhist">Vaccination History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Vaccin in cacheStorageItem.VaccinationHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Vaccin.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Vaccin.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Vaccin.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveVaccinationHistoryPopup(Vaccin)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Vaccin.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Nutritional History'&&cacheStorageItem.NutritionalHistory.length !== 0">
+                    <h3 class="text-ocularhist">Nutritional History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Nutrition in cacheStorageItem.NutritionalHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Nutrition.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Nutrition.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Nutrition.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveNutritionalHistoryPopup(Nutrition)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Nutrition.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='FunctionalStatus History'&&cacheStorageItem.FunctionalStatusHistory.length !== 0">
+                    <h3 class="text-ocularhist">FunctionalStatusHistory</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="Func in cacheStorageItem.FunctionalStatusHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{Func.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="Func.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="Func.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveFunctionalStatusHistoryPopup(Func)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="Func.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Ocular Surgical History'&&cacheStorageItem.OcularSurgicalHistory.length !== 0">
+                    <h3 class="text-ocularhist">Ocular Surgical History</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="OculSur in cacheStorageItem.OcularSurgicalHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{OculSur.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="OculSur.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="OculSur.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveOcularSurgicalHistoryPopup(OculSur)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="OculSur.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+
+                <div class="border-bottom p-t-5 p-b-5" ng-show="RosObj.Type=='Current Systemic Medications'&&cacheStorageItem.CurrentSystemicMedicationsHistory.length !== 0">
+                    <h3 class="text-ocularhist">Current Systemic Medications</h3>
+                    <table class="eh-table ros-table">
+                        <tbody ng-repeat="CurSurM in cacheStorageItem.CurrentSystemicMedicationsHistory | filter:{'ActiveInd':true} track by $index">
+                            <tr>
+                                <th>{{CurSurM.HistoryName}}</th>
+                                <td width="20%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="CurSurM.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="CurSurM.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="5%">
+                                    <div class="dis-flex">
+                                        <a ng-click="RemoveCurrentSystemicMedicationsHistoryPopup(CurSurM)">
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <input type="text" placeholder="add remarks here"
+                                           class="us-form ros-input" ng-model="CurSurM.Remarks"
+                                           ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- / -->
+
+            </div>
+        </div>
+    </div>
+</div>

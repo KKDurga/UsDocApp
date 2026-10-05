@@ -1,0 +1,220 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">
+        Show Claims
+    </h4>
+    <button type="button" class="close m-r-10 m-b-3 pos-absolute" ng-click="closeShowClaimPopup()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<div class="modal-body h-scroll" ng-style="heightBAO()" resize>
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable m-b-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="w-130">
+                                                <div class="form-group">
+                                                    <label>Payment From</label>
+                                                    <input class="form-control icons-calendar"
+                                                           ng-model="SearchPayorObj.DepositFrom"
+                                                           ng-change="changeTPAwiseFromDate(SearchPayorObj.DepositFrom)"
+                                                           datepickerforinventory readonly />
+                                                </div>
+                                            </td>
+                                            <td class="w-130">
+                                                <div class="form-group">
+                                                    <label>To </label>
+                                                    <input class="form-control icons-calendar"
+                                                           ng-model="SearchPayorObj.DepositTo"
+                                                           ng-change="changeTPAwiseToDate(SearchPayorObj.DepositTo)"
+                                                           datepickerforinventory readonly />
+                                                </div>
+                                            </td>
+                                         
+                                            <td>
+                                                <div class="form-group">
+                                                    <label>Payor</label>
+                                                    <select class="form-control"
+                                                            ng-model="SearchPayorObj.PayorObj"
+                                                            ng-options="list as list.PayorCode + ' -' + list.PayorName for list in PayorAllListArray"
+                                                            ng-change="ChangePayor(SearchPayorObj.PayorObj,SearchPayorObj)">
+                                                        <option value=""> All</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                                
+                                            <td>
+                                                <div class="form-group">
+                                                    <label>Provider <em>*</em></label>
+                                                    <select class="form-control" ng-model="SearchPayorObj.BillingProviderObj" ng-options="item as item.BillingProviderName for item in FacilitiesList" ng-change="changeBillingProvider(PayorDepositsObj)">
+                                                        <option value="" disabled="disabled">All</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="w-120">
+                                                <div class="form-group">
+                                                    <label>Payment Type</label>
+                                                    <select class="form-control" name="modepaymnt" ng-model="SearchPayorObj.PaymentDepositType">
+                                                        <option value="All">All</option>
+                                                        <option value="Electronic">Electronic</option>
+                                                        <option value="Manual">Manual EOB</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="w-120">
+                                                <div class="form-group">
+                                                    <label>Payment Mode</label>
+                                                    <select class="form-control" ng-model="SearchPayorObj.PaymentModeId" ng-options="pitem.PaymentModeId as pitem.PaymentModeName for pitem in masterPaymentModes">
+                                                        <option ng-value="0">All</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="w-120">
+                                                <div class="form-group">
+                                                    <label>Control Numbers</label>
+                                                    <input type="text" class="form-control" ng-model="SearchPayorObj.SearchText"/>
+                                                </div>
+                                            </td>
+                                            <td class="w-350">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn primary-btn w-100 m-t-25" ng-click="SearchPayorlist()">Search</button>
+                                                    <button type="button" class="btn btn-danger m-t-25" ng-click="ClearPayorDeposit()">Clear</button>
+                                                    <!--<button type="button" class="btn btn-info m-t-25" ng-click="GoToAddPayorDeposit();">Add Payor Deposit</button>-->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow" ng-show="PayorDepositListArray.length !==0">
+                <!--<div class="tile-header">
+
+                    <div class="row">
+                        <div class="col-lg-9"><h1>EOB List</h1></div>
+                        <div class="col-lg-3">
+                            <div class="form-group dis-flex">
+                                <label class="w-200">Control Number :</label>
+                                <input type="text" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="tile-body">
+                    <div class="table-responsive">
+                        <table class="table tableAccordion">
+                            <thead>
+                                <tr>
+                                    <th width="5%">Select</th>
+                                    <th width="9%">Deposit Date.</th>
+                                    <!--<th width="8%">Control No</th>-->
+                                    <th width="8%">Trace Number</th>
+                                    <th>Payor</th>
+                                    <th>Provider</th>
+                                    <th width="9%">Payment Type</th>
+                                    <th width="8%" class="text-center">Pay Mode</th>
+                                    <th width="9%">Deposit Amt</th>
+                                    <!--<th>Un Billed Amount</th>-->
+                                    <th width="9%"> Billed Amount</th>
+                                    <th width="10%">Balance Amount</th>
+                                    <th>Deposited By</th>
+                                   
+
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="mitem in PayorDepositListArray">
+                                <tr class="accotab-head">
+                                    <td>
+                                        <input type="radio" class="form-control" id="selctedpator{{mitem.PayorPaymentId}}" name="selectedPayorPaymentId" ng-value="true" ng-model="mitem.isSelected" ng-change="changedepositselection(mitem)" />
+                                        <label for="selctedpator{{mitem.PayorPaymentId}}"></label>
+                                    </td>
+                                    <td> {{mitem.PaymentDate | date:'dd-MM-yyyy'}} </td>
+                                    <td>
+                                        <a class="" href="" style="text-decoration:underline;" ng-click="SaveSelectedEOBtoSettlement(mitem)">{{mitem.TraceNumber}}</a>
+                                    </td>
+                                    <!--ng-click="navtoEOBPaymentScreen(mitem)"-->
+                                    <td> {{mitem.PayorName}} </td>
+                                    <td> {{mitem.BillingProviderName}} </td>
+                                    <td>
+                                        <span ng-if="mitem.IsManualPayment">Manual</span>
+                                        <span ng-if="!mitem.IsManualPayment">Electronic</span>
+                                    </td>
+                                    <td>{{mitem.PaymentMode}}</td>
+
+                                    <td> {{mitem.PaymentAmount}}</td>
+
+                                    <td> {{mitem.BilledAmount}}</td>
+                                    <td> {{mitem.UnBilledAmount}}</td>
+                                    <td> {{mitem.DepositedBy}}</td>
+
+
+                                </tr>
+                                 
+                            </tbody>
+
+
+
+                             
+                        </table>
+                    </div>
+
+                    <div class="row mb-10">
+                        <div class="col-lg-12 text-center EH-pagination">
+                            <uib-pagination ng-if="PayorDepositListArray.length > 0"
+                                            total-items="SearchPayorObj.TotalCount"
+                                            ng-model="SearchPayorObj.PageNumber"
+                                            ng-change="changePageNumber(SearchPayorObj.PageNumber)"
+                                            items-per-page="SearchPayorObj.PageSize"
+                                            class=""
+                                            boundary-link-numbers="true"
+                                            boundary-links="true"
+                                            max-size="maxSize"
+                                            rotate="false"></uib-pagination>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tile tile-shadow" ng-show="PayorDepositListArray.length ===0">
+                <div class="tile-header">
+                    <h1>Payor Deposits List</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" ng-click="closeShowClaimPopup()">Close</button>
+    <button type="button" class="btn primary-btn w-100" ng-click="SaveSelectedEOBtoSettlement()">Save</button>
+</div>

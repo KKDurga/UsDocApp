@@ -1,0 +1,448 @@
+﻿<div class="d__f-- fd__c-- height__100--" ng-controller="UsPatientTrackerCtrl">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table tableno-bordered m-b-0 apptFilterTable">
+                <tbody>
+                    <tr>
+                        <td width="20%">
+                            <div>
+                                <fieldset class="pos-relative">
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="NameId" name="patientSearch" ng-value="1" aria-invalid="false" ng-model="GetSearchPatient.TypeId" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                                        <label for="NameId" class="radio-custom-label cur-poiter mb-0 text-label">  {{ 'NAME' | translate}}</label>
+                                    </div>
+                                    <div class="dis-inline-block ml-5">
+                                        <input type="radio" class="radio-custom width-0 " id="mrMobileId" name="patientSearch" ng-value="2" aria-invalid="false" ng-model="GetSearchPatient.TypeId" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                                        <label for="mrMobileId" class="radio-custom-label cur-poiter mb-0 text-label">  {{ 'MRNO' | translate}}</label>
+                                    </div>
+                                    <!--<div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0 " id="oldMRId" name="patientSearch" ng-value="3" aria-invalid="false" ng-model="GetSearchPatient.TypeId" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                            <label for="oldMRId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'OLDMRNO' | translate}}</label>
+                        </div>-->
+                                    <div class="dis-inline-block ml-5">
+                                        <input type="radio" class="radio-custom width-0" id="DOBlist" name="patientSearch" ng-model="GetSearchPatient.TypeId" ng-value="4" ng-change="ChangePatientSearch(GetSearchPatient.TypeId)">
+                                        <label for="DOBlist" class="radio-custom-label cur-poiter mb-0 text-label">DOB</label>
+                                    </div>
+                                </fieldset>
+                                <div class="btn-group select-form-uib dropdown open">
+                                    <div class="form__group flex">
+                                        <input type="text" class="icons-search" data-toggle="dropdown" placeholder=" {{ 'SEARCHBYNAME' | translate}}" ng-if="GetSearchPatient.TypeId == 1" ng-model="GetSearchPatient.SearchText" ng-change="LoadPatientTrackerSearch(GetSearchPatient.SearchText,GetSearchPatient.TypeId, 'pre')">
+                                        <input type="text" class="icons-search" data-toggle="dropdown" placeholder=" {{ 'SEARCHBYMRNO' | translate}}" ng-if="GetSearchPatient.TypeId == 2" ng-model="GetSearchPatient.PaientMRNO" ng-change="LoadPatientTrackerSearch(GetSearchPatient.PaientMRNO,GetSearchPatient.TypeId, 'pre')">
+                                        <!--<input type="text" class="form-control btr-radius bbr-radius text-capitalize" data-toggle="dropdown" placeholder="Search By Old MR.No" ng-if="GetSearchPatient.TypeId == 3" ng-model="GetSearchPatient.PatientOldMrNo" ng-change="LoadPatientTrackerSearch(GetSearchPatient.PatientOldMrNo,GetSearchPatient.TypeId, 'pre')">-->
+                                        <input type="text" class="icons-search" data-toggle="dropdown" ng-model="GetSearchPatient.DOBSearch" ng-if="GetSearchPatient.TypeId == 4" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-change="LoadPatientTrackerSearch(GetSearchPatient.DOBSearch,GetSearchPatient.TypeId, 'pre')" />
+                                        <i class="fa fa-times new-color" ng-hide="GetSearchPatient.SearchText =='' && GetSearchPatient.PaientMRNO =='' && GetSearchPatient.PatientOldMrNo ==''&&GetSearchPatient.DOBSearch==''" ng-click="clearPatientApptSearch1()" style=" position: absolute; right: 5px; top: 4px; font-size: 15px;cursor:pointer;"></i>
+
+                                    </div>
+
+                                    <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="GetPatientsList.length > 0">
+                                        <li class="list-group-item text-dark cur-poiter"
+                                            ng-repeat="patientitem in GetPatientsList" ng-click="SelectedPatient(patientitem)">
+                                            <!--<span class="badge badge-primary">{{patientitem.HomeCountryCode}}-{{patientitem.HomeAreaCode}}-{{patientitem.HomeNumber}}</span>-->
+                                            <span class="badge badge-primary">{{patientitem.PhoneNumber}}</span>
+                                            {{patientitem.FullName}}
+                                            <b>{{patientitem.DisplayID}}</b>
+                                        </li>
+                                    </ul>
+
+                                    <!--<input type="text" class="form-control btr-radius bbr-radius" placeholder="Search for...">-->
+                                    <!--<span class="input-group-btn">
+                            <button class="btn btn-default" type="button" ng-click="LoadPatientSearch(GetSearchPatient.SearchText,GetSearchPatient.TypeId, 'pre')"><i class="fas fa-search new-color pos-relative top-2 left-0"></i></button>
+                        </span>-->
+                                </div>
+                            </div>
+                        </td>
+                        <td width="12%">
+                            <div class="form__group">
+                                <label>  {{ 'DATE' | translate}}</label>
+                                <input type="text" class="icons-calendar" ng-model="SearchObj.AppointmentDate" datepickerforapplist ng-change="changeDateForPatientTracker(SearchObj.AppointmentDate)" readonly date-format-input />
+                            </div>
+                        </td>
+                        <td width="24%">
+                            <div class="form__group">
+                                <label>{{ 'DOCTOR' | translate}}</label>
+                                <div>
+                                    <ui-select class="form__uiselect" ng-model="SearchObj.selectedDoctor" theme="bootstrap" on-select="changeAppointmentDoctor(SearchObj.selectedDoctor.DoctorID)">
+                                        <ui-select-match placeholder=" {{ 'SELECT' | translate}}">{{SearchObj.selectedDoctor.UserFullName?SearchObj.selectedDoctor.UserFullName:"Select Doctors"}}</ui-select-match>
+                                        <ui-select-choices repeat="item in clinicDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                            <span ng-bind-html="item.UserFullName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </div>
+                        </td>
+                        <td width="18%">
+                            <div class="form__group">
+                                <label> {{ 'ROLES' | translate}}</label>
+                                <select ng-model="SearchObj.RoleObj" ng-options="item as item.Role for item in RolesList" ng-change="ChangeRole(SearchObj);">
+                                    <option value="" disabled="disabled">{{ 'SELECT' | translate}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td width="15%">
+                            <div class="form__group">
+                                <label> {{ 'USERS' | translate}}</label>
+                                <select ng-model="SearchObj.UserId" ng-options="item.DoctorID as item.UserFullName for item in FilteredUsersList" ng-show="SearchObj.RoleDetailsId == 1 || SearchObj.RoleDetailsId == 6">
+                                    <option value="">{{ 'SELECT' | translate}}</option>
+                                </select>
+                                <select ng-model="SearchObj.UserId" ng-options="item.DoctorID as item.FullName for item in FilteredUsersList" ng-hide="SearchObj.RoleDetailsId == 1 || SearchObj.RoleDetailsId == 6">
+                                    <option value="">{{ 'SELECT' | translate}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td width="9%">
+                            <div class="d__f--  gap__x--8 mt__18--">
+                                <button class="btn__lg-- btn__1d5558--f" title="Apply" ng-click="Searchlist()">Apply</button>
+                                <a><i class="reload-icon ng-click=" Clearlist()""></i></a>
+                            </div>
+                        </td>
+                        <!--<td width="2%">
+                <span class="ml-5 cur-poiter pos-relative  t-5" role="button" tabindex="0">
+                    <i class="fas fa-filter followup-icon text-Follwpink" popover-class="increase-popover-width-bottom" popover-placement="bottom-center" uib-popover-template="FilterSelect.templateUrl" popover-trigger="outsideClick" popover-append-to-body="true"></i>
+                </span>
+            </td>-->
+                        <!--<td width="20%">
+            </td>-->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 p-0">
+            <div class="table-responsive slim-scroll">
+                <table  class="table tableno-bordered m-b-0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <ul class="dynamic-appointments">
+                                    <li class="customrecepwid tab-reception">
+                                        <h4>  {{ 'RECEPTION' | translate}}</h4>
+                                        <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+                                            <li ng-class="{ active: SubTab === 13}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(0,'All',13)">
+                                                    <h1>{{mainCountobj.All}}</h1>
+                                                    <p>  {{ 'ALL' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 14}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(0,'NotCheckIn',14)">
+                                                    <h1>{{mainCountobj.NotCheckedInCount}}</h1>
+                                                    <p>  {{ 'NOTCHECKIN' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 15}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(0,'CheckIn',15)">
+                                                    <h1>{{mainCountobj.CheckInCount}}</h1>
+                                                    <p> {{ 'CHECKIN' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 16}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(0,'Checkout',16)">
+                                                    <h1>{{mainCountobj.CheckOutCount}}</h1>
+                                                    <p> {{ 'CHECKOUT' | translate}}</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="tab-Waiting-Room">
+                                        <h4> {{ 'WAITINGROOM' | translate}}</h4>
+                                        <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+                                            <li ng-class="{ active: SubTab === 1 }">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(10,'Waiting',1)">
+                                                    <h1>{{mainCountobj.ReceptionWaiting}}</h1>
+                                                    <p>
+                                                        {{ 'RECEPTION' | translate}}
+                                                    </p>
+                                                </a>
+                                            </li>
+
+                                            <li ng-class="{ active: SubTab === 2 }">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(2,'Waiting',2)">
+                                                    <h1>{{mainCountobj.TechnicianWaiting}}</h1>
+                                                    <p>
+                                                        {{ 'TECHNICIAN' | translate}}
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 3}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(12,'Waiting',3)">
+                                                    <h1>{{mainCountobj.OptomWaiting}}</h1>
+                                                    <p>
+                                                        {{ 'OPTOMETRIST' | translate}}
+                                                    </p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 4}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(1,'Waiting',4)">
+                                                    <h1>{{mainCountobj.DoctorWaiting}}</h1>
+                                                    <p>{{ 'DOCTOR' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 5}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(4,'Waiting',5)">
+                                                    <h1>{{mainCountobj.CounselorWaiting}}</h1>
+                                                    <p>{{ 'COORDINATOR' | translate}}</p>
+                                                    <!--<p>{{ 'COUNSELLOR' | translate}}</p>-->
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 6}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(9,'Waiting',6)">
+                                                    <h1>{{mainCountobj.BillingWaiting}}</h1>
+                                                    <p>{{ 'BILLING' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 17}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(11,'Waiting',17)">
+                                                    <h1>{{mainCountobj.AscWaiting}}</h1>
+                                                    <p>ASC</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="tab-Active-Room">
+                                        <h4>{{ 'ACTIVEROOM' | translate}}</h4>
+                                        <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+                                            <li ng-class="{ active: SubTab === 7}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(10,'Active',7)">
+                                                    <h1>{{mainCountobj.ReceptionActive}}</h1>
+                                                    <p>{{ 'RECEPTION' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 8}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(2,'Active',8)">
+                                                    <h1>{{mainCountobj.TechnicianActive}}</h1>
+                                                    <p> {{ 'TECHNICIAN' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 9}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(12,'Active',9)">
+                                                    <h1>{{mainCountobj.OptomActive}}</h1>
+                                                    <p> {{ 'OPTOMETRIST' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 10}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(1,'Active',10)">
+                                                    <h1>{{mainCountobj.DoctorActive}}</h1>
+                                                    <p>{{ 'DOCTOR' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 11}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(4,'Active',11)">
+                                                    <h1>{{mainCountobj.CounselorActive}}</h1>
+                                                    <p>{{ 'COORDINATOR' | translate}}</p>
+                                                </a>
+                                            </li>
+                                            <li ng-class="{ active: SubTab === 12}">
+                                                <a data-toggle="tab" data-target="" ng-click="changeActiveSubTab(9,'Active',12)">
+                                                    <h1>{{mainCountobj.BillingActive}}</h1>
+                                                    <p>{{ 'BILLING' | translate}}</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row height__100--">
+        <div class="col-lg-12 height__100--">
+            <div class="table-responsive slim-scroll patient-tracking-table" ng-show="mainPatientTrackersArray.length > 0 && GetSearchPatient.IsPatientNameInd === false">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="2%">{{ 'S.NO' | translate}}</th>
+                            <th width="7%" class="position__sticky-- left__0--md zindex-2">{{ 'PATIENTNAME' | translate}}</th>
+                            <th width="7%">{{ 'APPTTIME' | translate}} & {{ 'CHECKIN' | translate}}</th>
+                            <th width="12%">Doctor & {{ 'VISITREASON' | translate}}</th>
+                            <!--<th width="6%">{{ 'CHECKIN' | translate}} </th>-->
+                            <th>{{ 'STATUS' | translate}}</th>
+                            <th width="6%">Express Checkout</th>
+                            <th width="6%">{{ 'CHECKOUT' | translate}}</th>
+                            <th width="8%">{{ 'TOTALWAITING' | translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in mainPatientTrackersArray | filter:{'PatientName':GetSearchPatient.SearchText,'PatientMrNo':GetSearchPatient.PaientMRNO, 'PatientOldMrNo':GetSearchPatient.PatientOldMrNo, 'PatientDOB':GetSearchPatient.DOBSearchf } track by $index">
+                            <td>
+                                <label class="fs__lg-- pl__10-- fw__5-- tc__3C3C3C--">{{$index+1}}</label>
+                            </td>
+                            <td  width="7%" class="position__sticky-- left__0--md zindex-1 bg__FFFFFF--">
+                                <!--<div class="profile-show-timetracking">
+                            <span>{{item.Title}}.{{item.PatientName}}</span>
+                            <p class="m-0">MR No: {{item.PatientMrNo}}</p>
+                        </div>-->
+                                <div class="dis-flex align-items-center">
+                                    <div class="flex profile-show-timetracking">
+                                        <span>{{item.PatientName}}</span>
+                                        <p class="m-0">MR No: {{item.PatientMrNo}}</p>
+                                        <!--<p class="m-0" ng-hide="item.OldMrno ==''"> Old MR No: {{item.OldMrno}}</p>-->
+                                        <p class="m-b-0"> DOB:{{item.PatientDOB| date:'MM-dd-yyyy'}}</p>
+                                        <div class="dis-flex align-items-center m-b-5">
+                                            <ul class="tag-patient-icons m-l-10" ng-repeat="Aitem in item.PatientTagList track by $index">
+                                                <li ng-if="Aitem.HospitalEquipmentId===1">
+                                                    <i class="wheelchair-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===2">
+                                                    <i class="autism-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===3">
+                                                    <i class="hearing-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===4">
+                                                    <i class="oneeye-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===6">
+                                                    <i class="heartdisease-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===5">
+                                                    <i class="anxiety-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===7">
+                                                    <i class="vip-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===8">
+                                                    <i class="epllepsy-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===9">
+                                                    <i class="emotional-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===10">
+                                                    <i class="alzheimer-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===11">
+                                                    <i class="blood-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===12">
+                                                    <i class="supportstick-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===13">
+                                                    <i class="boat-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===14">
+                                                    <i class="newborn-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                                <li ng-if="Aitem.HospitalEquipmentId===15">
+                                                    <i class="oxygenmask-tagpatient" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <!--<span class="tracking-doctor-text border-top m-t-3">{{item.AppointmentDoctorName}}</span>-->
+                            </td>
+                            <td width="5%">
+                                <div class="dis-flex">
+                                    <div class="w-25 Appt-span text-center font-weight-600">A: </div>
+                                    <div class="appt-text-light font-weight-600">
+                                        {{item.ConvertAppointmentStartTime}}
+                                    </div>
+                                </div>
+                                <div class="dis-flex" ng-if="item.CheckinStatusId !== 1">
+                                    <div class="w-25 Appt-span text-center font-weight-600">C: </div>
+                                    <!--<div class="text-success font-weight-600">-->
+                                    <div class="appt-text-light font-weight-600">
+                                        {{item.ConvertCheckInTime}}
+                                    </div>
+                                </div>
+                                <div class="dis-flex" ng-show="item.AppointmentCheckInDelayTime != ''">
+                                    <div class="w-25 Appt-span text-center font-weight-600">&nbsp; </div>
+                                    <div class="font-weight-600" ng-class="item.IsDelayTimeInd == true?'text-danger':'text-green'">
+                                        {{item.AppointmentCheckInDelayTime}}
+                                    </div>
+                                </div>
+
+
+
+
+                            </td>
+                            <td>
+                                <p><span class="tracking-doctor-text">{{item.AppointmentDoctorName}}</span></p>
+                                <p class="tracker-notes-time cur-poiter" title=" {{item.VisitReasonName}}">
+                                    {{item.VisitReasonName}}
+                                </p>
+                            </td>
+
+                            <td>
+
+                                <ul class="time-tracker-list">
+
+
+
+
+                                    <li ng-class="getFavClassIcon(Subitem)" ng-repeat="Subitem in item.TrackerDetails">
+                                        <label class="m-b-0">{{Subitem.RoomType}}</label>
+                                        <!--<p>{{Subitem.FirstName}}</p>-->
+                                        <p class="tracker-notes-time cur-poiter m-b-0" title=" {{Subitem.FullName}}">{{Subitem.FullName}}</p>
+                                        <div class="dis-flex" ng-if="Subitem.isWaitingSlot">
+                                            <div class="flex text-center">
+                                                <p class="text-waiting-active m-b-3">Waiting</p>
+                                                <span class="text-tracker-time  m-b-3">{{Subitem.WaitTime}}</span>
+                                                <span class="text-tracker-time">{{Subitem.CurrentStartTime}}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="dis-flex" ng-if="!Subitem.isWaitingSlot">
+                                            <div class="flex text-center">
+                                                <p class="text-waiting-active m-b-3">Waited</p>
+                                                <span class="text-tracker-time m-b-3">{{Subitem.WaitTime}}</span>
+                                            </div>
+                                            <div class="flex text-center">
+                                                <p class="text-waiting-active  m-b-3">Active</p>
+                                                <span class="text-tracker-time  m-b-3">{{Subitem.ActiveTime}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-center"  ng-if="!Subitem.isWaitingSlot">
+                                            <span class="text-tracker-time  m-b-3">{{Subitem.CurrentStartTime}}</span>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </td>
+                            <td width="6%">
+                                <div class="dis-block">
+                                    <p class="text-tracker-time text-left" ng-show="item.ExpressCheckOutTime != '00:00:00'" ng-bind="item.ExpressCheckOutTime"></p>
+                                </div>
+                            </td>
+                            <td width="6%">
+                                <div class="dis-block">
+                                    <p class="text-tracker-time text-left" ng-show="item.AppointmentCheckOutTime != '00:00:00'" ng-bind="item.AppointmentCheckOutTime"></p>
+                                </div>
+                            </td>
+                            <td width="8%">
+                                <div class="tracker-time waiting-time-tracker">
+                                    {{item.AppointmentTotalWaitingTime}}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="EH-pagination text-center" ng-show="mainPatientTrackersArray.length > 10 && GetSearchPatient.IsPatientNameInd === false">
+                <uib-pagination total-items="SearchObj.TotalCount"
+                                ng-model="SearchObj.PageNumber"
+                                ng-change="changePageNoForTracker(SearchObj.PageNumber)"
+                                max-size="5"
+                                items-per-page="SearchObj.PageSize"
+                                class=""
+                                boundary-link-numbers="true"
+                                rotate="false"></uib-pagination>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--"  ng-show="mainPatientTrackersArray.length === 0 || GetSearchPatient.IsPatientNameInd === true">
+                <i class="nodata__1-- f1__nodata--1"></i>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Patients to Track Right Now</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients in Room. Please modify the filters to see results.</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+
+ 

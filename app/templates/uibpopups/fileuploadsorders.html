@@ -1,0 +1,525 @@
+﻿<!--New Design 08/02/2025-->
+<div class="modal__style--1 d__f-- fd__c-- gap__5-- height__100--">
+    <div class="modal__header--">
+        <h1>Patient education</h1>
+       <ul class="flex-flow-list">
+           <li>
+               <button class="btn__lg-- btn__2D2D47--f" ng-if="EducationMaterialObj.View=='Upload'" ng-click="SendEducation(EducationMaterialObj)">Save</button>
+           </li>
+           <li class="btn__close--">
+               <a ng-click="uibclose()">
+                   <i class="close__w32--"></i>
+               </a>
+           </li>
+       </ul>      
+    </div>
+    <div class="modal__body-- height__100--">
+        <div class="d__f-- fd__c-- gap__y--8 height__100--">
+            <ul class="tab__style--7">
+                <li ng-class="EducationMaterialObj.View=='Upload'?'active':''">
+                    <a ng-click="EducationMaterialObj.View='Upload'">Upload</a>
+                </li>
+                <li ng-class="EducationMaterialObj.View=='List'?'active':''">
+                    <a ng-click="EducationMaterialObj.View='List'">List</a>
+                </li>
+            </ul>
+            <div class="position__relative-- height__100--" ng-if="EducationMaterialObj.View=='Upload'">
+                <div class="adjustable-position">
+                    <div class="d__f-- fd__c-- gap__y--8">
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <div>
+                                <label class="cur-poiter">
+                                    <input name="pnka" id="Procedure" value="Procedure" class="radio-custom width-0" type="radio" ng-model="EducationMaterialObj.Type" ng-click="EducationObjTypeChnage('Procedure')">
+                                    <span for="Procedure" class="radio-custom-label cur-poiter mb-0 text-tonometry">Procedure</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="cur-poiter">
+                                    <input name="nka" class="radio-custom width-0" id="General" value="General" type="radio" ng-model="EducationMaterialObj.Type" ng-click="EducationObjTypeChnage('General')">
+                                    <span for="General" class="radio-custom-label cur-poiter mb-0 text-tonometry">General</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="position__relative--" ng-show="EducationMaterialObj.Type=='Procedure'">
+                            <label class="fs__lg-- tc__1D1D1D-- fw__5--">Procuders</label>
+                            <input type="text"
+                                   class="icons-search input__style--1"
+                                   maxlength="100"
+                                   ng-model="EducationObj.SearchProcedureObj"
+                                   placeholder="Select Procedure"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                                   typeahead-on-select="OnSelectProcedure(EducationObj.SearchProcedureObj)" />
+                        </div>
+                        <div class="d__f-- ai__c-- jc__sb-- gap__10-- br__4-- border__E4E4E4-- bg__F9F9F9-- p__10--" ng-if="EducationMaterialObj.ProcedureName!=''">
+                            <h1 class="fs__lg-- tc__1D1D1D-- fw__6-- m__0--">{{EducationMaterialObj.CPTCode}} - {{EducationMaterialObj.ProcedureName}}</h1>
+                            <a href="javascript:;" tooltip-placement="top-right" uib-tooltip="Remove" ng-click="RemoveEducationProcedure()">
+                                <i class="icons__w16-- cancel__w16--o"></i>
+                            </a>
+                        </div>
+                        <div class="row nocolpad">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="section__style--4">
+                                    <div class="section__header--">
+                                        <h1>Upload File</h1>
+                                        <div class="py__3">
+                                            <div class="file-input-container w-200">
+                                                <input type="file"
+                                                       ng-model="file"
+                                                       ngf-select="selectPrintImgLogo($files)"
+                                                       ngf-pattern="'image/*,application/pdf'"
+                                                       ngf-accept="'image/*,application/pdf'"
+                                                       ngf-max-size="5MB"
+                                                       popover-append-to-body='true'
+                                                       multiple="multiple"
+                                                       name="upload" id="chooseFile" title="Choose a file to upload">
+                                                <label class="file-label" for="chooseFile">
+                                                    <i class="icons__w16-- upload__w16--w"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="section__body--" ng-if="(EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}).length > 0 || (EducationMaterialObj.TempPdfArray | filter:{'DeleteInd':false}).length > 0">
+                                        <table class="table__style--21 tableno-padding">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30%"><label>Files/Images</label></th>
+                                                    <th><label>Enter Name </label></th>
+                                                    <th width=10%><label> </label></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-if="(EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}).length > 0">
+                                                <tr ng-repeat="img in EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}" ng-if="(EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}).length > 0">
+                                                    <td>
+                                                        <div image-viewer isarraychanged="ImageFileUploadCount">
+                                                            <img ng-src="{{img.file}}" class="img-thumbnail w-50 height-50" width="30" ng-if="img.DocumentId!=0" />
+                                                            <img ngf-thumbnail="img.file" class="img-thumbnail w-50 height-50" width="30" ng-if="img.DocumentId==0" />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form__group">
+                                                            <input type="text" placeholder="Enter Name" ng-model="img.FileName" />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d__f-- jc__c-- ai__c-- h__30--">
+                                                            <a href="javascript:;" tooltip-placement="top-right" uib-tooltip="Remove" ng-click="Removetempimage(img)">
+                                                                <i class="icons__w16-- cancel__w16--o"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody>
+                                                <tr ng-repeat="img in EducationMaterialObj.TempPdfArray | filter:{'DeleteInd':false}" ng-if="(EducationMaterialObj.TempPdfArray | filter:{'DeleteInd':false}).length > 0">
+                                                    <td>
+                                                        <div>
+                                                            <img src="img/pdf.png" class="img-responsive img-thumbnail m-0 p-0" width="40" ng-click="openPdfFileUploads(img.file)" ng-if="img.DocumentId!=0">
+                                                            <img src="img/pdf.png" class="img-responsive img-thumbnail m-0 p-0" width="40" ng-if="img.DocumentId==0">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form__group">
+                                                            <input type="text" placeholder="Enter Name" ng-model="img.FileName" />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="javascript:;" tooltip-placement="top" uib-tooltip="Remove" ng-click="RemovePdfimage(img)">
+                                                            <i class="icons__w16-- cancel__w16--o"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="section__style--4">
+                                    <div class="section__header--">
+                                        <h1>Videos</h1>
+                                    </div>
+                                    <div class="section__body-- gap__10--">
+                                        <div class="d__f-- fd__c-- gap__y--4 position__relative-- br__4-- py__4-- px__6--" ng-class="{'bg__F9F9F9-- border__E4E4E4--':DeleteVideodetails && !$last}" ng-repeat="item in EducationMaterialObj.VideoDetails">
+                                            <div class="form__group">
+                                                <label>Enter video URL</label>
+                                                <input type="text" ng-model="item.VideoURL" placeholder="Enter the video  URL here">
+                                            </div>
+                                            <div class="form__group">
+                                                <label>Enter name</label>
+                                                <input type="text" ng-model="item.VideoName" placeholder="Enter the video  Name here" maxlength="50">
+                                            </div>
+                                            <div ng-show="$last">
+                                                <a class="fs__lg-- tc__1D5558-- fw__5-- d__f-- ai__c-- gap__x--3" href="javascript:;" ng-click="Addnew(EducationMaterialObj)">
+                                                    <i class="icons__w16-- add__w16--o"></i>
+                                                    Add another video
+                                                </a>
+                                            </div>
+                                            <a href="javascript:;" tooltip-placement="top" uib-tooltip="Remove" class="position__absolute-- top-5 right-5" ng-show="DeleteVideodetails && !$last" ng-click="ClearVideoDetails(item)">
+                                                <i class="icons__w16-- cancel__w16--o"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="height__100--" ng-if="EducationMaterialObj.View=='List'">
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position">
+                        <div class="d__f-- fd__c-- gap__y--8 px__15-- py__8--">
+                            <div>
+                                <p class="fs__lg-- tc__1D1D1D-- fw__6-- m__0--">Education Material List</p>
+                            </div>
+                            <uib-accordion class="accordian__style--2">
+                                <div uib-accordion-group ng-repeat="item in tempmaterialList" is-open="status.open">
+                                    <uib-accordion-heading>
+                                        <div class="d__f-- ai__c-- jc__sb-- flex">
+                                            <p class="fs__lg-- fw__5-- tc__1D1D1D-- m-0">{{ 'PROCEDURENAME' | translate}}  : {{item.ProcedureCode}} - {{item.ProcedureName}}</p>
+                                            <a ng-click="ShowHideAllDays(item);">
+                                                <i class="icons__w16-- arrowdown__w16--l" ng-class="{'icon__flip--180':item.IsShowAllDays}"></i>
+                                            </a>
+                                        </div>
+                                    </uib-accordion-heading>
+                                    <div class="px__10--">
+                                        <table class="table__style--5">
+                                            <thead>
+                                                <tr>
+                                                    <th><label>Name</label></th>
+                                                    <th width="5%"><label>Actions</label></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="vitem in item.DocumentDetails">
+                                                    <td>
+                                                        <div>
+                                                            <ul class="flex-flow-ulli">
+                                                                <li ng-if="vitem.DocumentExt !== 'application/pdf'">
+                                                                    <img title="{{vitem.FileName}}" image-viewer ng-src="{{vitem.S3URL}}" class="img-thumbnail w-50 height-50 b-0" />
+                                                                </li>
+                                                                <li ng-if="vitem.DocumentExt == 'application/pdf'">
+                                                                    <span>
+                                                                        <img src="img/pdf.png" class="w-50 height-50 b-0" ng-click="openPdfFileUploads(vitem.S3URL)"/>
+                                                                    </span>
+                                                                </li>
+                                                                <li class="flex">
+                                                                    <div class="p-6 bg-white width-100 text-s14w400c000">
+                                                                        {{vitem.FileName}}
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                    <td >
+                                                        <div class="ai__c--">
+                                                            <a href="javascript:;" tooltip-placement="top" uib-tooltip="Remove" ng-click="RemoveVideoFile(vitem,item,'img')">
+                                                                <i class="icons__w16-- cancel__w16--o"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-repeat="vitem in item.VideoDetails">
+                                                    <td>
+                                                        <div>
+                                                            <ul class="flex-flow-ulli">
+                                                                <li>
+                                                                    <a href="{{vitem.VideoURL}}" target="_blank" class="dis-block width-100">
+                                                                        <img ng-show="vitem.videoId !=null" ng-src="http://img.youtube.com/vi/{{vitem.videoId}}/hqdefault.jpg" style="height: 80px; width: 100%;" title="{{vitem.VideoName}}" />
+                                                                        <img ng-show="vitem.videoId ==null" class="width-100 height-100" src="img/new-icons/default-patient-education-1.png" title="YouTube Video" alt="YouTube Video" />
+                                                                    </a>
+                                                                </li>
+                                                                <li class="flex">
+                                                                    <div class="p-6 width-100 text-s14w400c000">
+                                                                        <a href="{{vitem.VideoURL}}" target="_blank">{{vitem.VideoName}}</a>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-show="vitem.VideoName !='' && vitem.VideoURL !=''">
+                                                        <div class="ai__c--">
+                                                            <a href="javascript:;" tooltip-placement="top" uib-tooltip="Remove" ng-click="RemoveVideoFile(vitem,item,'video')">
+                                                                <i class="icons__w16-- cancel__w16--o"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </uib-accordion>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f--  ai__c-- jc__c--" ng-show="EducationMaterialObj.View=='List' && tempmaterialList.length != 0">
+                <uib-pagination total-items="EducationListCount"
+                                ng-model="EducationObj.PageNumber"
+                                ng-change="EducationListPagechanged(EducationObj.PageNumber)"
+                                boundary-links="true"
+                                max-size="EducationObj.PageSize"                                
+                                rotate="false">
+                </uib-pagination>
+            </div>
+        </div>             
+    </div>    
+</div>
+<div class="eh-panel" ng-if="false">
+    <div class="eh-header bg-white">
+        <h1 class="text-1d5558 fs-20 font-weight-700">Patient education</h1>
+        <ul class="patient-education-tabs">
+            <li ng-class="EducationMaterialObj.View=='Upload'?'active':''">
+                <a ng-click="EducationMaterialObj.View='Upload'">Upload</a>
+            </li>
+            <li ng-class="EducationMaterialObj.View=='List'?'active':''">
+                <a ng-click="EducationMaterialObj.View='List'">List</a>
+            </li>
+        </ul>
+        <div>
+            <button class="btn btn-discard-us" ng-click="uibclose()">Close</button>
+            <!--<button class="btn btn-danger btn-save-us">Save</button>-->
+        </div>
+    </div>
+    <div class="eh-body" ng-if="EducationMaterialObj.View=='Upload'">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="dis-flex align-items-center grid-gap-15 m-b-15">
+                    <div>
+                        <label class="cur-poiter">
+                            <input name="pnka" id="Procedure" value="Procedure" class="radio-custom width-0" type="radio" ng-model="EducationMaterialObj.Type" ng-click="EducationObjTypeChnage('Procedure')">
+                            <span for="Procedure" class="radio-custom-label cur-poiter mb-0 text-tonometry">Procedure</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="cur-poiter">
+                            <input name="nka" class="radio-custom width-0" id="General" value="General" type="radio" ng-model="EducationMaterialObj.Type" ng-click="EducationObjTypeChnage('General')">
+                            <span for="General" class="radio-custom-label cur-poiter mb-0 text-tonometry">General</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="search-panel-input m-b-10" ng-show="EducationMaterialObj.Type=='Procedure'">
+                    <label class="text-s14w500c000">Procuders</label>
+                    <input type="text"
+                           class="icons-search"
+                           maxlength="100"
+                           ng-model="EducationObj.SearchProcedureObj"
+                           placeholder="Select Procedure"
+                           typeahead-min-length="0"
+                           typeahead-focus-on-select="false"
+                           uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                           typeahead-on-select="OnSelectProcedure(EducationObj.SearchProcedureObj)" />
+                </div>
+                <div class="two-sections">
+                    <div class="flex">
+                        <div class="file-uploads-section">
+                            <div class="file-uploads-header" ng-if="EducationMaterialObj.ProcedureName!=''">
+                                <h1>{{EducationMaterialObj.CPTCode}} - {{EducationMaterialObj.ProcedureName}}</h1>
+                                <a href="javascript:;" ng-click="RemoveEducationProcedure()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                        <path d="M13 1L1 13M1 1L13 13" stroke="#1D5558" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-s12w500C000">Upload</label>
+                                <!--<input type="file" class="docsfilechoose height-36" name="upload" id="chooseFile" title="Choose a file to upload">-->
+                                <input type="file"
+                                       ng-model="file"
+                                       ngf-select="selectPrintImgLogo($files)"
+                                       ngf-pattern="'image/*,application/pdf'"
+                                       ngf-accept="'image/*,application/pdf'"
+                                       ngf-max-size="5MB"
+                                       popover-append-to-body='true'
+                                       multiple="multiple"
+                                       class="docsfilechoose height-36" name="upload" id="chooseFile" title="Choose a file to upload">
+                            </div>
+                            <h5 class="text-s12w500C000" ng-if="(EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}).length > 0">Images/Files</h5>
+                            <ul class="flex-flow-ulli" ng-repeat="img in EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}" ng-if="(EducationMaterialObj.TempImagesArray | filter:{'DeleteInd':false}).length > 0">
+                                <li image-viewer isarraychanged="ImageFileUploadCount">
+                                    <!--<img class="img-thumbnail w-50 height-50" src="https://ehnote.com/images/index/a-simple-intuitive-customizable-ehr-software.png" />-->
+                                    <!--<img class="img-thumbnail w-50 height-50" ng-src="{{img.file}}" ng-if="img.DocumentId!=0" />
+                                    <img ngf-thumbnail="img.file" class="img-thumbnail w-50 height-50" width="50" height="50" ng-if="img.DocumentId==0" />-->
+                                    <img ng-src="{{img.file}}" class="img-thumbnail w-50 height-50" ng-if="img.DocumentId!=0" />
+                                    <img ngf-thumbnail="img.file" class="img-thumbnail w-50 height-50" ng-if="img.DocumentId==0" />
+                                </li>
+                                <li class="flex">
+                                    <div class="p-6 bg-white border width-100 text-s14w400c000">
+                                        <!--{{img.DisplayName}}-->
+                                        <input type="text" class="form-outline" placeholder="Enter Name" ng-model="img.FileName" />
+                                    </div>
+                                </li>
+                                <li class="w-30 text-center" ng-click="Removetempimage(img)">
+                                    <a href="javascript:;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                            <path d="M13 1L1 13M1 1L13 13" stroke="#FF4848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli" ng-repeat="img in EducationMaterialObj.TempPdfArray | filter:{'DeleteInd':false}" ng-if="(EducationMaterialObj.TempPdfArray | filter:{'DeleteInd':false}).length > 0">
+                                <li>
+                                    <img src="img/pdf.png" class="img-responsive img-thumbnail m-0 p-0" width="40" ng-click="openPdfFileUploads(img.file)" ng-if="img.DocumentId!=0">
+                                    <img src="img/pdf.png" class="img-responsive img-thumbnail m-0 p-0" width="40" ng-if="img.DocumentId==0">
+                                </li>
+                                <li class="flex">
+                                    <div class="p-6 bg-white border width-100 text-s14w400c000">
+                                        <!--{{img.DisplayName}}-->
+                                        <input type="text" placeholder="Enter Name" ng-model="img.FileName" />
+                                    </div>
+                                </li>
+                                <li class="w-30 text-center" ng-click="RemovePdfimage(img)">
+                                    <a href="javascript:;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                            <path d="M13 1L1 13M1 1L13 13" stroke="#FF4848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="file-uploads-section">
+                            <h5 class="text-s12w500C000">Videos</h5>
+                            <div ng-repeat="item in EducationMaterialObj.VideoDetails">
+                                <div class="form-group">
+                                    <label>Enter video URL</label>
+                                    <input type="text" class="height-36 form-outline" ng-model="item.VideoURL" placeholder="Enter the video  URL here">
+                                </div>
+                                <div class="form-group">
+                                    <label>Enter name</label>
+                                    <input type="text" class="height-36 form-outline" ng-model="item.VideoName" placeholder="Enter the video  Name here" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <a href="javascript:;" ng-show="$last" ng-click="Addnew(EducationMaterialObj)">
+                                        <img src="img/plus-symbole-icon.svg" width="20" />
+                                    </a>
+                                    <a href="javascript:;" ng-show="DeleteVideodetails && !$last" ng-click="ClearVideoDetails(item)">
+                                        <img src="img/close-red.svg" width="18" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 text-right">
+                <button class="btn btn-ehnote p-l-50 p-r-50" ng-click="SendEducation(EducationMaterialObj)">Upload</button>
+            </div>
+        </div>
+    </div>
+    <div class="eh-body " ng-if="EducationMaterialObj.View=='List'">
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="m-b-0 fs-14">Education Material List</p>
+                <uib-accordion class="panel-group-margin">
+                    <div uib-accordion-group class="asc-accordion" ng-repeat="item in tempmaterialList" is-open="status.open">
+                        <uib-accordion-heading>
+                            <div class="row">
+                                <div class="col-lg-12 m-t-10">
+                                    <table class="table tableno-bordered m-b-0 border">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <label class="text-s14w800c000">{{ 'PROCEDURENAME' | translate}}  : {{item.ProcedureCode}} - {{item.ProcedureName}}</label>
+                                                </td>
+                                                <td width="3%">
+                                                    <a ng-click="ShowHideAllDays(item);">
+                                                        <i class="glyphicon pull-right glyphicon-chevron-down pull-right text-black fs-14" ng-class="{'glyphicon glyphicon glyphicon-chevron-up': item.IsShowAllDays, 'glyphicon glyphicon glyphicon-chevron-down': !item.IsShowAllDays}"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </uib-accordion-heading>
+                        <div class="col-lg-12 p-l-10 p-r-10" ng-show="item.IsShowAllDays">
+                            <table class="referral-table table-striped tableno-bordered m-b-0">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-f2f2f2"><label>Name</label></th>
+                                        <th class="bg-f2f2f2" width="5%"><label>Actions</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="vitem in item.DocumentDetails">
+                                        <td>
+                                            <ul class="flex-flow-ulli">
+                                                <li>
+                                                    <!--<img class="img-thumbnail w-50 height-50 b-0" src="https://ehnote.com/images/index/a-simple-intuitive-customizable-ehr-software.png" />-->
+                                                    <!--<img ng-src="{{vitem.S3URL}}" width="40" height="40" class="img-responsive img-thumbnail m-0 p-0" />-->
+                                                    <img title="{{vitem.FileName}}" image-viewer ng-src="{{vitem.S3URL}}" ng-if="vitem.DocumentExt == 'image/png' || vitem.DocumentExt == 'image/jpeg' ||vitem.DocumentExt == 'jpg' || vitem.DocumentExt == 'png'|| vitem.DocumentExt == 'jfif' || vitem.DocumentExt == 'image/svg+xml' || vitem.DocumentExt == 'jpeg'" class="img-thumbnail w-50 height-50 b-0" />
+                                                </li>
+                                                <li class="flex">
+                                                    <div class="p-6 bg-white width-100 text-s14w400c000">
+                                                        {{vitem.FileName}}
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="javascript:;" ng-click="RemoveVideoFile(vitem,item,'img')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                                    <path d="M13 1L1 13M1 1L13 13" stroke="#FF4848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat="vitem in item.VideoDetails">
+                                        <td>
+                                            <ul class="flex-flow-ulli">
+                                                <li>
+
+                                                    <a href="{{vitem.VideoURL}}" target="_blank" class="dis-block width-100">
+                                                        <img ng-show="vitem.videoId !=null" ng-src="http://img.youtube.com/vi/{{vitem.videoId}}/hqdefault.jpg" style="height: 80px; width: 100%;" title="{{vitem.VideoName}}" />
+                                                        <img ng-show="vitem.videoId ==null" class="width-100 height-100" src="img/new-icons/default-patient-education.svg" title="YouTube Video" alt="YouTube Video" />
+                                                    </a>
+                                                </li>
+                                                <li class="flex">
+                                                    <div class="p-6 bg-white width-100 text-s14w400c000">
+                                                        <a href="{{vitem.VideoURL}}" target="_blank">{{vitem.VideoName}}</a>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td class="text-center" ng-show="vitem.VideoName !='' && vitem.VideoURL !=''">
+                                            <a href="javascript:;" ng-click="RemoveVideoFile(vitem,item,'video')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                                    <path d="M13 1L1 13M1 1L13 13" stroke="#FF4848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </uib-accordion>
+
+            </div>
+
+        </div>
+        <div class="tile-footer">
+            <div class="row">
+                <div class="col-lg-12 text-center EH-pagination">
+                    <uib-pagination total-items="EducationListCount"
+                                    ng-model="EducationObj.PageNumber"
+                                    ng-change="EducationListPagechanged(EducationObj.PageNumber)"
+                                    boundary-links="true"
+                                    max-size="EducationObj.PageSize"
+                                    ng-show="tempmaterialList.length != 0"
+                                    rotate="false">
+                    </uib-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,515 @@
+﻿<!-- CRM Communications -->
+<div class="row bg__FFFFFF-- height__100--" ng-controller="UsSMSCommunicationCtrl">
+    <div class="col-lg-12 d__f-- fd__c-- gap__y--8 height__100--">
+        <div class="row bb__DDD--">
+            <div class="d__f-- jc__sb-- ai__c-- gap__x--8 p__5-- ">
+                <div class="d__f-- ai__c-- gap__x--8 width__60--">
+                    <div class="d__ib--">
+                        <input type="radio" class="radio-custom" id="CalNameId" name="patSearchType" ng-value="1" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="1">
+                        <label for="CalNameId" class="cur-poiter radio-custom-label mb__0-- fs__lg-- fs__normal--" ng-class=" patSearchType === 1 ? 'tc__1D5558-- fw__6--': 'tc__656565-- fw__4--'">{{ 'NAME' | translate}}</label>
+                    </div>
+                    <div class="d__ib--">
+                        <input type="radio" class="radio-custom" id="CalmrMobileId" name="patSearchType" ng-value="2" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="2">
+                        <label for="CalmrMobileId" class="cur-poiter radio-custom-label mb__0-- fs__lg-- fs__normal-- " ng-class=" patSearchType === 2 ? 'tc__1D5558-- fw__6--': 'tc__656565-- fw__4--'">Mobile Number</label>
+                    </div>
+                    <div class="d__ib--">
+                        <input type="radio" class="radio-custom" id="DOBinc" name="patSearchType" ng-model="patSearchType" ng-value="3" ng-click="changeradiobtn(SearchObj,patSearchType)" value="3">
+                        <label for="DOBinc" class="radio-custom-label cur-poiter mb__0-- fs__lg--  fs__normal--" ng-class=" patSearchType === 3 ? 'tc__1D5558-- fw__6--': 'tc__656565-- fw__4--'">MR. No</label>
+                    </div>
+                    <div class="flex">
+                        <div class="position__relative--">
+                            <input type="text" class="input__style--1 text-capitalize" ng-class="(SearchObj.SearchByName =='' && SearchObj.SearchByMobileNo =='' && SearchObj.SearchByMrNo =='') ? 'icons-search' : ''" placeholder="Search Patient Name" ng-if="patSearchType==1" ng-model="SearchObj.SearchByName" ng-change="onChangeSearchAppt(SearchObj.SearchByName)" special-only>
+                            <input type="text" class="input__style--1 text-capitalize" ng-class="(SearchObj.SearchByName =='' && SearchObj.SearchByMobileNo =='' && SearchObj.SearchByMrNo =='') ? 'icons-search' : ''" placeholder="Search Patient Mobile No" ng-if="patSearchType==2" ng-model="SearchObj.SearchByMobileNo" ng-change="onChangeSearchAppt(SearchObj.SearchByMobileNo)" numbers-only maxlength="10">
+                            <input type="text" class="input__style--1 text-capitalize" ng-class="(SearchObj.SearchByName =='' && SearchObj.SearchByMobileNo =='' && SearchObj.SearchByMrNo =='') ? 'icons-search' : ''" placeholder="Search Patient MR No." ng-if="patSearchType==3" ng-model="SearchObj.SearchByMrNo" ng-change="onChangeSearchAppt(SearchObj.SearchByMrNo)" />
+                            <a class="position__absolute-- top-6 right-5 b__0--" ng-hide="SearchObj.SearchByName.length==0&&SearchObj.SearchByMobileNo.length==0&&SearchObj.SearchByMrNo.length==0" ng-click="clearvalue()" role="button" tabindex="0"><i class="icons__w16-- cancel__w16--o"></i></a>
+                        </div>
+                    </div>
+                    <div class="d__f-- ai__c-- gap__10--">
+                        <button type="button" class="btn__lg-- btn__1d5558--o" ng-if="patSearchType === 1" ng-click="changePatientApptSearchText(SearchObj.SearchByName,patSearchType)">Search</button>
+                        <button type="button" class="btn__lg-- btn__1d5558--o" ng-if="patSearchType === 2" ng-click="changePatientApptSearchText(SearchObj.SearchByMobileNo,patSearchType)">Search</button>
+                        <button type="button" class="btn__lg-- btn__1d5558--o" ng-if="patSearchType === 3" ng-click="changePatientApptSearchText(SearchObj.SearchByMrNo,patSearchType)">Search</button>
+                    </div>
+                </div>
+
+                <button class="btn__lg-- btn__1d5558--f" ng-click="openAppointmentPopup('op', 2)">Book Appointment</button>
+            </div>
+        </div>
+
+        <div class="six-sections">
+            <div class="settings-all-appts" ng-class="{ active: RespondingData==0}" ng-click="GetSMSAppointCountwithList(0)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">All Appointments</p>
+                        <label>{{SMSCommunicationListObj.AllAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings-all-appts " ng-class="{ active: RespondingData==1}" ng-click="GetSMSAppointCountwithList(1)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">Confirmed Appt’s</p>
+                        <label>{{SMSCommunicationListObj.ConfirmAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings-all-appts" ng-class="{ active: RespondingData==2}" ng-click="GetSMSAppointCountwithList(2)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">Rescheduled Appt’s</p>
+                        <label>{{SMSCommunicationListObj.RescheduledAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings-all-appts" ng-class="{ active: RespondingData==3}" ng-click="GetSMSAppointCountwithList(3)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">Cancelled Appt’s</p>
+                        <label>{{SMSCommunicationListObj.CancelledAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings-all-appts" ng-class="{ active: RespondingData==4}" ng-click="GetSMSAppointCountwithList(4)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">Need Assistance</p>
+                        <label>{{SMSCommunicationListObj.NeedAssistanceAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings-all-appts" ng-class="{ active: RespondingData==5}" ng-click="GetSMSAppointCountwithList(5)">
+                <div class="circle-dashboard">
+                    <i class="fas fa-calendar-alt fs-18"></i>
+                </div>
+                <ul class="dashboard-count">
+                    <li>
+                        <p class="m-b-0">Not Respond</p>
+                        <label>{{SMSCommunicationListObj.NotRespondAppointmentCount}}</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="px__5--">
+            <table class="table tableno-bordered tableno-padding m-0">
+                <tbody>
+                    <tr>
+                        <td width="12%">
+                            <div class="form__group">
+                                <label>From Date</label>
+                                <a class="pos-absolute right-0 fs-14 text-underline" ng-show="SMSCommunicationObj.HideFromDateInd" ng-click="GetTodayDate(1)">Today</a>
+                                <input class="icons-calendar" readonly placeholder="" datepickerregpatient ng-model="SMSCommunicationObj.FromDate" ng-change="UpdateToday(1)" />
+                            </div>
+                        </td>
+                        <td width="12%">
+                            <div class="form__group">
+                                <label>To Date</label>
+                                <a class="pos-absolute right-0 fs-14 text-underline" ng-show="SMSCommunicationObj.HideToDateInd" ng-click="GetTodayDate(2)">Today</a>
+                                <input class=" icons-calendar" readonly placeholder="" datepickerregpatient ng-model="SMSCommunicationObj.ToDate" ng-change="UpdateToday(2)" />
+                            </div>
+                        </td>
+
+                        <td width="10%">
+                            <div class="form__group">
+                                <label>Location</label>
+                                <div class="dropdown" button-dropdown-direction>
+                                    <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        {{AppListselectedclinic.ClinicName}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form__control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in BranchesListArray | filter:{'ClinicName':searchHospital.txt1}" ng-click="ChangeApptBranch(item)">
+                                                    <a href="javascript:;" ng-bind="item.ClinicName"></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+
+                        <td>
+                            <div class="form__group">
+                                <label>Doctors</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+
+                                    <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                        {{selectedDoctorName}}
+                                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                        <div class="p-5">
+                                            <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.FullName" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li>
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllstatusListCheck.AllDoctorscheck" ng-click="checkAllDoctorList(AllstatusListCheck.AllDoctorscheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>All Doctors</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="item in MultiselectDoctorlist | filter:{'SecondUserFullName':searchHospital.FullName}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.SecondUserFullName"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group">
+                                <label>{{ 'VISITREASON' | translate}}</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+
+                                    <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                        {{selectedVisitReason}}
+                                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                        <div class="p-5">
+                                            <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.visitRsnName" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li>
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllstatusListCheck.AllVisitReasonsCheck" ng-click="checkAllVisitReasons(AllstatusListCheck.AllVisitReasonsCheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="item in Visitreasons | filter:{'Reason':searchHospital.visitRsnName}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggle(item);">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.Reason"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group">
+                                <label>Patient Status</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+
+                                    <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                        {{selectedPatientstatus}}
+                                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                        <div class="p-5">
+                                            <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.PatientStatusName" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li>
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllstatusListCheck.AllPatientStatusCheck" ng-click="checkPatienttatus(AllstatusListCheck.AllPatientStatusCheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>All Patient Status</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="item in PatientReponcestatusList | filter:{'statusname':searchHospital.PatientStatusName}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="PatientstatusnToggle(item);">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.statusname"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form__group">
+                                <label>Agent status</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                    <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                        {{selectedAgentstatus}}
+                                        <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                        <div class="p-5">
+                                            <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.AgentStatusName" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li>
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllstatusListCheck.AllAgentstatusCheck" ng-click="checkAgentstatus(AllstatusListCheck.AllAgentstatusCheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>All Agent Status</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="item in AgentstatusList | filter:{'statusname':searchHospital.AgentStatusName}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="AgentstatusToggle(item);">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.statusname"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td width="10%">
+                            <div class="form__group m-t-16 d__f-- gap__5--x">
+                                <!--<button class="btn btn-info" ng-click="GetTodayDate()">Today</button>-->
+                                <button class="btn__xl-- btn__1d5558--f" ng-click="GetSMSAppointCountwithList()">Apply</button>
+                                <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" role="button" tabindex="0" ng-click="RefreshInfo()">Reset<i class="icons__w16-- refresh__w16--o"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll pb__5--">
+                <table class="table__style--20 bc__c--" ng-if="SMSCommunicationListObj.FrontendAppointmentList.length>0">
+                    <thead>
+                        <tr ng-if="SMSCommunicationListObj.FrontendAppointmentList.length>0">
+                            <th width="5%" class="text-center position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">S.No</label>
+                            </th>
+                            <th class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Patient Name/Mr No./Phone No</label></th>
+                            <th width="16%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">NoLocation/Facility/Doctor</label>
+                            </th>
+                            <th width="10%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Appt. Date</label></th>
+                            <th width="15%" class="position__sticky-- top__0-- text-center">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Visit Reason</label></th>
+                            <th width="14%" class="position__sticky-- top__0--">
+                                Patient Status
+                                <!--<i class="fas fa-long-arrow-alt-up"></i>
+                    <i class="fas fa-long-arrow-alt-down"></i>-->
+                            </th>
+                            <th width="15%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Agent Status</label></th>
+                            <th width="7%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Action</label></th>
+                        </tr>
+                    </thead>
+                    <tbody ng-if="SMSCommunicationListObj.FrontendAppointmentList.length>0">
+                        <tr class="hover__f2f2f2--f" ng-repeat="item in SMSCommunicationListObj.FrontendAppointmentList track by $index" ng-class="!$last ? 'bb__DDD--' : ''">
+                            <td><label class="text-center fs__lg-- fw__5-- width__100--">{{$index+1}}</label></td>
+                            <td>
+                                <div class="d__f-- fd__c--">
+                                    <div class="d__f-- ai__c-- gap__x--4 mw__0--  show__popover--">
+                                        <label class="fs__xl-- fw__6-- tc__4A4A4A-- lh__normal-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{item.PatientName}}">{{item.PatientName | textUpperCase}}</label>
+                                        <div popover-template="'templates/UIBPopovers/UspatientProfileBasicPopover.html'" popover-data="item" popover-class="opprofile__popover" dynamic-us-patient-profile-basic-popover>
+                                            <a>
+                                                <i class="icons__w16-- drawarrow__w16--o"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <label class="fs__lg-- fw__5-- tc__F37123--">
+                                        {{item.MrNo}} | <span class="fs__lg-- fw__5-- tc__4A4A4A--"> {{item.DOB|date:'MM-dd-yyyy'}}</span>
+                                    </label>
+                                    <label class="fs__lg-- fw__5-- tc__4A4A4A--" ng-if="item.FormatedMobileNo!=''">{{item.FormatedMobileNo}}</label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d__f-- fd__c-- gap__5--y">
+                                    <span class="fs__lg-- fw__5-- tc__4A4A4A--">{{item.DoctorName}}</span>
+                                    <span class="fs__lg-- fw__4-- tc__4A4A4A--"> {{item.Branchname}}</span>
+                                    <span class="fs__lg-- fw__4-- tc__4A4A4A--"> {{item.FacilityName}}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">
+                                    {{item.ApptDate|date:'MM-dd-yyyy'}}
+                                </label>
+                            </td>
+                            <td class="text-center" title="{{item.VisitReason}}">
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">
+                                    {{item.VisitReason}}
+                                </label>
+                            </td>
+                            <td>
+                                <a class="fs__md-- fw__5-- tc__3BAC66-- bg__E2F3E8-- bradius__5-- px__8-- py__4--" ng-if="item.ReplyText==1">Confirmed </a>
+                                <a class="fs__md-- fw__5-- tc__537ACF-- bg__DCE6FC-- bradius__5-- px__8-- py__4--" ng-if="item.ReplyText==2">Reschedule </a>
+                                <a class="fs__md-- fw__5-- tc__C71D27-- bg__EFBCBF-- bradius__5-- px__8-- py__4--" ng-if="item.ReplyText==3">Cancelled</a>
+                                <a class="fs__md-- fw__5-- tc__FF9F2D-- bg__FFF5EA-- bradius__5-- px__8-- py__4--" ng-if="item.ReplyText==4">Need Assistance</a>
+                                <a class="fs__md-- fw__5-- tc__656565-- bg__E4E4E4-- bradius__5-- px__8-- py__4--" ng-if="item.ReplyText==5">Not Respond </a>
+                            </td>
+                            <td>
+                                <span class="fs__md-- fw__5-- tc__65665-- bg__E4E4E4-- bradius__5-- px__8-- py__4-- ">{{item.CRMAgentStatus}}</span>
+                            </td>
+                            <td>
+                                <div class="d__f-- ai__c-- gap__10--x">
+                                    <a class="tc__1D5558-- fs__lg-- d__f--  ai__c--" tooltip-placement="top" uib-tooltip="Edit" ng-if="item.ReplyText!=='1'" ng-click="crmrescheduledpopup(item)">
+                                        <i class="icons__w16-- edit__w16--o"></i>
+                                    </a>
+
+                                    <!--<a class="crm-log crm-dashboard-icons" popover-class="increase-popover-width-bottom"
+                           popover-placement="left"
+                           uib-popover-template="agentSmsLogHistory.templateUrl"
+                           popover-trigger="outsideClick" popover-append-to-body="true"
+                           ng-if="item.ReminderArray.length>0" ng-click="CrmAgentWorkHistory(item)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M7.99935 3C4.66602 3 1.81935 5.07333 0.666016 8C1.81935 10.9267 4.66602 13 7.99935 13C8.23935 13 8.47935 13 8.71935 12.9667C8.6848 12.7573 8.66697 12.5455 8.66602 12.3333C8.66602 11.96 8.71935 11.5867 8.82602 11.2267C8.55268 11.2933 8.27935 11.3333 7.99935 11.3333C7.11529 11.3333 6.26745 10.9821 5.64233 10.357C5.01721 9.7319 4.66602 8.88406 4.66602 8C4.66602 7.11595 5.01721 6.2681 5.64233 5.64298C6.26745 5.01786 7.11529 4.66667 7.99935 4.66667C8.8834 4.66667 9.73125 5.01786 10.3564 5.64298C10.9815 6.2681 11.3327 7.11595 11.3327 8C11.3327 8.19333 11.366 8.14 11.3327 8.33333C11.666 8.33333 12.1927 8.33333 12.666 8.33333C13.446 8.33333 13.666 8.33333 14.3327 8.33333C14.9993 8.33333 14.9993 8.33333 14.9993 8.33333C13.8775 5.48659 11.3327 3 7.99935 3ZM7.99935 6C7.46892 6 6.96021 6.21071 6.58514 6.58579C6.21006 6.96086 5.99935 7.46957 5.99935 8C5.99935 8.53043 6.21006 9.03914 6.58514 9.41421C6.96021 9.78929 7.46892 10 7.99935 10C8.52978 10 9.03849 9.78929 9.41356 9.41421C9.78864 9.03914 9.99935 8.53043 9.99935 8C9.99935 7.46957 9.78864 6.96086 9.41356 6.58579C9.03849 6.21071 8.52978 6 7.99935 6Z" fill="#414167" />
+                                <path d="M12.0007 8.66699C10.5313 8.66699 9.33398 9.86433 9.33398 11.3337C9.33398 12.803 10.5313 14.0003 12.0007 14.0003C13.47 14.0003 14.6673 12.803 14.6673 11.3337C14.6673 9.86433 13.47 8.66699 12.0007 8.66699ZM11.8007 10.267C11.8007 10.1577 11.8913 10.067 12.0007 10.067C12.11 10.067 12.2007 10.1577 12.2007 10.267V11.6003C12.2007 11.7097 12.11 11.8003 12.0007 11.8003C11.8913 11.8003 11.8007 11.7097 11.8007 11.6003V10.267ZM12.246 12.5017C12.2327 12.5363 12.214 12.563 12.19 12.5897C12.1633 12.6137 12.134 12.6323 12.102 12.6457C12.07 12.659 12.0353 12.667 12.0007 12.667C11.966 12.667 11.9313 12.659 11.8993 12.6457C11.8673 12.6323 11.838 12.6137 11.8113 12.5897C11.7873 12.563 11.7687 12.5363 11.7553 12.5017C11.742 12.4697 11.734 12.435 11.734 12.4003C11.734 12.3657 11.742 12.331 11.7553 12.299C11.7687 12.267 11.7873 12.2377 11.8113 12.211C11.838 12.187 11.8673 12.1683 11.8993 12.155C11.9633 12.1283 12.038 12.1283 12.102 12.155C12.134 12.1683 12.1633 12.187 12.19 12.211C12.214 12.2377 12.2327 12.267 12.246 12.299C12.2593 12.331 12.2673 12.3657 12.2673 12.4003C12.2673 12.435 12.2593 12.4697 12.246 12.5017Z" fill="#414167" />
+                            </svg>
+                        </a>-->                         <a class="tc__1D5558-- fs__lg-- d__f--  ai__c--" tooltip-placement="top" uib-tooltip="ChatHistory" ng-click="ChatHistory(item)">
+                                        <i class="icons__w16-- chat__w16--l"></i>
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table__style--20 height__100--"  ng-show="SMSCommunicationListObj.FrontendAppointmentList.length == 0">
+                    <thead>
+                        <tr >
+                            <th width="5%" class="text-center position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">S.No</label>
+                            </th>
+                            <th class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Patient Name/Mr No./Phone No</label>
+                            </th>
+                            <th width="16%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">NoLocation/Facility/Doctor</label>
+                            </th>
+                            <th width="10%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Appt. Date</label>
+                            </th>
+                            <th width="15%" class="position__sticky-- top__0-- text-center">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Visit Reason</label>
+                            </th>
+                            <th width="14%" class="position__sticky-- top__0--">
+                                Patient Status
+                                <!--<i class="fas fa-long-arrow-alt-up"></i>
+                    <i class="fas fa-long-arrow-alt-down"></i>-->
+                            </th>
+                            <th width="15%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Agent Status</label>
+                            </th>
+                            <th width="7%" class="position__sticky-- top__0--">
+                                <label class="fs__md-- fw__5-- tc__1D1D1D--">Action</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8">
+                                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                    <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Patients Found</h1>
+                                    <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                   
+            </div>
+        </div>
+    </div>   
+</div>
+
+    <!--  -->
+    <script type="text/ng-template" id="agentSmsLogHistory.html">
+        <div class="form-group">
+            <div class="col-lg-12 p-0">
+
+                <div class="col-lg-12 p-0"></div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable">
+                            <tbody ng-if="ReminderArray.length>0">
+                                <tr ng-repeat="item in ReminderArray">
+                                    <td>
+                                        <div class="form-group">
+                                            <p class="m-b-0 fs-13">
+                                                <span class="upcmng-appt">Worked by:</span>
+                                                <span>{{item.CreatedByName}}({{item.CreatedDt | date:'MM-dd-yyyy,hh:mm a'}})</span>
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </script>

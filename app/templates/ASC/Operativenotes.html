@@ -1,0 +1,608 @@
+﻿<div class="h-100">
+    <div class="two-sections flex h-100" ng-show="isAddingScreenVisible">
+        <!--ng-if="OperativeNotesObj.IsShowAddScreen"-->
+         
+        <div class="flex p-6 pos-relative">
+            <div class="bg-DDDDDD bradius-6 p-6 adjustable-position">
+                <div class="asc-panel">
+                    <div class="asc-panel-header">
+                        <h1>Operative notes <i class="fa fa-chevron-down m-l-5"></i></h1>
+                        <ul>
+                            <li>
+                                <div class="dis-flex align-items-center grid-gap-15">
+                                    <button class="btn btn-save-us-outline" ng-show="UserAccessRights.AllAccessRights.ASCOperativeNotesSignoff" ng-click="OperativeNotesSignOff('SignOff');"><i class="fas fa-sign-out-alt"></i> Sign Off</button>
+                                    <button class="btn btn-save-us" ng-if="OperativeNotesObj.OperativeChartStatus !== 'E'&&UserAccessRights.AllAccessRights.ASCOperativeNotesUnsign" ng-click="SaveOperativeNotes();">Save</button>
+                                    <button class="btn btn-discard-us" ng-click="closeuib()">Close</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Patient : </span>
+                                        <label>{{cacheStorageItem.PatientName}}</label>
+                                    </li>
+                                    <li>
+                                        <span>MR.No : </span>
+                                        <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                                    </li>
+                                    <li>
+                                        <span>DOB : </span>
+                                        <label>{{cacheStorageItem.PatientDOB | date: "MM-dd-yyyy"}}</label>
+                                    </li>
+                                    <li>
+                                        <span>Date : </span>
+                                        <label>{{SurgeryDiagnosisObj.SurgeryDate | date: "MM-dd-yyyy"}}</label>
+                                    </li>
+                                </ul>
+
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Procedure : </span>
+                                        <label>{{SurgeryDiagnosisObj.OperativeProcedure}}</label>
+                                    </li>
+                                    <li>
+                                        <span>Operated Eye : </span>
+                                        <label> {{SurgeryDiagnosisObj.OrganId === 1 ? 'OD' : (SurgeryDiagnosisObj.OrganId === 2 ? 'OS': (SurgeryDiagnosisObj.OrganId === 3 ? 'OU':(SurgeryDiagnosisObj.OrganId === 4 ? 'General':''))) }}</label>
+                                    </li>
+
+                                </ul>
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Surgeon : </span>
+                                        <label>{{SurgeryDiagnosisObj.Surgeon}}</label>
+                                    </li>
+                                    <li>
+                                        <span>Anesthetist :</span>
+                                        <label>{{SurgeryDiagnosisObj.Anesthetist}}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table class="asc-table-admission">
+                                    <tbody>
+                                        <tr>
+                                            <th width="16%">
+                                                Pre-Op Dx
+                                            </th>
+                                            <td ng-if="SurgeryDiagnosisObj.Diagnosis!=''">
+                                                <ul class="referral-summary-list">
+                                                    <li>
+                                                        {{SurgeryDiagnosisObj.ICDCode}}-{{SurgeryDiagnosisObj.Diagnosis}}  <span ng-show="SurgeryDiagnosisObj.Diagnosis2 !=''">,{{ SurgeryDiagnosisObj.ICDCode2}}-{{SurgeryDiagnosisObj.Diagnosis2}}</span>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="SurgeryDiagnosisObj.Diagnosis ==''">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Post-op Dx
+                                            </th>
+                                            <td ng-show="(Diagnosis| filter:{DeleteInd: 'N'}).length>0">
+                                                <div ng-repeat="item in Diagnosis | filter:{DeleteInd: 'N'} track by $index">
+                                                    <ul class="referral-summary-list">
+                                                        <li>
+                                                            <label>{{item.ICD10CODE}}-{{item.ICD10DIAGNAME}}</label>
+                                                        </li>
+                                                    </ul>
+                                                    <ul class="referral-summary-list" ng-repeat="Litem in item.StatusList">
+                                                        <li class="text-s12w500c000" ng-if="Litem.SeverityId!=null">
+                                                            <span>Severity:</span>
+                                                            <label ng-if="Litem.SeverityId==1">Mild</label>
+                                                            <label ng-if="Litem.SeverityId==3">Moderate</label>
+                                                            <label ng-if="Litem.SeverityId==5">Severe</label>
+                                                        </li>
+                                                        <li class="text-s12w500c000" ng-if="Litem.DiagnosisStatusId!=null">
+                                                            <span>Status:</span>
+                                                            <label ng-if="Litem.DiagnosisStatusId==1">Provisional</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==2">Active</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==3">InActive</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==4">Resolved</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==5">RuledOut</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==6">Not Examined</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==7">Entered In Error</label>
+                                                        </li>
+                                                        <li class="text-s12w500c000" ng-if="Litem.OrganId!=null">
+                                                            <span>Eye:</span>
+                                                            <label ng-if="Litem.OrganId==1">OD</label>
+                                                            <label ng-if="Litem.OrganId==2">OS</label>
+                                                            <label ng-if="Litem.OrganId==3">OU</label>
+                                                            <label ng-if="Litem.OrganId==4">General</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td ng-show="(Diagnosis| filter:{DeleteInd: 'N'}).length==0">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Lens Used
+                                            </th>
+                                            <td ng-show="(ImplantsDetailsArray| filter:{'DeleteInd':'N'}).length>0">
+                                                <ul class="referral-summary-list" ng-repeat="imp in ImplantsDetailsArray| filter:{'DeleteInd':'N'} track by $index">
+                                                    <li>
+                                                        <span>Lens</span>
+                                                        <label>{{imp.LensType}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <span>Power: </span>
+                                                        <label>{{imp.Power}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <span>Serial No:</span>
+                                                        <label>{{imp.SerialNumber}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <label>Status:</label>
+                                                        <span>{{imp.StatusName}}</span>
+                                                    </li>
+                                                    <li>
+                                                        <label>Remarks:</label>
+                                                        <span>{{imp.Remarks}}</span>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="(ImplantsDetailsArray| filter:{'DeleteInd':'N'}).length==0">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Procedure Notes
+                                            </th>
+                                            <td>
+                                                <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                    <select class="form-outline flex" ng-model="OperativeNotesObj.SelectedProcedureNotesTemplate" ng-options="item as item.TemplateName for item in OperativeNotesObj.ProcedureDetailsTempList" ng-change="OnselectProcedureNotesTemplates(OperativeNotesObj.SelectedProcedureNotesTemplate);">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <!--<a class="white-nowrap" ng-click="AddChecklistProcedureTemplate();">Add Template</a>-->
+                                                    <a class="white-nowrap"
+                                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                                       popover-trigger="outsideClick"
+                                                       popover-is-open="TempObj.IsProcedureNotesTemplateSavePopOver == true"
+                                                       ng-click="TempObj.IsProcedureNotesTemplateSavePopOver = true;TempObj.EnterProcedureNotesTemplateName=''"
+                                                       popover-placement="bottom-right"
+                                                       uib-popover-template="clickcreatetemplateover.templateUrl">
+                                                        Add Template
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="javascript:;" ng-click="OperativeNotesObj.ProcedureDetailsInd = !OperativeNotesObj.ProcedureDetailsInd"> {{ OperativeNotesObj.ProcedureDetailsInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                    <textarea ng-if="OperativeNotesObj.ProcedureDetailsInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" ng-model="OperativeNotesObj.ProcedureDetails" rows="3" ng-focus="OperativeNotesObj.ProcedureDetailsInd" ng-change="ClearProcedureTempNotes(OperativeNotesObj.ProcedureDetails)"></textarea>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Complications
+                                            </th>
+                                            <td>
+                                                <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                    <select class="form-outline flex" ng-model="OperativeNotesObj.SelectedSurgicalComplicationsTemplate" ng-options="item as item.TemplateName for item in OperativeNotesObj.ComplicationTemplatesList" ng-change="OnselectSurgicalNotesComplicationsTemplates(OperativeNotesObj.SelectedSurgicalComplicationsTemplate);">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <!--<a class="white-nowrap" ng-click="AddChecklistTemplateComplications();">Add Template</a>-->
+                                                    <a class="white-nowrap"
+                                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                                       popover-trigger="outsideClick"
+                                                       popover-is-open="TempObj.IsComplicationsTemplateSavePopOver == true"
+                                                       ng-click="TempObj.IsComplicationsTemplateSavePopOver = true;TempObj.EnterComplicationsTemplateName=''"
+                                                       popover-placement="bottom-right"
+                                                       uib-popover-template="Complicationstemplateover.templateUrl">
+                                                        Add Template
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="javascript:;" ng-click="OperativeNotesObj.ComplicationsInd = !OperativeNotesObj.ComplicationsInd"> {{ OperativeNotesObj.ComplicationsInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                    <textarea ng-if="OperativeNotesObj.ComplicationsInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="OperativeNotesObj.Complications" ng-focus="OperativeNotesObj.ComplicationsInd" ng-change="ClearComplicationsTempNotes(OperativeNotesObj.Complications)"></textarea>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Findings
+                                            </th>
+                                            <td>
+                                                <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                    <select class="form-outline flex" ng-model="OperativeNotesObj.SelectedFindingsTemplate" ng-options="item as item.TemplateName for item in OperativeNotesObj.FindingsDetailsTempList" ng-change="OnselectFindingsTemplates(OperativeNotesObj.SelectedFindingsTemplate);">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <!--<a class="white-nowrap" ng-click="AddTemplateFindingNotes();">Add Template</a>-->
+
+                                                    <a class="white-nowrap"
+                                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                                       popover-trigger="outsideClick"
+                                                       popover-is-open="IsOpenFindings == true"
+                                                       ng-click="IsOpenFindingsTemp()"
+                                                       popover-placement="bottom-right"
+                                                       uib-popover-template="Findingstemplateover.templateUrl">
+                                                        Add Template
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="javascript:;" ng-click="OperativeNotesObj.FindingsInd = !OperativeNotesObj.FindingsInd"> {{ OperativeNotesObj.FindingsInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                    <textarea ng-if="OperativeNotesObj.FindingsInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="OperativeNotesObj.Findings" ng-change="ClearFindingsTempNotes(OperativeNotesObj.Findings)" ng-focus="OperativeNotesObj.FindingsInd"></textarea>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Surgeon operative notes
+                                            </th>
+                                            <td>
+                                                <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                    <select class="form-outline flex" ng-model="OperativeNotesObj.SelectedSurgeonOperativeTemplate" ng-options="item as item.TemplateName for item in OperativeNotesObj.SurgeonOperativeTemplatesList" ng-change="OnselectSurgeonOperativeTemplates(OperativeNotesObj.SelectedSurgeonOperativeTemplate);">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <!--<a class="white-nowrap" ng-click="AddTemplateSurgeonOperativeNotes();">Add Template</a>-->
+
+                                                    <a class="white-nowrap"
+                                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                                       popover-trigger="outsideClick"
+                                                       popover-is-open="IsOpenSurgeon == true"
+                                                       ng-click="IsOpenSurgeonTemp()"
+                                                       popover-placement="bottom-right"
+                                                       uib-popover-template="Surgeontemplateover.templateUrl">
+                                                        Add Template
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="javascript:;" ng-click="OperativeNotesObj.SurgeonOperativeNotesInd = !OperativeNotesObj.SurgeonOperativeNotesInd"> {{ OperativeNotesObj.SurgeonOperativeNotesInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                    <textarea ng-if="OperativeNotesObj.SurgeonOperativeNotesInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="OperativeNotesObj.SurgeonOperativeNotes" ng-change="ClearSurgeonOperativeTempNotes(OperativeNotesObj.SurgeonOperativeNotes)" ng-focus="OperativeNotesObj.SurgeonOperativeNotesInd"></textarea>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="asc-panel">
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli">
+                                    <li>
+                                        <span class="text-s12w400C000">Reviewed By:</span>
+                                    </li>
+                                    <li>
+                                        <select class="form-outline w-250" ng-model="OperativeNotesObj.OperativeNotesReviewedBy" ng-options="item.DoctorID as item.FullName for item in OperativeArray" ng-change="ChangeOperativeReviewedbyItem(OperativeNotesObj.OperativeNotesReviewedBy)">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        Signature
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              
+            </div>
+
+        </div>
+        <!--class="overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 600px)"-->
+    </div>
+
+    <div class="bg-white width-100 p-6 pos-relative h-100" ng-show="isEditScreenVisible">
+        <div class="bg-white p-6 referal-head-lb">
+            <ul class="asc-actions-scroll">
+                <li>
+                    <label>Operative notes: </label>
+                </li>
+                <li class="flex text-right">
+                    <button class="btn btn-light-green" ng-click="OperativeNotesPrint()">Print</button>
+                    <button class="btn bg-068cb0 b-0 quick-summary-profile active" ng-if="OperativeNotesObj.OperativeChartStatus !== 'E'&&UserAccessRights.AllAccessRights.ASCOperativeNotesEdit" ng-click="NavFromSumaryOperativeNotes(OperativeNotesObj)">Edit</button>
+                    <button class="btn bg-F19398 text-white" ng-if="OperativeNotesObj.OperativeChartStatus === 'E'&&UserAccessRights.AllAccessRights.ASCOperativeNotesUnsign" ng-click="UnsignFromSumary()">Un-sign</button>
+                    <button class="btn btn-discard-us" ng-click="closeuib()">Close</button>
+                </li>
+            </ul>
+        </div>
+        <div class="pos-relative h-100">
+            <div class="bg-DDDDDD bradius-6 adjustable-position flex h-100">
+                <!--style="min-height: 72vh"-->
+                <div class="asc-panel">
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Patient : </span>
+                                        <label>{{cacheStorageItem.PatientName}}</label>
+                                    </li>
+                                    <li>
+                                        <span>MR.No : </span>
+                                        <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                                    </li>
+                                    <li>
+                                        <span>DOB : </span>
+                                        <label>{{cacheStorageItem.PatientDOB | date: "MM-dd-yyyy"}}</label>
+                                    </li>
+                                    <li>
+                                        <span>DOS : </span>
+                                        <label>{{SurgeryDiagnosisObj.SurgeryDate | date: "MM-dd-yyyy"}}</label>
+                                    </li>
+                                </ul>
+
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Procedure : </span>
+                                        <label>{{SurgeryDiagnosisObj.OperativeProcedure}}</label>
+                                    </li>
+                                    <li>
+                                        <span>Operated Eye : </span>
+                                        <label> {{SurgeryDiagnosisObj.OrganId === 1 ? 'OD' : (SurgeryDiagnosisObj.OrganId === 2 ? 'OS': (SurgeryDiagnosisObj.OrganId === 3 ? 'OU':(SurgeryDiagnosisObj.OrganId === 4 ? 'General':''))) }}</label>
+                                    </li>
+                                </ul>
+
+                                <ul class="referral-summary-list">
+                                    <li>
+                                        <span>Surgeon : </span>
+                                        <label>{{SurgeryDiagnosisObj.Surgeon}}</label>
+                                    </li>
+                                    <li>
+                                        <span>Anesthetist :</span>
+                                        <label>{{SurgeryDiagnosisObj.Anesthetist}}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table class="asc-table-admission">
+                                    <tbody>
+                                        <tr>
+                                            <th width="16%">
+                                                Pre-op Dx
+                                            </th>
+                                            <td ng-if="SurgeryDiagnosisObj.Diagnosis!=''">
+                                                <ul class="referral-summary-list">
+                                                    <li>
+                                                        {{SurgeryDiagnosisObj.ICDCode}}-{{SurgeryDiagnosisObj.Diagnosis}}  <span ng-show="SurgeryDiagnosisObj.Diagnosis2 !=''">,{{ SurgeryDiagnosisObj.ICDCode2}}-{{SurgeryDiagnosisObj.Diagnosis2}}</span>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="SurgeryDiagnosisObj.Diagnosis ==''">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Post-op Dx
+                                            </th>
+                                            <td ng-if="(Diagnosis | filter:{DeleteInd: 'N'}).length>0">
+                                                <div ng-repeat="item in Diagnosis | filter:{DeleteInd: 'N'} track by $index">
+                                                    <ul class="referral-summary-list">
+                                                        <li>
+                                                            <label>{{item.ICD10CODE}}-{{item.ICD10DIAGNAME}}</label>
+                                                        </li>
+                                                    </ul>
+                                                    <ul class="referral-summary-list" ng-repeat="Litem in item.StatusList">
+                                                        <li class="text-s12w500c000" ng-if="Litem.SeverityId!=null">
+                                                            <span>Severity:</span>
+                                                            <label ng-if="Litem.SeverityId==1">Mild</label>
+                                                            <label ng-if="Litem.SeverityId==3">Moderate</label>
+                                                            <label ng-if="Litem.SeverityId==5">Severe</label>
+                                                        </li>
+                                                        <li class="text-s12w500c000" ng-if="Litem.DiagnosisStatusId!=null">
+                                                            <span>Status:</span>
+                                                            <label ng-if="Litem.DiagnosisStatusId==1">Provisional</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==2">Active</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==3">InActive</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==4">Resolved</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==5">RuledOut</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==6">Not Examined</label>
+                                                            <label ng-if="Litem.DiagnosisStatusId==7">Entered In Error</label>
+                                                        </li>
+                                                        <li class="text-s12w500c000" ng-if="Litem.OrganId!=null">
+                                                            <span>Eye:</span>
+                                                            <label ng-if="Litem.OrganId==1">OD</label>
+                                                            <label ng-if="Litem.OrganId==2">OS</label>
+                                                            <label ng-if="Litem.OrganId==3">OU</label>
+                                                            <label ng-if="Litem.OrganId==4">General</label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td ng-if="(Diagnosis | filter:{DeleteInd: 'N'}).length==0">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Lens Used
+                                            </th>
+                                            <td ng-if="ImplantsDetailsArray.length > 0">
+                                                <ul class="referral-summary-list" ng-repeat="imp in ImplantsDetailsArray| filter:{'DeleteInd':'N'} track by $index">
+                                                    <li>
+                                                        <span>Lens: </span>
+                                                        <label>{{imp.LensType}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <span>Power: </span>
+                                                        <label>{{imp.Power}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <span>Serial No:</span>
+                                                        <label>{{imp.SerialNumber}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <label>Status:</label>
+                                                        <span>{{imp.StatusName}}</span>
+                                                    </li>
+                                                    <li>
+                                                        <label>Remarks:</label>
+                                                        <span>{{imp.Remarks}}</span>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-if="ImplantsDetailsArray.length === 0">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Procedure Notes
+                                            </th>
+                                            <td ng-if="OperativeNotesObj.ProcedureDetails != ''">
+                                                <span class="pre-line" ng-bind-html="OperativeNotesObj.ProcedureDetails"></span>
+                                            </td>
+                                            <td ng-if="OperativeNotesObj.ProcedureDetails == ''">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Complications
+                                            </th>
+                                            <td ng-if="OperativeNotesObj.Complications  != ''">
+                                                <span class="pre-line" ng-bind-html="OperativeNotesObj.Complications"></span>
+
+                                            </td>
+                                            <td ng-if="OperativeNotesObj.Complications  == ''">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Findings
+                                            </th>
+                                            <td ng-if="OperativeNotesObj.Findings != ''">
+                                                <span class="pre-line" ng-bind-html="OperativeNotesObj.Findings"></span>
+
+                                            </td>
+                                            <td ng-if="OperativeNotesObj.Findings == ''">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Surgeon Operative Notes
+                                            </th>
+                                            <td ng-if="OperativeNotesObj.SurgeonOperativeNotes != ''">
+                                                <span class="pre-line" ng-bind-html="OperativeNotesObj.SurgeonOperativeNotes"></span>
+
+                                            </td>
+                                            <td ng-if="OperativeNotesObj.SurgeonOperativeNotes == ''">
+                                                <p>No data Added.</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="asc-panel" ng-if="OperativeNotesObj.OperativeNotesReviewedBy != ''">
+                                <div class="asc-panel-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="flex-flow-ulli">
+                                                <li>
+                                                    <span class="text-s12w400C000">Reviewed By:</span>
+                                                </li>
+                                                <li>
+                                                    {{OperativeNotesObj.OperativeReviewedName}} {{OperativeNotesObj.OperativeReviewedNameSuffix}} 
+                                                </li>
+                                                <li ng-show="OperativeNotesObj.ReviewedByLicenseNumber !==''">
+                                                   Lic: {{OperativeNotesObj.ReviewedByLicenseNumber}}
+                                                </li>
+                                                
+                                                <li>
+                                                    {{OperativeNotesObj.OperativeReviewedDate}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                        
+                            <div class="col-lg-12">
+                                <div class="asc-panel">
+                                    <div class="asc-panel-header">
+                                        <h1>Signed By</h1>
+                                    </div>
+                                    <div class="asc-panel-body">
+                                        <ul class="flex-flow-ulli-mb0">
+                                            <li ng-repeat="item in OperativeNotesObj.LastSignOffUserDetails">
+                                                <label ng-show="item.IsSurgeon">Surgeon :  </label>
+                                                <label>Electronically Signed By - </label>
+                                                <label ng-show="item.SuffixId ==10">Dr. </label>
+                                                <label>{{item.SignOffUserName}} {{item.SuffixName}},</label>
+                                                <label ng-show="item.LicenseNumber !==''">Lic: {{item.LicenseNumber}},</label>
+                                                <label>{{item.Date | date:"MM-dd-yyyy"}},</label>
+                                                <label>{{item.Time | amPm}}</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <
+</div>
+
+<!--<div ng-if="!OperativeNotesObj.IsShowAddScreen" class="h-100">
+    <div ng-include="'templates/ASC/ASCSummaryParent.html'" class="h-100"></div>
+</div>-->
+
+<script type="text/ng-template" id="AddProcedureNotesTemplatSave.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterProcedureNotesTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveProcedureNotesTemplate()">Save Template</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="AddComplicationsTemplatSave.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterComplicationsTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveComplicationsTemplate()">Save Template</button>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="AddFindingsTemplatSave.html">
+    <div ng-if="IsOpenFindings">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterFindingsTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddTemplateFindingNotes()">Save Template</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="AddSurgeonTemplatSave.html">
+    <div ng-if="IsOpenSurgeon">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterSurgeonTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddTemplateSurgeonOperativeNotes()">Save Template</button>
+    </div>
+</script>

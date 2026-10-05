@@ -1,0 +1,1359 @@
+﻿<div ng-controller="USCoordinatorParentCtrl">
+    <!--<div class="ROS-flex-flow m-t-10 grid-gap-5 align-items-center  m-b-10">
+        <div class="ehr-tabs border">
+            <ul>
+                <li class="active">
+                    <a href="javascript:;" data-toggle="tab" data-target="">Surgeries</a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-toggle="tab" data-target="">Investigations</a>
+                </li>
+                <li>
+                    <a href="javascript:;" data-toggle="tab" data-target="">Procedures</a>
+                </li>
+            </ul>
+        </div>
+        <div class="flex">
+            <input type="text" class="form-control icons-search input-color" placeholder="Enter CPT Code">
+        </div>
+        <div>
+            <a href="javascript:;" ng-click="">
+                <i class="plus-icon-us us-icon"></i>
+            </a>
+        </div>
+    </div>-->
+
+     
+
+
+     
+
+    <uib-accordion close-others="oneAtATime" class="coordinator-accordion" ng-repeat="item in Coordinatorobj.FinalOrdersList track by $index" ng-show="!Mainobj.SummaryView">
+        <div uib-accordion-group class="panel-default" is-open="item.open">
+            <uib-accordion-heading>
+                <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                {{item.ProcedureCode}}
+                <span ng-if="item.OrganId === 1">(OD)</span>
+                <span ng-if="item.OrganId === 2">(OS)</span>
+                <span ng-if="item.OrganId === 3">(OU)</span>
+                | {{item.Description}}
+                <ul class="flex-flow-ulli-mb0 counsler-remarks m-0" ng-click="$event.stopPropagation();">
+                    <li uib-popover-template="CoordinatornotesPopover.templateUrl" popover-append-to-body="true" class="cur-poiter" popover-placement="bottom-right" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-300">
+                        <img src="img/consultation/counsler-remarks.svg" />
+                        <span class="m-l-5">Co.Notes</span>
+                    </li>
+                    <li uib-popover-template="DoctornotesPopover.templateUrl" popover-append-to-body="true" class="cur-poiter" popover-placement="bottom-right" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-300">
+                        <img src="img/consultation/counsler-remarks.svg" />
+                        <span class="m-l-5">Dr.Notes</span>
+                    </li>
+                    <li class="bg-none b-0">
+                        <div class="form-group m-0">
+                            <select class="form-control" ng-model="item.CoordinatorStatusId" ng-change="changeStatus(item)">
+                                <option value="">Surgery Status</option>
+                                <option value="3">Accepted</option>
+                                <option value="2">Follow-Up</option>
+                                <option value="1">Not Accepted</option>
+                            </select>
+                        </div>
+                    </li>
+                    <!--<li uib-popover-template="LognotesPopover.templateUrl" class="cur-poiter" popover-placement="auto" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-300">
+                        <img src="img/consultation/counsler-remarks.svg" />
+                        <span  class="m-l-5">Log</span>
+                    </li>-->
+                </ul>
+            </uib-accordion-heading>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="three-sections">
+                        <div class="eh-panel flex">
+                            <div class="eh-header">
+                                <h1>Diagnosis</h1>
+                                <ul class="us-controls">
+                                    <li>
+                                        <a href="javascript:;">
+                                            <img src="img/us-consultation/plus-icon.svg" />
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="eh-body">
+                                <table class="table tableno-bordered tableno-padding m-0">
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in item.DiagnosisList">
+                                            <td width="8%">
+                                                <span class="text-s14w600c000">{{Ditem.ICDCode}}</span>
+                                            </td>
+                                            <td>
+                                                {{Ditem.DiagnosisName}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="eh-panel flex" ng-if="item.CoordinatorStatusId == 3">
+                            <div class="eh-header">
+                                <h1>Appointment Booking</h1>
+                                <ul class="us-controls">
+                                    <li>
+                                        <a href="javascript:;" class="btn btn-save-us text-white" ng-click="SurgeryBookAppt('PreAdmission',item)">
+                                            Book
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="eh-body">
+                                <div class="three-sections">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Pre Admission</label>
+                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="item.PreAdmissionDate" datepickerapnlus readonly ng-focus="CalendarAdmissionFocus == true" class="icons-calendar" />
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Date of surgery</label>
+                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="item.DateOfSurgery" datepickerapnlus readonly ng-focus="CalendarSurgeryFocus == true" class="icons-calendar" ng-change="changeDateOfSurgery(item.DateOfSurgery,item);" />
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Post 1 Day</label>
+                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="item.FirstFollowupDate" datepickerapnlus readonly ng-focus="CalendarPost1DayFocus == true" class="icons-calendar" />
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Post 1 week</label>
+                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="item.SecondFollowupDate" datepickerapnlus readonly ng-focus="CalendarPost1WeekFocus == true" class="icons-calendar" />
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Post 1 Month</label>
+                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="item.ThirdFollowupDate" datepickerapnlus readonly ng-focus="CalendarPost1MonthFocus == true" class="icons-calendar" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="eh-header">
+                                <h1>Surgery Staff</h1>
+                            </div>
+                            <div class="eh-body">
+                                <div class="two-sections">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Doctor</label>
+                                        <select ng-model="item.DoctorId" ng-options="doc.DoctorID as doc.FullName for doc in clinicDoctorList">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Additional Doctor</label>
+                                        <select ng-model="item.CoSurgeonId" ng-options="doc.DoctorID as doc.FullName for doc in clinicDoctorList">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Nurse</label>
+                                        <select ng-model="item.NurseId" ng-options="doc.DoctorID as doc.FullName for doc in AllNursesList">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Anesthetist</label>
+                                        <select ng-model="item.AnesthesistId" ng-options="doc.DoctorID as doc.FullName for doc in AllAnesthesistsList">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="eh-panel flex" ng-if="item.CoordinatorStatusId == 3">
+                            <div class="eh-header">
+                                <h1>Approvals & Consents</h1>
+                                <!--<ul class="autofill-list m-0">
+                                    <li>
+                                        <a class="active-summary" href="javascript:;">
+                                            Care Providers
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;">
+                                            Guardian
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;">
+                                            Patient
+                                        </a>
+                                    </li>
+                                </ul>-->
+                                <div>
+                                    <a href="javascript:;">
+                                        <img src="img/us-consultation/plus-icon.svg" />
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="eh-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <table class="table table-border-bottom m-0">
+                                            <tbody ng-repeat="i in [1,2,3,4]">
+                                                <tr>
+                                                    <td>
+                                                        <div class="checkbox cn">
+                                                            <label>
+                                                                <input name="checkbox-1" type="checkbox">
+                                                                <span class="checkbox-material">
+                                                                    <span class="check"></span>
+                                                                </span>
+                                                                <small class="text-s12w500c000 m-l-5">
+                                                                    Co-Management consent &amp; transfer of care form
+                                                                </small>
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <button class="btn btn-save-us">Action</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="checkbox cn">
+                                                            <label>
+                                                                <input name="checkbox-1" type="checkbox">
+                                                                <span class="checkbox-material">
+                                                                    <span class="check"></span>
+                                                                </span>
+                                                                <small class="text-s12w500c000 m-l-5">
+                                                                    Co-Management consent &amp; transfer of care form
+                                                                </small>
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span class="text-3ebaab">Complete</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eh-panel" ng-if="item.CoordinatorStatusId == 1">
+                            <div class="eh-header">
+                                <h1>Not Accepted</h1>
+                            </div>
+                            <div class="eh-body">
+                                <div class="form-group">
+                                    <ul class="flex-flow-ulli-mb0">
+                                        <li>
+                                            <span>Follow-Up Date</span>
+                                        </li>
+                                        <li>
+                                            <div class="ehr-input pop-ehr-input">
+                                                <input type="text" placeholder="MM-DD-YYYY" ng-model="item.FollowupDate" datepickerapnlus readonly ng-focus="CalendarFollowUpDateFocus == true" class="icons-calendar" />
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="ehr-input pop-ehr-input">
+                                    <textarea class="msd-elastic: \n; ros-notes" placeholder="Enter Notes" rows="3" maxlength="500" ng-model="item.Remarks"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eh-panel" ng-if="item.CoordinatorStatusId == 2">
+                            <div class="eh-header">
+                                <h1>Follow Up</h1>
+                            </div>
+                            <div class="eh-body">
+                                <div class="form-group">
+                                    <ul class="flex-flow-ulli-mb0">
+                                        <li>
+                                            <span>Follow-Up Date</span>
+                                        </li>
+                                        <li>
+                                            <div class="ehr-input pop-ehr-input">
+                                                <input type="text" placeholder="MM-DD-YYYY" ng-model="item.FollowupDate" datepickerapnlus readonly ng-focus="CalendarFollowUpDateFocus == true" class="icons-calendar" />
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="ehr-input pop-ehr-input">
+                                    <textarea class="msd-elastic: \n; ros-notes" placeholder="Enter Notes" rows="3" maxlength="500" ng-model="item.Remarks"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </uib-accordion>
+
+    <div class="row">
+        <div class="col-lg-12" ng-show="Mainobj.IsEditData && Mainobj.SummaryView ==false">
+             
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="two-sections">
+                        <section class="eh-panel flex">
+                            <div class="eh-header">
+                                <h1 class="text-068cb0">Cost Estimated</h1>
+
+                                <div class="width-35 m-l-10 pos-relative" ng-if="Mainobj.CostEstimatorType == 'Bill'">
+                                    <input type="text" class="form-control icons-search input-color" placeholder="Enter CPT code"
+                                           autocomplete="off"
+                                           maxlength="100"
+                                           ng-model="Coordinatorobj.BillParticular"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           uib-typeahead="treatitem as treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                           typeahead-on-select="pushtoBill(Coordinatorobj.BillParticular)" />
+                                </div>
+                                <ul class="us-controls" ng-if="Mainobj.CostEstimatorType == 'Bill'">
+                                    <li>
+                                        <select class="form-control"
+                                                ng-options="Ditem as Ditem.TemplateName for Ditem in BillItemTemplatesArray"
+                                                ng-model="Coordinatorobj.SelectedBillTemplateName"
+                                                ng-change="ChangesForBillTemp(Coordinatorobj.SelectedBillTemplateName)">
+                                            <option value="">Template</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <input type="text" class="bg-dbf6ff form-control btr-radius bbr-radius" ng-model="Coordinatorobj.EnterBillTemplateName" placeholder="Template Name" />
+                                        <button class="btn-eh-dark btn m-r-10 btl-radius bbl-radius" ng-click="SaveBillTemplates()">Save</button>
+                                    </li>
+                                    <li>
+                                        <img src="img/consultation/cost-estimated-upload.svg" width="30" ng-class="Mainobj.CostEstimatorType =='Uploaded'?'active':''" ng-click="Mainobj.CostEstimatorType ='Uploaded'" title="Upload" />
+                                    </li>
+                                </ul>
+                                
+                            </div>
+                            <div class="eh-body">
+                                <div class="row" ng-show="Mainobj.CostEstimatorType =='Bill'">
+                                    <div class="col-lg-12" ng-show="Mainobj.BillItemList.length>0">
+                                        <table class="table-eh">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"></th>
+                                                    <th class="text-center">Bill Item</th>
+                                                    <th width="10%" class="text-center">Units</th>
+                                                    <th width="15%" class="text-center">Price</th>
+                                                    <th width="10%" class="text-center">Total</th>
+                                                    <th width="5%" class="text-center"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="Bitem in Mainobj.BillItemList">
+                                                    <td><span class="text-s14w600c000">{{Bitem.CPTCode}}</span>  </td>
+                                                    <td>{{Bitem.ProcedureName}}(OD)</td>
+                                                    <td class="text-center">
+                                                        <input type="number" class="form-control" ng-model="Bitem.Units" ng-change="changePrice(Bitem)" />
+                                                    </td>
+                                                    <!--ng-blur="onblurevent()"-->
+                                                    <td class="text-center">
+                                                        <input type="number" class="form-control" ng-change="changePrice(Bitem)" ng-model="Bitem.PatientCoPay" />
+                                                        <!--<span class="border bradius-6 p-t-5 p-b-5 p-l-10 p-r-10">27,363</span>-->
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input type="number" class="form-control" ng-disabled="true" ng-model="Bitem.Total" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a href="javascript:;" ng-click="DelectBillitem(Bitem,$index)">
+                                                            <i class="eh-close eh-icon"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" class="text-right">
+                                                        <button class="btn btn-save-us-outline" ng-click="CordinatePrint(Mainobj,PatientInfo)">Print <i class="fas fa-print"></i></button>
+                                                    </th>
+                                                    <th></th>
+                                                    <th class="text-center text-s12w500c000">
+                                                        Total Price
+                                                    </th>
+                                                    <th class="text-center text-s14w600c000">
+                                                        {{Mainobj.TotalChargeAmount}}
+                                                    </th>
+                                                    <th>&nbsp;</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- / -->
+                                <div class="row" ng-show="Mainobj.CostEstimatorType =='Uploaded'">
+                                    <div class="col-lg-12">
+                                        <table class="table tableno-bordered tableno-padding">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div class="ehr-input">
+                                                            <label>Upload</label>
+                                                            <input id="fileName" type="file"
+                                                                   ng-model="file"
+                                                                   ngf-select="selectPrintImgLogo($file)"
+                                                                   name="file"
+                                                                   ngf-pattern="'image/*,application/pdf'"
+                                                                   ngf-accept="'image/*,application/pdf'"
+                                                                   ngf-max-size="5MB"
+                                                                   multiple="multiple" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="w-50">
+                                                        <img ngf-thumbnail="file" class="img-responsive img-thumbnail" ng-if="file != ''">
+                                                    </td>
+                                                    <td width="20%">
+                                                        <div class="ehr-input">
+                                                            <label>Total Price</label>
+                                                            <input type="number" ng-model="Mainobj.TotalAmount" />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="pop-ehr-input">
+                                                            <button class="btn btn-save-us btn-block" ng-click="Savebillitemimage()">Save</button>
+                                                            <button class="btn btn-danger-us btn-block" ng-click="Mainobj.CostEstimatorType = 'Bill'">Close</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="eh-panel width-35">
+                            <div class="eh-header">
+                                <h1 class="text-068cb0">Patient Education</h1>
+                                <ul class="us-controls">
+                                    <!--<li>
+                                        <select class="form-control w-200">
+                                            <option>Search</option>
+                                        </select>
+                                    </li>-->
+                                    <li>
+                                        <div class="ehr-tabs">
+                                            <ul>
+                                                <li class="active">
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Videos">Videos</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Images">Images</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Files">Files</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" title="list" ng-click="GetOrganizationSurgery()">
+                                                        view
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" ng-click="EducationfieldPopup()">
+                                            <i class="plus-icon-us us-icon"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="eh-body m-t-10">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="ehr-tabs">
+                                            <!--<ul>
+                                                <li class="active">
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Videos">Videos</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Images">Images</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-toggle="tab" data-target="#Files">Files</a>
+                                                </li>
+                                            </ul>-->
+                                            <div class="tab-content">
+                                                <div id="Videos" class="tab-pane fade in active">
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control icons-search input-color" pattern="Search video" />
+                                                    </div>
+                                                    <ul class="patient-education-list h-205 overflow-y-scroll overflow-x-hidden">
+                                                        <!--ng-repeat="Vitem in Mainobj.PatientEducationVideoList"-->
+                                                        <li ng-repeat="Vitem in Coordinatorobj.VideoDetails">
+                                                            <section class="width-100">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-1" type="checkbox" ng-model="Vitem.IsChecked">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                                <a href="{{Vitem.VideoURL}}" target="_blank" class="dis-block width-100">
+                                                                    <img ng-show="Vitem.videoId !=null" class="width-100 height-100" src="http://img.youtube.com/vi/{{Vitem.videoId}}/hqdefault.jpg" title="{{Vitem.VideoName}}" />
+                                                                    <img ng-show="Vitem.videoId ==null" class="width-100 height-100" src="img/new-icons/default-patient-education.svg" title="YouTube Video" alt="YouTube Video" />
+                                                                </a>
+
+                                                                <label ng-show="Vitem.VideoName !=''"><a href="{{Vitem.VideoURL}}" target="_blank">{{Vitem.VideoName}}</a></label>
+                                                                <label ng-show="Vitem.VideoName ==''"><a href="{{Vitem.VideoURL}}" target="_blank">---</a></label>
+                                                            </section>
+                                                        </li>
+                                                        <!--<li>
+                                                            <section>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-1" type="checkbox">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                                <img src="http://img.youtube.com/vi/_4H1Wrz2rno/hqdefault.jpg" title="YouTube Video" alt="YouTube Video" />
+                                                                <label>
+                                                                    Sai Jyothi Hospital Testimonial #EHNOTE
+                                                                </label>
+                                                            </section>
+                                                        </li> -->
+                                                    </ul>
+                                                </div>
+                                                <div id="Images" class="tab-pane fade">
+                                                    <ul class="patient-education-list h-205 overflow-y-scroll" ng-if="Coordinatorobj.TempImagesArray.length != 0">
+                                                        <li ng-repeat="imgitem in Coordinatorobj.TempImagesArray" image-viewer isarraychanged="0" timeout="500">
+                                                            <section class="width-100">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-1" type="checkbox" ng-model="imgitem.IsChecked">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                                <img title="{{imgitem.FileName}}" ng-src="{{imgitem.S3URL}}" />
+                                                                <label>{{imgitem.FileName}}</label>
+                                                            </section>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                                <div id="Files" class="tab-pane fade">
+                                                    <ul class="patient-education-list h-205 overflow-y-scroll">
+                                                        <li ng-repeat="pdfitem in Coordinatorobj.TempPdfArray">
+                                                            <section class="width-100">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-1" type="checkbox" ng-model="pdfitem.IsChecked">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                                <span>
+                                                                    <img src="img/pdf.png" ng-click="openPdfFileUploads(pdfitem.S3URL)" ng-if="pdfitem.DocumentId!=0" />
+                                                                </span>
+                                                                <label>{{pdfitem.FileName}}</label>
+                                                            </section>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- / -->
+                                <div class="well well-sm row m-0">
+                                    <div class="col-lg-6">
+                                        <ul class="list-unstyled m-0 dis-flex align-items-center">
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-1" type="checkbox">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>
+                                                            SMS
+                                                        </small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-1" type="checkbox">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>
+                                                            Email
+                                                        </small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6 text-right">
+                                        <button class="btn btn-save-us">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- / -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <section class="eh-panel">
+                        <div class="eh-header">
+                            <h1 class="text-068cb0">Medications</h1>
+                        </div>
+                        <div class="eh-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="consultation-ros">
+                                        <section class="eh-panel">
+                                            <div class="eh-header">
+                                                <h1>Pre Surgery Medications</h1>
+                                                <ul class="us-controls">
+                                                    <li>
+                                                        <a href="javascript:;" ng-click="medicationcordinatorclick('PreSurgery')">
+                                                            <i class="plus-icon-us us-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="eh-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <ul class="list-cord-pcl">
+                                                            <li ng-repeat="Poitem in Mainobj.MedicationsList |filter:{DeleteInd: 'N'} track by $index">
+                                                                <label>{{Poitem.MedicineName}}</label>
+                                                                <p>
+                                                                    <span ng-show="Poitem.Action!=''">{{Poitem.Action}}</span>
+                                                                    <span ng-show="Poitem.Dose!=''">{{Poitem.Dose}}</span>
+                                                                    <span ng-show="Poitem.DoseUnit!=''">{{Poitem.DoseUnit}}</span>
+                                                                    <span ng-show="Poitem.Route!=''">{{Poitem.Route}}</span>
+                                                                    <span ng-show="Poitem.Frequency!=''">{{Poitem.Frequency}}</span>
+                                                                    <span ng-show="Poitem.DoseOther!=''">{{Poitem.DoseOther}}</span>
+                                                                    <span ng-show="Poitem.DaysSupply!=''">{{Poitem.DaysSupply}}</span>
+                                                                </p>
+                                                                <!--<span ng-show="Poitem.Instructions!=''">
+                                                                    <b>Instructions:</b> {{Poitem.Instructions}}
+                                                                </span>-->
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="eh-panel">
+                                            <div class="eh-header">
+                                                <h1>Current Medications</h1>
+                                                <ul class="us-controls">
+                                                    <li>
+                                                        <a href="javascript:;" ng-click="medicationcordinatorclick('CurrentMedications')">
+                                                            <i class="plus-icon-us us-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="eh-body p-t-5">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div>
+                                                            <b class="text-c28acb4 m-b-5">Stopped Medications(NPO)</b>
+                                                            <ul class="list-cord-pcl">
+                                                                <li ng-if="Citem.MedicationType =='Stop'" ng-repeat="Citem in Mainobj.CurrentMedicationList |filter:{DeleteInd: 'N'} track by $index">
+                                                                    <p>
+                                                                        {{Citem.MedicineName}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <span ng-show="Citem.Action!=''">{{Citem.Action}}</span>
+                                                                        <span ng-show="Citem.Dose!=''">{{Citem.Dose}}</span>
+                                                                        <span ng-show="Citem.DoseUnit!=''">{{Citem.DoseUnit}}</span>
+                                                                        <span ng-show="Citem.Route!=''">{{Citem.Route}}</span>
+                                                                        <span ng-show="Citem.Frequency!=''">{{Citem.Frequency}}</span>
+                                                                        <span ng-show="Citem.DoseOther!=''">{{Citem.DoseOther}}</span>
+                                                                        <span ng-show="Citem.DaysSupply!=''">{{Citem.DaysSupply}}</span>
+                                                                    </p>
+                                                                </li>
+
+                                                            </ul>
+                                                        </div>
+                                                        <div>
+                                                            <b class="text-ce86868 m-b-5">Continuation Medications</b>
+                                                            <ul class="list-cord-pcl">
+                                                                <li ng-if="Citem.MedicationType =='Continuation'" ng-repeat="Citem in Mainobj.CurrentMedicationList |filter:{DeleteInd: 'N'} track by $index">
+                                                                    <p>
+                                                                        {{Citem.MedicineName}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <span ng-show="Citem.Action!=''">{{Citem.Action}}</span>
+                                                                        <span ng-show="Citem.Dose!=''">{{Citem.Dose}}</span>
+                                                                        <span ng-show="Citem.DoseUnit!=''">{{Citem.DoseUnit}}</span>
+                                                                        <span ng-show="Citem.Route!=''">{{Citem.Route}}</span>
+                                                                        <span ng-show="Citem.Frequency!=''">{{Citem.Frequency}}</span>
+                                                                        <span ng-show="Citem.DoseOther!=''">{{Citem.DoseOther}}</span>
+                                                                        <span ng-show="Citem.DaysSupply!=''">{{Citem.DaysSupply}}</span>
+                                                                    </p>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="eh-panel">
+                                            <div class="eh-header">
+                                                <h1>Labs/Investigations</h1>
+                                                <ul class="us-controls">
+                                                    <li>
+                                                        <a href="javascript:;" ng-click="medicationcordinatorclick('LabInvestigations')">
+                                                            <i class="plus-icon-us us-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="eh-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <ul class="list-cord-pcl">
+                                                            <li ng-repeat="Iitem in Mainobj.InvestigationsList |filter:{DeleteInd: 'N'} track by $index">
+                                                                <span>
+                                                                    ({{Iitem.OrganId === 1 ? 'OD' : (Iitem.OrganId === 2 ? 'OS': (Iitem.OrganId === 3 ? 'OU': (Iitem.LocationId === 2 ? 'General':''))) }}) {{Iitem.ProcedureCode}} |{{Iitem.InvestigationName}}
+                                                                    <span class="text-s12w400c767575" ng-if="Iitem.DurationDate !='' && Iitem.DurationDate != null">(Scheduled on {{Iitem.DurationDate | date:"MM-dd-yyyy"}})</span>
+                                                                    <span class="text-s12w400c767575" ng-if="Iitem.Duration != '' && Iitem.Duration != null">(Scheduled For {{Iitem.Duration}} {{Iitem.DurationType === 'Y' ? 'Year(s)' : (Iitem.DurationType === 'W' ? 'Week(s)' : (Iitem.DurationType === 'M' ? 'Month(s)' : (Iitem.DurationType === 'D' ? 'Day(s)' :  (Iitem.DurationType === 'SB'? 'Since Birth' : ''))))}})</span>
+                                                                </span>
+                                                                <p ng-show="Iitem.InvestigationNotes!=''" class="fs-12 text-s12w500c000 font-weight-600">
+                                                                    <b class="text-068cb0 fs-12">Notes :</b> {{Iitem.InvestigationNotes}}
+                                                                </p>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="eh-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="col-lg-12 p-l-0">
+                                        <div class="pop-ehr-input ehr-input">
+                                            <label>Remarks</label>
+                                            <textarea class="msd-elastic: \n; ros-notes" placeholder="Enter Coordinater Remarks" rows="1" maxlength="500" ng-model="Mainobj.Remarks"></textarea>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="15%">
+                                    <div class="pop-ehr-input ehr-input">
+                                        <label>Reviewed By</label>
+                                        <select class="height-36" ng-model="Mainobj.ReviewedBy" ng-options="item.DoctorID as item.FullName for item in AllCoordinatorList">
+                                            <option value="">Select</option>
+                                            <!--<option></option>
+                                            <option></option>-->
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="16%">
+                                    <div class="form-group m-t-25">
+                                        <button class="btn btn-success height-35 p-l-30 p-r-30 m-l-5" ng-show="Mainobj.StatusFlag !='C'" ng-click="AddUpdateAdvisedProcedures('D');">Save</button>
+                                        <button class="btn btn-save-us height-35 p-l-30 p-r-30" ng-click="AddUpdateAdvisedProcedures('C');">Sign Off</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+
+            <!-- Summary -->
+            <div class="" ng-show="Mainobj.SummaryView ==true">
+                <div class="row">
+                    <div class="col-lg-12 m-t-10">
+                        <div class="form-group text-right">
+                            <button class="btn btn-success" ng-show="Mainobj.StatusFlag =='D'" ng-click="AfterEditSummary(Mainobj);">
+                                <i class="fas fa-edit"></i>Edit
+                            </button>
+                            <button class="btn btn-danger" ng-show="Mainobj.StatusFlag =='C'" ng-click="AfterEditSummary(Mainobj);">
+                                <i class="fas fa-sign-out-alt m-r-5"></i> Un-Sign
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table tableno-bordered m-b-0 tableno-padding">
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <section class="eh-panel" ng-repeat="item in Mainobj.FinalOrdersList">
+                                            <div class="eh-header bg-none">
+                                                <h1 class="fs-14">{{item.ProcedureCode}} | {{item.Description}} </h1>
+                                                <ul class="us-controls">
+                                                    <li uib-popover-template="CoordinatornotesPopover.templateUrl" class="cur-poiter" popover-placement="bottom-right" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-300">
+                                                        <img src="img/consultation/counsler-remarks.svg" />
+                                                        <span class="m-l-5">Co.Notes</span>
+                                                    </li>
+                                                    <li uib-popover-template="DoctornotesPopover.templateUrl" class="cur-poiter" popover-placement="bottom-right" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-300">
+                                                        <img src="img/consultation/counsler-remarks.svg" />
+                                                        <span class="m-l-5">Dr.Notes</span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="text-s14w500C068cb0">Status:</span>
+                                                        <span> {{item.CoordinatorStatus}}</span>
+                                                    </li>
+                                                    <li ng-if="item.PreAdmissionStatusId !== null">
+                                                        <span class="text-s14w500C068cb0">PreAdmission Status:</span>
+                                                        <span ng-if="item.PreAdmissionStatusId === 1"> Approved</span>
+                                                        <span ng-if="item.PreAdmissionStatusId === 2"> Not Fit for Surgery</span>
+                                                        <span ng-if="item.PreAdmissionStatusId === 3"> Postpone Surgery</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="eh-body">
+                                                <div class="three-sections">
+                                                    <section class="eh-panel bg-f1f1f1 b-0 width-30">
+                                                        <div class="eh-header b-0">
+                                                            <h1>Diagnosis</h1>
+                                                        </div>
+                                                        <div class="eh-body">
+                                                            <ul class="plan-of-d-list">
+                                                                <li ng-repeat="Ditem in item.DiagnosisList">
+                                                                    {{Ditem.ICDCode}} | {{Ditem.DiagnosisName}}
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </section>
+                                                    <section class="eh-panel bg-f1f1f1 width-30 b-0">
+                                                        <div class="eh-header b-0">
+                                                            <h1>Appointment Booking</h1>
+                                                        </div>
+                                                        <div class="eh-body">
+                                                            <ul class="flex-flow-ulli-mb0">
+                                                                <li ng-show="item.DoctorName!=''">
+                                                                    <span class="text-s12w500C068cb0">Doctor</span>
+                                                                    <span>{{item.DoctorName}}</span>
+                                                                </li>
+                                                                <li ng-show="item.CoSurgeonName!=''">
+                                                                    <span class="text-s12w500C068cb0">Additional Doctor:</span>
+                                                                    <span>{{item.CoSurgeonName}}</span>
+                                                                </li>
+                                                                <li ng-show="item.NurseName!=''">
+                                                                    <span class="text-s12w500C068cb0">Nurse:</span>
+                                                                    <span>{{item.NurseName}}</span>
+                                                                </li>
+                                                                <li ng-show="item.AnesthesistName!=''">
+                                                                    <span class="text-s12w500C068cb0">Anesthetist:</span>
+                                                                    <span>{{item.AnesthesistName}}</span>
+                                                                </li>
+                                                            </ul>
+                                                            <table class="table tableno-bordered m-b-0">
+                                                                <tbody class="bg-f1f1f1">
+                                                                    <tr ng-show="item.PreAdmissionDate!=''">
+                                                                        <td width="30%">
+                                                                            <span class="text-s12w500C068cb0">Pre Admission</span>
+                                                                        </td>
+                                                                        <td width="1%">
+                                                                            <span>:</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{item.PreAdmissionDate| date:'MM-dd-yyyy'}}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr ng-show="item.DateOfSurgery!=''">
+                                                                        <td>
+                                                                            <span class="text-s12w500C068cb0">Date of surgery</span>
+                                                                        </td>
+                                                                        <td width="1%">
+                                                                            <span>:</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{item.DateOfSurgery| date:'MM-dd-yyyy'}}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr ng-show="item.FirstFollowupDate!=''">
+                                                                        <td>
+                                                                            <span class="text-s12w500C068cb0">Post 1 Day</span>
+                                                                        </td>
+                                                                        <td width="1%">
+                                                                            <span>:</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{item.FirstFollowupDate| date:'MM-dd-yyyy'}}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr ng-show="item.SecondFollowupDate!=''">
+                                                                        <td>
+                                                                            <span class="text-s12w500C068cb0">Post 1 Week</span>
+                                                                        </td>
+                                                                        <td width="1%">
+                                                                            <span>:</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{item.SecondFollowupDate| date:'MM-dd-yyyy'}}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr ng-show="item.ThirdFollowupDate!=''">
+                                                                        <td>
+                                                                            <span class="text-s12w500C068cb0">Post 1 Month</span>
+                                                                        </td>
+                                                                        <td width="1%">
+                                                                            <span>:</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span>{{item.ThirdFollowupDate| date:'MM-dd-yyyy'}}</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </section>
+                                                    <section class="eh-panel bg-f1f1f1 flex b-0">
+                                                        <div class="eh-header b-0">
+                                                            <h1>Approvals & Consents</h1>
+                                                        </div>
+                                                        <div class="eh-body">
+                                                            <ul class="flex-flow-ulli-mb0 dis-block">
+                                                                <li ng-repeat="i in [1,2,3,4]">
+                                                                    <label>Co-Management consent & transfer of care form</label>
+                                                                    <span>Not Done</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </section>
+                                                </div>
+                                            </div>
+
+                                        </section>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="two-sections">
+                            <section class="eh-panel flex">
+                                <div class="eh-header">
+                                    <h1 class="text-068cb0">Cost Estimated</h1>
+                                </div>
+                                <div class="eh-body">
+                                    <div class="row" ng-show="Mainobj.CostEstimatorType =='Bill'">
+                                        <div class="col-lg-12" ng-show="Mainobj.BillItemList.length>0">
+                                            <table class="table-eh">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center"></th>
+                                                        <th class="text-center">Bill Item</th>
+                                                        <th width="10%" class="text-center">Units</th>
+                                                        <th width="15%" class="text-center">Price</th>
+                                                        <th width="10%" class="text-center">Total</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="Bitem in Mainobj.BillItemList">
+                                                        <td><span class="text-s14w600c000">{{Bitem.CPTCode}}</span>  </td>
+                                                        <td>{{Bitem.ProcedureName}}(OD)</td>
+                                                        <td class="text-center">
+                                                            <span class="border bradius-6 p-t-5 p-b-5 p-l-10 p-r-10">{{Bitem.Units}}</span>
+                                                        </td>
+                                                        <!--ng-blur="onblurevent()"-->
+                                                        <td class="text-center">
+                                                            <span class="border bradius-6 p-t-5 p-b-5 p-l-10 p-r-10">{{Bitem.PatientCoPay}}</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="border bradius-6 p-t-5 p-b-5 p-l-10 p-r-10">{{Bitem.Total}}</span>
+
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                                <thead>
+                                                    <tr>
+
+                                                        <th colspan="3"></th>
+                                                        <th class="text-center text-s12w500c000">
+                                                            Total Price
+                                                        </th>
+                                                        <th class="text-center text-s14w600c000">
+                                                            {{Mainobj.TotalChargeAmount}}
+                                                        </th>
+                                                        <th>&nbsp;</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- / -->
+                                    <div class="row" ng-show="Mainobj.CostEstimatorType =='Uploaded'">
+                                        <div class="col-lg-12">
+                                            <table class="table tableno-bordered tableno-padding">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="ehr-input">
+                                                                <label>Upload</label>
+                                                                <input id="fileName" type="file"
+                                                                       ng-model="file"
+                                                                       ngf-select="selectPrintImgLogo($file)"
+                                                                       name="file"
+                                                                       ngf-pattern="'image/*,application/pdf'"
+                                                                       ngf-accept="'image/*,application/pdf'"
+                                                                       ngf-max-size="5MB"
+                                                                       multiple="multiple" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="w-50">
+                                                            <img ngf-thumbnail="file" class="img-responsive img-thumbnail" ng-if="file != ''">
+                                                        </td>
+                                                        <td width="20%">
+                                                            <div class="ehr-input">
+                                                                <label>Total Price</label>
+                                                                <input type="number" ng-model="Mainobj.TotalAmount" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="valign-bottom w-100">
+                                                            <div class="ehr-input">
+                                                                <button class="btn btn-save-us btn-block" ng-click="Savebillitemimage()">Save</button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="eh-panel width-35">
+                                <div class="eh-header">
+                                    <h1 class="text-068cb0">Patient Education</h1>
+                                    <ul class="us-controls">
+                                        <!--<li>
+                                            <select class="form-control w-200">
+                                                <option>Search</option>
+                                            </select>
+                                        </li>-->
+                                        <li>
+                                            <div class="ehr-tabs">
+                                                <ul>
+                                                    <li class="active">
+                                                        <a href="javascript:;" data-toggle="tab" data-target="#Videos">Videos</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;" data-toggle="tab" data-target="#Images">Images</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;" data-toggle="tab" data-target="#Files">Files</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="eh-body m-t-10">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="ehr-tabs">
+                                                <div class="tab-content">
+                                                    <div id="Videos" class="tab-pane fade in active">
+                                                        <ul class="patient-education-list h-205 overflow-y-scroll">
+                                                            <!--ng-repeat="Vitem in Mainobj.PatientEducationVideoList"-->
+                                                            <li ng-repeat="Vitem in Mainobj.PatientEducationVideoList">
+                                                                <section>
+                                                                    <div class="checkbox cn">
+                                                                        <label>
+                                                                            <input name="checkbox-1" type="checkbox">
+                                                                            <span class="checkbox-material">
+                                                                                <span class="check"></span>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <a href="{{Vitem.VideoURL}}" target="_blank">
+                                                                        <img ng-show="Vitem.videoId !=null" src="http://img.youtube.com/vi/{{Vitem.videoId}}/hqdefault.jpg" style="height: 80px; width: 100%;" title="{{Vitem.VideoName}}" />
+                                                                        <img ng-show="Vitem.videoId ==null" src="img/new-icons/default-patient-education.svg" style="height: 80px; width: 100%;" title="YouTube Video" alt="YouTube Video" />
+                                                                    </a>
+
+                                                                    <label ng-show="Vitem.VideoName !=''"><a href="{{Vitem.VideoURL}}" target="_blank">{{Vitem.VideoName}}</a></label>
+                                                                    <label ng-show="Vitem.VideoName ==''"><a href="{{Vitem.VideoURL}}" target="_blank">---</a></label>
+                                                                </section>
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+                                                    <div id="Images" class="tab-pane fade">
+                                                        <ul class="patient-education-list h-205 overflow-y-scroll" ng-if="tempmaterialList[0].TempImagesArray.length != 0">
+                                                            <li ng-repeat="imgitem in tempmaterialList[0].TempImagesArray" image-viewer isarraychanged="0" timeout="500">
+                                                                <section>
+                                                                    <div class="checkbox cn">
+                                                                        <label>
+                                                                            <input name="checkbox-1" type="checkbox">
+                                                                            <span class="checkbox-material">
+                                                                                <span class="check"></span>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <img title="{{imgitem.FileName}}" ng-src="{{imgitem.S3URL}}" />
+                                                                    <label>{{imgitem.FileName}}</label>
+                                                                </section>
+                                                            </li>
+                                                        </ul>
+
+                                                    </div>
+                                                    <div id="Files" class="tab-pane fade">
+                                                        <ul class="patient-education-list h-205 overflow-y-scroll">
+                                                            <li ng-repeat="pdfitem in tempmaterialList[0].TempPdfArray">
+                                                                <section>
+                                                                    <div class="checkbox cn">
+                                                                        <label>
+                                                                            <input name="checkbox-1" type="checkbox">
+                                                                            <span class="checkbox-material">
+                                                                                <span class="check"></span>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <span>
+                                                                        <img src="img/pdf.png" ng-click="openPdfFileUploads(pdfitem.S3URL)" ng-if="pdfitem.DocumentId!=0" />
+                                                                    </span>
+                                                                    <label>{{pdfitem.FileName}}</label>
+                                                                </section>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- / -->
+
+                                </div>
+                            </section>
+                            <!-- / -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <section class="eh-panel">
+                            <div class="eh-header">
+                                <h1 class="text-068cb0">Medications</h1>
+                            </div>
+                            <div class="eh-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="consultation-ros">
+                                            <section class="eh-panel">
+                                                <div class="eh-header">
+                                                    <h1>Pre Surgery Medications</h1>
+                                                </div>
+                                                <div class="eh-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <ul class="list-cord-pcl">
+                                                                <li ng-repeat="Poitem in Mainobj.MedicationsList |filter:{DeleteInd: 'N'} track by $index">
+                                                                    <label>{{Poitem.MedicineName}}</label>
+                                                                    <p>
+                                                                        <span ng-show="Poitem.Action!=''">{{Poitem.Action}}</span>
+                                                                        <span ng-show="Poitem.Dose!=''">{{Poitem.Dose}}</span>
+                                                                        <span ng-show="Poitem.DoseUnit!=''">{{Poitem.DoseUnit}}</span>
+                                                                        <span ng-show="Poitem.Route!=''">{{Poitem.Route}}</span>
+                                                                        <span ng-show="Poitem.Frequency!=''">{{Poitem.Frequency}}</span>
+                                                                        <span ng-show="Poitem.DoseOther!=''">{{Poitem.DoseOther}}</span>
+                                                                        <span ng-show="Poitem.DaysSupply!=''">{{Poitem.DaysSupply}}</span>
+                                                                    </p>
+                                                                    <!--<span ng-show="Poitem.Instructions!=''">
+                                                                        <b>Instructions:</b> {{Poitem.Instructions}}
+                                                                    </span>-->
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <section class="eh-panel">
+                                                <div class="eh-header">
+                                                    <h1>Current Medications</h1>
+                                                    <!--<ul class="us-controls">
+                                                        <li>
+                                                            <a href="javascript:;" ng-click="medicationcordinatorclick('CurrentMedications')">
+                                                                <i class="plus-icon-us us-icon"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>-->
+                                                </div>
+                                                <div class="eh-body p-t-5">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div>
+                                                                <b class="text-c28acb4 m-b-5">Stopped Medications(NPO)</b>
+                                                                <ul class="list-cord-pcl">
+                                                                    <li ng-if="Citem.MedicationType =='Stop'" ng-repeat="Citem in Mainobj.CurrentMedicationList |filter:{DeleteInd: 'N'} track by $index">
+                                                                        <p>
+                                                                            {{Citem.MedicineName}}
+                                                                        </p>
+                                                                        <p>
+                                                                            <span ng-show="Citem.Action!=''">{{Citem.Action}}</span>
+                                                                            <span ng-show="Citem.Dose!=''">{{Citem.Dose}}</span>
+                                                                            <span ng-show="Citem.DoseUnit!=''">{{Citem.DoseUnit}}</span>
+                                                                            <span ng-show="Citem.Route!=''">{{Citem.Route}}</span>
+                                                                            <span ng-show="Citem.Frequency!=''">{{Citem.Frequency}}</span>
+                                                                            <span ng-show="Citem.DoseOther!=''">{{Citem.DoseOther}}</span>
+                                                                            <span ng-show="Citem.DaysSupply!=''">{{Citem.DaysSupply}}</span>
+                                                                        </p>
+                                                                    </li>
+
+                                                                </ul>
+                                                            </div>
+                                                            <div>
+                                                                <b class="text-ce86868 m-b-5">Continuation Medications</b>
+                                                                <ul class="list-cord-pcl">
+                                                                    <li ng-if="Citem.MedicationType =='Continuation'" ng-repeat="Citem in Mainobj.CurrentMedicationList |filter:{DeleteInd: 'N'} track by $index">
+                                                                        <p>
+                                                                            {{Citem.MedicineName}}
+                                                                        </p>
+                                                                        <p>
+                                                                            <span ng-show="Citem.Action!=''">{{Citem.Action}}</span>
+                                                                            <span ng-show="Citem.Dose!=''">{{Citem.Dose}}</span>
+                                                                            <span ng-show="Citem.DoseUnit!=''">{{Citem.DoseUnit}}</span>
+                                                                            <span ng-show="Citem.Route!=''">{{Citem.Route}}</span>
+                                                                            <span ng-show="Citem.Frequency!=''">{{Citem.Frequency}}</span>
+                                                                            <span ng-show="Citem.DoseOther!=''">{{Citem.DoseOther}}</span>
+                                                                            <span ng-show="Citem.DaysSupply!=''">{{Citem.DaysSupply}}</span>
+                                                                        </p>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <section class="eh-panel">
+                                                <div class="eh-header">
+                                                    <h1>Labs/Investigations</h1>
+                                                    <!--<ul class="us-controls">
+                                                        <li>
+                                                            <a href="javascript:;" ng-click="medicationcordinatorclick('LabInvestigations')">
+                                                                <i class="plus-icon-us us-icon"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>-->
+                                                </div>
+                                                <div class="eh-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <ul class="list-cord-pcl">
+                                                                <li ng-repeat="Iitem in Mainobj.InvestigationsList |filter:{DeleteInd: 'N'} track by $index">
+                                                                    <label>
+                                                                        ({{Iitem.OrganId === 1 ? 'OD' : (Iitem.OrganId === 2 ? 'OS': (Iitem.OrganId === 3 ? 'OU': (Iitem.LocationId === 2 ? 'General':''))) }}) {{Iitem.ProcedureCode}} |{{Iitem.InvestigationName}}
+                                                                        <span ng-if="Iitem.DurationDate !='' && Iitem.DurationDate != null">(Scheduled on {{Iitem.DurationDate| date:"MM-dd-yyyy"}})</span>
+                                                                        <span ng-if="Iitem.Duration != '' && Iitem.Duration != null">(Scheduled For {{Iitem.Duration}} {{Iitem.DurationType === 'Y' ? 'Year(s)' : (Iitem.DurationType === 'W' ? 'Week(s)' : (Iitem.DurationType === 'M' ? 'Month(s)' : (Iitem.DurationType === 'D' ? 'Day(s)' :  (Iitem.DurationType === 'SB'? 'Since Birth' : ''))))}})</span>
+                                                                    </label>
+                                                                    <p ng-show="Iitem.InvestigationNotes!=''" class="fs-12 text-s12w500c000 font-weight-600">
+                                                                        <b class="text-068cb0 fs-12">Notes :</b> {{Iitem.InvestigationNotes}}
+                                                                    </p>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="eh-table">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="col-lg-12 p-l-0">
+                                            <div class="pop-ehr-input ehr-input">
+                                                <label>Remarks</label>
+                                                <span>{{Mainobj.Remarks}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="15%">
+                                        <div class="pop-ehr-input ehr-input">
+                                            <label>Reviewed By</label>
+                                            <span>{{Mainobj.ReviewedByName}}</span>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- /Summary -->
+        </div>
+        <div class="col-lg-12 text-center" ng-hide="Mainobj.IsEditData">
+            <div class="billing-cominsoon m-t-20">
+                <img src="img/no-data/no-data-icon.png">
+                <div class="msg m-t-20">
+                    <p class="nodata-text">Oops!!</p>
+                    <p class="nodata-txt-line2">
+                        <!--<span>No data Added.</span>-->
+                        <span>No Adviced Orders added.</span>
+                        <a href="" ng-click="ViewAdvisorpopup(Coordinatorobj.Type)">Click here</a>
+                        <!--<span>to add Surgeries/Investigations/Procedures</span>-->
+                        <span>or on the search box to add Adviced Orders.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script type="text/ng-template" id="CoordinatorLogPopup.html">
+        <div class="modal-header">
+            <h4 class="modal-title">Sign Off Details</h4>
+            <button type="button" class="btn btn-link" ng-click="CloseCosultPop()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table-eh">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Doctor Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in Mainobj.CordinatorAdvicedlogArray">
+                                <td ng-bind="item.ModifiedDt| date : 'MM-dd-y HH:mm:ss' "></td>
+                                <td>Dr.{{item.ModifiedBy}}</td>
+                                <td>
+                                    <span ng-if="item.StatusFlag == 'C'" class="text-profile-completed">Completed</span>
+                                    <span ng-if="item.StatusFlag == 'D'" class="text-profile-saved">Saved</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </script>
+</div>
+
+
+
+ 

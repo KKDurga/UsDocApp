@@ -1,0 +1,1814 @@
+﻿<div ng-controller="EhnoteAppointmentDynamicStatusCtrl">
+
+    <!-- / -->
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label>{{ 'DATE' | translate}}</label>
+                                <input class="form-control icons-calendar cur-default bg-white" ng-model="ToDate" datepickerforinventory ng-change="ChangeInvDate(ToDate)">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+
+                            <div class="form-group select-ui-match custom-select-width">
+                                <label>{{ 'BRANCH' | translate}} <em>*</em> </label>
+                                <ui-select ng-model="obj.HospitalObj" theme="bootstrap" on-select="ChangeHospitalDetails(obj.HospitalObj)">
+                                    <ui-select-match placeholder="select">{{obj.HospitalObj.ClinicName}}</ui-select-match>
+                                    <ui-select-choices repeat="item in AllUserBranchesList1 | filter: $select.search" null-option="EmptySelect" loose-null>
+                                        <span ng-bind-html="item.ClinicName | highlight: $select.search"></span>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <label></label>
+                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                    {{obj.HospitalObj.ClinicName}}
+                                </button>
+
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li role="presentation" ng-repeat="item in AllUserBranchesList1 | filter:{'ClinicName':searchHospital.txt1}" ng-click="ChangeHospitalDetails(item)">
+                                                <a href="javascript:;" ng-bind="item.ClinicName"></a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+                        <div class="col-lg-2">
+
+                            <div class="form-group select-ui-match custom-select-width">
+                                <label>{{ 'SPECIALIZATION' | translate}} </label>
+                                <ui-select ng-model="selectedSpecialization" theme="bootstrap" on-select="changeHospitalSpecialization(selectedSpecialization)">
+                                    <ui-select-match placeholder="select">{{selectedSpecialization.SpecializationName}}</ui-select-match>
+                                    <ui-select-choices repeat="item in OrgSpecialitiesArray | filter: $select.search" null-option="EmptySelect" loose-null>
+                                        <span ng-bind-html="item.SpecializationName | highlight: $select.search"></span>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+
+                            <!--<div class="form-group">
+                                <label></label>
+                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                    {{selectedSpecialization.SpecializationName}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Specialization" ng-model="searchtxtSpc.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li role="presentation" ng-repeat="item in OrgSpecialitiesArray | filter:{'SpecializationName':searchtxtSpc.txt1} track by $index" ng-click="changeHospitalSpecialization(item)">
+                                                <a href="javascript:;" ng-bind="item.SpecializationName"> </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <div class="dropdown cstm-dropdown width-100">
+                                    <label class="apptlbln">{{ 'DEPARTMENTS' | translate}}</label>
+                                    <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        {{ 'SELECT' | translate}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2"  ng-click="stopClosingDropDown($event)">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.departmentTxt" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+
+                                                <li>
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="AllSubSpecializationsCheck" ng-click="DynamiccheckAllSubSpecializations(AllSubSpecializationsCheck)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small>{{ 'SELECTALL' | translate}}</small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li ng-repeat="item in allSubSpecializationsArray | filter:{'SubSpecializationName':searchHospital.departmentTxt}">
+                                                    <div class="checkbox cn">
+                                                        <label>
+                                                            <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DynamictoggleSubSpecialization(item)">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small ng-bind="item.SubSpecializationName"></small>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="col-lg-2">
+                            <div class="form-group">
+                                <label>Select Doctor</label>
+                                <div class="sel-doc-box width-100">
+                                    <div class="dropdown cstm-dropdown width-100">
+                                        <button class="form-control select-dropdown boxshadowbill text-left">
+                                            Doctor
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app">
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Search Doctor">
+                                            </div>
+                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                <ul>
+                                                    <li>
+                                                        <a href="javascript:;">Santhosh Reddy</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;">Santhosh Reddy</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                        <div class="col-lg-1">
+                            <button class="btn btn-success btn-block m-t-24" ng-click="SearchDynamicStatus()">{{ 'SEARCH' | translate}}</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    
+    <!-- --------------------------------------------------------------------------------/-------------------------------------------------- -->
+
+    <div class="row">
+        <div class="col-lg-12">
+            <ul class="dynamic-appointments">
+                <li style="width:50%">
+                    <h4>Reception</h4>
+                    <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+                        <li class="dynamic-dilation" ng-class="{ active: SubTab == 11 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(11)">
+                                <h1>{{PatientCount.ReceptionCount}}</h1>
+                                <p>All</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-counsoller" ng-class="{ active: SubTab == 12 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(12)">
+                                <h1>{{PatientStatusCount.CheckedInCount}}</h1>
+                                <p>Check In</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-doctor" ng-class="{ active: SubTab == 13 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(13)">
+                                <h1>{{PatientStatusCount.CompletedCount}}</h1>
+                                <p>Check out</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Waiting Room</h4>
+                    <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+                        <li class="dynamic-doctor" ng-class="{ active: SubTab == 1 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(1)">
+                                <h1>{{PatientStatusCount.DoctorRoomCount}}</h1>
+                                <p>Doctor</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-optom" ng-class="{ active: SubTab == 2 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(2)">
+                                <h1>{{PatientStatusCount.OptomRoomCount}}</h1>
+                                <p>
+                                    Optometrist
+                                </p>
+                            </a>
+                        </li>
+                        <li class="dynamic-AR" ng-class="{ active: SubTab == 14 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(14)">
+                                <h1>{{PatientStatusCount.ARRoomCount}}</h1>
+                                <p>
+                                    AR
+                                </p>
+                            </a>
+                        </li>
+                        <li class="dynamic-dilation" ng-class="{ active: SubTab == 3 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(3)">
+                                <h1>{{PatientStatusCount.DilationRoomCount}}</h1>
+                                <p>Dilation</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-counsoller" ng-class="{ active: SubTab == 4 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(4)">
+                                <h1>{{PatientStatusCount.CounsellorRoomCount}}</h1>
+                                <p>Counsoller</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-counsoller" ng-class="{ active: SubTab == 5 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(5)">
+                                <h1>{{PatientStatusCount.InvestigationRoomCount}}</h1>
+                                <p>Investigation</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Active Room</h4>
+                    <ul class="nav nav-tabs dynamicStatus b-0 nav-justified">
+
+                        <li class="dynamic-doctor" ng-class="{ active: SubTab == 6 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(6)">
+                                <h1>{{PatientStatusCount.DoctorRoomActiveCount}}</h1>
+                                <p>Doctor</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-optom" ng-class="{ active: SubTab == 7 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(7)">
+                                <h1>{{PatientStatusCount.OptomRoomActiveCount}}</h1>
+                                <p>
+                                    Optometrist
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="dynamic-Ar" ng-class="{ active: SubTab === 15}">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(15)">
+                                <h1>{{PatientStatusCount.ARRoomActiveCount}}</h1>
+                                <p>
+                                    AR
+                                </p>
+                            </a>
+                        </li>
+                        <li class="dynamic-dilation" ng-class="{ active: SubTab == 8 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(8)">
+                                <h1>{{PatientStatusCount.DilationRoomActiveCount}}</h1>
+                                <p>Dilation</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-counsoller" ng-class="{ active: SubTab == 9 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(9)">
+                                <h1>{{PatientStatusCount.CounsellorRoomActiveCount}}</h1>
+                                <p>Counsoller</p>
+                            </a>
+                        </li>
+                        <li class="dynamic-counsoller" ng-class="{ active: SubTab == 10 }">
+                            <a data-toggle="tab" data-target="" ng-click="changeSubTab(10)">
+                                <h1>{{PatientStatusCount.InvestigationRoomActiveCount}}</h1>
+                                <p>Investigation</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="row" ng-show="SubTab===11">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Reception Room - All Patients</h1>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="PatientListarray.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Doctor</label></th>
+                                            <th><label>Status</label></th>
+                                            <th><label>Appt Type </label></th>
+                                            <th><label>Action</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in PatientListarray">
+
+                                            <td ng-bind="item.PatientName"></td>
+                                            <td>
+                                                <label class="dis-block">{{item.PatientAge}}</label>
+                                            </td>
+                                            <td>
+                                                <label>{{item.Gender}}</label>
+                                            </td>
+                                            <td>
+                                                <label class="dis-block">{{item.AppointmentDoctor}}</label>
+                                            </td>
+                                            <td>
+                                                <label>
+                                                    <span class="appointment-booked" ng-bind="item.StatusFlag"></span>
+                                                </label>
+                                            </td>
+                                            <td ng-bind="item.AppointmentType"></td>
+                                            <td>
+                                                <button class="btn btn-sendto" ng-click="SendToPatientRoomType(item)">Send To</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="PatientListarray.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Patient Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!--/-->
+    <div class="row" ng-show="SubTab===1">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - Doctor</h1>
+                    <ul class="controls">
+                        <li>
+                            <!--<pre>{{selectedDoctor}}</pre>-->
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,1)"
+                                    ng-options="item as item.FullName for item in clinicDoctorList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="DoctorWaitingRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th><label>Doctor</label></th>
+                                            <!--<th  ng-show="(userLoginDetails.RoleID ===4||userLoginDetails.RoleID ===43||userLoginDetails.RoleID ===56||userLoginDetails.RoleID ===57||userLoginDetails.RoleID ===1)&&($scope.DoctorId === object.DoctorID)">-->
+                                            <th>
+                                                <label>Action</label>
+                                            </th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in DoctorWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td ng-bind="Ditem.AppointmentDoctorName"></td>
+
+                                            <td>
+                                                <button class="btn btn-sendto"
+                                                        ng-show="(userLoginDetails.RoleID ===4||userLoginDetails.RoleID ===43||userLoginDetails.RoleID ===56||userLoginDetails.RoleID ===57||userLoginDetails.RoleID ===1)&&(Ditem.startConsultationEntryAccess === true)"
+                                                        ng-click="MoveToDoctorRoom(Ditem)">
+                                                    Start
+                                                </button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="DoctorWaitingRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===2">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - Optometrist</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,2)"
+                                    ng-options="item as item.FullName for item in AllOpthaList">
+                                <option value="">Select</option>
+                            </select>
+
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row" ng-if="OptomWaitingRoomList.length !== 0">
+                        <div class="col-lg-12 p-r-0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Optometrist</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th ng-show="userLoginDetails.RoleID ===10"><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in OptomWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.AppOptometristName"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+
+                                            <td ng-show="userLoginDetails.RoleID ===10">
+                                                <!--<button class="btn btn-sendto btn-block" ng-click="PreStartDirectConsultation(Ditem)">Send To</button>-->
+                                                <button class="btn btn-sendto" ng-click="MoveToOptomRoom(Ditem)">Strat</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="OptomWaitingRoomList.length === 0">
+                        <div class="col-lg-12">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===14">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - AR</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,8)"
+                                    ng-options="item as item.FullName for item in AllARList">
+                                <option value="">Select</option>
+                            </select>
+
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row" ng-if="ARWaitingRoomList.length !== 0">
+                        <div class="col-lg-12 p-r-0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>AR Name</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th ng-show="userLoginDetails.RoleID ===10"><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in ARWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.AppARName"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+
+                                            <td ng-show="userLoginDetails.RoleID ===61">
+                                                <button class="btn btn-sendto" ng-click="MoveToARRoom(Ditem)">Strat</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="ARWaitingRoomList.length === 0">
+                        <div class="col-lg-12">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- / -->
+    <div class="row" ng-show="SubTab===3">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - Dilation</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,3)"
+                                    ng-options="item as item.FullName for item in AllDilationList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="DilationWaitingRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th><label>Dilation</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                            <!--<th><label>Action</label></th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in DilationWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+
+                                            <td>
+                                                <button class="btn btn-success" ng-show="userLoginDetails.RoleID ===54||userLoginDetails.RoleID ===2||userLoginDetails.RoleID ===10"
+                                                        ng-click="ActiveStratDilation(Ditem)">
+                                                    Start
+                                                </button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                            <!--<td>
+                                                <button class="btn btn-sendto btn-block">Send To</button>
+                                            </td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="DilationWaitingRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===4">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - Counsellor</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,4)"
+                                    ng-options="item as item.FullName for item in AllCounsollerList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="CounsellorWaitingRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th ng-show="userLoginDetails.RoleID ===18"><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in CounsellorWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+
+                                            <td style="width:70px" ng-show="userLoginDetails.RoleID ===18">
+                                                <button class="btn btn-sendto btn-block" ng-click="SendToCounsellor(Ditem)">Strat</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="CounsellorWaitingRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===5">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Waiting Room - Investigation </h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesDoctor(selectedDoctor.Doctorobj,5)"
+                                    ng-options="item as item.FullName for item in AllTechnicianList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="InvestigationWaitingRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>Status</label></th>
+                                            <th ng-show="userLoginDetails.RoleID===55 || userLoginDetails.RoleID===4|| userLoginDetails.RoleID===43 || userLoginDetails.RoleID===2 ||userLoginDetails.RoleID===10"><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Ditem in InvestigationWaitingRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td ng-bind="Ditem.Patient.AgeInYears"></td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime  | date:'HH:mm'"></td>
+
+                                            <td ng-show="userLoginDetails.RoleID===55 || userLoginDetails.RoleID===4|| userLoginDetails.RoleID===43 || userLoginDetails.RoleID===2 ||userLoginDetails.RoleID===10">
+                                                <button class="btn btn-sendto" ng-click="SendToInvestigation(Ditem)">Strat</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="InvestigationWaitingRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===6">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - Doctor</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,1)"
+                                    ng-options="item as item.FullName for item in clinicDoctorList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="DoctorActiveRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+                                        <tr ng-repeat="Ditem in DoctorActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="DoctorActiveRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===7">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - Optometrist</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,1)"
+                                    ng-options="item as item.FullName for item in AllOpthaList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="OptomActiveRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <!--<th><label>Action</label></th>-->
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+
+                                        <tr ng-repeat="Ditem in OptomActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                            <!--<td>
+                                                <button class="btn btn-sendto">Send To</button>
+                                            </td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="OptomActiveRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===15">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - AR</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,1)"
+                                    ng-options="item as item.FullName for item in AllARList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="ARActiveRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>StartTime</label></th>
+                                            <!--<th><label>Action</label></th>-->
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+
+                                        <tr ng-repeat="Ditem in ARActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                            <!--<td>
+                                                <button class="btn btn-sendto">Send To</button>
+                                            </td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="ARActiveRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===8">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - Dilation</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,3)"
+                                    ng-options="item as item.FullName for item in AllDilationList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-show="DilationActiveRoomList.length !==0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>Status</label></th>
+                                            <th><label>Dilation</label></th>
+                                            <th><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+                                        <tr ng-repeat="Ditem in DilationActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+
+                                            <td>
+                                                <!--<button class="btn btn-sendto"
+                                                        ng-click="!Ditem.isDilationstarted ? StratDilation(Ditem) :StopDilation(Ditem)" ng-class="(Ditem.Conunter=='00:00') ?'dilation-start':(Ditem.Conunter=='Done')?'dilation-done':'dilation-timer'">
+                                                    <i class="far fa-clock" ng-hide="Ditem.Conunter=='00:00' ||Ditem.Conunter=='Done'"></i> {{Ditem.Conunter=="00:00" ?'Start':Ditem.Conunter}}
+                                                </button>
+                                                <p class="m-b-0 m-t-5 no-wrapappt fs-13" title="{{Ditem.OrganId == '1'?'RE':Ditem.OrganId == '2'?'LE':Ditem.OrganId == '3'?'BE':''}} -  {{Ditem.DilationMedicationName}}">
+                                                    {{Ditem.OrganId == '1'?'RE':Ditem.OrganId == '2'?'LE':Ditem.OrganId == '3'?'BE':''}}<span ng-show="Ditem.OrganId != ''"> - </span> {{Ditem.DilationMedicationName}}
+                                                </p>-->
+                                                <div class="dis-flex align-items-center">
+                                                    <button class="btn  btn-fill-horz-o p-t-2 p-b-2 btn-sm  fs-12 text-uppercase text-center" ng-click="!Ditem.isDilationstarted ? StratDilation(Ditem) :StopDilation(Ditem)" ng-class="(Ditem.Conunter=='00:00') ?'dilation-start':(Ditem.Conunter=='Done')?'dilation-done':'dilation-timer'">
+                                                        {{(Ditem.Conunter=='00:00') ?'Start':(Ditem.Conunter=='Done')?'Done':'Stop'}}
+                                                    </button>
+                                                    <span class="input-group-btn">
+                                                        <button href="javascript:;" ng-click="ViewDilationHistory(Ditem)" class="btn btn-default" uib-tooltip="History" placement="top" title="History" ng-if="Ditem.Conunter==='Done' || Ditem.IsDilationDone"><i class="fas fa-history"></i></button>
+                                                    </span>
+                                                </div>
+                                                <label ng-hide="Ditem.Conunter=='00:00' ||Ditem.Conunter=='Done'">
+                                                    {{Ditem.Conunter}}
+                                                </label>
+                                                <p class="m-b-0 m-t-5 no-wrapappt fs-13" title="{{Ditem.OrganId == '1'?'OD':Ditem.OrganId == '2'?'OS':Ditem.OrganId == '3'?'OU':''}} -  {{Ditem.DilationMedicationName}}">
+                                                    {{Ditem.OrganId == '1'?'OD':Ditem.OrganId == '2'?'OS':Ditem.OrganId == '3'?'OU':''}}<span ng-show="Ditem.OrganId != ''"> - </span> {{Ditem.DilationMedicationName}}
+                                                </p>
+                                                <!--<a href="javascript:;" ng-click="ViewDilationHistory(Ditem)" class="history-position-new" ng-if="Ditem.Conunter==='Done' || Ditem.IsDilationDone">History</a>-->
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sendto" ng-click="SendToOtherRoom(Ditem)">Send To</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="DilationActiveRoomList.length === 0">
+                            <div id="" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===9">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - Counsellor</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,4)"
+                                    ng-options="item as item.FullName for item in AllCounsollerList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="CounsellorActiveRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>Status</label></th>
+                                            <th><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+                                        <tr ng-repeat="Ditem in CounsellorActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td>
+                                                <button class="btn btn-sendto">Send To</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="CounsellorActiveRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===10">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Active Room - Investigation</h1>
+                    <ul class="controls">
+                        <li>
+                            <select class="form-control"
+                                    ng-model="selectedDoctor.Doctorobj"
+                                    ng-change="ChangesActiveDoctor(selectedDoctor.Doctorobj,5)"
+                                    ng-options="item as item.FullName for item in AllTechnicianList">
+                                <option value="">Select</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-if="InvestigationActiveRoomList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Next Counter</label></th>
+                                            <th><label>Status</label></th>
+                                            <th><label>Action</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="headermainscroll" ng-style="tabletilestyle()" resize>
+                                        <tr ng-repeat="Ditem in InvestigationActiveRoomList">
+                                            <td ng-bind="Ditem.PatientName"></td>
+                                            <td>
+                                                <span ng-if="Ditem.year !==0">{{ Ditem.year}}Y {{ Ditem.month}}M</span>
+                                                <span ng-if="Ditem.year ===0">{{ Ditem.month}}M {{ Ditem.day}}D</span>
+                                            </td>
+                                            <td ng-bind="Ditem.Gender"></td>
+                                            <td ng-bind="Ditem.NextCounter"></td>
+                                            <td ng-bind="Ditem.StartTime"></td>
+                                            <td>
+                                                <button class="btn btn-sendto">Send To</button>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Ditem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-if="InvestigationActiveRoomList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===12">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Check-In</h1>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-show="INPatientsList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Booking Type</label></th>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Doctor</label></th>
+                                            <th><label>BranchName</label></th>
+                                            <th><label>Status</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Citem in INPatientsList">
+                                            <td ng-bind="Citem.BookingType"></td>
+                                            <td ng-bind="Citem.PatientName"></td>
+                                            <td ng-bind="Citem.Age"></td>
+                                            <td ng-bind="Citem.Gender"></td>
+                                            <td ng-bind="Citem.AppointmentDoctor"></td>
+                                            <td ng-bind="Citem.BranchName"></td>
+
+
+                                            <td>
+                                                <span ng-show="Citem.Status ==='Booked'" class="appointment-booked">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Saved'" class="appointment-started">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Ongoing'" class="appointment-paused">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Completed'" class="appointment-completed">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Cancelled'" class="appointment-cancelled">{{Citem.Status}}</span>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Citem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-show="INPatientsList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+    <div class="row" ng-show="SubTab===13">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-header consl-sc-head">
+                    <h1>Check-out</h1>
+                </div>
+                <div class="tile-body headermainscroll" ng-style="heightCBB()" resize>
+                    <div class="row">
+                        <div class="col-lg-12 p-r-0" ng-show="OutPatientsList.length !== 0">
+                            <div class="table-responsive">
+                                <table class="table grid-table m-b-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><label>Booking Type</label></th>
+                                            <th><label>Patient Name</label></th>
+                                            <th><label>Age</label></th>
+                                            <th><label>Gender</label></th>
+                                            <th><label>Doctor</label></th>
+                                            <th><label>BranchName</label></th>
+                                            <th><label>Status</label></th>
+                                            <th ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true"><label></label></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="Citem in OutPatientsList">
+                                            <td ng-bind="Citem.BookingType"></td>
+                                            <td ng-bind="Citem.PatientName"></td>
+                                            <td ng-bind="Citem.Age"></td>
+                                            <td ng-bind="Citem.Gender"></td>
+                                            <td ng-bind="Citem.AppointmentDoctor"></td>
+                                            <td ng-bind="Citem.BranchName"></td>
+
+
+                                            <td>
+                                                <span ng-show="Citem.Status ==='Booked'" class="appointment-booked">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Saved'" class="appointment-started">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Ongoing'" class="appointment-paused">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Completed'" class="appointment-completed">{{Citem.Status}}</span>
+                                                <span ng-show="Citem.Status ==='Cancelled'" class="appointment-cancelled">{{Citem.Status}}</span>
+                                            </td>
+                                            <td ng-show="UserAccessRights.AllAccessRights.PatientDynamicViewPatientTracker ===true" ng-click="viewTracking(Citem)">Track</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12" ng-show="OutPatientsList.length === 0">
+                            <div id="grid1" class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- / -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<script type="text/ng-template" id="ViewAvaliableSlots.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Room Selection</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="patients-profile clearfix">
+                    <ul>
+                        <li>
+                            <div class="profile-avatar-image">
+                                <!--<div>
+                                    <img class="img-responsive" width="50" height="50" src="">
+                                </div>-->
+                                <div ng-show="Patientlistdata.S3URL !==''" image-viewer isarraychanged="0">
+                                    <img ngf-thumbnail="Patientlistdata.S3URL" class="img-responsive" width="50" height="50" />
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-user"></i> Patient Name</h3>
+                            <p><span>{{Patientlistdata.Title}} .</span> <span>{{Patientlistdata.fullName}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-barcode"></i> M.R.No.</h3>
+                            <p><span>{{Patientlistdata.PatientDisplayId}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-venus-mars"></i> Age&amp;Gender</h3>
+                            <!--<p>
+                                <span>41 <span>Y</span></span>
+                                <span>3 <span>M</span></span>
+                                <span>25 <span>D</span></span>
+                                | <span>Male</span>
+                            </p>-->
+
+                            <p ng-if="Patientlistdata.AgeInYears !==0"> <span>{{Patientlistdata.AgeInYears}}Y</span><span>{{Patientlistdata.AgeInMonths}}M</span>| <span>{{Patientlistdata.Gender}}</span></p>
+                            <p ng-if="Patientlistdata.AgeInYears ===0"> <span>{{Patientlistdata.AgeInMonths}}M</span> <span>{{Patientlistdata.AgeInDays}}D</span>| <span>{{Patientlistdata.Gender}}</span></p>
+                        </li>
+                        <!--<li>
+                            <h3><i class="fas fa-calendar-alt"></i> Register Date</h3>
+                            <p><span ng-bind="selectedPatientObj.CreatedDt | date:'dd-MMM-yyyy'" class="ng-binding">06-Aug-2020</span></p>
+                        </li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- / -->
+        <div class="row m-t-10">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Select Room Type<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.RoomTypeobj"
+                            ng-change="ChangesRoomType(RoomSearchObj.RoomTypeobj)"
+                            ng-options="item as item.Name for item in RoomTypeList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId !==7">
+                <div class="form-group">
+                    <label>Select Room<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Roomobj"
+                            ng-change="ChangesRoom(RoomSearchObj.Roomobj)"
+                            ng-options="item as item.RoomName for item in RoomListarray">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===2">
+                <div class="form-group">
+                    <label>Optometrist<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Opthamobj"
+                            ng-change="ChangesOptham(RoomSearchObj.Opthamobj)"
+                            ng-options="item as item.FullName for item in AllOpthaList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId === 8">
+                <div class="form-group">
+                    <label>AR</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.ARobj"
+                            ng-change="ChangesAR(RoomSearchObj.ARobj)"
+                            ng-options="item as item.FullName for item in AllARList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===1">
+                <div class="form-group">
+                    <label>Doctors<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Doctorobj"
+                            ng-change="ChangesDoctors(RoomSearchObj.Doctorobj)"
+                            ng-disabled="true"
+                            ng-options="item as item.FullName for item in AllDoctorList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===3">
+                <div class="form-group">
+                    <label>Dilation<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.DilationAssistantobj"
+                            ng-change="ChangesDilation(RoomSearchObj.DilationAssistantobj)"
+                            ng-options="item as item.FullName for item in AllDilationList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===4">
+                <div class="form-group">
+                    <label>Counsellor<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Counsellorobj"
+                            ng-change="ChangesCounsellor(RoomSearchObj.Counsellorobj)"
+                            ng-options="item as item.FullName for item in AllCounsollerList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===5">
+                <div class="form-group">
+                    <label>Investigation</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Technicianobj"
+                            ng-change="ChangesTechnician(RoomSearchObj.Technicianobj)"
+                            ng-options="item as item.FullName for item in AllTechnicianList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer text-right">
+        <button class="btn btn-danger p-l-25 p-r-25" ng-click="closeAvaliableSlots()">Close</button>
+        <button class="btn btn-success p-l-25 p-r-25" ng-click="AddToWaitingRoom()">Save</button>
+    </div>
+
+</script>
+<script type="text/ng-template" id="ViewAvaliableSlots1.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Room Selection</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="patients-profile clearfix">
+                    <ul>
+                        <!--<li>
+                            <div class="profile-avatar-image">
+                                <div ng-show="Patientlistdata.S3URL !==''" image-viewer isarraychanged="0">
+                                    <img ngf-thumbnail="Patientlistdata.S3URL" class="img-responsive" width="50" height="50" />
+                                </div>
+                            </div>
+                        </li>-->
+                        <li>
+                            <h3><i class="fas fa-user"></i> Patient Name</h3>
+                            <p><span>{{Patientlistdata.FullName}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-barcode"></i> M.R.No.</h3>
+                            <p><span>{{Patientlistdata.MRNO}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-venus-mars"></i> Age&amp;Gender</h3>
+                            <p ng-if="Patientlistdata.year !==0"> <span>{{Patientlistdata.year}}Y</span><span>{{Patientlistdata.month}}M</span>| <span>{{Patientlistdata.Gender}}</span></p>
+                            <p ng-if="Patientlistdata.year ===0"> <span>{{Patientlistdata.month}}M</span> <span>{{Patientlistdata.day}}D</span>| <span>{{Patientlistdata.Gender}}</span></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row m-t-10">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Select Room Type</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.RoomTypeobj"
+                            ng-change="ChangesRoomType(RoomSearchObj.RoomTypeobj)"
+                            ng-options="item as item.Name for item in RoomTypeList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId !==7">
+                <div class="form-group">
+                    <label>Select Room</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Roomobj"
+                            ng-change="ChangesRoom(RoomSearchObj.Roomobj)"
+                            ng-options="item as item.RoomName for item in RoomListarray">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId ===2">
+                <div class="form-group">
+                    <label>Optometrist</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Opthamobj"
+                            ng-change="ChangesOptham(RoomSearchObj.Opthamobj)"
+                            ng-options="item as item.FullName for item in AllOpthaList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId === 8">
+                <div class="form-group">
+                    <label>AR</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.ARobj"
+                            ng-change="ChangesAR(RoomSearchObj.ARobj)"
+                            ng-options="item as item.FullName for item in AllARList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId ===3">
+                <div class="form-group">
+                    <label>Dilation</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.DilationAssistantobj"
+                            ng-change="ChangesDilation(RoomSearchObj.DilationAssistantobj)"
+                            ng-options="item as item.FullName for item in AllDilationList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4 p-l-0" ng-show="RoomSearchObj.RoomTypeId ===4">
+                <div class="form-group">
+                    <label>Counsellor</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Counsellorobj"
+                            ng-change="ChangesCounsellor(RoomSearchObj.Counsellorobj)"
+                            ng-options="item as item.FullName for item in AllCounsollerList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===5">
+                <div class="form-group">
+                    <label>Investigation</label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Technicianobj"
+                            ng-change="ChangesTechnician(RoomSearchObj.Technicianobj)"
+                            ng-options="item as item.FullName for item in AllTechnicianList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer text-right">
+        <button class="btn btn-danger p-l-25 p-r-25" ng-click="closeRoom()">Close</button>
+        <button class="btn btn-success p-l-25 p-r-25" ng-click="SendToRoom(Patientlistdata)">Save</button>
+    </div>
+</script>
+<script type="text/ng-template" id="DilationMedicationpopup.html">
+    <div class="modal-header">
+        <h4 class="modal-title text-black">{{ 'DILATIONMEDICATION' | translate}}</h4>
+        <button type="button" class="btn btn-link m-r-10 m-b-3" ng-click="Closemed()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body b-0 popall-body pt-4 pb-3 bg-default">
+        <div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>{{ 'MEDICATION' | translate}}</label>
+                        <select class="form-control " ng-model="MedicationObj" ng-options="item as item.MedicationName for item in DilationList">
+                            <option value="">{{ 'SELECT' | translate}}</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="col-lg-12  bg-info">
+                    <fieldset class="text-center">
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom" id="RightEye" name="SelectedEye" ng-value="1" ng-model="DilationSelectedEye" />
+                            <label for="RightEye" class="radio-custom-label cur-poiter mb-0">{{ 'OD' | translate}}</label>
+                        </div>
+                        <div class="ml-15 dis-inline-block">
+                            <input type="radio" class="radio-custom" id="LeftEye" name="SelectedEye" ng-value="2" ng-model="DilationSelectedEye" />
+                            <label for="LeftEye" class="radio-custom-label cur-poiter mb-0">{{ 'OS' | translate}}</label>
+                        </div>
+                        <div class="ml-15 dis-inline-block">
+                            <input type="radio" class="radio-custom" id="BothEyes" name="SelectedEye" ng-value="3" ng-model="DilationSelectedEye" />
+                            <label for="BothEyes" class="radio-custom-label cur-poiter mb-0">{{ 'OU' | translate}}</label>
+                        </div>
+
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-3 mt-10">
+            <div class="col text-right">
+                <button class="btn-success btn pl-50 pr-50" ng-click="SaveDilation(MedicationObj,DilationSelectedEye)" ng-disabled="MedicationObj==''"> {{ 'CONTINUE' | translate}}</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="viewpatienttracking.html">
+    <div class="modal-header">
+        <h4 class="modal-title dis-inline-block">Patient Tracking</h4>
+        <button type="button" class="close" data-dismiss="modal" ng-click="closeTrackingPopup()">&times;</button>
+    </div>
+
+    
+
+    <section class="tracking-timeline">
+        <ol>
+            <li ng-repeat="option in PatientTrackingList">
+                <div class="dynamic-inside">
+                    <div class="p-l-15 p-r-15 p-t-5 p-b-5">
+                        <time ng-bind="option.AppointmentDate"></time>
+                        <p><b class="text-eh" ng-bind="option.RoomType">Billing</b></p>
+                        <p><b class="text-dark" ng-bind="option.AssignedUser"></b> 
+                        <span> - {{option.Status}}</span></p>
+                        <p class="m-b-0"><span class="text-muted">In Time :</span> <b ng-bind="option.StartTime">03:30 PM</b> - <span class="text-muted">Out Time :</span> <b ng-bind="option.EndTime">03:50 PM</b></p>
+                    </div>
+                    <label class="show-time-dynamic text-white">
+                        <span>Wait Time :</span>
+                        <b ng-bind="option.AvgTime |date:'HH:mm'"></b>
+                    </label>
+                </div>
+                <section class="waittime-min">
+                    <!--<span>Wait Time</span>
+                    <p class="m-0" ng-bind="option.AvgTime |date:'HH:mm'">10 Min</p>-->
+                </section>
+            </li>
+            <!--<li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>
+            <li>
+                <div>
+                    <time>26-NOV-2020</time>
+                    <p><b class="text-eh">Billing</b></p>
+                    <p><b class="text-dark">Dr : Santhosh Reddy</b></p>
+                    <p><span class="text-muted">In Time :</span> <b>03:30 PM</b> - <span class="text-muted">Out Time :</span> <b>03:50 PM</b></p>
+                </div>
+                <section class="waittime-min">
+                    <span>Wait Time</span>
+                    <p class="m-0">10 Min</p>
+                </section>
+            </li>-->
+        </ol>
+    </section>
+</script>
+

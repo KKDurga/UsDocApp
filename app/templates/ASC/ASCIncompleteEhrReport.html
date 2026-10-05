@@ -1,0 +1,365 @@
+<div class="d__f-- fd__c-- gap__10-- height__100--" ng-controller="UsASCIncompleteEhrReportCtrl">
+
+    <div class="p__3-- bg__FFFFFF-- border__E4E4E4-- br__4--">
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="10%">
+                        <div class="form__group">
+                            <label class="text-appt">DOS</label>
+                            <select id="select__ASCEhrDateRange--" class="form__control" ng-model="EhrFilter.DateRangeId"
+                                    ng-options="item.Id as item.Name for item in EhrDateRangeList"
+                                    ng-change="setEhrDateRange()"></select>
+                        </div>
+                    </td>
+                    <td width="9%" ng-if="EhrFilter.DateRangeId == EhrCustomRangeId">
+                        <div class="form__group">
+                            <label class="text-appt">From Date</label>
+                            <input type="text" id="input__ASCEhrFromDate--" class="form__control icons-calendar" ng-model="EhrFilter.FromDate" datepickerforapplist readonly date-format-input>
+                        </div>
+                    </td>
+                    <td width="9%" ng-if="EhrFilter.DateRangeId == EhrCustomRangeId">
+                        <div class="form__group">
+                            <label class="text-appt">To Date</label>
+                            <input type="text" id="input__ASCEhrToDate--" class="form__control icons-calendar" ng-model="EhrFilter.ToDate" datepickerforapplist readonly date-format-input>
+                        </div>
+                    </td>
+                    <td width="11%">
+                        <div class="form__group">
+                            <label class="text-appt">{{ 'LOCATION' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left pr__20--" id="button__ASCEhrLocation--" data-toggle="dropdown" title="{{EhrLocations.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{EhrLocations.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="EhrLocations.SearchText" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-location" type="checkbox" ng-model="EhrLocations.AllCheck" ng-change="checkAllDashboardItems(EhrLocations)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Locations</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in EhrLocations.List | filter:{'DisplayName':EhrLocations.SearchText} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-location" type="checkbox" ng-model="item.isChecked" ng-change="toggleDashboardItem(EhrLocations)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="::item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="11%">
+                        <div class="form__group">
+                            <label class="text-appt">{{ 'ROLES' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left pr__20--" id="button__ASCEhrRole--" data-toggle="dropdown" title="{{EhrRoles.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{EhrRoles.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-role" type="checkbox" ng-model="EhrRoles.AllCheck" ng-change="checkAllEhrRoles(EhrRoles)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in EhrRoles.List track by item.RoleTypeId">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-role" type="checkbox" ng-model="item.isChecked" ng-change="toggleEhrRole(EhrRoles)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="::item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label class="text-appt">{{ 'DOCTORS' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left pr__20--" id="button__ASCEhrProfessional--" data-toggle="dropdown" title="{{EhrProfessionals.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{EhrProfessionals.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="EhrProfessionals.SearchText" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-professional" type="checkbox" ng-model="EhrProfessionals.AllCheck" ng-change="checkAllDashboardItems(EhrProfessionals)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Doctors</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in EhrProfessionals.List | filter:{'DisplayName':EhrProfessionals.SearchText} track by item.DoctorID">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-professional" type="checkbox" ng-model="item.isChecked" ng-change="toggleDashboardItem(EhrProfessionals)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="::item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label class="text-appt">Screen</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left pr__20--" id="button__ASCEhrSection--" data-toggle="dropdown" title="{{EhrSections.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{EhrSections.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-section" type="checkbox" ng-model="EhrSections.AllCheck" ng-change="checkAllDashboardItems(EhrSections)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Screens</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in EhrSections.List track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-ehr-section" type="checkbox" ng-model="item.isChecked" ng-change="toggleDashboardItem(EhrSections)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="::item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="d__f-- ai__c-- gap__10-- mt__20--">
+                            <button id="button__ASCEhrApply--" class="btn__lg-- btn__1d5558--f" ng-click="GetIncompleteEhrSummary()">{{ 'APPLY' | translate}}</button>
+                            <a id="button__ASCEhrReset--" class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" role="button" tabindex="0" title="Clear Filters" ng-click="ResetIncompleteEhrFilters()">Reset<i class="icons__w16-- refresh__w16--o"></i></a>
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="d__f-- ai__c-- gap__10--x mt__20-- jc__fe--">
+                            <div class="position__relative-- p__2--">
+                                <a id="button__ASCEhrExcelStatus--" class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" ng-click="IncompleteEhrExcelStatus()" tooltip-placement="top" uib-tooltip="Excel exports">
+                                    <i svg-icon="icon__download--" size="14" style="color: #6A7282"></i>
+                                </a>
+                            </div>
+                            <button id="button__ASCEhrExcelExport--" class="btn__lg-- btn__1d5558--f" ng-click="ClickForIncompleteEhrExcelExport()">Export Excel</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul class="tab__style--1 pl__5--">
+        <li ng-class="EhrView.Tab === 'Report' ? 'active' : ''">
+            <a id="a__IncompleteEhrReportTab--" ng-click="SetEhrView('Report')">Report</a>
+        </li>
+        <li ng-class="EhrView.Tab === 'Dashboard' ? 'active' : ''">
+            <a id="a__IncompleteEhrDashboardTab--" ng-click="SetEhrView('Dashboard')">Dashboard</a>
+        </li>
+    </ul>
+
+    <div class="position__relative-- height__100--" ng-show="EhrView.Tab === 'Report'">
+        <div class="adjustable-position d__f-- gap__10--x">
+            <div class="width__50-- height__100--">
+                <div id="IncompleteEhrAgGrid" class="ag-theme-alpine" style="height:100%;width:100%"></div>
+            </div>
+            <div class="flex height__100-- bg__FFFFFF-- border__E4E4E4-- br__4-- p__10--">
+                <div id="IncompleteEhrBarChart" style="height:100%;width:100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d__f-- fd__c-- gap__20-- p__10-- overflow__auto--y" ng-show="EhrView.Tab === 'Dashboard'">
+
+        <div class="d__f-- fd__c-- gap__5--" ng-if="EhrDashboard.Context">
+            <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- p__0--">Incomplete EHR Records &mdash; Dashboard</h1>
+            <span class="fs__md-- fw__4-- tc__656565--">
+                {{EhrDashboard.Context.DateRange}} &middot; {{EhrDashboard.Context.Location}} location(s)
+                &middot; {{EhrDashboard.Context.Roles}} role(s) &middot; Generated {{EhrDashboard.Context.Generated}}
+            </span>
+        </div>
+
+        <div class="d__f-- gap__10--x fw__w--">
+            <div class="section__style--4 boxs__0000001A--br10 px__16-- py__12-- d__f-- ai__c-- gap__12-- bl__1D5558--2">
+                <span class="fs__28-- fw__7-- tc__1D1D1D-- lh__1--">{{EhrDashboard.Unique.Total || 0}}</span>
+                <div class="d__f-- fd__c--">
+                    <span class="fs__md-- fw__6-- tc__1D1D1D--">OPEN RECORDS</span>
+                    <span class="fs__md-- fw__4-- tc__656565--">unique by service date</span>
+                </div>
+            </div>
+            <div class="section__style--4 boxs__0000001A--br10 px__16-- py__12-- d__f-- ai__c-- gap__12-- bg__FFFBEB-- border__FDE68A--">
+                <span class="fs__28-- fw__7-- lh__1-- tc__B45309--">{{EhrDashboard.Unique.MoreThan30Days || 0}}</span>
+                <div class="d__f-- fd__c--">
+                    <span class="fs__md-- fw__6-- tc__B45309--">&ge; 30 DAYS</span>
+                    <span class="fs__md-- fw__4-- tc__656565--">needs follow up</span>
+                </div>
+            </div>
+            <div class="section__style--4 boxs__0000001A--br10 px__16-- py__12-- d__f-- ai__c-- gap__12-- bl__D1D5DB--">
+                <span class="fs__28-- fw__7-- tc__1D1D1D-- lh__1--">{{EhrDashboard.Unique.LessThan30Days || 0}}</span>
+                <div class="d__f-- fd__c--">
+                    <span class="fs__md-- fw__6-- tc__1D1D1D--">&lt; 30 DAYS</span>
+                    <span class="fs__md-- fw__4-- tc__656565--">within window</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d__f-- gap__10--x fw__w-- ai__fs--">
+            <div class="section__style--4 boxs__0000001A--br10 d__f-- fd__c-- flex"
+                 ng-repeat="panel in EhrDashboard.Panels track by $index">
+                <div class="section__header-- bg__FFFFFF-- px__16-- py__10-- border__none--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- p__0--">{{panel.DisplayName}} <span class="fs__md-- fw__4-- tc__656565--">({{panel.Count}} with incomplete records)</span></h1>
+                </div>
+                <div class="section__body-- px__16-- py__10-- border__none--">
+                    <table class="table tableno-bordered m__0-- width__100--">
+                        <thead>
+                            <tr>
+                                <th class="fs__md-- fw__6-- tc__656565-- pl__0--">Professional</th>
+                                <th class="fs__md-- fw__6-- tc__656565-- text-center">&lt; 30</th>
+                                <th class="fs__md-- fw__6-- tc__656565-- text-center">&ge; 30</th>
+                                <th class="fs__md-- fw__6-- tc__656565-- text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="member in panel.Members track by $index">
+                                <td class="fs__lg-- fw__4-- tc__3C3C3C-- pl__0--">{{member.Name}}</td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="fs__lg-- fw__5-- tc__1D5558--"
+                                       ng-click="OpenIncompleteEhrDetails(member, 'LessThan30Days')"
+                                       tooltip-placement="top" uib-tooltip="View detail report">{{member.LessThan30Days}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="fs__lg-- fw__6-- tc__B45309--"
+                                       ng-click="OpenIncompleteEhrDetails(member, 'MoreThan30Days')"
+                                       tooltip-placement="top" uib-tooltip="View detail report">{{member.MoreThan30Days}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="fs__lg-- fw__7-- tc__1D5558--"
+                                       ng-click="OpenIncompleteEhrDetails(member, 'Total')"
+                                       tooltip-placement="top" uib-tooltip="View detail report">{{member.Total}}</a>
+                                    <span class="d__b-- h__4-- bg__F3F4F6-- bradius__4--">
+                                        <span class="d__b-- h__4-- bg__1D5558-- bradius__4--"
+                                              ng-style="{'width': member.BarPercent + '%'}"></span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section__style--4 boxs__0000001A--br10 d__f-- fd__c--">
+            <div class="section__header-- bg__FFFFFF-- px__16-- py__10-- border__none--">
+                <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- p__0--">EHR incomplete by section</h1>
+            </div>
+            <div class="section__body-- px__16-- py__10-- border__none-- d__f-- fd__c-- gap__10--">
+                <div class="d__g-- gtc__3--1fr gtc__3--1fr-web gap__10--">
+                    <div class="border__E5E7EB-- bradius__6-- bg__FFFFFF-- px__12-- py__10-- d__f-- fd__c-- gap__5--"
+                         ng-repeat="section in EhrDashboard.SortedSections track by $index">
+                        <span class="fs__lg-- fw__6-- tc__1D1D1D--">{{section.DisplayName}}</span>
+
+                        <span class="fs__md-- fw__4-- tc__656565--" ng-if="section.IsPending">Definition pending</span>
+                        <span class="fs__md-- fw__4-- tc__656565--" ng-if="!section.IsPending && !section.HasCounts">Awaiting DB mapping</span>
+
+                        <div class="d__f-- fd__c-- gap__5--" ng-if="section.HasCounts">
+                            <span class="fs__xl-- fw__7-- tc__1D1D1D--">{{section.Total}}</span>
+                            <span class="fs__md-- fw__5-- tc__656565--">
+                                {{section.LessThan30Days}} &lt; 30 &middot;
+                                <b class="tc__B45309--">{{section.MoreThan30Days}} &ge; 30</b>
+                            </span>
+                            <span class="d__b-- h__4-- bg__F3F4F6-- bradius__4--">
+                                <span class="d__b-- h__4-- bg__1D5558-- bradius__4--"
+                                      ng-style="{'width': section.BarPercent + '%'}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <span class="fs__md-- fw__4-- tc__656565--">
+                    Note: unique records = Unique records are counted by service date.
+                    A record missing several sections is counted in each, so sections do not sum to the total.
+                </span>
+            </div>
+        </div>
+
+        <div class="d__g-- gtc__2--1fr gtc__2--1fr-web gap__10--">
+            <div class="section__style--4 boxs__0000001A--br10 d__f-- fd__c--">
+                <div class="section__header-- bg__FFFFFF-- px__16-- py__10-- border__none--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- p__0--">By professional</h1>
+                    <span class="fs__md-- fw__4-- tc__656565--">Descending order by Total<span ng-if="EhrDashboard.ProviderChartRows.length >= 10"> &mdash; top 10</span></span>
+                </div>
+                <div class="section__body-- px__16-- py__10-- border__none--">
+                    <div id="EhrDashboardProviderChart" class="h__300-- width__100--"></div>
+                </div>
+            </div>
+            <div class="section__style--4 boxs__0000001A--br10 d__f-- fd__c--">
+                <div class="section__header-- bg__FFFFFF-- px__16-- py__10-- border__none--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- p__0--">By section</h1>
+                    <span class="fs__md-- fw__4-- tc__656565--">Descending order by Total</span>
+                </div>
+                <div class="section__body-- px__16-- py__10-- border__none--">
+                    <div id="EhrDashboardSectionChart" class="h__300-- width__100--"></div>
+                    <span class="fs__md-- fw__4-- tc__656565--" ng-if="EhrDashboard.SectionChartRows.length === 0">No section counts for the current filters.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

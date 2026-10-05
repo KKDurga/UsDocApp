@@ -1,0 +1,1179 @@
+﻿<div class="modal__style--1 height__100--">
+    <div class="modal__header--">
+        <h1>Payment</h1>
+        <ul class="us-controls">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5">
+                    <img ng-if="mainNMIPaymentRequestObj.S3URL != ''" width="25" height="25" src="{{mainNMIPaymentRequestObj.S3URL}}" image-viewer />
+                    <img ng-if="mainNMIPaymentRequestObj.S3URL == ''" width="25" height="25" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span class="fs__lg-- fw__7--">{{mainNMIPaymentRequestObj.PatientFirstName}} {{mainNMIPaymentRequestObj.PatientLastName}}</span>
+                        <p class="tc__1D1D1D-- fw__5-- fs__normal-- m-0">
+                            <span class="tc__656565-- fw__4-- fs__normal--">MR No : </span> {{mainNMIPaymentRequestObj.PatientMrno}} ,
+                            <span class="tc__656565-- fw__4-- fs__normal--">Gender : </span> {{mainNMIPaymentRequestObj.PatientGender}} ,
+                            <span class="tc__656565-- fw__4-- fs__normal--">Age : </span> {{mainNMIPaymentRequestObj.PatientAgeInYears}}Y {{mainNMIPaymentRequestObj.PatientAgeInMonths}}M ,
+                            <span class="tc__656565-- fw__4-- fs__normal--">DOB : </span> {{mainNMIPaymentRequestObj.PatientDOB}} ,
+                            <span class="tc__656565-- fw__4-- fs__normal--">Mobile : </span> {{mainNMIPaymentRequestObj.PatientMobileNumber}}
+                        </p>
+                    </div>
+                    <!--<span><i class="icons__w16-- info__w16--f"></i></span>-->
+                </div>
+            </li>
+            <li>
+                <a class="btn__close--2" ng-click="uibclose()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </li>
+        </ul>
+
+    </div>
+    <div class="modal__body--" ng-if="IsShowDepsoitNewScreen">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll">
+                <div class="d__f-- fd__c-- gap__5--y height__100--">
+                    <div class="d__f-- gap__5--x">
+                        <div class="form__group width__18--">
+                            <label>Received by</label>
+                            <ui-select id="b__apptDetails__allusers" class="form__uiselect" ng-model="mainNMIPaymentRequestObj.RecievedUserObj" theme="bootstrap" on-select="changePaymentReciever(mainNMIPaymentRequestObj.RecievedUserObj)" ng-disabled="IsShowDepositFields == true">
+                                <ui-select-match placeholder="{{ 'SELECTRECEIVEDBY' | translate}}">{{mainNMIPaymentRequestObj.RecievedUserObj.SecondUserFullName?mainNMIPaymentRequestObj.RecievedUserObj.SecondUserFullName:"Select Receiver"}}</ui-select-match>
+                                <ui-select-choices repeat="item in allUserList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                    <span ng-bind-html="item.SecondUserFullName | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <div class="form__group width__18--">
+                            <label>Received date</label>
+                            <input type="text" id="input_paymentdate" class="icons-calendar" ng-model="mainNMIPaymentRequestObj.PaymentDate" placeholder="MM-DD-YYYY" datepickerregpatient readonly date-format-input ng-disabled="IsShowDepositFields == true" />
+
+                        </div>
+                        <div class="form__group flex" ng-if="false">
+                            <label>Add Notes</label>
+                            <textarea placeholder="Enter Notes" rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="d__f-- jc__fs-- height__100--">
+
+                        <!-- ═══ LEFT: deposit line items table ═══ -->
+                        <div class="section__style--5 height__100-- flex btrr__0-- bbrr__0--">
+                            <div class="section__header-- jc__sb--">
+                                <h1>Add Payments</h1>
+                                <div class="d__f-- ai__c-- gap__5--x px__8-- py__3-- bg__FEF9C6-- bradius__4--"
+                                     ng-if="MainParentobj.PaymentTypeId == 2">
+                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Total Payable Amount :</span>
+                                    <span class="fs__lg-- fw__6-- tc__000--">${{(MainParentobj.PaymentAmount || 0) | number:2}}</span>
+                                </div>
+                            </div>
+                            <div class="section__body-- p__0-- height__100--">
+                                <div class="position__relative-- height__100--">
+                                    <div class="adjustable-position slim-scroll">
+                                        <table class="table__style--2 table__auto--">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%" class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">S.No</label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Amount($)<em>*</em></label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Payment Code</label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Location<em>*</em></label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Billing Provider<em>*</em></label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Rendering Provider</label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Payment Method<em>*</em></label>
+                                                    </th>
+                                                    <th class="bg__EEEEEE-- px__8-- py__10-- position__sticky-- top__0-- zindex-10 bbw__1-- bc__E4E4E4-- bs__s--" width="10%">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">Action</label>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                          
+                                            <tbody ng-repeat="item in mainNMIPaymentRequestObj.PatientDepositLineItem track by $index"
+                                                   ng-click="SetActiveDepositeClick($index, item, $event)"
+                                                   style="cursor: pointer;">
+
+                                                <tr>
+
+                                                  
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <label class="fs__md-- fw__7-- tc__1D1D1D-- fs__normal--">{{$index + 1}}</label>
+                                                    </td>
+
+                                                  
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="form__group">
+                                                            <input type="text" placeholder="0"
+                                                                   ng-model="item.DepositAmount"
+                                                                   validtwodecimal-number
+                                                                   ng-blur="CollectDepositAmount(item.DepositAmount, item)"
+                                                                   ng-change="changedecimalvalue(item.DepositAmount, item)"
+                                                                   ng-disabled="item.IsDepositLineItemDisabled == true"
+                                                                   maxlength="8" />
+                                                        </div>
+                                                      
+                                                    </td>
+
+                                                
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="form__group">
+                                                            <select ng-model="item.DepositTypeId"
+                                                                    ng-change="ChangePatientDepositType(item.DepositTypeId, item)"
+                                                                    ng-options="d.DepositTypeId as d.DepositTypeName for d in DepositTypes"
+                                                                    ng-disabled="item.IsDepositLineItemDisabled == true">
+                                                                <option value="" disabled>Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Location -->
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="form__group">
+                                                            <select ng-change="ChangeDepositPaymentLocation(item.HospitalId, item)"
+                                                                    ng-options="Sitem.ClinicId as Sitem.ClinicName for Sitem in LocationFilterDta"
+                                                                    ng-model="item.HospitalId"
+                                                                    ng-disabled="item.IsDepositLineItemDisabled == true">
+                                                                <option value="" disabled>Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Billing Provider -->
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="form__group">
+                                                            <select ng-model="item.BillingProviderId"
+                                                                    ng-change="changeDepositBillingProvider(item.BillingProviderId, item)"
+                                                                    ng-options="b.OrganizationBillingProviderId as b.BillingProviderName for b in BillingProviderList | filter:{'ActiveInd':'Y'}"
+                                                                    ng-disabled="item.IsDepositLineItemDisabled == true">
+                                                                <option value="" disabled>Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Rendering Provider -->
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div>
+                                                            <ui-select class="form__uiselect"
+                                                                       ng-model="item.RenderingProviderObj"
+                                                                       theme="bootstrap"
+                                                                       on-select="changeRenderingProvider(item.RenderingProviderObj, item)"
+                                                                       ng-disabled="item.IsDepositLineItemDisabled == true">
+                                                                <ui-select-match placeholder="{{ 'SELECT' | translate}}">
+                                                                    {{item.RenderingProviderObj.SecondUserFullName ? item.RenderingProviderObj.SecondUserFullName : "Select Provider"}}
+                                                                </ui-select-match>
+                                                                <ui-select-choices repeat="p in AllDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                                                    <span ng-bind-html="p.SecondUserFullName | highlight: $select.search"></span>
+                                                                </ui-select-choices>
+                                                            </ui-select>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Payment Method -->
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="form__group">
+                                                            <select ng-model="item.PaymentModeId"
+                                                                    ng-options="Sitem.PaymentModeId as Sitem.PaymentModeName for Sitem in filteredPaymentModes"
+                                                                    ng-change="changeDepositPaymentMode(item.PaymentModeId, item, $index)"
+                                                                    ng-disabled="item.IsDepositLineItemDisabled == true">
+                                                                <option value="" disabled>Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Actions -->
+                                                    <td class="px__4-- py__5-- vl__middle--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="d__f-- ai__c-- gap__5--x">
+
+                                                            <!-- Normal mode actions -->
+                                                            <ng-container class="d__f-- ai__c-- gap__5--x" ng-if="!item.IsEditMode">
+
+                                                                <!-- Print — only for saved success rows -->
+                                                                <a ng-if="item.IsDepositLineItemDisabled == true && item.Status != 'Failed'">
+                                                                    <i class="icons__w16-- printnew__w16--b"
+                                                                       ng-click="DepositCollectPrint(mainNMIPaymentRequestObj, item); $event.stopPropagation()"></i>
+                                                                </a>
+
+                                                                <!-- Delete — only for unsaved rows when multiple exist -->
+                                                                <a ng-if="mainNMIPaymentRequestObj.PatientDepositLineItem.length > 1
+                           && item.IsDepositLineItemDisabled == false">
+                                                                    <i class="icons__w16-- cancel__w16--o"
+                                                                       ng-click="DeletePatientDepositLineItem($index, item); $event.stopPropagation()"></i>
+                                                                </a>
+
+                                                                <!-- Edit — only for saved cash/check rows, today only -->
+                                                                <a ng-if="item.IsDepositLineItemDisabled == true
+           && item.Status == 'Success'
+           && item.PaymentProcessTypeId != 3
+           && item.PaymentProcessTypeId != 2"
+                                                                   ng-click="EditDepositLineItem(item, $index); $event.stopPropagation()"
+                                                                   tooltip-placement="top" uib-tooltip="Edit">
+                                                                    <i class="icons__w16-- edit__w16--o"></i>
+                                                                </a>
+                                                                <!-- Notes popover -->
+                                                                <!--<a uib-popover-template="notesPopoverClick.templateUrl"
+                       popover-placement="auto"
+                       popover-trigger="outsideClick"
+                       popover-class="w__330-- m__0--"
+                       title="Add Notes"
+                       ng-hide="item.Notes == '' && item.Status == 'Failed'"
+                       ng-click="ShowEachDepositNotes($index, item); $event.stopPropagation()">
+                        <i class="icons__w16-- notes__w16--o"></i>
+                    </a>-->
+                                                                <a title="Add Notes" ng-hide="item.IsDepositLineItemDisabled"
+                                                                   ng-click="ShowEachDepositNotes(item);">
+                                                                    <i class="icons__w16-- notes__w16--o"></i>
+                                                                </a>
+                                                            </ng-container>
+
+                                                            <!-- Edit mode actions — Save + Cancel -->
+                                                            <ng-container ng-if="item.IsEditMode">
+                                                                <button class="btn__sm-- btn__C71D27--o"
+                                                                        ng-click="CancelEditDepositLineItem(item); $event.stopPropagation()">
+                                                                    Cancel
+                                                                </button>
+                                                            </ng-container>
+
+                                                        </div>
+                                                        <div class="d__f-- jc__fe-- ai__c-- px__8-- py__9--" ng-show="$last">
+                                                            <a>
+                                                                <i class="icons__w16-- add__w16--f" ng-click="AddDepositLineItem()"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="ShouldShowFeeRow(item)" class="bg__F9F9F9--">
+                                                    <td></td>
+                                                    <td colspan="7" class="py__4-- px__8--">
+                                                        <div class="d__f-- ai__c-- gap__15-- fs__sm--">
+                                                            <div class="d__f-- ai__c-- gap__5--">
+                                                                <i class="icons__w14-- info__w14--o tc__1D5558--"></i>
+                                                                <span class="tc__656565--">
+                                                                    Patient Amount: <b class="tc__1D1D1D--">${{(item.OriginalAmount || item.DepositAmount || 0) | number:2}}</b>
+                                                                </span>
+                                                            </div>
+                                                            <div class="d__f-- ai__c-- gap__5--" ng-if="item.ConvenienceFeeAmount > 0">
+                                                                <span class="tc__656565--">
+                                                                    Convenience Fee: <b class="tc__F7981C--">+${{(item.ConvenienceFeeAmount || 0) | number:2}}</b>
+                                                                </span>
+                                                                <span class="fs__sm-- tc__656565--"
+                                                                      ng-if="ConvenienceFeeMap[item.PaymentModeId]">
+                                                                    ({{
+ConvenienceFeeMap[item.PaymentModeId].ConvenienceFeeTypeId == 2
+                           ? ConvenienceFeeMap[item.PaymentModeId].ConvenienceFeeValue + '%'
+                           : '$' + (ConvenienceFeeMap[item.PaymentModeId].ConvenienceFeeValue | number:2) + ' flat'
+                                                                    }})
+                                                                </span>
+                                                            </div>
+                                                            <div class="d__f-- ai__c-- gap__5-- ml__auto--">
+                                                                <span class="tc__1D1D1D-- fw__6--">
+                                                                    Charge Total: <b class="tc__1D5558--">${{(item.FinalChargedAmount || item.DepositAmount || 0) | number:2}}</b>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-show="item.IsShoweachDepositNotes">
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}"><label>Note :</label></td>
+                                                    <td class="px__4-- py__5--" ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}" colspan="7"><textarea class="form__control" placeholder="Enter Notes" rows="1" ng-model="item.Notes"></textarea></td>
+                                                </tr>
+                                                <!-- Status row -->
+                                                <tr ng-if="item.Status != ''">
+                                                    <td class="px__4-- py__5--"
+                                                        ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}"></td>
+                                                    <td class="px__4-- py__5--" colspan="7"
+                                                        ng-class="{'bg__E8EEEE--': item.IsActive && !item.IsDepositLineItemDisabled}">
+                                                        <div class="d__f-- ai__c-- gap__5--x" ng-if="item.Status == 'Success'">
+                                                            <span class="icons__w16-- active__w16--f"></span>
+                                                            <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--">
+                                                                Payment of
+                                                                <span class="tc__00A331-- fs__lg-- fw__7-- fs__normal--">
+                                                                    ${{item.DepositAmount}} {{item.Status}}
+                                                                </span>
+                                                                via {{item.PaymentMode}}
+                                                            </span>
+                                                        </div>
+                                                        <div class="d__f-- ai__c-- gap__5--x" ng-if="item.Status != 'Success'">
+                                                            <span class="icons__w16-- cancel__w16--o"></span>
+                                                            <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--">
+                                                                Payment of
+                                                                <span class="tc__C71D27-- fs__lg-- fw__7-- fs__normal--">
+                                                                    ${{item.DepositAmount}} {{item.Status}}
+                                                                </span>
+                                                                via {{item.PaymentMode}}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="item.Status != '' && item.Notes!='' && !item.IsShoweachDepositNotes">
+                                                    <td colspan="8" class=" bbw__1-- bc__E4E4E4-- bs__s--"><label>Notes :</label> {{item.Notes}}</td>
+                                                </tr>
+                                            </tbody>
+
+
+                                            <tbody>
+                                                <!--<tr class="bg__1D55581A--">
+                                                    <td colspan="2" class="py__6--">
+                                                        <div class="d__f-- ai__c-- gap__15--">
+                                                            <div>
+                                                                <label class="fs__md-- fw__5-- tc__656565--">Subtotal:</label>
+                                                                <span class="fs__lg-- fw__6-- tc__1D1D1D--">
+                                                                    ${{TotalSubtotalAmount | number:2}}
+                                                                </span>
+                                                            </div>
+                                                            <div ng-if="TotalConvenienceFee > 0">
+                                                                <label class="fs__md-- fw__5-- tc__656565--">Convenience Fee:</label>
+                                                                <span class="fs__lg-- fw__6-- tc__F7981C--">
+                                                                    +${{TotalConvenienceFee | number:2}}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td colspan="6" class="py__6-- text-right">
+                                                        <label class="fs__lg-- fw__7-- tc__1D1D1D--">Total Charge:</label>
+                                                        <span class="fs__xl-- fw__7-- tc__1D5558-- ml__5--">
+                                                            ${{TotalFinalAmount | number:2}}
+                                                        </span>
+                                                    </td>
+                                                </tr>-->
+                                                <tr>
+                                                    <td colspan="2" class="text-center">
+                                                        <label class="fs__lg-- fw__7-- tc__1D1D1D-- fs__normal--">
+                                                            Total : <span>${{(TotalDepositAmount || 0) | number:2}}</span>
+                                                        </label>
+                                                    </td>
+                                                    <td colspan="8">
+                                                        <div class="d__f-- jc__fe-- ai__c-- px__8-- py__9--" ng-if="false">
+                                                            <a ng-if="TotalDepositAmount != MainParentobj.PaymentAmount">
+                                                                <i class="icons__w16-- add__w16--f" ng-click="AddDepositLineItem()"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ═══ RIGHT: side panel — binds to ActiveDepositItem (active row reference) ═══ -->
+                        <div class="section__style--5 height__100-- width__20-- blw__0-- btlr__0-- bblr__0-- mb__2--"
+                             ng-if="ISShowCardPaymentDetails && ActiveDepositItem">
+
+                            <div class="section__header-- jc__sb--">
+                                <h1>{{ActiveDepositItem.PaymentMode}} Payment</h1>
+                            </div>
+
+                            <div class="section__body-- height__100-- bg__E8EEEE--">
+                                <div class="position__relative-- height__100--">
+                                    <div class="adjustable-position">
+                                        <div class="d__f-- fd__c-- gap__10--y">
+
+                                            <!-- Amount summary -->
+                                            <div class="bg__1D55580A-- bradius__5-- p__10-- mb__10--"
+                                                 ng-if="ShouldShowPaymentBreakdown()">
+
+                                                <div class="d__f-- jc__sb-- ai__c-- py__3--">
+                                                    <label class="fs__md-- fw__5-- tc__656565--">Patient Amount</label>
+                                                    <span class="fs__lg-- fw__6-- tc__1D1D1D--">
+                                                        ${{(ActiveDepositItem.OriginalAmount || ActiveDepositItem.DepositAmount || 0) | number:2}}
+                                                    </span>
+                                                </div>
+
+                                                <div class="d__f-- jc__sb-- ai__c-- py__3--"
+                                                     ng-if="ActiveDepositItem.ConvenienceFeeAmount > 0">
+                                                    <label class="fs__md-- fw__5-- tc__656565-- d__f-- ai__c-- gap__5--">
+                                                        Convenience Fee
+                                                        <a tabindex="0"
+                                                           uib-popover="A {{GetFeeDisplayText(ActiveDepositItem)}} convenience fee applies to this payment method."
+                                                           popover-trigger="mouseenter"
+                                                           popover-placement="top">
+                                                            <i class="icons__w12-- info__w12--o"></i>
+                                                        </a>
+                                                    </label>
+                                                    <span class="fs__lg-- fw__6-- tc__F7981C--">
+                                                        +${{(ActiveDepositItem.ConvenienceFeeAmount || 0) | number:2}}
+                                                    </span>
+                                                </div>
+
+                                                <div class="bt__DDD-- mt__6-- pt__6-- d__f-- jc__sb-- ai__c--">
+                                                    <label class="fs__lg-- fw__7-- tc__1D1D1D--">Total to Charge</label>
+                                                    <span class="fs__2l-- fw__7-- tc__1D5558--">
+                                                        ${{(ActiveDepositItem.FinalChargedAmount || ActiveDepositItem.DepositAmount || 0) | number:2}}
+                                                    </span>
+                                                </div>
+
+                                                <div class="mt__8-- p__6-- bg__F7981C1A-- bradius__4--"
+                                                     ng-if="ActiveDepositItem.ConvenienceFeeAmount > 0">
+                                                    <div class="d__f-- ai__fs-- gap__5--">
+                                                        <i class="icons__w14-- info__w14--o tc__F7981C-- mt__2--"></i>
+                                                        <small class="fs__sm-- tc__656565-- lh__16--">
+                                                            A convenience fee of <b>${{(ActiveDepositItem.ConvenienceFeeAmount || 0) | number:2}}</b>
+                                                            is added to this payment. By proceeding, the patient agrees to be charged
+                                                            <b>${{(ActiveDepositItem.FinalChargedAmount || 0) | number:2}}</b> total.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--<div class="p__7-- bw__1-- bs__s-- bc__E4E4E4-- d__f-- fd__c-- gap__5--y bg__FFF-- br__4--">
+        <span class="tc__1D1D1D-- fs__lg-- fw__7-- fs__normal--">
+            ${{(ActiveDepositItem.DepositAmount || 0) | number:2}}
+        </span>
+        <span class="tc__656565-- fs__md-- fw__5-- fs__normal--">
+            {{ActiveDepositItem.PaymentMode}}
+        </span>
+    </div>-->
+                                            <!-- Receive Via — credit / debit / ACH -->
+                                        <div class="form__group"
+                                             ng-if="ActiveDepositItem.PaymentModeId === 2
+         || ActiveDepositItem.PaymentModeId === 3
+         || ActiveDepositItem.PaymentModeId === 7">
+                                            <label class="tc__000-- fw__6--">Receive Via <em>*</em></label>
+                                            <select ng-model="ActiveDepositItem.PaymentProcessTypeId"
+                                                    ng-options="Sitem.PaymentProcessTypeId as Sitem.PaymentProcessType disable when Sitem.disabled
+                        for Sitem in masterPaymentProcessingTypes | filter:filterProcessTypesForMode"
+                                                    ng-change="changePatPaymentProcessingType(ActiveDepositItem.PaymentProcessTypeId)">
+                                                <option value="" disabled>Select</option>
+                                            </select>
+                                        </div>
+
+                                            <!-- CREDIT / DEBIT — Payment Page (CollectJS) -->
+                                            <div class="d__f-- fd__c-- gap__5--"
+                                                 ng-if="(ActiveDepositItem.PaymentModeId === 2 || ActiveDepositItem.PaymentModeId === 3)
+                                 && ActiveDepositItem.PaymentProcessTypeId === 3">
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Card Information <em>*</em></label>
+                                                    <div id="nmi-ccnumber"></div>
+                                                </div>
+                                                <div class="d__f-- ai__c-- gap__5--x">
+                                                    <div class="form__group flex"><div id="nmi-exp"></div></div>
+                                                    <div class="form__group width__30--"><div id="nmi-cvv"></div></div>
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Card Holder Name</label>
+                                                    <input type="text" placeholder="Enter card holder name"
+                                                           ng-model="ActiveDepositItem.CardHolderName" />
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Zip Code <em>*</em></label>
+                                                    <input type="text" placeholder="Enter zip code"
+                                                           ng-model="ActiveDepositItem.CardBillingZip" />
+                                                </div>
+                                            </div>
+
+                                            <!-- CREDIT / DEBIT — Without Gateway (manual) -->
+                                            <div class="d__f-- fd__c-- gap__10--y"
+                                                 ng-if="(ActiveDepositItem.PaymentModeId === 2 || ActiveDepositItem.PaymentModeId === 3)
+                                 && ActiveDepositItem.PaymentProcessTypeId === 4">
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Card Type <em>*</em></label>
+                                                    <select ng-model="ActiveDepositItem.CardTypeId"
+                                                            ng-options="Citem.CardtypeId as Citem.CardType for Citem in AllCardTypes"
+                                                            ng-change="ChangePatientCardType(ActiveDepositItem.CardTypeId)">
+                                                        <option value="" disabled>Select</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Last 4 Digits <em>*</em></label>
+                                                    <input type="text" placeholder="0000"
+                                                           ng-model="ActiveDepositItem.CardNumber"
+                                                           maxlength="4" numbers-only />
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Reference Number</label>
+                                                    <input type="text" placeholder="Enter reference number"
+                                                           ng-model="ActiveDepositItem.TransactionId"
+                                                           maxlength="50" />
+                                                </div>
+                                            </div>
+
+                                            <!-- CREDIT / DEBIT — EMV Device -->
+                                            <div class="form__group"
+                                                 ng-if="(ActiveDepositItem.PaymentModeId === 2 || ActiveDepositItem.PaymentModeId === 3)
+                                 && ActiveDepositItem.PaymentProcessTypeId === 1">
+                                                <label class="tc__000-- fw__6--">POI Device <em>*</em></label>
+                                                <select ng-model="ActiveDepositItem.PoiDeviceId"
+                                                        ng-change="changePOIDevice(ActiveDepositItem.PoiDeviceId)"
+                                                        ng-options="Sitem.PoiDeviceId as Sitem.DeviceName+'-'+Sitem.DeviceNumber for Sitem in FilterPOIDeviceList">
+                                                    <option value="" disabled>Select</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- CHECK / CHEQUE (PaymentModeId = 5) -->
+                                            <div class="form__group"
+                                                 ng-if="ActiveDepositItem.PaymentModeId === 5">
+                                                <label class="tc__000-- fw__6--">Check Number <em>*</em></label>
+                                                <input type="text" placeholder="Enter check number"
+                                                       ng-model="ActiveDepositItem.ChequeNumber"
+                                                       maxlength="25" numbers-only />
+                                            </div>
+
+                                            <!-- ACH / ATH — Payment Page (CollectJS) -->
+                                            <div class="d__f-- fd__c-- gap__10--y"
+                                                 ng-if="ActiveDepositItem.PaymentModeId === 7
+                                 && ActiveDepositItem.PaymentProcessTypeId === 3">
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Account Number <em>*</em></label>
+                                                    <div id="nmi-chkacctnumber"></div>
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Routing Number <em>*</em></label>
+                                                    <div id="nmi-checkaba"></div>
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Account Holder Name <em>*</em></label>
+                                                    <div id="nmi-checkname"></div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ACH / ATH — Without Gateway (manual) -->
+                                            <div class="d__f-- fd__c-- gap__10--y"
+                                                 ng-if="ActiveDepositItem.PaymentModeId === 7
+                                 && ActiveDepositItem.PaymentProcessTypeId === 4">
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Account Number <em>*</em></label>
+                                                    <input type="text" placeholder="Enter account number"
+                                                           ng-model="ActiveDepositItem.ACHAccountNumber"
+                                                           maxlength="20" numbers-only />
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Routing Number <em>*</em></label>
+                                                    <input type="text" placeholder="Enter routing number"
+                                                           ng-model="ActiveDepositItem.ACHABANumber"
+                                                           maxlength="9" numbers-only />
+                                                </div>
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Reference Number</label>
+                                                    <input type="text" placeholder="Enter reference number"
+                                                           ng-model="ActiveDepositItem.TransactionId"
+                                                           maxlength="50" />
+                                                </div>
+                                            </div>
+
+
+                                            <!-- CREDIT / DEBIT — TextToPay -->
+                                            <div class="d__f-- fd__c-- gap__10--y"
+                                                 ng-if="ActiveDepositItem.PaymentModeId === 16">
+
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Mobile Number <em>*</em></label>
+                                                    <input type="text" placeholder="Patient mobile"
+                                                           ng-model="ActiveDepositItem.PatientMobile" 
+                                                            ng-change="formatUSNumberInfo(ActiveDepositItem.PatientMobile);"
+                                                           us-mobile-number-sepical-characters
+                                                            maxlength="14" />
+                                                </div>
+
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Topic <em>*</em></label>
+                                                    <input type="text" placeholder="Auto generated"
+                                                           ng-model="ActiveDepositItem.TextToPayTopic"
+                                                           maxlength="100" />
+                                                </div>
+
+                                             
+
+                                                <div class="form__group">
+                                                    <label class="tc__000-- fw__6--">Expiration  <em>*</em></label>
+                                                    <select ng-model="ActiveDepositItem.TextToPayExpiration"
+                                                            ng-options="o.value as o.label for o in TextToPayExpirationOptions">
+                                                    </select>
+                                                </div>
+
+                                                <div class="p__7-- bg__FEF9C6-- br__4--">
+                                                    <span class="fs__sm-- tc__656565--">
+                                                        SMS will be sent to the patient. Payment will reflect once the patient completes it.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Side panel footer -->
+                            <div class="modal__footer--">
+                                <div class="d__f-- jc__fe--">
+                                    <!--<button class="btn__xl-- btn__1d5558--f py__12--"
+                                            ng-click="navtoCollectMulipleDepositPayments()"
+                                            ng-if="!IsEditLineItemMode"
+                                            ng-disabled="isPaymentInProgress">
+                                        Collect Payment
+                                    </button>-->
+                                    <button class="btn__xl-- btn__1d5558--f py__12--"
+                                            ng-click="navtoCollectMulipleDepositPayments()"
+                                            ng-if="!IsEditLineItemMode"
+                                            ng-disabled="isPaymentInProgress">
+                                        {{ActiveDepositItem.PaymentModeId === 16 ? 'Send TextToPay' : 'Collect Payment'}}
+                                    </button>
+                                </div>
+
+                              
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal__footer--" ng-if="IsShowDepsoitNewScreen">
+        <div class="d__f-- fd__c-- gap__5--y width__100--">
+            <div>
+                <!-- Normal collect flow -->
+                <button class="btn__xl-- py__15-- btn__1d5558--f width__100--"
+                        ng-if="IsShowCollectpaymentbutton && !IsEditLineItemMode"
+                        ng-click="navtoCollectMulipleDepositPayments('close')"
+                        ng-disabled="IsShowpaymentbutton">
+                    Collect and Save Payment
+                </button>
+
+                <!-- Edit mode — triggers same navtoCollectMulipleDepositPayments internally -->
+                <button class="btn__xl-- py__15-- btn__1d5558--f width__100--"
+                        ng-if="IsEditLineItemMode"
+                        ng-click="SaveEditDepositLineItem(EditingLineItem, EditingLineItemIndex)"
+                        ng-disabled="isPaymentInProgress">
+                    Save Changes
+                </button>
+
+               
+                <!-- All saved, just close -->
+                <button class="btn__xl-- py__15-- btn__1d5558--f width__100--"
+                        ng-if="!IsShowCollectpaymentbutton && !IsEditLineItemMode"
+                        ng-click="uibclose()"
+                        ng-disabled="IsShowpaymentbutton">
+                    Save Payment
+                </button>
+            </div>
+        </div>
+    </div>
+     
+
+     
+
+</div>
+
+
+
+<script type="text/ng-template" id="paymentCollection.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1>Payment Collection</h1>
+            <a class="btn__close--2" ng-click="paymentClose()">
+                <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+            </a>
+        </div>
+        <div class="modal__body-- p__0--">
+            <div class="position__relative-- height__100--" ng-if="ShowCollectpaymetnpaymentPopup == false">
+                <div class="adjustable-position slim-scroll p__12--">
+                    <div class="d__f-- fd__c-- gap__y--12">
+                        <div class="d__f-- fd__c-- border__E4E4E4-- bg__F5F5F5-- px__13-- py__8-- bradius__4--">
+                            <div class="d__f-- ai__c-- jc__sb-- pb__5-- bb__DDD--">
+                                <label class="fs__md-- fw__4-- tc__656565-- ">Amount</label>
+                                <label class="fs__xl-- fw__7-- tc__1D1D1D-- ">${{(PatientDepositLineItemObj.DepositAmount || 0) | number:2}}</label>
+                            </div>
+                            <ul class="list__none-- m__0-- d__f-- fd__c-- gap__y--8 pt__5--">
+                                <li>
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__md-- fw__4-- tc__656565-- lh__18-- ">Location:</label>
+                                        <label class="fs__md-- fw__5-- tc__1D1D1D-- lh__18-- ">{{mainPatientDepositReqObj.HospitalName}}</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__md-- fw__4-- tc__656565-- lh__18-- ">Billing Provider:</label>
+                                        <label class="fs__md-- fw__5-- tc__1D1D1D-- lh__18-- ">{{mainPatientDepositReqObj.BillingProviderName}}</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__md-- fw__4-- tc__656565-- lh__18-- ">Rendering Provider:</label>
+                                        <label class="fs__md-- fw__5-- tc__1D1D1D-- lh__18-- ">{{mainPatientDepositReqObj.RenderingProviderName}}</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__md-- fw__4-- tc__656565-- lh__18-- ">Payment Code:</label>
+                                        <label class="fs__md-- fw__5-- tc__1D1D1D-- lh__18-- ">{{mainPatientDepositReqObj.DepositTypeName}}</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="d__f-- fd__c-- gap__10--y ">
+                            <div class="row nocolpad">
+                                <div class="col-lg-6">
+                                    <div class="input__style--5">
+                                        <label>Payment Method<em>*</em></label>
+                                        <select class="" id="select_paymentmode" ng-model="mainPatientDepositReqObj.PaymentModeId" ng-options="Sitem.PaymentModeId as Sitem.PaymentModeName for Sitem in filteredPaymentModes" ng-change="changePaymentMethod(mainPatientDepositReqObj.PaymentModeId, mainPatientDepositReqObj)" disabled="disabled">
+                                            <option value="" disabled>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input__style--5" ng-if="mainPatientDepositReqObj.PaymentModeId===2 || mainPatientDepositReqObj.PaymentModeId===3 || mainPatientDepositReqObj.PaymentModeId===7">
+                                        <label>Receive Via<em>*</em></label>
+                                        <select class="" id="select_receivevia" ng-model="mainPatientDepositReqObj.PaymentProcessTypeId" ng-options="Sitem.PaymentProcessTypeId as Sitem.PaymentProcessType for Sitem in masterPaymentProcessingTypes" ng-change="changePatientPmntProcessingType(mainPatientDepositReqObj.PaymentProcessTypeId)">
+                                            <option value="" disabled>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!------------------------------------ EMV Device option ----------------------------->
+
+                            <div class="row  nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId==1">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>POI Device<em>*</em></label>
+                                        <select class="" id="select_poidevicelist" ng-model="mainPatientDepositReqObj.PoiDeviceId"
+                                                ng-change="changePOIDevicePayment(mainPatientDepositReqObj.PoiDeviceId)" ng-options="Sitem.PoiDeviceId as Sitem.DeviceName+'-'+Sitem.DeviceNumber for Sitem in FilterPOIDeviceList">
+                                            <option value="" disabled>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!------------------------------------ Payment Gateway Option ----------------------------->
+
+                            <div class="row  nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==4 && mainPatientDepositReqObj.PaymentModeId != 7">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Card Type<em>*</em></label>
+                                        <select ng-model="mainPatientDepositReqObj.CardTypeId"
+                                                id="select_cardtype"
+                                                ng-options="Citem.CardtypeId as Citem.CardType for Citem in AllCardTypes "
+                                                ng-change="ChangePatientCardType(mainPatientDepositReqObj.CardTypeId)">
+                                            <option value="" disabled>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && (mainPatientDepositReqObj.PaymentModeId==2 || mainPatientDepositReqObj.PaymentModeId==3) ">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Card Number<em>*</em></label>
+                                        <div id="nmi-ccnumber"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && (mainPatientDepositReqObj.PaymentModeId==2 || mainPatientDepositReqObj.PaymentModeId==3) ">
+                                <div class="col-lg-6">
+                                    <div class="input__style--5">
+                                        <label>CCV<em>*</em></label>
+                                        <!--<input type="text" placeholder="***" />-->
+                                        <div id="nmi-cvv"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input__style--5">
+                                        <label>Expiry Date<em>*</em></label>
+                                        <div id="nmi-exp"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && (mainPatientDepositReqObj.PaymentModeId==2 || mainPatientDepositReqObj.PaymentModeId==3) ">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Card Holder Name<em>*</em></label>
+                                        <input type="text" id="input_cardholdername" placeholder="Enter CardHolderName" ng-model="mainPatientDepositReqObj.CardHolderName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && (mainPatientDepositReqObj.PaymentModeId==2 || mainPatientDepositReqObj.PaymentModeId==3) ">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Zip code<em>*</em></label>
+                                        <input type="text" id="input_zipcode" placeholder="Enter ZipCode" ng-model="mainPatientDepositReqObj.CardBillingZip" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentModeId ==5">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Cheque Number<em>*</em></label>
+                                        <input type="text" placeholder="Enter check Number" ng-model="mainPatientDepositReqObj.ChequeNumber" maxlength="25" numbers-only />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && mainPatientDepositReqObj.PaymentModeId==7">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Account Number <em>*</em></label>
+                                        <div id="nmi-chkacctnumber"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 && mainPatientDepositReqObj.PaymentModeId==7">
+                                <div class="col-lg-6">
+                                    <div class="input__style--5">
+                                        <label>Routing Number<em>*</em></label>
+                                        <div id="nmi-checkaba"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input__style--5">
+                                        <label>Account Owner's Name<em>*</em></label>
+                                        <div id="nmi-checkname"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--------------------------------- Manual Entry option ------------------------->
+
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==4 && mainPatientDepositReqObj.PaymentModeId != 7">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Last 4 Digits<em>*</em></label>
+                                        <input type="text" id="input_lastfour" ng-model="mainPatientDepositReqObj.CardNumber" maxlength="4" placeholder="0000" numbers-only />
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row nocolpad" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==4">
+                                <div class="col-lg-12">
+                                    <div class="input__style--5">
+                                        <label>Reference Number</label>
+                                        <input type="text" id="input_refnumber" placeholder="Enter Reference Number" ng-model="mainPatientDepositReqObj.TransactionId" maxlength="50" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--------------------------- transaction page --------------------->
+            <div class="position__relative-- height__100--" ng-if="ShowCollectpaymetnpaymentPopup == true">
+                <div class="adjustable-position slim-scroll  px__20-- py__10-- bg__f6f9fc-- ">
+                    <div class="d__f-- fd__c-- gap__20--y height__100--">
+                        <div class="d__f-- fd__c--  gap__10--y">
+                            <div class="d__f-- fd__c-- ai__c-- jc__c-- gap__y--6 p__12-- ">
+                                <a ng-if="mainPatientDepositReqObj.UITransactionStatus=='Success'"><i class="icons__w40-- success__w40--"></i></a>
+                                <a ng-if="mainPatientDepositReqObj.UITransactionStatus !='Success'"><i class="icons__w40-- failed__w40--"></i></a>
+                                <h3 class="fs__3l-- fw__6-- tc__1D1D1D-- lh__24-- m__0--" ng-if="mainPatientDepositReqObj.UITransactionStatus=='Success'">Transaction Successful</h3>
+                                <h3 class="fs__3l-- fw__6-- tc__1D1D1D-- lh__24-- m__0--" ng-if="mainPatientDepositReqObj.UITransactionStatus !='Success'">Transaction Failed</h3>
+                                <h3 class="fs__3l-- fw__6-- tc__1D1D1D-- lh__24-- m__0--" ng-if="mainPatientDepositReqObj.ResponseText!=''">({{mainPatientDepositReqObj.ResponseText}})</h3>
+                                <label class="fs__md-- fw__4-- tc__4A4A4A-- lh__18--" ng-if="mainPatientDepositReqObj.ReceiptNo!=0">Receipt ID : <span class="fw__5--">{{mainPatientDepositReqObj.ReceiptNo}}</span></label>
+
+                                <!--<label class="fs__md-- fw__4-- tc__4A4A4A-- lh__18--">Transaction ID : <span class="fw__5--">{{mainPatientDepositReqObj.TransactionReceiptNo}}</span></label>-->
+
+                            </div>
+                            <div class="bg__FFF-- border__E4E4E4--">
+                                <div class="d__f-- fd__c-- gap__6--y p-40">
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A-- lh__20-- modal__width--35">Total Amount</label>
+                                        <label class="fs__xl-- fw__6-- tc__1D1D1D-- lh__22-- ">${{(mainPatientDepositReqObj.PaymentAmount || 0) | number:2}} </label>
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__lg-- fw__7-- tc__4A4A4A-- lh__20--">Paid Amount</label>
+                                        <label class="fs__3l-- fw__7-- tc__1D1D1D-- lh__22-- ">${{(mainPatientDepositReqObj.PaymentAmount || 0) | number:2}}</label>
+                                    </div>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__c--  position__relative--">
+                                    <div class="position__absolute-- bg__f6f9fc-- h__40-- w__20--  br__E4E4E4-- bradius__20--yr l__n1--">
+
+                                    </div>
+                                    <div class="bb__e4e4e4-- width__75--"></div>
+                                    <div class="position__absolute-- bg__f6f9fc-- h__40-- w__20-- bl__E4E4E4-- bradius__20--yl r__n1--">
+
+                                    </div>
+                                </div>
+                                <div class="d__f-- fd__c-- gap__10--y p-40">
+                                    <ul class="list__none-- m__0-- d__f-- fd__c-- gap__y--10  pt__30-- pt__30--">
+                                        <li>
+                                            <div class="d__f-- ai__c-- jc__sb-- ">
+                                                <label class="fs__md-- fw__5-- tc__4A4A4A--">Sender Name</label>
+                                                <label class="fs__md-- fw__5-- tc__1D1D1D--">{{mainPatientDepositReqObj.PatientFullName}}</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="d__f-- ai__c-- jc__sb-- ">
+                                                <label class="fs__md-- fw__5-- tc__4A4A4A--">Trans. Date & Time</label>
+                                                <label class="fs__md-- fw__5-- tc__1D1D1D--">{{mainPatientDepositReqObj.TransactionDate | date: 'MM-dd-yyyy' }} {{ mainPatientDepositReqObj.TransactionTime | date:'hh:mm a' }}</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="d__f-- ai__c-- jc__sb-- ">
+                                                <label class="fs__md-- fw__5-- tc__4A4A4A--">Payment Method</label>
+                                                <label class="fs__md-- fw__5-- tc__1D1D1D--">{{mainPatientDepositReqObj.PaymentMode}}</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="d__f-- ai__c-- jc__sb-- gap__10--x">
+                                                <label class="fs__md-- fw__5-- tc__4A4A4A-- white-nowrap">Reference No</label>
+                                                <label class="fs__md-- fw__5-- tc__1D1D1D-- word-brk" ng-if="mainPatientDepositReqObj.ReferenceNumber != ''">{{mainPatientDepositReqObj.ReferenceNumber}}</label>
+                                                <label class="fs__md-- fw__5-- tc__1D1D1D--" ng-if="mainPatientDepositReqObj.ReferenceNumber == ''">-</label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Buttons -->
+                        <div class="d__f-- fd__c-- gap__y--12 pb__10--">
+                            <button class="btn__xl-- btn__1d1d1d--f py__12--" id="button_print" ng-click="DepositTransactionPrintrecept()" ng-if="mainPatientDepositReqObj.UITransactionStatus == 'Success'">
+                                <i class="icons__w16-- printnew__w16--w"></i> Print Receipt
+                            </button>
+
+                            <button class="btn__xl-- btn__FFFFFF--f py__12-- boxs__00000040--" ng-click="paymentClose()">
+                                <span ng-bind="mainPatientDepositReqObj.PaymentTypeId == 1 ? 'Back to Deposit' :
+                                      mainPatientDepositReqObj.PaymentTypeId == 2 ? 'Back to Payment' : ''">
+                                </span>
+                                <!--Back to Deposit-->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer--" ng-if="ShowCollectpaymetnpaymentPopup == false">
+            <div class="d__f-- fd__c-- gap__y--8 width__100--">
+                <!--<div class="d__f-- ai__c-- gap__5--x">
+                    <label class="cur-poiter d__f-- ai__c--">
+                        <input type="checkbox" class="checkbox ">
+                        <span class="lbl"></span>
+                        <span class="fs__lg-- fw__5-- tc__1D1D1D-- "></span>
+                    </label>
+                    <a>
+                        <i class="icons__w16-- printnew__w16--b"></i>
+                    </a>
+                    <label class="fs__lg-- fw__4-- tc__1D1D1D-- ">Print Receipt</label>
+                </div>-->
+                <button class="btn__xl-- btn__1d5558--f py__12--" ng-click="navtoCollectDepositPayment(mainPatientDepositReqObj)" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId == '' || mainPatientDepositReqObj.PaymentProcessTypeId == 0 || mainPatientDepositReqObj.PaymentProcessTypeId == 4">Collect Payment <span>of ${{PatientDepositLineItemObj.DepositAmount}}</span> </button>
+                <button class="btn__xl-- btn__1d5558--f py__12--" ng-click="navtoDepositOnlinePaymentGateway(mainPatientDepositReqObj)" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==3 || mainPatientDepositReqObj.PaymentProcessTypeId ==1">Collect Payment <span>of ${{PatientDepositLineItemObj.DepositAmount}}</span> </button>
+                <!-- <button class="btn__xl-- btn__1d5558--f py__12--" ng-click="navtoCollectPaymentFromDevice(mainPatientDepositReqObj)"  ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==1">Collect Payment <span>of ${{PatientDepositLineItemObj.DepositAmount}}</span> </button>-->
+                <!--<div class="p__10-- bt__DDD--">
+                    <button class="btn__xl-- btn__1d5558--f width__100--" id="button_collectpayment1" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId==3" ng-click="navtoOnlinePaymentGatewayPayment()">Collect Payment</button>
+                    <button class="btn__xl-- btn__1d5558--f width__100--" id="button_collectpayment2" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId==1 || mainPatientDepositReqObj.PaymentProcessTypeId==2" ng-click="navtoCollectPaymentFromCloudDevice()">Collect Payment</button>
+                    <button class="btn__xl-- btn__1d5558--f width__100--" id="button_manualcollect" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==4||mainPatientDepositReqObj.PaymentProcessTypeId ==5" ng-click="navtoCollectCashPayment(2)">Manual Collect Payment</button>
+                    <button class="btn__xl-- btn__1d5558--f width__100--" id="button_collectpayment3" ng-if="mainPatientDepositReqObj.PaymentProcessTypeId ==''||mainPatientDepositReqObj.PaymentProcessTypeId ==0" ng-click="navtoCollectCashPayment(1)">Collect Payment</button>
+                </div>-->
+            </div>
+        </div>
+
+    </div>
+</script>
+
+<script type="text/ng-template" id="notesPopover.html">
+    <div class="d__f-- fd__c-- gap__5--">
+        <div class="d__f-- ai__c-- jc__sb--">
+            <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Add Notes</h1>
+            <!--<button class="btn__sm-- btn__1d5558--f">Save</button>-->
+            <div>
+                <!--<a href="javascript:;" ng-if="item.Status!='' && item.Status!='Failed' && item.IsEditDepositNotes" ng-click="navtoEditDepositNotes(item, $index)">
+                    <i class="icons__w16-- edit__w16--o"></i>
+                </a>
+                <button class="btn__sm-- btn__1d5558--f" ng-click="UpdatePatientDepositNotes(item, $index)">Update</button>-->
+                <button class="btn__sm-- btn__1d5558--f" ng-if="item.Status!='' && item.Status!='Failed'" ng-click="UpdatePatientDepositNotes(item, $index)">Update</button>
+            </div>
+        </div>
+        <div class="form__group">
+            <!-- <textarea placeholder="Enter Notes" rows="5" ng-model="item.Notes" ng-disabled="item.IsEditDepositNotes == true"></textarea>-->
+            <textarea placeholder="Enter Notes" rows="5" ng-model="item.Notes" ng-change="onNotesChange(item)"></textarea>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="infoPopover.html">
+    <div class="d__f-- fd__c-- gap__10--">
+        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Payment Details</h1>
+        <table class="table tableno-bordered tableno-padding m__0--">
+            <tbody>
+                <tr>
+                    <td><span class="fs__lg-- fw__5-- tc__656565--">Payment Code :</span></td>
+                    <td class="text-right"><span class="fs__lg-- fw__6-- tc__1D1D1D--">General</span></td>
+                </tr>
+                <tr>
+                    <td><span class="fs__lg-- fw__5-- tc__656565--">Location :</span></td>
+                    <td class="text-right"><span class="fs__lg-- fw__6-- tc__1D1D1D--">Instituto A</span></td>
+                </tr>
+                <tr>
+                    <td><span class="fs__lg-- fw__5-- tc__656565--">Billing Provider :</span></td>
+                    <td class="text-right"><span class="fs__lg-- fw__6-- tc__1D1D1D--">Waxahachine Surgical Center</span></td>
+                </tr>
+                <tr>
+                    <td><span class="fs__lg-- fw__5-- tc__656565--">Rendering Provider :</span></td>
+                    <td class="text-right"><span class="fs__lg-- fw__6-- tc__1D1D1D--">Dr. Micheal Anderson</span></td>
+                </tr>
+                <tr>
+                    <td><span class="fs__lg-- fw__5-- tc__656565--">Receive Via</span></td>
+                    <td class="text-right"><span class="fs__lg-- fw__6-- tc__1D1D1D--">DMV Device</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+
+
+<div class="m-5 " style="display:none;" id="PrintDepsoitTransPopupNew">
+    <div style="width: 800px; margin: auto; padding-bottom: 12px; background-color: #fff; display: flex; flex-direction: column; grid-column-gap: 8px;">
+        <table style="width: 800px; border-bottom: 0.5px solid #ADADAD;">
+            <tbody>
+                <tr>
+                    <td style="vertical-align:top; text-align:center;">
+                        <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{DepositTransactionObj.OrganizationName}}</div>
+                        <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; color: #000; ">{{DepositTransactionObj.CityTown}}, {{DepositTransactionObj.State}}, {{DepositTransactionObj.Country}}</div>
+                        <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; color: #000; ">
+                            <!--Phone: {{HospitalAddress.ContactNo}}-->
+                            <span ng-if="DepositTransactionObj.FaxNumber != '' ">Fax: {{DepositTransactionObj.FaxNumber}}</span>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <div style="color: #000;  font-size: 14px; font-style: normal; font-weight: 700; line-height: normal;  text-align: center; margin-top:15px;">
+            {{TransactionReceiptText}}
+        </div>
+        <table style="width: 800px; border: 0.6px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px; background: #F0EFEF;" ng-if="false">
+            <tbody>
+                <tr>
+                    <td width="60%" style="vertical-align:top;">
+                        <table style="border: none; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:10px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Patient Name</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;"> {{PatientDetails.PatientFullName}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">MR. No</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;"> {{PatientDetails.PatientDisplayId}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+            Transaction Details
+        </div>
+        <table style="width: 800px; border: none; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+            <tbody>
+                <tr>
+                    <td width="60%" style="vertical-align:top;">
+                        <table style="border: none; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:10px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Patient Name</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;"> {{DepositTransactionObj.PatientFullName}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">MR. No</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;"> {{DepositTransactionObj.PatientDisplayId}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Transaction Date & Time</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;">  {{ DepositTransactionObj.TransactionDate | date:'MM-dd-yyyy' }} {{ DepositTransactionObj.TransactionTime}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Payment Method</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;">{{DepositTransactionObj.PaymentMethodName}}</td>
+                                </tr>
+                                <tr ng-if="DepositTransactionObj.CardNumber != ''">
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Last 4 Digits</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;" ng-if="DepositTransactionObj.CardNumber!= ''">{{DepositTransactionObj.CardNumber}}</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;" ng-if="DepositTransactionObj.CardNumber == ''"> - </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td width="40%" style="vertical-align:top;">
+                        <table style=" border: none; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:10px;">
+                            <tbody>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align:top; width:30%;">Receipt No</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top;">  {{DepositTransactionObj.ReceiptNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align:top; width:30%;">Reference No</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top;" ng-if="DepositTransactionObj.ReferenceNumber != ''"> {{DepositTransactionObj.ReferenceNumber}}</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top;" ng-if="DepositTransactionObj.ReferenceNumber == ''"> - </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Cheque Number</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;" ng-if="DepositTransactionObj.ChequeNumber != ''">  {{DepositTransactionObj.ChequeNumber}}</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;" ng-if="DepositTransactionObj.ChequeNumber == '' "> -</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:35%;">Transaction ID</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000;  vertical-align:top;">  {{DepositTransactionObj.TransReciptNo}}</td>
+                                </tr>
+                                <tr ng-if="DepositTransactionObj.CardType != ''">
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align:top; width:30%;">Payment Type</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top; width:5%;">:</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top;" ng-if="DepositTransactionObj.CardType != ''">  {{DepositTransactionObj.CardType}}</td>
+                                    <td style="font-size: 10px; padding: 2px 8px; font-style: normal; font-weight: 400; line-height: normal; color: #000; vertical-align: top;" ng-if="DepositTransactionObj.CardType == ''"> - </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div style="color: #1D1D1D; font-size: 12px; font-style: normal; font-weight: 600; line-height: normal; padding: 2px 8px; margin-top: 5px; border-top: 0.5px solid #ADADAD; border-bottom: 0.5px solid #ADADAD; ">
+            <label>Total Amount :</label>
+            <label style="float:right;">$ {{DepositTransactionObj.TransactionAmount}}</label>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<style>
+    /* Style the iframe container */
+    #nmi-ccnumber, #nmi-cvv, #nmi-exp {
+        height: 45px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 6px;
+        background-color: #fff;
+        transition: border-color 0.3s;
+    }
+
+        /* Target the iframe inside each field */
+        #nmi-ccnumber iframe,
+        #nmi-cvv iframe,
+        #nmi-exp iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+        }
+
+    .disabled-icon {
+        pointer-events: none;
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>

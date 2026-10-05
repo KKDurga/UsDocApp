@@ -1,0 +1,708 @@
+﻿<div class="modal-header eh-header">  
+    <h1>&nbsp;</h1>
+    <ul class="us-controls">
+        <li>
+            <a href="javascript:;"ng-click="BillingPopUpClose()">
+                <img src="img/appt-list/close-icon-new.svg" width="18">
+            </a>
+        </li>
+    </ul>
+   
+</div>
+<div class="modal-body p-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="eh-panel">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <section class="eh-panel b-0">
+                                <div class="eh-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="patients-profile clearfix b-0">
+                                                <ul>
+                                                    <li>
+                                                        <button ng-show="IsComingFrom !=='OPBilling'" class="btn btn-link" ng-click="navtoBillingList()"> <i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button>
+                                                    </li>
+                                                    <li>
+                                                        <h3><i class="fas fa-user"></i> Patient Name  : {{appointmentinfo.PatientDetails.FullName}}</h3>
+
+                                                    </li>
+                                                    <li>
+                                                        <h3><i class="fas fa-barcode"></i> MR.No. :{{appointmentinfo.PatientDetails.PatientDisplayId}}</h3>
+
+                                                    </li>
+                                                    <li>
+                                                        <h3><i class="fas fa-money-bill-alt"></i> Deposit Amount : N/A</h3>
+                                                    </li>
+                                                    <li>
+                                                        <h3><i class="fas fa-money-bill-alt"></i> Insurance : N/A</h3>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                   
+                    <div class="eh-body">
+                        <div class="table-responsive">
+                            <table class="table tableno-bordered m-b-0 apptFilterTable bg-white">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:150px;">
+                                            <div class="form-group">
+                                                <label>Payment By</label>
+                                             
+                                                <select class="form-control" ng-model="mainBillingObject.ClaimActionObj"
+                                                        ng-options="item as item.BillPaymentTypeName for item in billPaymentByModes"
+                                                        ng-change="ChangeBillByMode(mainBillingObject)">
+                                                </select>
+                                            </div>
+                                        </td>
+                                         
+                                        <td style="width:350px;">
+                                            <div class="form-group">
+
+                                                <fieldset class="pos-relative">
+                                                    <label>Billing Provider </label>
+                                                    <div class="dis-inline-block mr-10" style="float:right;">
+                                                        <input type="radio" class="radio-custom width-0" id="ProfessionalszId" name="patientClaimInszSearch" ng-value="1"   ng-model="mainBillingObject.ClaimTypeId" ng-click="changeClaimType(mainBillingObject)">
+                                                        <label for="ProfessionalszId" class="radio-custom-label cur-poiter mb-0 text-label">Proffesional</label>
+                                                    </div>
+                                                    <div class="dis-inline-block mr-5" style="float:right;">
+
+                                                        <input type="radio" class="radio-custom width-0 " id="InstitutionalszId" name="patientClaimInszSearch" ng-value="2"   ng-model="mainBillingObject.ClaimTypeId" ng-click="changeClaimType(mainBillingObject)">
+
+                                                        <label for="InstitutionalszId" class="radio-custom-label cur-poiter mb-0 text-label">Institutional</label>
+                                                    </div>
+                                                </fieldset>
+                                                <select class="form-control" ng-model="mainBillingObject.BillingProviderObj" ng-options="item as item.BillingProviderName for item in FacilitiesList" ng-change="changeBillingProvider(mainBillingObject)">
+                                                    <option value="" disabled="disabled">Select</option>
+                                                </select>
+
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Place Of Service </label>
+                                                <select class="form-control" ng-model="mainBillingObject.PlaceOfServiceId" ng-options="item.PlaceOfServiceId as item.PlaceofServiceCode + ' - ' + item.PlaceofServiceName for item in FacilityPlaceOfServiceArray" ng-change="changeBillingServiceLocation(mainBillingObject)">
+                                                    <option value="" disabled="disabled">Select</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <!--<td>
+                                            <div class="form-group">
+                                                <label>Facility Code <em ng-show="IsComingFrom =='PendingClaims'">*</em></label>
+                                                <input type="text" class="form-control dropdown"
+                                                       autocomplete="off"
+                                                       placeholder="Facility Code"
+                                                       maxlength="100"
+                                                       ng-model="mainBillingObject.FacilityObj"
+                                                       typeahead-min-length="1"
+                                                       uib-typeahead="item as item.FacilityCode for item in GetOrganizationFacilities($viewValue)"
+                                                       typeahead-on-select="onSelectFacilities(mainBillingObject);"
+                                                       ng-change="ChangeFacility();" />
+                                            </div>
+                                        </td>-->
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Rendering Provider</label>
+                                                <div class="form-group select-ui-match custom-select-width">
+                                                    <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                                        {{DoctorObj.NPI}}-{{DoctorObj.FullName}}
+                                                    </button>
+                                                    <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                                            <span class="input-group-addon">
+                                                                <span class="mainsearch-App">
+                                                                    <i class="fas fa-search"></i>
+                                                                </span>
+                                                            </span>
+                                                            <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchInvestigationHospital.txt2" />
+                                                        </div>
+                                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                                            <ul>
+                                                                <li role="presentation" ng-repeat="item in BranchDoctorsList | filter:{'NPI':searchInvestigationHospital.txt2}"
+                                                                    ng-click="ChangeDoctor(item)">
+                                                                    <a href="javascript:;">{{item.NPI}}-{{item.FullName}}</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Referring <em ng-show="IsComingFrom =='PendingClaims'">*</em></label>
+                                                <input type="text" class="form-control dropdown"
+                                                       autocomplete="off"
+                                                       placeholder="Referring"
+                                                       maxlength="100"
+                                                       ng-model="mainBillingObject.ReferralObj"
+                                                       typeahead-min-length="0"
+                                                       uib-typeahead="item as item.NPI+'-'+item.FullName for item in GetReferalPCPDoctors($viewValue)"
+                                                       typeahead-on-select="onSelectReferral(mainBillingObject);" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Referral #.</label>
+                                                <input type="text" class="form-control" ng-model="mainBillingObject.ReferringNo" />
+                                            </div>
+                                        </td>
+                                         
+                                    </tr>
+
+
+                                    <tr ng-hide="mainBillingObject.BillTypeId===1">
+                                        <td colspan="6">
+                                            <div class="row">
+
+                                                <div class="col-lg-6" ng-show="mainBillingObject.BillTypeId ===2 || mainBillingObject.BillTypeId ===4 || mainBillingObject.BillTypeId ===5">
+                                                    <div class="form-group insurence-span">
+                                                        <div class="dis-flex align-items-center">
+                                                            <div class="flex profile-show-timetracking dis-flex">
+                                                                <span class="text-068cb0 m-t-2 w-120">  Primary: </span>  <select class="form-control" ng-model="mainBillingObject.PayorObj" ng-change="changePayorBilling(mainBillingObject,1)" ng-options="item as item.PayorName + '-'+item.PlanCode for item in patientInsurancesArray"></select>
+                                                            </div>
+                                                            <div class="text-center w-100 pull-right">
+                                                                <img src="img/appt-list/insurence-info-edit.svg" class="cur-poiter" ng-click="EditInsurance(mainBillingObject.PayorObj)" />
+                                                                <span class="text-red fs-10" ng-show="!mainBillingObject.PayorObj.IsVerified" ng-click="CheckVerifyEligibityBll(mainBillingObject)">(Not Verified)</span>
+                                                                <span class="text-green" style="text-decoration:underline" ng-show="mainBillingObject.PayorObj.IsVerified" ng-click="showEligibilityinPopup(mainBillingObject.PayorObj,1)">(Verified)</span>
+                                                                <!--<button type="button" class="btn btn-save-us" title="Eligibility Details" ng-click="showEligibilityinPopup(PatientInsuranceItems,1)">Active</button>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group insurence-span" ng-show="mainBillingObject.BillTypeId ===3 || mainBillingObject.BillTypeId ===4">
+                                                        <div class="dis-flex align-items-center">
+                                                            <div class="flex profile-show-timetracking dis-flex">
+                                                                <!--<span>Secondary : <b>{{mainBillingObject.PayorObj1.PayorName}} - {{mainBillingObject.PlanObj1.PlanName}}</b></span>-->
+                                                                <span class="text-068cb0 m-t-2 w-120">Secondary : </span>
+                                                                <select class="form-control" ng-model="mainBillingObject.PayorObj1" ng-change="changePayorBilling(mainBillingObject,1)" ng-options="item as item.PayorName+ '-'+item.PlanCode for item in patientInsurancesArray"></select>
+                                                            </div>
+                                                            <div class="text-center w-100 pull-right">
+                                                                <img src="img/appt-list/insurence-info-edit.svg" class="cur-poiter" ng-click="EditInsurance(mainBillingObject.PayorObj1)" />
+                                                                <span class="text-red fs-10" ng-show="!mainBillingObject.PayorObj1.IsVerified">(Not Verified)</span><span class="text-green" style="text-decoration:underline" ng-show="mainBillingObject.PayorObj1.IsVerified" ng-click="showEligibilityinPopup(mainBillingObject.PayorObj1,1)">(Verified)</span>
+                                                                <!--<button type="button" class="btn btn-save-us" title="Eligibility Details" ng-click="showEligibilityinPopup(PatientInsuranceItems,2)">Active</button>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                     
+                                </tbody>
+                                
+                            </table>
+                        </div>
+
+
+                    </div>
+                </section>
+               
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="eh-panel">
+                    <div class="eh-header b-0">
+                        <label class="text-068cb0">Diagnosis</label>
+                        <ul class="us-controls">
+                            <li>
+                                <button class="btn btn-save-us" ng-click="LoadConsultationOrders()">Load Consultation Orders</button>
+                            </li>
+                            <li>
+                                <button class="btn btn-save-us" ng-click="advisedItemspopcons()">Advised Items</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="eh-body">
+                        <div class="row">
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'A'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">A</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)" />
+                                        <!--<select class="register-select br-0 ">
+                                            <option></option>
+                                        </select>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'B'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">B</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'C'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">C</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'D'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">D</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'E'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">E</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION  for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                        <!--<select class="register-select br-0 ">
+                                            <option></option>
+                                        </select>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'F'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">F</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION  for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 p-r-0">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'G'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">G</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION  for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group" ng-repeat="item in DiagnosisListArray | filter:{'Type':'H'}">
+                                    <div class="input-group left-ra-inpur drodown-scroll">
+                                        <div class="input-group-addon input-billing font-weight-600">H</div>
+                                        <input type="text" class="register-select br-0 "
+                                               placeholder="ICD-10 Description"
+                                               ng-model="item.SelectedObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeselectDiagnosisitem(item.SelectedObj,item)"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectDiagnosisitem(item.SelectedObj,item)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="referal-container">
+                                    <div class="referal-head referal-head-lb bg-white">
+                                        <h4>Service Lines</h4>
+                                    </div>
+                                    <div class="referal-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <table class="table tableno-bordered tableno-padding m-b-0">
+                                                    <thead>
+                                                        <tr class="table-bg-header">
+                                                            <th class="fs-11">Service Date</th>
+                                                            <th class="fs-11">POS</th>
+                                                            <th class="fs-11">Service <em>*</em></th>
+                                                            <th class="fs-11" title="Diagnosis Pointers">Diag.Pointers</th>
+                                                            <th class="fs-11" ng-if="mainBillingObject.ClaimTypeId ==2">Revenue Code</th>
+                                                            <th class="fs-11">Modifiers</th>
+                                                            <th class="fs-11">Unit Charge</th>
+                                                            <th width="1%"></th>
+                                                            <th class="fs-11">Units</th>
+                                                            <th width="1%"></th>
+                                                            <th class="fs-11">Total Charge</th>
+                                                            <th class="fs-11">Allowed</th>
+                                                            <!--<th class="fs-11">Ins 1</th>-->
+                                                            <!--<th class="fs-11">Ins 2</th>-->
+                                                            <th class="fs-11">Copay</th>
+                                                            <th class="fs-11">Balance.</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="billing-tabledata">
+                                                        <tr ng-repeat="item in mainBillingObject.BillingDetail track by $index">
+
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline icons-calendar" ng-model="item.Service" datepickerforusformat placeholder="MM-DD-YYYY" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <select id="msg" type="text" class="form-outline" name="msg" ng-model="item.POSId"
+                                                                            ng-options="Aitem.POSId as Aitem.POSCODEECLAIM+'-'+ Aitem.POSCODENAME for Aitem in POSCodeList"
+                                                                            ng-change="ChangePOSStatus(Aitem)">
+                                                                        <option value="" selected>Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="Enter CPT code"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.selectedParticular"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           ng-disabled="IsComingFrom =='PendingClaims'"
+                                                                           typeahead-template-url="orgDfProceduress.html"
+                                                                           ng-change="ProcedureChange(item.selectedParticular,item)"
+                                                                           uib-typeahead="treatitem as treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                                           typeahead-on-select="pushtoBill(item.selectedParticular,item)" />
+
+                                                                    <script type="text/ng-template" id="orgDfProceduress.html">
+                                                                        <a tabindex="-1" class="m-w-350 fs-10">
+                                                                            <span>{{match.model.ProcedureCode}} - {{match.model.ProcedureName}}</span>
+                                                                        </a>
+                                                                    </script>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+
+
+                                                                <div class="form-group ">
+                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                        <button class="form-control select-dropdown insurence-select-btn boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                                            {{item.DiagnosisType}}
+                                                                        </button>
+                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                <ul>
+
+                                                                                    <li ng-repeat="dsitem in item.addedDiagnosisArray | filter:{'Type':item.DiagnosisSearchType}">
+                                                                                        <div class="checkbox cn">
+                                                                                            <label>
+                                                                                                <input name="checkbox-11" type="checkbox" ng-model="dsitem.IsSelected" ng-click="DiagnosisPointersTypeToggle(item)">
+                                                                                                <span class="checkbox-material">
+                                                                                                    <span class="check"></span>
+                                                                                                </span>
+                                                                                                <small ng-bind="dsitem.Type"></small>
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+
+                                                            <td class="w-150" ng-if="mainBillingObject.ClaimTypeId ==2">
+                                                                <div class="ehr-input pop-ehr-input">
+                                                                    <input type="text" placeholder="Select Revenue code"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.RevenueBillingCodeObj"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           ng-change="changeRevenueCode(item.RevenueBillingCodeObj,item)"
+                                                                           uib-typeahead="ritem as ritem.RevenueBillingCode +' - '+ritem.RevenueBillingCodeName for ritem in masterRevenueBillingCodes | filter:{RevenueBillingCodeName:$viewValue}"
+                                                                           typeahead-on-select="onSelectRevenueBillingCode(item.RevenueBillingCodeObj,item)" />
+                                                                    <!--typeahead-on-select="pushtoBill(item.selectedParticular,item)"-->
+
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group dis-flex drodown-scroll">
+
+                                                                    <input type="text" class="form-outline m-r-5" placeholder="Modi"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.SelectedObj1"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="Mitem as Mitem.ModifierName for Mitem in getModifier($viewValue)"
+                                                                           typeahead-on-select="OnSelectModifierName(item.SelectedObj1,item,1)" />
+                                                                    <input type="text" class="form-outline m-r-5" placeholder="Modi"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.SelectedObj2"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="Mitem as Mitem.ModifierName for Mitem in getModifier($viewValue)"
+                                                                           typeahead-on-select="OnSelectModifierName(item.SelectedObj2,item,2)" />
+                                                                    <input type="text" class="form-outline m-r-5" placeholder="Modi"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.SelectedObj3"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="Mitem as Mitem.ModifierName for Mitem in getModifier($viewValue)"
+                                                                           typeahead-on-select="OnSelectModifierName(item.SelectedObj3,item,3)" />
+                                                                    <input type="text" class="form-outline m-r-5" placeholder="Modi"
+                                                                           autocomplete="off"
+                                                                           maxlength="100"
+                                                                           name="treatment"
+                                                                           ng-model="item.SelectedObj4"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="Mitem as Mitem.ModifierName for Mitem in getModifier($viewValue)"
+                                                                           typeahead-on-select="OnSelectModifierName(item.SelectedObj4,item,4)" />
+
+
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline"
+                                                                           ng-model="item.ProcedureCost"
+                                                                           placeholder="0"
+                                                                           ng-blur="calculateProcedureCost(item,$index)"
+                                                                           numbers-only="numbers-only" maxlength="8" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-danger fs-17 pos-absolute bottom-10">x</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="0" ng-model="item.Multiplyfactor" ng-blur="changemultiplyfactor(item,$index)" numbers-only="numbers-only" maxlength="3" />
+
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-danger fs-17 pos-absolute bottom-10">=</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="0" ng-model="item.Charges" ng-disabled="true" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="0" ng-model="item.InsuranceAmount1" ng-blur="changeInsuranceAmount1(item,$index)" />
+                                                                </div>
+                                                            </td>
+                                                            <!--<td class="w-80">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-blur="changeInsuranceAmount2(item)" class="form-outline" placeholder="0" ng-model="item.InsuranceAmount2" />
+
+                                                                </div>
+                                                            </td>-->
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="0" ng-model="item.PatientCoPay" ng-blur="changePatientCopay(item,$index)" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-outline" placeholder="0" ng-model="item.TotalBalance" ng-disabled="true" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <a ng-hide="$last" ng-click="deleteBillingItem($index,item)">
+                                                                    <i class="eh-close eh-icon"></i>
+                                                                </a>
+                                                            </td>
+
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+         
+
+        <div class="row">
+
+            <div class="col-lg-4">
+             
+                <section class="eh-panel billingpanel">
+                    <div class="eh-body">
+                        <ul class="list-group paymentlist-summary  m-r-5 p-r-10 m-b-0" style="line-height:0px !important;font-size:11px;">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <!--Total Net Amount-->
+                                Total Charges
+                                <span class="badge fs-12">$ {{mainBillingObject.TotalChargeAmount | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Insurance Amount
+                                <span class="badge fs-12">$ {{mainBillingObject.TotalInsuranceAmount | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Co-Pay Amount
+                                <span class="badge fs-12">$ {{mainBillingObject.TotalCopayAmount | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Bill Amount
+                                <span class="badge fs-14">$ {{mainBillingObject.TotalNetAmount | number:2}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-4">
+              
+                <section class="eh-panel billingpanel">
+                    <div class="eh-body">
+                        <ul class="list-group paymentlist-summary  m-r-5 p-r-10 m-b-0" style="line-height:0px !important;font-size:11px;">
+
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Received
+                                <span class="badge fs-12">$ {{mainBillingObject.TotalReceivedAmount | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Insurance Balance
+                                <span class="badge fs-12">$ {{mainBillingObject.DueFromInsurance | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Patient Balance
+                                <span class="badge fs-12">$ {{mainBillingObject.TotalPatientBalance | number:2}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Balance
+                                <span class="badge fs-14">$ {{mainBillingObject.TotalBalance | number:2}}</span>
+                            </li>
+
+                        </ul>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-4">
+              
+                <section class="eh-panel">
+                    <div class="eh-body">
+                        <ul class="list-group paymentlist-summary  m-r-5 p-r-10 m-b-0">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Claim Type <em>*</em>
+                                <span class="badge fs-12">
+                                    <select class="form-control" ng-model="mainBillingObject.SendViaObj"
+                                            ng-options="item as item.Value for item in SendViaList"
+                                            ng-change="ChangeSendVia(mainBillingObject)">
+                                        <option value="" selected>Select</option>
+                                    </select>
+                                </span>
+                            </li>
+
+                        </ul>
+                        <ul class="sendSmsside m-b-0">
+
+                            <li>
+                                <div class="dis-flex">
+                                    <div>
+                                        <button class="btn btn-billing-pay m-r-10 w-100" ng-click="SubmitPendingClaims(false)">Validate</button>
+                                    </div>
+
+                                    <div>
+                                        <button class="btn btn-billing-pay m-r-10 w-130" ng-click="SubmitPendingClaims(true)">Validate & Submit</button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-billing-pay m-r-10 w-100"  data-modal-action="close" ng-click="clearBillingClaimVerify()">Clear</button>
+                                    </div>
+                                   
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+ 
+
+<!--<div class="modal-footer">
+    <div class="row m-t-10">
+        <div class="col-lg-12 text-center">
+            <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="clearBillingClaimVerify()">Clear</button>
+            <button type="button" class="etn btn-ehnote p-l-25 p-r-25" ng-click="saveClaimVerify()">Save</button>
+        </div>
+    </div>
+</div>-->
+
+
+

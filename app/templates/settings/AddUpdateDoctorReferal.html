@@ -1,0 +1,248 @@
+﻿<div class="row">
+    <div class="col-lg-12">
+        <section class="tile tile-shadow">
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="doctor-search">Doctor Search</span>
+                                <input type="text" class="form-control" ng-model="sDoctor" placeholder="Search" aria-describedby="doctor-search" ng-change="searchDoctors(1);">
+                            </div>
+                        </div>
+                        <!-- /col -->
+                        <div class="col-lg-3">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="doctor-search">Speciality</span>
+                                <select class="form-control" ng-options="value.Id as value.Name for value in specialitylist" ng-model="sSpecility" ng-change="searchDoctors(1);"></select>
+                            </div>
+                        </div>
+                        <!-- /col -->
+                        <div class="col-lg-2">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="doctor-search">Status</span>
+                                <select class="form-control" ng-model="sActiveInactive" ng-change="searchDoctors(1);">
+                                    <option class="text-success" value="Y">Active</option>
+                                    <option class="text-danger" value="N">In Active</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- /col -->
+                        <div class="col-lg-3">
+                            <button class="btn btn-sm btn-block btn-success" data-toggle="modal" data-target="#adddoctor" ng-click="openPopup();" ng-show="ReferralAccess.addReferalAccess">Add Doctor</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Row -->
+            </div>
+        </section>
+    </div>
+</div>
+<!-- /Row -->
+<div class="row">
+    <div class="col-lg-12" ng-if="UserAccessRights.AllAccessRights.ReferralList">
+        <section class="tile tile-shadow" ng-hide="ReferalDoctorsList.length === 0">
+            <div class="tile-header">
+                <h1>Care Team</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive border-d2d2d2">
+                            <table class="table care-table table-bordered table-striped">
+                                <thead class="care-thead">
+                                    <tr>
+                                        <th>Name & Details</th>
+                                        <th>Speciality</th>
+                                        <th>Address</th>
+                                        <th>Email ID</th>
+                                        <th>Added By</th>
+                                        <th>Added On</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <!--care-tbody-->
+                                <tbody class="">
+                                    <tr ng-repeat="item in ReferalDoctorsList">
+                                        <td>
+                                            <p class="m-b-0"><b>{{item.RefDocName}}</b></p>
+                                            <p class="m-b-0">{{item.Gender}}</p>
+                                            <p class="m-b-0">{{(item.countrycode?'+'+item.countrycode+'-':'')+item.Mobile}}</p>
+                                        </td>                                       
+                                        <td ng-bind="item.Specialization"></td>                                      
+                                        <td width="25%" ng-bind="item.Address" title="{{item.Address}}"></td>
+                                        <td ng-bind="item.EmailId"></td>
+                                        <td ng-bind="item.CreatedBy"></td>
+                                        <td ng-bind="item.CreatedDt | date : 'd-MMM-y'"></td>
+                                        <td class="care-status">
+                                            <select class="care-active" ng-model="item.del_ind" ng-change="EditReferal(item,'ActiveInactive');" ng-show="ReferralAccess.modifyReferalAccess">
+                                                <option class="text-success" value="Y" selected>Active</option>
+                                                <option class="text-danger" value="N">In Active</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-center" width="30px">
+                                            <img width="17" class="cur-poiter" src="img/ehnote-edit.svg" data-toggle="modal" data-target="#adddoctor" ng-click="EditReferal(item,'edit');" ng-if="ReferralAccess.modifyReferalAccess">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+        </section>
+        <section class="tile tile-shadow" ng-if="ReferalDoctorsList.length === 0">
+            <div class="tile-header">
+                <h1>Care Team</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="billing-cominsoon text-center">
+                            <img src="img/no-data/no-results.png">
+                            <div class="msg">
+                                <p class="goback-text">No results Found</p>
+                                <p class="no-records-txt-line2">
+                                    Try using a different criteria to view better results.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-12" ng-if="!UserAccessRights.AllAccessRights.ReferralList">
+        <div class="billing-cominsoon text-center" style="margin: 80px 0px; color: rgb(179, 179, 179); font-size: 15px;">
+            <img src="img/no-data/no-results-appointment.png">
+            <div class="msg">
+                <p class="goback-text">Access Denined</p>
+                <p class="goback-text">
+                    Please contact your administrator.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-10">
+    <div class="col-lg-12 text-center EH-pagination">
+        <uib-pagination total-items="ReferalDoctorsListCount" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false" ng-model="pagination" ng-change="searchDoctors(pagination)"></uib-pagination>
+    </div>
+</div>
+<!--<footer class="footer">
+    <div class="col-lg-12">
+        <uib-pagination total-items="ReferalDoctorsListCount" max-size="maxSize" class="pull-right pagination-sm" boundary-link-numbers="true" rotate="false" ng-model="pagination" ng-change="searchDoctors(pagination)"></uib-pagination>
+    </div>
+</footer>-->
+<!-- Modal -->
+<div id="adddoctor" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Doctor</h4>
+            </div>
+            <div class="modal-body">
+                <form name="ReferalForm" class="css-form" novalidate>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="required">Doctor Name <em>*</em></label>
+                                <input type="text" name="RefDocName" class="form-control" required ng-model="RefDocName" />
+                                <div class="RequiredErrCls" ng-show="ReferalForm.RefDocName.$error.required && ReferalForm.$submitted"><span>Enter Doctor Name </span></div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group care-gender">
+                                <label class="required">Gender <em>*</em></label>
+                                <fieldset class="text-left">
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom" id="Male" name="gender" value="Male" ng-model="gender" required />
+                                        <label for="Male" class="radio-custom-label cur-poiter mb-0">Male</label>
+                                    </div>
+                                    <div class="ml-15 dis-inline-block">
+                                        <input type="radio" class="radio-custom" id="Female" name="gender" value="Female" ng-model="gender" required />
+                                        <label for="Female" class="radio-custom-label cur-poiter mb-0">Female</label>
+                                    </div>
+                                    <div class="RequiredErrCls" ng-show="ReferalForm.gender.$error.required && ReferalForm.$submitted"><span>Enter Gender </span></div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="required">Speciality</label>
+                                <select class="form-control" name="speciality" ng-model="speciality" ng-options="value.Id as value.Name for value in specialitylist" required></select>
+                                <div class="RequiredErrCls" ng-show="ReferalForm.speciality.$error.required && ReferalForm.$submitted"><span>Enter Speciality </span></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="required">Email ID <em>*</em></label>
+                                <input type="email" name="EmailID" class="form-control" ng-model="EmailID" required ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" />
+                                <div class="RequiredErrCls" ng-show="ReferalForm.EmailID.$error.required && ReferalForm.$submitted"><span>Enter Email </span></div>
+                                <div class="RequiredErrCls" ng-show="ReferalForm.EmailID.$error.email && ReferalForm.$submitted"><span>Enter valid Email </span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-3 pr-0">
+                                    <div class="form-group">
+                                        <label class="required">Code</label>
+                                        <select class="form-control  pl-0 pr-0" name="CountryCode" ng-model="CountryCode" required>
+                                            <option value="">Select</option>
+                                            <option value="91">91</option>
+                                            <option value="915">915</option>
+                                        </select>
+                                        <!--<div class="RequiredErrCls" ng-show="ReferalForm.CountryCode.$error.required && ReferalForm.$submitted"><span>Enter Country Code </span></div>-->
+                                    </div>
+                                </div>
+                                <div class="col-lg-9">
+                                    <div class="form-group">
+                                        <label class="required">Mobile Number <em>*</em></label>
+                                        <input name="MobileNumber" numeric-duration maxlength="10" class="form-control" ng-model="MobileNumber" required />
+                                    </div>
+                                </div>
+                                <div class="RequiredErrCls" ng-show="(ReferalForm.MobileNumber.$error.required || ReferalForm.CountryCode.$error.required) && ReferalForm.$submitted"><span>Enter Country Code and mobile Number </span></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Practicing Hospital</label>
+                                <input type="text" class="form-control" ng-model="HospitalName" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Row -->
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <div class="form-group">
+                                <label>Address <em>*</em></label>
+                                <textarea class="form-control" rows="1" ng-model="Address"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <!--<button >Save</button>-->
+                            <input type="submit" class="btn btn-sm primary-btn btn-block mt-20" ng-disabled="ReferalForm.$invalid" data-dismiss="modal" value="Save" ng-click="AddReferalDoctor();" />
+                            <!--<input type="submit" class="btn btn-sm primary-btn btn-block mt-20" value="Save" />-->
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

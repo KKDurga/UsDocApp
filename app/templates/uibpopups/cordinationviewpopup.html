@@ -1,0 +1,876 @@
+﻿<div class="modal__style--1 height__100--">
+    <div class="modal__header--">
+        <h1>Orders</h1>
+        <ul class="autofill-list m-b-0">
+            <li ng-class="Surgeryobj.SubType=='PreSurgery'?'active':''">
+                <a href="javascript:;" ng-click="Surgeryobj.SubType='PreSurgery'">Medications</a>
+            </li>
+            <li ng-class="Surgeryobj.SubType=='LabInvestigations'?'active':''">
+                <a href="javascript:;" ng-click="Surgeryobj.SubType='LabInvestigations'">Labs/Investigations</a>
+            </li>
+        </ul>
+        <ul class="us-controls">
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="SaveMedicationsData()">Save</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__C71D27--o" ng-click="closeuib()">Close</button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="modal__body-- height__100--">
+        <div class="tab-content overflow-x-hideen overflow-y-scroll" style="height: calc(100vh - 56px)">
+            <div class="tab-pane show" ng-show="Surgeryobj.SubType=='PreSurgery'">
+
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="search-panel">
+                            <div class="search-panel-header">
+                                <div class="pos-relative flex search-panel-input" ng-show="!MedicalrxObj.IsRcopiaa">
+                                    <input type="text" class="form-outline icons-search" placeholder="Search Medications"
+                                           ng-model="medicineGetObj.MedicineObject"
+                                           typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Ehnote','MedicineOrders')"
+                                           typeahead-focus-on-select="false"
+                                           typeahead-min-length="3"
+                                           uib-typeahead="Medlist as Medlist.MedicineName for Medlist in GetOrganizationMedicationlist($viewValue)"
+                                           ng-change="PrescriptionChange(medicineGetObj.SearchText)" />
+                                </div>
+                                <div class="pos-relative flex search-panel-input" ng-show="MedicalrxObj.IsRcopiaa">
+                                    <input type="text" class="form-outline icons-search" placeholder="Enter Rcopia Medicine Name"
+                                           ng-model="medicineGetObj.MedicineObject"
+                                           typeahead-focus-on-select="false"
+                                           typeahead-min-length="3"
+                                           typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Rcopia','MedicineOrders')"
+                                           uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength  +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)"
+                                           ng-change="PrescriptionChange(MedicineObject)" />
+                                </div>
+                                <div>
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input name="checkbox-1" type="checkbox" ng-model="MedicalrxObj.IsRcopiaa">
+                                            <span class="checkbox-material">
+                                                <span class="check"></span>
+                                            </span>
+                                            <small class="text-s12w700c000">Is Rcopia</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="asc-templates-view m-b-5">
+                                    <select class="form-outline flex" ng-model="MedicationObj.SelectedmedicationTemplate" ng-options="item as item.TemplateName for item in MedicationTemplates" ng-change="OnselectMedicationNotesTemplates(MedicationObj.SelectedmedicationTemplate);">
+                                        <option value="">Select</option>
+                                    </select>
+
+                                    <a class="white-nowrap"
+                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                       popover-trigger="outsideClick"
+                                       popover-is-open="IsOpenMedication == true"
+                                       ng-click="IsOpenMedicationTemp()"
+                                       popover-placement="bottom-right"
+                                       uib-popover-template="Medicationtemplateover.templateUrl">
+                                        Add Template
+                                    </a>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div  class="bg-E0F4F0 p-l-6 p-r-6 m-b-5"  ng-if="PrescriptionMainAddObj.PrescriptionDetails.length > 0" ng-repeat="presc in PrescriptionMainAddObj.PrescriptionDetails|filter:{'DeleteInd':'N'} track by $index">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <ul class="referral-summary-list">
+                                <li class="flex">
+                                    {{$index+1}}. {{presc.MedicationName}}
+                                    <p ng-show="presc.DrugStrength != ''"> -{{presc.DrugStrength}}</p>
+                                </li>
+                                <!--<li>
+                                <fieldset class="pos-relative">
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" ng-model="presc.SelectedMedicationHistory" value="CurrentEyeMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)">
+                                        <label for="CurrentEyeMedication" class="radio-custom-label cur-poiter mb-0 text-label">Current Eye</label>
+                                    </div>
+                                    <div class="dis-inline-block m-l-5">
+                                        <input type="radio" class="radio-custom width-0" ng-model="presc.SelectedMedicationHistory" value="CurrentSystemicMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)">
+                                        <label for="CurrentSystemicMedication" class="radio-custom-label cur-poiter mb-0 text-label">Current Systemic</label>
+                                    </div>
+                                </fieldset>
+                            </li>-->
+                                <li ng-click="$event.stopPropagation();">
+                                    <ul class="flex-flow-ulli-mb0">
+                                        <!--<li>
+                                        <input type="radio" id="currenteye" class="radio-custom width-0" ng-model="presc.SelectedMedicationHistory" value="CurrentEyeMedication" />
+                                        <label for="currenteye" class="radio-custom-label cur-poiter mb-0 text-s12w700c000">Current Eye</label>
+                                    </li>
+                                    <li>
+                                        <input type="radio" id="systemic" class="radio-custom width-0" ng-model="presc.SelectedMedicationHistory" value="CurrentSystemicMedication" />
+                                        <label for="systemic" class="radio-custom-label cur-poiter mb-0 text-s12w700c000">Current Systemic</label>
+                                    </li>-->
+                                        <li>
+                                            <input type="radio" ng-model="presc.SelectedMedicationHistory" value="CurrentEyeMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)" />
+                                            <b> Current Eye </b>
+                                        </li>
+                                        <li>
+                                            <input type="radio" ng-model="presc.SelectedMedicationHistory" value="CurrentSystemicMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)" />
+                                            <b>Current Systemic</b>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <ul class="flex-flow-ulli-mb0">
+                                        <li>
+                                            <label>Start Date :</label>
+                                        </li>
+                                        <li class="w-160">
+                                            <input type="text" class="form-control icons-calendar" ng-model="presc.StartDate" datepickeruniversaldate readonly>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <ul class="flex-flow-ulli-mb0">
+                                        <li>
+                                            <label>Stop Date :</label>
+                                        </li>
+                                        <li class="w-160">
+                                            <input type="text" class="form-control icons-calendar" ng-model="presc.StopDate" datepickeruniversaldate readonly>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" ng-click="RemovePrescriptionDetailObj($index,presc);">
+                                        <i class="fas fa-times text-black m-r-3"></i>
+                                    </a>
+                                    <a href="javascript:;" ng-click="ClearMedicineItem(presc)">
+                                        <i class="fas fa-redo text-black m-l-3"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="row m-t-6">
+                        <div class="col-lg-12">
+                            <div class="search-panel">
+                                <div class="search-panel-header">
+                                    <div class="form-group width-75">
+                                        <input type="text" class="form-control" ng-model="presc.SigObj"
+                                               placeholder="Search FastSig"
+                                               ng-disabled="presc.IsMedicationStopped"
+                                               typeahead-focus-on-select="false"
+                                               typeahead-min-length="0"
+                                               typeahead-on-select="ONSigDetailsMedOrders(presc.SigObj,presc)"
+                                               ng-change="changeSigForMedicine(presc)"
+                                               uib-typeahead="Medlist as Medlist.Sig for Medlist in getParticularSigMedicationitems(presc.SigObj,presc)" />
+                                        <!--<input type="text" class="form-control" ng-if="presc.IsAllSig" ng-model="presc.MedicineObj"
+                                           placeholder="Search AllSig"
+                                           ng-disabled="presc.IsMedicationStopped"
+                                           typeahead-focus-on-select="false"
+                                           typeahead-min-length="0"
+                                           typeahead-on-select="ONSigDetailsSig(presc.MedicineObj,presc)"
+                                           ng-change="changeSigForMedicine(presc)"
+                                           uib-typeahead="Medlist as Medlist.Sig for Medlist in getOrganizationMedicationSigitems(presc.MedicineObj)" />-->
+                                    </div>
+                                    <ul class="us-controls">
+                                        <li>
+                                            <div class="checkbox cn">
+                                                <label>
+                                                    <input name="checkbox-1" type="checkbox" ng-model="presc.IsAllSig">
+                                                    <span class="checkbox-material">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                    <small class="text-s12w700c000">All Sig</small>
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <button class="form-outline" ng-click="EditSigFields(presc)"  ng-class="{ 'bg-72b4a6 text-white':presc.isEditFocused }" ng-if="presc.ActionId!=''||presc.DoseId!=''||presc.DoseUnitId!=''||presc.RouteId!=''||presc.FrequencyId!=''||presc.DoseOtherId!=''||presc.DaysSupplyId!=''||presc.Quantity!=''||presc.QuantityUnitId!=''||presc.RefillId!=''"><i class="fas fa-pen"></i> Edit</button>
+                                        </li>
+                                        <li>
+                                            <button class="form-outline" ng-class="{ 'bg-72b4a6 text-white':presc.isAddFocused }" ng-click="AddNewMedicineIdchange(presc)"><i class="fas fa-plus"></i> Add Sigs</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="search-panel-body">
+                                    <table class="table tableno-bordered m-b-0 tableno-padding">
+                                        <tbody>
+                                            <tr>
+
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Quantity</label>
+                                                        <input type="text" class="form-outline" ng-model="presc.Quantity" ng-disabled="presc.IsMedicationStopped" placeholder="1" />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Quantity unit</label>
+                                                        <select class="form-outline" ng-model="presc.QuantityUnitId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescQuantityUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in QuantityUnitArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Refill</label>
+                                                        <select class="form-outline" ng-model="presc.RefillId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescRefill(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RefillsArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Substitution</label>
+                                                        <select class="form-outline" ng-model="presc.SubstitutionPermitted" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescSubmission(presc)">
+                                                            <option value="y">Yes</option>
+                                                            <option value="n">No</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td ng-if="hide">
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Start Date</label>
+                                                        <input type="text" class="form-control icons-calendar" ng-model="presc.StartDate" datepickerregpatient readonly>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody  ng-show="presc.SigFields == true">
+                                            <tr>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Action</label>
+                                                        <select class="form-outline" ng-model="presc.ActionId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescAction(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in ActionArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose</label>
+                                                        <select class="form-outline" ng-model="presc.DoseId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDose(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose unit</label>
+                                                        <select class="form-outline" ng-model="presc.DoseUnitId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDoseUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseUnitArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Route</label>
+                                                        <select class="form-outline" ng-model="presc.RouteId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescRoute(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RouteArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose Timing</label>
+                                                        <select class="form-outline" ng-model="presc.FrequencyId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescFrequency(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in FrequencyArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Other</label>
+                                                        <select class="form-outline" ng-model="presc.DoseOtherId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDoseOther(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseOtherArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose Supply</label>
+                                                        <select class="form-outline" ng-model="presc.DaysSupplyId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDaysSupply(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DurationArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div class="form-group">
+                                                        <label>Medication Instructions</label>
+                                                        <input type="text" class="form-control bg-dbf6ff" placeholder="Additional directions to Patient" ng-model="presc.PatientInstructions" ng-disabled="presc.IsMedicationStopped" maxlength="500" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody ng-if="adnewsigobj.IsNewSig && presc.SigFormationFields">
+                                            <tr>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Action</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.ActionId" ng-change="changePopupPrescAction(addNewOrganizationSigObj)"
+                                                                ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in ActionArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseId" ng-change="changePopupPrescDose(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose unit</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseUnitId" ng-change="changePopupPrescDoseUnit(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseUnitArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Route</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.RouteId" ng-change="changePopupPrescRoute(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RouteArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose Timing</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.FrequencyId" ng-change="changePopupPrescFrequency(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in FrequencyArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Other</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseOtherId" ng-change="changePopupPrescDoseOther(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseOtherArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label class="text-s12w500c000">Dose Supply</label>
+                                                        <select class="form-outline" ng-model="addNewOrganizationSigObj.DaysSupplyId" ng-change="changePopupPrescDaysSupply(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DurationArray">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">
+
+                                                </td>
+                                                <!--<td>
+                                                <div class="form-group">
+                                                    <label class="text-s12w500c000">Quantity</label>
+                                                    <input type="text" class="form-outline" ng-model="addNewOrganizationSigObj.Quantity" placeholder="1" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label class="text-s12w500c000">Quantity unit</label>
+                                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.QuantityUnitId" ng-change="changePopupPrescQuantityUnit(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in QuantityUnitArray">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label class="text-s12w500c000">Refill</label>
+                                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.RefillId" ng-change="changePopupPrescRefill(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RefillsArray">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label class="text-s12w500c000">Substitution</label>
+                                                    <select class="form-outline" ng-model="presc.SubstitutionPermitted" ng-change="changePrescSubmission(presc)">
+                                                        <option value="y">Yes</option>
+                                                        <option value="n">No</option>
+                                                    </select>
+                                                </div>
+                                            </td>-->
+                                                <td>
+                                                    <div class="m-t-20">
+                                                        <label class="cur-poiter">
+                                                            <input type="checkbox" id="1" value="Latent" class="checkbox ng-pristine ng-valid ng-touched" ng-model="addNewOrganizationSigObj.IsFrequent" aria-invalid="false" style="">
+                                                            <span class="lbl"></span>
+                                                            <span class="list-opt-text-new">FrequentlyAdded</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2">
+                                                    <div class="form-group text-right m-t-20">
+                                                        <button type="button" class="betn btn-ehnote-outline p-l-25 p-r-25" ng-click="clearOrganizationSiginput(addNewOrganizationSigObj)">Clear</button>
+                                                        <button type="button" class="betn btn-ehnote p-l-25 p-r-25" ng-click="SaveOrganizationSig(presc)">Save</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label> Instructions</label>
+                    <input type="text" class="form-control bg-dbf6ff" placeholder="Enter Instructions" ng-model="PreSurgeryIns.MedicineOrdersInstructions" maxlength="500" />
+                </div>
+
+
+            </div>
+            <div class="tab-pane show" ng-show="Surgeryobj.SubType=='CurrentMedications'">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="search-panel">
+                            <div class="search-panel-header">
+                                <h1>Current Medications</h1>
+
+                                <div class="search-panel-input flex">
+                                    <input type="text"
+                                           placeholder="Enter Current Medication"
+                                           autocomplete="off"
+                                           ng-model="Surgeryobj.CurrentMedicationobj"
+                                           maxlength="200"
+                                           typeahead-on-select="onRosCurrentMedicationsHistorylist(Surgeryobj.CurrentMedicationobj)"
+                                           uib-typeahead="item as item.MedicineName for item in GetOrganizationMedicationlist($viewValue)"
+                                           typeahead-focus-on-select="false"
+                                           typeahead-min-length="0" />
+                                </div>
+                            </div>
+                            <div class="search-panel-body" style="height: calc(100vh - 50px);">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <table class="table tableno-bordered tableno-padding table-layout-fix">
+                                            <tbody ng-repeat="Poitem in Surgeryobj.CurrentMedicationslist |filter:{DeleteInd: 'N'} track by $index">
+                                                <tr>
+                                                    <td>
+                                                        <span class="text-s14w600c000 dis-block m-t-10 m-b-10">{{Poitem.MedicineName}}</span>
+                                                    </td>
+                                                    <td width="30%">
+                                                        <ul class="flex-flow-ulli-mb0">
+                                                            <li>
+                                                                <span>Fast Sig -</span>
+                                                            </li>
+                                                            <li class="flex">
+                                                                <div class="search-panel-input flex">
+                                                                    <input type="text"  ng-model="MedicineObject"
+                                                                           placeholder="Search "
+                                                                           typeahead-focus-on-select="false"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-on-select="ONSigDetails(MedicineObject,Poitem)"
+                                                                           uib-typeahead="Medlist as Medlist.Sig for Medlist in getParticularSigMedicationitems(MedicineObject,Poitem)" />
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <a class="btn-link text-068cb0 font-weight-500" ng-click="addnewOrganizationSig(Poitem)" title="Add New Sig">+ Add</a>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                    <!--<td colspan="2" class="hide">
+                                                    <ul class="flex-flow-ulli-mb0 justify-space-between">
+                                                        <li>
+                                                            <a class="btn btn-link" ng-click="ShowSigSearch(Poitem)" title="Add New Sig">Show Sig Search</a>
+                                                        </li>
+                                                    </ul>
+                                                </td>-->
+                                                    <td ng-show="Poitem.IsAllSig == true">
+                                                        <ul class="flex-flow-ulli-mb0">
+                                                            <li>
+                                                                <span> Sig -</span>
+                                                            </li>
+                                                            <li class="flex">
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" ng-model="SigObject"
+                                                                           placeholder="Search "
+                                                                           typeahead-focus-on-select="false"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-on-select="ONSigDetailsAll(SigObject,Poitem)"
+                                                                           uib-typeahead="Medlist as Medlist.Sig for Medlist in getOrganizationMedicationSigitems(SigObject,Poitem)" />
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                    <td>
+                                                        <ul class="flex-flow-ulli-mb0 justify-space-between">
+                                                            <li>
+                                                                <label class="cur-poiter">
+                                                                    <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="Poitem.IsAllSig" />
+                                                                    <span class="lbl"></span>
+                                                                    <span class="text-s12w500C068cb0 lh-2-0 fs-14">All Sigs</span>
+                                                                </label>
+                                                            </li>
+                                                            <li>
+                                                                <a class="btn-link text-068cb0 font-weight-500" ng-click="ShowSigFields(Poitem)" title="Show Sig Fields">Show Sig Fields</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:;" ng-click="ClearCurrentMedication(Poitem,$index)" title="Remove Pre Surgery Medications">
+                                                                    <i class="eh-close eh-icon"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <button class="btn btn-save-us fs-12 p-l-20 p-r-20" ng-click="ChangeMedicationType(Poitem,'Stop')">Stop Medication</button>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-show="Poitem.MedicationType =='Continuation' && Poitem.SigfieldsShows == true">
+                                                    <td colspan="4">
+                                                        <table class="table tableno-bordered tableno-padding m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Action</label>
+                                                                            <select ng-model="Poitem.ActionId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in ActionArray"
+                                                                                    ng-change="ChangeType(Poitem.ActionId,Poitem,'Action')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="valign-bottom">
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Dose</label>
+                                                                            <select ng-model="Poitem.DoseId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseArray"
+                                                                                    ng-change="ChangeType(Poitem.DoseId,Poitem,'Dose')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                            <!--<div class="ehr-input-group">-->
+                                                                            <!--<button disabled>T/Day</button>-->
+                                                                            <!--</div>-->
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Dose Unit</label>
+                                                                            <select ng-model="Poitem.DoseUnitId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseUnitArray"
+                                                                                    ng-change="ChangeType(Poitem.DoseUnitId,Poitem,'DoseUnit')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Route</label>
+                                                                            <select ng-model="Poitem.RouteId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RouteArray"
+                                                                                    ng-change="ChangeType(Poitem.RouteId,Poitem,'Route')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Dose Timing</label>
+                                                                            <select ng-model="Poitem.FrequencyId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in FrequencyArray"
+                                                                                    ng-change="ChangeType(Poitem.FrequencyId,Poitem,'DoseTiming')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Other</label>
+                                                                            <select ng-model="Poitem.DoseOtherId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DoseOtherArray"
+                                                                                    ng-change="ChangeType(Poitem.DoseOtherId,Poitem,'Other')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Duration</label>
+                                                                            <select ng-model="Poitem.DaysSupplyId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in DurationArray"
+                                                                                    ng-change="ChangeType(Poitem.DaysSupplyId,Poitem,'Duration')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Qty</label>
+                                                                            <input type="text" ng-model="Poitem.Quantity" numbers-only maxlength="10" />
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Unit</label>
+                                                                            <select ng-model="Poitem.QuantityUnitId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in QuantityUnitArray"
+                                                                                    ng-change="ChangeType(Poitem.QuantityUnitId,Poitem,'Unit')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Refill</label>
+                                                                            <select ng-model="Poitem.RefillId"
+                                                                                    ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in RefillsArray"
+                                                                                    ng-change="ChangeType(Poitem.RefillId,Poitem,'Refill')">
+                                                                                <option value="">Select</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="valign-bottom">
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label>Substitution</label>
+                                                                            <select class="form-control" ng-model="Poitem.SubstitutionPermitted">
+                                                                                <option value="y">Yes</option>
+                                                                                <option value="n">No</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-show="Poitem.MedicationType =='Continuation' && Poitem.SigfieldsShows == true">
+
+                                                    <td colspan="4">
+                                                        <div class="ehr-input  pop-ehr-input">
+                                                            <label> Patient Instructions</label>
+                                                            <!--<input type="text" ng-model="Poitem.Instructions" placeholder="Enter Remarks" maxlength="500"/>-->
+                                                            <textarea class="msd-elastic: \n;" type="text" ng-model="Poitem.PatientInstructions" placeholder="Enter Instructions" maxlength="500" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-show="Poitem.MedicationType =='Stop'">
+                                                    <td colspan="4">
+                                                        <table class="table tableno-bordered tableno-padding m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <ul class="flex-flow-ulli-mb0">
+                                                                            <li>
+                                                                                <span class="text-s10w500c767575">From</span>
+                                                                            </li>
+                                                                            <li class="flex">
+                                                                                <div class="ehr-input  pop-ehr-input">
+                                                                                    <div class="ehr-input-group">
+                                                                                        <input type="text" class="icons-calendar" placeholder="MM-DD-YYYY" ng-model="Poitem.StartDate" datepickerapnlus readonly />
+                                                                                        <input type="text" class="icons-time width-80" ng-model="Poitem.StartTime" ng-click="GetPresentTime(Poitem);" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                    <td>
+                                                                        <ul class="flex-flow-ulli-mb0">
+                                                                            <li>
+                                                                                <span class="text-s10w500c767575">To</span>
+                                                                            </li>
+                                                                            <li>
+                                                                                <div class="ehr-input  pop-ehr-input">
+                                                                                    <div class="ehr-input-group">
+                                                                                        <input type="text" class="icons-calendar" placeholder="MM-DD-YYYY" ng-model="Poitem.StopDate" to-datepickerdash readonly mindate="Poitem.StartDate" maxdate="MaxDate" changeyear="changeYear" changemonth="changeMonth" />
+                                                                                        <input type="text" class="icons-time width-80" ng-model="Poitem.EndTime" ng-click="GetPresentTime2(Poitem);" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li>
+                                                                                <button class="btn btn-save-us btn-block fs-12" ng-click="ChangeMedicationType(Poitem,'Continuation')">Switch Medication</button>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>
+                                                                    <td colspan="4">
+                                                                        <div class="ehr-input  pop-ehr-input">
+                                                                            <label> Patient Instructions</label>
+                                                                            <!--<input type="text" ng-model="Poitem.Instructions" placeholder="Enter Remarks" maxlength="500"/>-->
+                                                                            <textarea class="msd-elastic: \n;" type="text" ng-model="Poitem.PatientInstructions" placeholder="Enter Instructions" maxlength="500" />
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane show" ng-show="Surgeryobj.SubType=='LabInvestigations'">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="search-panel">
+                            <div class="search-panel-header">
+                                <h1>Labs/Investigations</h1>
+                                <div class="search-panel-input flex">
+                                    <input type="text" class="icons-search"
+                                           autocomplete="off"
+                                           placeholder="Enter Investigation"
+                                           ng-model="Surgeryobj.InvestigationObj"
+                                           typeahead-min-length="0"
+                                           typeahead-focus-on-select="false"
+                                           typeahead-on-select="onselectInvestigation(Surgeryobj.InvestigationObj)"
+                                           uib-typeahead="InvItem as InvItem.ProcedureCode + ' - ' + InvItem.ProcedureName for InvItem in GetOrganizationTypeOfService($viewValue,'Investigation')" />
+
+                                </div>
+                                <div class="asc-templates-view m-b-5">
+                                    <select class="form-outline flex" ng-model="InvestObj.SelectedInvestTemplate" ng-options="item as item.TemplateName for item in InvestigationTemplates" ng-change="OnselectInvestNotesTemplates(InvestObj.SelectedInvestTemplate);">
+                                        <option value="">Select</option>
+                                    </select>
+
+                                    <a class="white-nowrap"
+                                       popover-class="popover-auto ros-popover-width popover-width-300"
+                                       popover-trigger="outsideClick"
+                                       popover-is-open="IsOpenInvestigation == true"
+                                       ng-click="IsOpenInvestigationTemp()"
+                                       popover-placement="bottom-right"
+                                       uib-popover-template="Investigationtemplateover.templateUrl">
+                                        Add Template
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="search-panel-body overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 105px)">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <table class="search-table-list">
+                                            <tbody ng-repeat="Iitem in Surgeryobj.Investigationslist |filter:{DeleteInd: 'N'} track by $index">
+                                                <tr>
+                                                    <td>
+                                                        <ul class="referral-summary-list">
+                                                            <li class="flex">
+                                                                <label>{{Iitem.ProcedureCode}} |{{Iitem.InvestigationName}}</label>
+                                                            </li>
+                                                            <li>
+                                                                <ul class="flex-flow-ulli-mb0">
+                                                                    <li>
+                                                                        <label>Schedule :</label>
+                                                                    </li>
+                                                                    <li>
+                                                                        <div class="ehr-input pop-ehr-input">
+                                                                            <div class="ehr-input-group" ng-show="!Iitem.ShowDateFormat">
+                                                                                <input type="text" class="w-60" ng-model="Iitem.Duration" placeholder="0" ng-change="ChangeDuration(Iitem)" maxlength="4" numbers-only>
+                                                                                <select ng-model="Iitem.DurationType" class="flex">
+                                                                                    <option value="">Select</option>
+                                                                                    <option value="D">Days</option>
+                                                                                    <option value="W">Weeks</option>
+                                                                                    <option value="M">Months</option>
+                                                                                    <option value="Y">Years</option>
+                                                                                </select>
+                                                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                                                            </div>
+                                                                            <div class="ehr-input-group" ng-show="Iitem.ShowDateFormat">
+                                                                                <input type="text" placeholder="MM-DD-YYYY" ng-model="Iitem.DurationDate" datepickerapnlus readonly
+                                                                                       ng-change="ChangeFormatDate(Iitem)" />
+                                                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li>
+                                                                        <ul class="flex-flow-ulli-mb0">
+                                                                            <li>
+                                                                                <label>Location :</label>
+                                                                            </li>
+                                                                            <li>
+                                                                                <div class="ehr-input  pop-ehr-input">
+                                                                                    <!--<select class="form-control bg-f9f9f9"
+                                                                                        ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                                                        ng-model="Iitem.OrganId">
+                                                                                    <option value="">Select</option>
+                                                                                </select>-->
+                                                                                    <select ng-options="Eitem.LocationId as Eitem.LocationName for Eitem in GetLocationNameList"
+                                                                                            ng-model="Iitem.LocationId" ng-change="ChangeLocation(Iitem,Iitem.LocationId)">
+                                                                                        <option value="">Select</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="actions-black" href="javascript:;" ng-click="LabInvestNotes(Iitem)">
+                                                                            <i class="fas fa-file-medical text-black fa-lg"></i>
+                                                                        </a>
+                                                                        <a class="actions-black" href="javascript:;" ng-click="DelectInvestigation(Iitem);">
+                                                                            <i class="fas fa-times fa-lg text-black"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+
+                                                <!--<tr>
+                                                <td ng-show="Iitem.LocationId ==1">
+                                                    <fieldset class="border dis-flex align-items-center justify-content-flex-start us-os bbl-radius bbr-radius">
+                                                        <div class="m-l-5 dis-flex m-r-10" ng-repeat="item in GetOrganNameList">
+                                                            <input type="radio" class="form-control w-15 m-t-0" id="normal3{{item.OrganId}}{{$index+1}}" ng-value="{{item.OrganId}}" ng-model="Iitem.OrganId">
+                                                            <label for="normal3{{item.OrganId}}{{$index+1}}" class="text-s14w600C000 m-l-5 cur-poiter mb-0">{{item.OrganName}}</label>
+                                                        </div>
+                                                    </fieldset>
+                                                </td>
+                                            </tr>-->
+                                                <tr ng-show="Iitem.IsNoteEdit==true">
+                                                    <td>
+                                                        <div class="ehr-input  pop-ehr-input">
+                                                            <textarea class="msd-elastic: \n;"  ng-model="Iitem.InvestigationNotes" maxlength="500" placeholder="Enter Notes" ng-focus="Iitem.IsNoteEdit==true"></textarea>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="MedicationTemplatSave.html">
+    <div ng-if="IsOpenMedication">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="MedicationObj.TemplateName " placeholder="Enter Template Name" ng-if="IsOpenMedication == true" ng-focus="MedicationObj.autoFocusTrigger = true" autofocus/>
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveIntraMedicationTemplate()">Save Template</button>
+    </div>
+</script>
+
+
+<!--ng-if="IsOpenInvestigation"-->
+<script type="text/ng-template" id="InvestigationTemplatSave.html">
+    <div ng-if="IsOpenInvestigation">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="InvestObj.TemplateName " placeholder="Enter Template Name" ng-if="IsOpenInvestigation == true" ng-focus="InvestObj.autoFocusTrigger = true" autofocus/>
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveIntraInvestTemplate()">Save Template</button>
+    </div>
+</script>
+
+

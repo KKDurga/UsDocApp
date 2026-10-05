@@ -1,0 +1,402 @@
+﻿ <div class="bg-fafafa dis-flex flex-direction-column h-100">
+    <div class="asc-model-header">
+        <h1>Upload Images</h1>
+        <ul>
+            <li>
+                <button class="btn-d" type="button" ng-click="closeImagePopup()">Close</button>
+            </li>
+            <li>
+                <button class="btn-s" type="button" ng-click="SavePatientOrderDetails()">Save</button>
+            </li>
+            <li>
+                <a ng-click="clearImagePopup()">Clear</a>
+            </li>
+        </ul>
+    </div>
+    <div class="asc-model-body h-100">
+        <div class="two-sections h-100">
+            <div class="flex bg-fafafa h-100">
+                <section class="eh-panel b-0 bg-f2f2f2 m-b-0 h-100" ng-hide="PatientOrdersArray.length == 0">
+                    <div class="eh-header b-0 bg-f2f2f2">
+                        <h1 class="text-1d5558 fs-16">Select Existing Order</h1>
+                        <button class="btn btn-link" ng-click="navtoCreateNewOrder()" style="float:right">Create New Order</button>
+                    </div>
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position">
+                            <table class="table table-bordered m-b-0 select-exiting-order-table">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-f2f2f2">
+                                            <label>Select</label>
+                                        </th>
+                                        <th class="bg-f2f2f2" width="17%">
+                                            <label>Date</label>
+                                        </th>
+                                        <th class="bg-f2f2f2">
+                                            <label>Modality</label>
+                                        </th>
+                                        <th class="bg-f2f2f2">
+                                            <label>Order Description</label>
+                                        </th>
+                                        <th class="bg-f2f2f2">
+                                            <label>Provider</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in PatientOrdersArray">
+                                        <td>
+                                            <div class="checkbox cn">
+                                                <label>
+                                                    <input name="checkbox-1" type="checkbox" ng-disabled="item.isdisableOrderSelection" ng-model="item.IsSelected" ng-change="changeOrderSelected(item)">
+                                                    <span class="checkbox-material">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>  {{item.OrderDate | date:"MM-dd-yyyy" }}</td>
+                                        <td>{{item.ModalityName}}</td>
+                                        <td>{{item.ProcedureName}} - {{item.OrganName}}</td>
+                                        <td>Dr. {{item.SecondUserFullName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <div class="bg-white h-100" ng-show="PatientOrdersArray.length == 0 && !showAddOrderDiv">
+                    <div class="billing-cominsoon m-20">
+                        <img src="img/no-data/no-data-icon.png" />
+                        <div class="msg m-t-20">
+                            <p class="nodata-text">Oops!!</p>
+                            <p class="nodata-txt-line2">
+                                No Order is Added.  <a href="" ng-click="navtoCreateNewOrder()">Click Here</a> to add Order.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="width-40 pos-relative bg-white" ng-show="showAddOrderDiv">
+                <div class="adjustable-position">
+                    <section class="eh-panel m-b-0 b-0 h-100">
+                        <div class="eh-header bg-white">
+                            <h1 class="text-1d5558 fs-16" ng-if="addUpdatePatientOrderImageDetailsReq.PatientOrderId==0">Create  Order</h1>
+                            <h1 class="text-1d5558 fs-16" ng-hide="addUpdatePatientOrderImageDetailsReq.PatientOrderId==0">Order Details</h1>
+                        </div>
+                        <div class="eh-body">
+                            <table class="table tableno-bordered m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="form-group">
+                                                <label>Visit <em>*</em></label>
+                                                <select class="form-outline" ng-disabled="addUpdatePatientOrderImageDetailsReq.PatientOrderId!=0" ng-change="changeOrderAppointment(addUpdatePatientOrderImageDetailsReq.ConsultationId)" ng-model="addUpdatePatientOrderImageDetailsReq.ConsultationId" ng-options="aitem.VisitId as aitem.VisitDate +' - '+aitem.VisitDoctorFullName for aitem in previousAppointmentsList">
+                                                    <option value="" disabled="disabled">Select</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Modality<em>*</em></label>
+
+                                                <select class="form-outline" ng-change="changeOrderModality(addUpdatePatientOrderImageDetailsReq.ModalityId)" ng-model="addUpdatePatientOrderImageDetailsReq.ModalityId" ng-options="option.ModalityId as option.ModalityName+' ('+option.ModalityShortName+')' for option in ModalityArray">
+                                                    <option value="" disabled="disabled">select</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Organ</label>
+
+                                                <select class="form-outline" ng-model="addUpdatePatientOrderImageDetailsReq.OrganId" ng-options="option.OrganId as option.OrganName for option in organsArray">
+                                                    <option value="" disabled="disabled">select</option>
+
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="form-group">
+                                                <label>Investigation Name <em>*</em></label>
+                                                <input type="text" class="form-control" placeholder="Enter CPT code"
+                                                       autocomplete="off"
+                                                       maxlength="100"
+                                                       name="treatment"
+                                                       ng-disabled="addUpdatePatientOrderImageDetailsReq.PatientOrderId!=0"
+                                                       ng-model="addUpdatePatientOrderImageDetailsReq.ProcedureObj"
+                                                       typeahead-min-length="0"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-template-url="orgDfProceduresdf.html"
+                                                       ng-change="onInvOrderProcedureChange(addUpdatePatientOrderImageDetailsReq.ProcedureObj)"
+                                                       uib-typeahead="treatitem as treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                       typeahead-on-select="onSelectOrderProcedureInv(addUpdatePatientOrderImageDetailsReq.ProcedureObj)" />
+                                                <script type="text/ng-template" id="orgDfProceduresdf.html">
+                                                    <a tabindex="-1" class="m-w-350 fs-10">
+                                                        <span>{{match.model.ProcedureCode}} - {{match.model.ProcedureName}}</span>
+                                                    </a>
+                                                </script>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Order Number</label>
+                                                <input type="text" class="form-outline" ng-model="addUpdatePatientOrderImageDetailsReq.OrderNumber" />
+
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Order Date</label>
+                                                <input type="text" class="form-control" placeholder="MM-DD-YYYY" ng-model="addUpdatePatientOrderImageDetailsReq.OrderDate" datepickeruniversal readonly />
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <section class="eh-panel b-0 bg-white">
+                                                <div class="eh-header bg-white b-0">
+                                                    <h1>New Diagnosis</h1>
+                                                </div>
+                                                <div class="eh-body">
+                                                    <div class="form-group">
+
+                                                        <input type="text" class="form-outline icons-search bg-inputy"
+                                                               placeholder="Search Diagnosis/ICD 10 Codes"
+                                                               ng-model="newSelectedDiagObj"
+                                                               maxlength="100"
+                                                               typeahead-min-length="0"
+                                                               typeahead-focus-on-select="false"
+                                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in getCombinedList($viewValue)"
+                                                               typeahead-on-select="onselectOrderDiagnosisitem(newSelectedDiagObj)"
+                                                               ng-change="changeselectOrderDiagnosisitem(newSelectedDiagObj)" />
+                                                    </div>
+                                                    <!--<ul class="img-Diagnosis-search" ng-if="addUpdatePatientOrderImageDetailsReq.DiagnosisList.length > 0">
+                                                        <li class="bg-white border-bottom-1" ng-repeat="sitem in addUpdatePatientOrderImageDetailsReq.DiagnosisList | filter:{DeleteInd: 'N'} track by $index">
+                                                            <a>
+                                                                {{sitem.ICDCode}} |   {{sitem.DiagnosisName}}
+                                                            </a>
+                                                            <img src="img/close-red.svg" width="12" ng-click="removedSelectedDiagnosis(sitem)">
+                                                        </li>
+                                                    </ul>-->
+                                                </div>
+                                            </section>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <label>Diagnosis</label>
+                                            <ul class="list-group m-b-5">
+                                                <li class="list-group-item" ng-repeat="Sitem in addUpdatePatientOrderImageDetailsReq.DiagnosisList | filter:{'DeleteInd':'N'}">
+                                                    <small class="fs-14">{{Sitem.ICDCode}}|{{Sitem.DiagnosisName}}  <span ng-hide="$last"> ,</span></small>
+                                                    <img src="img/close-red.svg" width="12" style="float:right;" ng-click="removedSelectedDiagnosis(Sitem)">
+
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="dis-flex">
+                                                <div class="form-group width-85">
+                                                    <label>Right Eye</label>
+                                                    <!--<input type="text" class="form-outline" />-->
+                                                    <input type="file" class="form-outline" id="ImageMgmtOD" value="Choose Files"
+                                                           ngf-select="selectedEyeFiles($files,'OD');"
+                                                           ngf-pattern="'image/*,application/pdf'"
+                                                           ngf-accept="'image/*,application/pdf'"
+                                                           accept="image/*,application/pdf"
+                                                           name="Rfile"
+                                                           multiple="multiple" />
+                                                </div>
+                                                <!--<button class="btn choose-btn">Choose files</button>-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <ul class="flex-flow-ulli drawingpad-img-show">
+                                                <li ng-repeat="titem in tempODImagesArray">
+                                                    <!--<div ng-if="titem.DocumentId==0">
+        <img ng-if="titem.DocumentExt!=='dcm'" ngf-thumbnail="titem.file" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer />
+        <img ng-src="{{imgitem.DocURL}}" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer ng-if="titem.DocumentExt=='dcm'" />
+        <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="removeImage(titem, 'OD')">
+            <img src="img/close-round.svg" width="17" />
+        </a>
+        <a href="{{imgitem.DocURL}}" target="_blank" ng-if="titem.DocumentExt == 'application/pdf'">
+            <img src="img/pdf.png" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" />
+        </a>
+    </div>
+    <div ng-if="titem.DocumentId!==0">
+        <img ng-src="{{imgitem.DocURL}}" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer />
+        <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="removeImage(titem, 'OD')">
+            <img src="img/close-round.svg" width="17" />
+        </a>
+        <a href="{{imgitem.DocURL}}" target="_blank" ng-if="titem.DocumentExt == 'application/pdf'">
+            <img src="img/pdf.png" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" />
+        </a>
+    </div>-->
+
+                                                    <div>
+                                                        <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="removeImage(titem, 'OD')">
+                                                            <img src="img/close-round.svg" width="17" />
+                                                        </a>
+                                                        <!--<img ngf-thumbnail="imgitem.file" height="120" ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg'|| imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml')&&imgitem.DocumentID==0" />-->
+                                                        <img ngf-thumbnail="titem.file" height="120" image-viewer ng-if="(titem.DocumentExt !== 'application/pdf' && titem.DocumentExt !== 'pdf'&& titem.DocumentExt !== 'Pdf')&&titem.DocumentId==0" />
+                                                        <!--<img ng-src="{{titem.DocURL}}" height="120" image-viewer ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg'|| imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml')&&imgitem.DocumentID!=0" />-->
+                                                        <img ng-src="{{titem.DocURL}}" height="120" image-viewer ng-hide="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf'|| titem.DocumentExt == 'Pdf') || titem.DocumentId == 0 || (titem.DocumentExt == 'tiff' || titem.FileExt == 'tif' || titem.DocumentExt=='image/tiff')" />
+                                                        <a href="{{titem.DocURL}}" target="_blank" ng-if="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf' || titem.DocumentExt == 'Pdf')&&titem.DocumentId!=0">
+                                                            <img src="img/pdf.png" height="120" class="m-b-10" />
+                                                        </a>
+                                                        <a ng-if="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf' || titem.DocumentExt == 'Pdf')&&titem.DocumentId==0">
+                                                            <img src="img/pdf.png" height="120" class="m-b-10" />
+                                                        </a>
+                                                        <a href="{{titem.DocURL}}" target="_blank" ng-if="titem.DocumentExt == 'tiff' || titem.DocumentExt == 'tif' || titem.DocumentExt=='image/tiff' || titem.FileExt=='.tif'">
+                                                            <img height="120" src="img/appt-list/tifficon.png" />
+                                                        </a>
+
+                                                    </div>
+
+
+                                                    <div class="m-t-5">
+                                                        <h1 class="no-wrapappt fs-12" title="{{titem.DocumentName}}">{{titem.DisplayName}}</h1>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <!--<td colspan="2">
+                                            <div class="form-group">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation" image-viewer style="border:0px !important;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td ng-repeat="titem in tempODImagesArray" style="width:20%;">
+
+                                                                    <img ng-if="titem.DocumentExt!=='dcm'" ngf-thumbnail="titem.file" class="img-thumbnail" style="height:50px !important;width:50px !important" />
+
+
+                                                                    <a ng-if="titem.DocumentExt == 'application/pdf'">
+                                                                        <img src="img/pdf.png" height="120" class="m-b-10" style="height:50px !important;width:50px !important" />
+                                                                    </a>
+
+                                                                    <img ng-if="titem.DocumentExt=='dcm'" style="width:20%" src="./img/diconIcon.png" />
+                                                                    <button class="btn btn-link p-l-5 p-r-5 m-l-3" style="top: -15px; right: 4px;" ng-click="removeImage(titem, 'OD')">
+                                                                        <i class="fas fa-times-circle text-danger fa-lg"></i>
+                                                                    </button>
+
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>-->
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="dis-flex">
+                                                <div class="form-group width-85">
+                                                    <label>Left Eye</label>
+                                                    <!--<input type="text" class="form-outline" />-->
+                                                    <input type="file" class="form-outline" id="ImageMgmtOS" value="Choose Files"
+                                                           ngf-select="selectedEyeFiles($files,'OS');"
+                                                           accept="image/*,application/pdf"
+                                                           ngf-pattern="'image/*,application/pdf'"
+                                                           ngf-accept="'image/*,application/pdf'"
+                                                           name="Lfile"
+                                                           multiple="multiple" />
+                                                </div>
+                                                <!--<button class="btn choose-btn">Choose files</button>-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td colspan="2">
+                                            <ul class="flex-flow-ulli drawingpad-img-show">
+                                                <li ng-repeat="titem in tempOSImagesArray">
+                                                    <!--//changed the code for image and pdf binding-->
+                                                    <!--<div>
+        <img ng-if="titem.DocumentExt!=='dcm'"  ngf-thumbnail="titem.file" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer />
+        <img ng-src="{{imgitem.DocURL}}" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer ng-if="titem.DocumentExt=='dcm'" />
+        <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="removeImage(titem, 'OS')">
+            <img src="img/close-round.svg" width="17" />
+        </a>
+        <a href="{{imgitem.DocURL}}" target="_blank" ng-if="titem.DocumentExt == 'application/pdf'">
+            <img src="img/pdf.png" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" />
+        </a>
+    </div>-->
+
+                                                    <div>
+                                                        <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="removeImage(titem, 'OS')">
+                                                            <img src="img/close-round.svg" width="17" />
+                                                        </a>
+                                                        <!--<img ngf-thumbnail="imgitem.file" height="120" ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg'|| imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml')&&imgitem.DocumentID==0" />-->
+                                                        <img ngf-thumbnail="titem.file" height="120" image-viewer ng-if="(titem.DocumentExt !== 'application/pdf' && titem.DocumentExt !== 'pdf'&& titem.DocumentExt !== 'Pdf')&&titem.DocumentId==0" />
+                                                        <!--<img ng-src="{{titem.DocURL}}" height="120" image-viewer ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg'|| imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml')&&imgitem.DocumentID!=0" />-->
+                                                        <img ng-src="{{titem.DocURL}}" height="120" image-viewer ng-hide="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf'|| titem.DocumentExt == 'Pdf') || titem.DocumentId == 0 || (titem.DocumentExt == 'tiff' || titem.FileExt == 'tif' || titem.DocumentExt=='image/tiff')" />
+                                                        <a href="{{titem.DocURL}}" target="_blank" ng-if="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf' || titem.DocumentExt == 'Pdf')&&titem.DocumentId!=0">
+                                                            <img src="img/pdf.png" height="120" class="m-b-10" />
+                                                        </a>
+                                                        <a ng-if="(titem.DocumentExt == 'application/pdf' || titem.DocumentExt == 'pdf' || titem.DocumentExt == 'Pdf')&&titem.DocumentId==0">
+                                                            <img src="img/pdf.png" height="120" class="m-b-10" />
+                                                        </a>
+                                                        <a href="{{titem.DocURL}}" target="_blank" ng-if="titem.DocumentExt == 'tiff' || titem.DocumentExt == 'tif' || titem.DocumentExt=='image/tiff' || titem.FileExt=='.tif'">
+                                                            <img height="120" src="img/appt-list/tifficon.png" />
+                                                        </a>
+
+                                                    </div>
+
+                                                    <div class="m-t-5">
+                                                        <h1 class="no-wrapappt fs-12" title="{{titem.DocumentName}}">{{titem.DisplayName}}</h1>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <!--<td colspan="2">
+                                            <div class="form-group">
+                                                <div class="table-responsive">
+                                                    <table class="table table-consultation" image-viewer style="border:0px !important;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td ng-repeat="titem in tempOSImagesArray" style="width:20%;">
+                                                                    <img ng-if="titem.DocumentExt!=='dcm'" ngf-thumbnail="titem.file" class="img-thumbnail" style="height:50px !important;width:50px !important" />
+                                                                    <img ng-if="titem.DocumentExt=='dcm'" style="width:20%" src="./img/diconIcon.png" />
+                                                                    <a ng-if="titem.DocumentExt == 'application/pdf'">
+                                                                        <img src="img/pdf.png" height="120" class="m-b-10" style="height:50px !important;width:50px !important" />
+                                                                    </a>
+                                                                    <button class="btn btn-link p-l-5 p-r-5 m-l-3 " style="top:-15px; right: 4px;" ng-click="removeImage(titem, 'OS')">
+                                                                        <i class="fas fa-times-circle text-danger fa-lg"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>-->
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

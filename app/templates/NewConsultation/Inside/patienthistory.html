@@ -1,0 +1,1063 @@
+﻿<section class="tile tile-shadow consul-sc-bdr" ng-show="cat.CategoryId===2 &&((cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:3}:true).length != 0 ||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:4}:true).length != 0)||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:5}:true).length != 0||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:6}:true).length != 0||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:7}:true).length != 0||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:8}:true).length != 0||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:9}:true).length != 0||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:10}:true).length != 0 ||(cat.CategoryDetails|filter:{'Active':'Y','IsSubCategoryChecked':true,SubCategoryId:37}:true).length != 0">
+    <div class="tile-header consl-sc-head">
+        <h1>Patient History</h1>
+        <ul class="controls">
+            <!--<li>
+                <div class="checkbox mr-0">
+                    <label>
+                        <input name="checkbox-2" type="checkbox" ng-change="CheckCategory(cat)" ng-model="cat.IsCategoryChecked" />
+                        <span class="checkbox-material">
+                            <span class="check"></span>
+                        </span>
+                    </label>
+                </div>
+            </li>-->
+            <li>
+                <div class="print-section" ng-click="PrintNewConsultation('PrintSubModule','2')">
+                    <i class="fas fa-print"></i> Print
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="tile-body p-8">
+        
+        <!-- /row -->
+        <div class="row">
+            
+            <div class="col-lg-12">
+                <div class="panel panel-ehnote" ng-repeat="item in cat.CategoryDetails" ng-show="item.SubCategoryId===4 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+                    <div class="panel-heading">
+                        Current Treatment
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" ng-show="(cacheStorageItem.MedicalConditions | filter:{'ActiveIND':'Y'}).length > 0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody ng-repeat="treat in cacheStorageItem.MedicalConditions | filter:{'ActiveIND':'Y'} track by $index">
+                                            <tr>
+                                                <td width="50%">
+                                                    <h5 class="m-b-2 inside-label-text" ng-bind="treat.MedicalConditionName" ng-hide="treat.IsEdit"></h5>
+                                                    <div class="dis-flex align-items-center justify-space-between m-r-5" ng-show="treat.IsEdit">
+                                                        <textarea class="form-control" rows="1" ng-model="treat.MedicalConditionName" enter-directive></textarea>
+                                                        <button class="btn btn-sm btn-primary btn-block w-100 h-100 m-l-10" ng-disabled="treat.MedicalConditionName==''" ng-click="treat.IsEdit = ! treat.IsEdit;AddToCache();;">Update</button>
+                                                    </div>
+                                                    <a href="javascript:;" ng-click="clickCurrentHistory(treat)">+ Add Instructions</a>
+                                                </td>
+                                                <td width="40%">
+                                                    <div class="dis-flex">
+                                                        <div class="dropdown consultation-button width-50 m-r-10">
+                                                            <button class="btn btn-default dropdown-toggle btr-radius bbr-radius" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                {{treat.OrganName}}
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                <li role="menuitem" ng-repeat="item in GetOrganNameList" ng-click="ChangecheifComplaintsEye(item,treat);">
+                                                                    <a href="javascript:;">
+                                                                        <label class="cur-poiter" ng-bind="item.OrganName"></label>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="padd-tab-td">
+                                                            <div class="dis-flex">
+                                                                <div class="width-40">
+                                                                    <input type="number" maxlength="2" placeholder="0" class="form-control btr-radius bbr-radius" ng-model="treat.Duration" />
+                                                                </div>
+                                                                <div class="dropdown consultation-button width-60">
+                                                                    <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                        Since
+                                                                        {{treat.DurationType === 'Y' ? 'Year(s)' : (treat.DurationType === 'W' ? 'Week(s)' : (treat.DurationType === 'M' ? 'Month(s)' : (treat.DurationType === 'D' ? 'Day(s)' :  "")))}}
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                        <li ng-click="ChangeChiefComplaintData('D',treat);"><a href="">Days</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('W',treat);"><a href="">Weeks</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('M',treat);"><a href="">Months</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('Y',treat);"><a href="">Years</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td width="10%" class="p-0 text-center pos-relative ">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{treat.ModifiedBy}} on {{treat.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/ehnote-edit.svg" class="cur-poiter pos-relative right-5 " width="20" height="20" ng-click="treat.IsEdit = ! treat.IsEdit" ng-hide="treat.IsEdit" />
+                                                    <img src="img/delete-icon.svg" class="cur-poiter pos-relative right-5" width="20" height="20" ng-click="RemoveMedicalCondition(treat)" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" ng-show="treat.showCurrentHistoryRemarks">
+                                                    <textarea placeholder="Enter Notes" class="invisible-textarea" ng-model="treat.Remarks" ng-change="AddToCache();"></textarea>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2" ng-model="obj.SelectedCurrentTreatmentItem"
+                                                           placeholder="Enter Medical condition"
+                                                           typeahead-on-select="onMedicalconditionItemSelect(obj.SelectedCurrentTreatmentItem)"
+                                                           uib-typeahead="item as item.MedicalConditionName for item in GetMedicalConditionArray($viewValue)"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-min-length="0" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedCurrentTreatmentItem='';obj.showhideMedAddBtn=false;" ng-hide="obj.SelectedCurrentTreatmentItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.showhideMedAddBtn" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="addMedicalCondition(obj.SelectedCurrentTreatmentItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedCurrentTreatmentItem == ''}">
+                                                    <a class="cur-poiter" ng-click="addMedicalCondition(obj.SelectedCurrentTreatmentItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-show="item.SubCategoryId===5 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Medical History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+                        
+                        <!-- /row -->
+                        <div class="row" ng-show="(cacheStorageItem.MedicalHistory | filter:{'ActiveInd':true}).length > 0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody>
+                                            <tr ng-repeat="medhis in cacheStorageItem.MedicalHistory | filter:{'ActiveInd':true} track by $index">
+                                                <td width="90%">
+                                                    <div class="dis-flex">
+                                                        <div class="width-70">
+                                                            <label class="inside-label-text" ng-bind="medhis.HistoryName"></label>
+                                                        </div>
+                                                        <div class="width-30">
+                                                            <div class="dis-flex" ng-show="!medhis.ShowDateFormat">
+                                                                <div class="width-40">
+                                                                    <input type="text" maxlength="2" placeholder="0" class="form-control btr-radius bbr-radius" ng-model="medhis.Duration" ng-blur="ChangeDuration(medhis)" ng-change="AddToCache();">
+                                                                </div>
+                                                                <div class="dropdown consultation-button width-60">
+                                                                    <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="medhisdropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                        Since
+                                                                        {{medhis.DurationTypeName}}
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="medhisdropdownMenu1">
+                                                                        <li ng-click="bindHistoryDurationType(medhis,'D')"><a href="">Days</a></li>
+                                                                        <li ng-click="bindHistoryDurationType(medhis,'W')"><a href="">Weeks</a></li>
+                                                                        <li ng-click="bindHistoryDurationType(medhis,'M')"><a href="">Months</a></li>
+                                                                        <li ng-click="bindHistoryDurationType(medhis,'Y')"><a href="">Years</a></li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div class="width-25">
+                                                                    <button class="btn btn-default btn-block lh-1-4 m-t-0" ng-show="medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    <button class="btn btn-default btn-block lh-1-4 m-t-0" ng-show="!medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-keyboard fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dis-flex" ng-show="medhis.ShowDateFormat">
+                                                                <div class="form-group m-b-0">
+                                                                    <input type="text" class="form-control icons-calendar height-25" ng-model="medhis.DurationDate" datepickerregpatient readonly ng-change="ChangeFormatDate(medhis)" />
+                                                                </div>
+                                                                <div class="width-25">
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="!medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-keyboard fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <!--<div class="dis-flex" ng-show="medhis.ShowDateFormat">
+                                                                <div class="form-group m-b-0">
+                                                                    <input type="text" class="form-control icons-calendar height-25" ng-model="medhis.DurationDate" datepickerregpatient readonly ng-change="ChangeFormatDate(medhis)" />
+                                                                </div>
+                                                                <div class="width-25">
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="!medhis.ShowDateFormat" ng-click="ChangeItem(medhis)"><i class="far fa-keyboard fa-lg"></i></button>
+                                                                </div>
+                                                            </div>-->
+                                                            <a href="javascript:;" ng-click="clickMedicalHistory(medhis)" class="addDetails-text">
+                                                                + Add Instructions
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group m-t-5" ng-show="medhis.showMedicalHistoryRemarks">
+                                                        <textarea class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="medhis.Remarks" ng-change="AddToCache();"></textarea>
+                                                    </div>
+                                                </td>
+                                                <td width="10%" class="p-0 text-center pos-relative">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{medhis.ModifiedBy}} on {{medhis.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveMedHistory(medhis)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2"
+                                                           ng-model="obj.SelectedMedicalHistoryItem"
+                                                           typeahead-min-length="0"
+                                                           placeholder="Enter Past Medicals"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterMedicalHistory($viewValue,1)"
+                                                           typeahead-on-select="MedHistoryBlurChange(obj.SelectedMedicalHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedMedicalHistoryItem='';obj.AddMedicalHistory=false;" ng-hide="obj.SelectedMedicalHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddMedicalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewMedicalHistory(obj.SelectedMedicalHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedMedicalHistoryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewMedicalHistory(obj.SelectedMedicalHistoryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===37 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Ocular History
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody ng-repeat="Occudhis in cacheStorageItem.OccularHistory | filter:{'ActiveInd':true} track by $index">
+                                            <tr>
+                                                <td width="50%">
+                                                    <h5 class="m-b-2 inside-label-text" ng-bind="Occudhis.HistoryName"></h5>
+                                                    <a href="javascript:;" ng-click="clickOccularHistory(Occudhis)">+ Add Instructions</a>
+                                                </td>
+                                                <td width="40%">
+                                                    <div class="dis-flex">
+                                                        <div class="dropdown consultation-button width-50 m-r-10">
+                                                            <button class="btn btn-default dropdown-toggle btr-radius bbr-radius" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                {{Occudhis.OrganName}}
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                <li role="menuitem" ng-repeat="item in GetOrganNameList" ng-click="ChangecheifComplaintsEye(item,Occudhis);">
+                                                                    <a href="javascript:;">
+                                                                        <label class="cur-poiter" ng-bind="item.OrganName"></label>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="padd-tab-td">
+                                                            <div class="dis-flex">
+                                                                <div class="width-40">
+                                                                    <input type="text" maxlength="2" placeholder="0" class="form-control btr-radius bbr-radius" ng-model="Occudhis.Duration" />
+                                                                </div>
+                                                                <div class="dropdown consultation-button width-60">
+                                                                    <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                        Since
+                                                                        {{Occudhis.DurationType === 'Y' ? 'Year(s)' : (Occudhis.DurationType === 'W' ? 'Week(s)' : (Occudhis.DurationType === 'M' ? 'Month(s)' : (Occudhis.DurationType === 'D' ? 'Day(s)' :  "")))}}
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                        <li ng-click="ChangeChiefComplaintData('D',Occudhis);"><a href="">Days</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('W',Occudhis);"><a href="">Weeks</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('M',Occudhis);"><a href="">Months</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('Y',Occudhis);"><a href="">Years</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td width="10%" class="p-0 text-center pos-relative ">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by{{Occudhis.ModifiedBy}} on {{Occudhis.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter pos-relative right-5" width="20" height="20" ng-click="RemoveOccularHistory(Occudhis)" />
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <div class="form-group m-t-10 m-b-0" ng-show="Occudhis.showOccularHistory">
+                                                        <textarea class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="Occudhis.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+                        
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           rows="2"
+                                                           autocomplete="off"
+                                                           ng-model="obj.SelectedOcularHistoryItem"
+                                                           placeholder="Enter Occular Histroy"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterOccularHistory($viewValue,2)"
+                                                           typeahead-on-select="OccularHistoryBlurChange(obj.SelectedOcularHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedOcularHistoryItem='';obj.AddOccularHistory=false;" ng-hide="obj.SelectedOcularHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddOccularHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewOccularHistory(obj.SelectedOcularHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedFamilyHistoryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewFamilyHistory(obj.SelectedFamilyHistoryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===6 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Birth History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody ng-repeat="Birhis in cacheStorageItem.BirthHistory | filter:{'ActiveInd':true} track by $index">
+                                            <tr>
+                                                <td width="50%">
+                                                    <h5 class="m-b-2 inside-label-text" ng-bind="Birhis.HistoryName"></h5>
+                                                    <a href="javascript:;" ng-click="clickBirthHistory(Birhis)">+ Add Instructions</a>
+                                                </td>
+                                                <td width="40%">
+                                                    <div class="dis-flex">
+                                                        <div class="dropdown consultation-button width-50 m-r-10">
+                                                            <button class="btn btn-default dropdown-toggle btr-radius bbr-radius" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                {{Birhis.OrganName}}
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                <li role="menuitem" ng-repeat="item in GetOrganNameList" ng-click="ChangecheifComplaintsEye(item,Birhis);">
+                                                                    <a href="javascript:;">
+                                                                        <label class="cur-poiter" ng-bind="item.OrganName"></label>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="padd-tab-td">
+                                                            <div class="dis-flex">
+                                                                <div class="width-40">
+                                                                    <input type="text" maxlength="2" placeholder="0" class="form-control btr-radius bbr-radius" ng-model="Birhis.Duration" />
+                                                                </div>
+                                                                <div class="dropdown consultation-button width-60">
+                                                                    <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                        Since
+                                                                        {{Birhis.DurationType === 'Y' ? 'Year(s)' : (Birhis.DurationType === 'W' ? 'Week(s)' : (Birhis.DurationType === 'M' ? 'Month(s)' : (Birhis.DurationType === 'D' ? 'Day(s)' :  "")))}}
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                        <li ng-click="ChangeChiefComplaintData('D',Birhis);"><a href="">Days</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('W',Birhis);"><a href="">Weeks</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('M',Birhis);"><a href="">Months</a></li>
+                                                                        <li ng-click="ChangeChiefComplaintData('Y',Birhis);"><a href="">Years</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td width="10%" class="p-0 text-center pos-relative ">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by{{Birhis.ModifiedBy}} on {{Birhis.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveBirthHistory(Birhis)" />
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <textarea ng-show="Birhis.showBirthHistory" class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="Birhis.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+                        
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2"
+                                                           ng-model="obj.SelectedBirthHistoryItem"
+                                                           typeahead-min-length="0"
+                                                           placeholder="Enter Birth Histroy"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterBirthHistory($viewValue,6)"
+                                                           typeahead-on-select="BirthHistoryBlurChange(obj.SelectedBirthHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedBirthHistoryItem='';obj.AddBirthHistory=false;" ng-hide="obj.SelectedBirthHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddBirthHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewBirthHistory(obj.SelectedBirthHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedBirthHistoryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewBirthHistory(obj.SelectedBirthHistoryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===7 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Surgical History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody ng-repeat="Surgery in cacheStorageItem.SurgicalHistory | filter:{'ActiveInd':true} track by $index">
+                                            <tr>
+                                                <td width="50%">
+                                                    <h5 class="m-b-2 inside-label-text">
+                                                        <label>{{Surgery.HistoryName}}</label>
+                                                    </h5>
+                                                    <a href="javascript:;" ng-click="clickSurgicalHistory(Surgery)">+ Add Instructions</a>
+                                                </td>
+                                                <td width="40%">
+                                                    <div class="dis-flex">
+                                                        <div class="dropdown consultation-button width-50 m-r-10">
+                                                            <button class="btn btn-default dropdown-toggle btr-radius bbr-radius" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                {{Surgery.OrganName}}
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                <li role="menuitem" ng-repeat="item in GetOrganNameList" ng-click="ChangecheifComplaintsEye(item,Surgery);">
+                                                                    <a href="javascript:;">
+                                                                        <label class="cur-poiter" ng-bind="item.OrganName"></label>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="padd-tab-td">
+                                                            <div class="dis-flex" ng-show="!Surgery.ShowDateFormat">
+                                                                
+                                                                <div class="width-100">
+                                                                    <button class="btn btn-default btn-block lh-1-4 m-t-0" ng-show="Surgery.ShowDateFormat" ng-click="ChangeItem(Surgery)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    <button class="btn btn-default btn-block lh-1-4 m-t-0" ng-show="!Surgery.ShowDateFormat" ng-click="ChangeItem(Surgery)"><i class="far fa-keyboard fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dis-flex" ng-show="Surgery.ShowDateFormat">
+                                                                <div class="form-group m-b-0">
+                                                                    <input type="text" class="form-control icons-calendar height-25" ng-model="Surgery.DurationDate" datepickerregpatient readonly ng-change="ChangeFormatDate(Surgery)" />
+                                                                </div>
+                                                                <div class="width-100">
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="Surgery.ShowDateFormat" ng-click="ChangeItem(Surgery)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    <button class="btn btn-default btn-block height-25 lh-1-4 m-t-0" ng-show="!Surgery.ShowDateFormat" ng-click="ChangeItem(Surgery)"><i class="far fa-keyboard fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td width="10%" class="p-0 text-center pos-relative ">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by{{Surgery.ModifiedBy}} on {{Surgery.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter pos-relative right-5" ng-click="RemoveSurgicalHistory(Surgery)" width="20" height="20" />
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <textarea ng-show="Surgery.showSurgicalHistory" class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="Surgery.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+                        
+                        <!-- /row -->
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-5">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2"
+                                                           ng-model="obj.SelectedSurgeryItem"
+                                                           placeholder="Enter Surgical History"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterSurgicalHistory($viewValue,5)"
+                                                           typeahead-on-select="SurgicalHistoryBlurChange(obj.SelectedSurgeryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedSurgeryItem='';obj.AddSurgicalHistory=false;" ng-hide="obj.SelectedSurgeryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddSurgicalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewSurgicalHistory(obj.SelectedSurgeryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedSurgeryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewSurgicalHistory(obj.SelectedSurgeryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===8 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Nutritional History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+                        <!-- /row -->
+                        <div class="row" ng-if="(cacheStorageItem.NutritionalHistory| filter:{'ActiveInd':true}).length > 0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody>
+                                            <tr ng-repeat="Nutrition in cacheStorageItem.NutritionalHistory | filter:{'ActiveInd':true} track by $index">
+                                                <td width="90%">
+                                                    <div class="padd-tab-td">
+                                                        <label>{{Nutrition.HistoryName}}</label>
+                                                        <a href="javascript:;" ng-click="clickNutritionalHistory(Nutrition)" class="addDetails-text">
+                                                            + Add Instructions
+                                                        </a>
+                                                        <textarea ng-show="Nutrition.showNutritionalHistory" class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="Nutrition.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                    </div>
+                                                </td>
+                                                <!--<td width="25%">
+                                                    <div class="padd-tab-td text-right">
+                                                        <div class="dis-flex">
+                                                            <div class="width-40">
+                                                                <input type="text" placeholder="0" class="form-control btr-radius bbr-radius" >
+                                                            </div>
+                                                            <div class="dropdown consultation-button width-60">
+                                                                <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Since / Days(s)
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a href="">Days</a></li>
+                                                                    <li><a href="">Weeks</a></li>
+                                                                    <li><a href="">Months</a></li>
+                                                                    <li><a href="">Years</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>-->
+                                                <td width="10%" class="p-0 text-center pos-relative">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{Nutrition.ModifiedBy}} on {{Nutrition.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveNutritionalHistory(Nutrition)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2"
+                                                           typeahead-min-length="0"
+                                                           ng-model="obj.SelectedNutritionalHistoryItem"
+                                                           placeholder="Enter Nutritional Histroy"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterNutritionalHistory($viewValue,3)"
+                                                           typeahead-on-select="NutritionalHistoryBlurChange(obj.SelectedNutritionalHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedNutritionalHistoryItem='';obj.AddNutritionalHistory=false;" ng-hide="obj.SelectedNutritionalHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddNutritionalHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewNutritionalHistory(obj.SelectedNutritionalHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedNutritionalHistoryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewNutritionalHistory(obj.SelectedNutritionalHistoryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===3 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Allergies
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+
+                        <!-- /row -->
+                        <div class="row" ng-if="cacheStorageItem.AllergyItems.length > 0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody>
+                                            <tr ng-repeat="Allergy in cacheStorageItem.AllergyItems track by $index">
+                                                <td width="90%">
+                                                    <div class="padd-tab-td">
+                                                        <label>{{Allergy.AllergyName}}</label>
+                                                        <a href="javascript:;" ng-click="clickAllergieshistory(Allergy)" class="addDetails-text">
+                                                            + Add Instructions
+                                                        </a>
+                                                        <textarea ng-show="Allergy.showAllergieshistory" class="invisible-textarea" placeholder="Enter Notes" rows="2" ng-model="Allergy.Reaction" ng-change="AddToCache();" enter-directive></textarea>
+                                                    </div>
+                                                </td>
+                                                <!--<td width="25%">
+                                                    <div class="padd-tab-td text-right">
+                                                        <div class="dis-flex">
+                                                            <div class="width-40">
+                                                                <input type="text" placeholder="0" class="form-control btr-radius bbr-radius">
+                                                            </div>
+                                                            <div class="dropdown consultation-button width-60">
+                                                                <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Since / Days(s)
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a href="">Days</a></li>
+                                                                    <li><a href="">Weeks</a></li>
+                                                                    <li><a href="">Months</a></li>
+                                                                    <li><a href="">Years</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>-->
+                                                <td width="10%" class="p-0 text-center pos-relative">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{Allergy.ModifiedBy}} on {{Allergy.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveAllergies($index)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           autocomplete="off"
+                                                           rows="2" ng-model="obj.SelectedAllergyItem"
+                                                           placeholder="Type allergies"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-on-select="onAllergySelect(obj.SelectedAllergyItem)"
+                                                           uib-typeahead="item as item.AllergyName for item in GetAllergyList($viewValue)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedAllergyItem='';obj.AddAllergyshow=false;" ng-hide="obj.SelectedAllergyItem=='';"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddAllergyshow" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="addAllergy(obj.SelectedAllergyItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedAllergyItem == ''}">
+                                                    <a class="cur-poiter" ng-click="addAllergy(obj.SelectedAllergyItem);">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===9 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Family History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+
+                        <!-- /row -->
+                        <div class="row" ng-if="(cacheStorageItem.FamilyHistory| filter:{'ActiveInd':true}).length > 0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody>
+                                            <tr ng-repeat="family in cacheStorageItem.FamilyHistory | filter:{'ActiveInd':true} track by $index">
+                                                <td width="90%">
+                                                    <div class="padd-tab-td">
+                                                        <div class="dis-flex">
+                                                            <div class="width-70">
+                                                                <label>{{family.HistoryName}}</label>
+                                                            </div>
+                                                            <div class="width-30">
+                                                                <div class="form-group m-b-0">
+                                                                    <select class="form-control"
+                                                                            ng-model="family.RelationShipId"
+                                                                            ng-options="i.RelationId as i.RelationName for i in RelationShipTypeList" ng-change="ChangeFamilyHistory(family)">
+                                                                        <option value="" selected>Select</option>
+                                                                    </select>
+                                                                </div>
+                                                                <a href="javascript:;" ng-click="clickFamilyHistory(family)" class="addDetails-text">
+                                                                    + Add Instructions
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group m-t-10 m-b-0" ng-show="family.showFamilyHistory">
+                                                            <textarea class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="family.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <!--<td width="25%">
+                                                    <div class="padd-tab-td text-right">
+                                                        <div class="dis-flex">
+                                                            <div class="width-40">
+                                                                <input type="text" placeholder="0" class="form-control btr-radius bbr-radius">
+                                                            </div>
+                                                            <div class="dropdown consultation-button width-60">
+                                                                <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Since / Days(s)
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a href="">Days</a></li>
+                                                                    <li><a href="">Weeks</a></li>
+                                                                    <li><a href="">Months</a></li>
+                                                                    <li><a href="">Years</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>-->
+
+                                                <td width="10%" class="p-0 text-center pos-relative">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{family.ModifiedBy}} on {{family.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveFamilyHistory(family)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           rows="2"
+                                                           autocomplete="off"
+                                                           ng-model="obj.SelectedFamilyHistoryItem"
+                                                           placeholder="Enter Family Histroy"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterFamilyHistory($viewValue,2)"
+                                                           typeahead-on-select="FamilyHistoryBlurChange(obj.SelectedFamilyHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedFamilyHistoryItem='';obj.AddFamilyHistory=false;" ng-hide="obj.SelectedFamilyHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddFamilyHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewFamilyHistory(obj.SelectedFamilyHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="10%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedFamilyHistoryItem == ''}">
+                                                    <a class="cur-poiter" ng-click="AddNewFamilyHistory(obj.SelectedFamilyHistoryItem)">
+                                                        <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="15" height="15">
+                                                        <span>Add New</span>
+                                                    </a>
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+            <div class="col-lg-12" ng-repeat="item in cat.CategoryDetails" ng-if="item.SubCategoryId===10 && (item.Active==='Y' && item.IsSubCategoryChecked)">
+
+                <div class="panel panel-ehnote">
+                    <div class="panel-heading">
+                        Immunisation History
+                        <!--<ul class="controls">
+                            <li>
+                                <a href="javascript:;" class="text-danger"><i class="fas fa-times"></i></a>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="panel-body">
+                        <!-- /row -->
+                        <div class="row" ng-if="(cacheStorageItem.ImmunisationHistory| filter:{'ActiveInd':true}).length>0">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-consultation">
+                                        <tbody>
+                                            <tr ng-repeat="Immunisation in cacheStorageItem.ImmunisationHistory | filter:{'ActiveInd':true} track by $index">
+                                                <td width="90%">
+                                                    <div class="padd-tab-td">
+                                                        <label>{{Immunisation.HistoryName}}</label>
+                                                        <a href="javascript:;" ng-click="clickImmunisationHistory(Immunisation)" class="addDetails-text">
+                                                            + Add Instructions
+                                                        </a>
+                                                        <textarea ng-show="Immunisation.showImmunisationHistory" class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes" rows="1" ng-model="Immunisation.Remarks" ng-change="AddToCache();" enter-directive></textarea>
+                                                    </div>
+                                                </td>
+                                                <!--<td width="25%">
+                                                    <div class="padd-tab-td text-right">
+                                                        <div class="dis-flex">
+                                                            <div class="width-40">
+                                                                <input type="text" placeholder="0" class="form-control btr-radius bbr-radius">
+                                                            </div>
+                                                            <div class="dropdown consultation-button width-60">
+                                                                <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Since / Days(s)
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a href="">Days</a></li>
+                                                                    <li><a href="">Weeks</a></li>
+                                                                    <li><a href="">Months</a></li>
+                                                                    <li><a href="">Years</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>-->
+                                                <td width="10%" class="p-0 text-center pos-relative">
+                                                    <div class="doc-info-right"
+                                                         uib-popover="by {{Immunisation.ModifiedBy}} on {{Immunisation.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                                         popover-trigger="mouseenter"
+                                                         popover-append-to-body="true" popover-placement="auto right-top">
+                                                        <i class="fas fa-info"></i>
+                                                    </div>
+                                                    <img src="img/delete-icon.svg" class="cur-poiter" width="20" height="20" ng-click="RemoveImmunisationHistory(Immunisation)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="100%" class="text-clear-cons p-0">
+                                                    <input type="text" class="form-control auto-textarea"
+                                                           rows="2"
+                                                           autocomplete="off"
+                                                           ng-model="obj.SelectedImmunisatonHistoryItem"
+                                                           placeholder="Enter ImmunisationHistroy"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.HistoryName for item in GetMasterImmunisationHistory($viewValue,4)"
+                                                           typeahead-on-select="ImmunisationHistoryBlurChange(obj.SelectedImmunisatonHistoryItem)" />
+                                                    <i class="fas fa-times-circle" ng-click="obj.SelectedImmunisatonHistoryItem='';obj.AddImmunisationHistory=false;" ng-hide="obj.SelectedImmunisatonHistoryItem==''"></i>
+                                                    <ul class="dropdown-menu pos-absolute" ng-show="obj.AddImmunisationHistory" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                                        <li><a ng-click="AddNewImmunisationHistory(obj.SelectedImmunisatonHistoryItem)">Add new</a></li>
+                                                    </ul>
+                                                </td>
+                                                <!--<td width="5%" class="p-0 text-center" ng-class="{'tdhide': obj.SelectedImmunisatonHistoryItem == ''}">
+                                                    <img src="img/plus-symbole-icon.svg" class="cur-poiter" width="20" height="20" ng-click="AddNewImmunisationHistory(obj.SelectedImmunisatonHistoryItem)" />
+                                                </td>-->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /row -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- / -->
+
+        </div>
+    </div>
+</section>

@@ -1,0 +1,172 @@
+﻿<div class="modal-overlay" ng-show="addAppointmentInfo"></div>
+<div class="modal-common" ng-show="addAppointmentInfo" id="bkAppointment">
+    <div class="modal-common-dialog w-800">
+        <div class="model-popup-header">
+            <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
+        </div>
+        <div class="p-15 pl-popup bg-white">
+            <form name="patientform" class="css-form" novalidate>
+                <div class="responsive patient-displayTable">
+                    <table class="table">
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>
+                                <p ng-show="PhoneNumber !== undefined || PhoneNumber.length > 0"> Contact Number </p>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>{{(Title === undefinedFullName) ? FullName : Title + ". " + FullName}}</td>
+                            <td>{{Gender == 'M' ? 'Male': 'Female'}}</td>
+                            <td> {{((CurrentAge === undefined) ? '-' :(((CurrentAge.year > 0) ? CurrentAge.year + "y" : '' )+ ' ' + (((CurrentAge.month > 0) ? CurrentAge.month + "m" : ''))))}} </td>
+                            <td> {{PhoneNumber.length < 6 ? "-": PhoneNumber}} </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="clearfix">
+                    <p ng-show="(docTimeStatus == 'A')"
+                       class="clearfix_p">
+                        Your doctor may not be available in this time. <br />
+                        You can proceed with bookings anyway!
+                    </p>
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="AppointmentType" class="control-label">Appointment Type</label>
+                            <div class="form-group" ng-show="showmandatory =='Y'">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                    <select name="appointment_type" id="appointment_type" class="form-control select-dropdown" ng-model="appointment_type" ng-change="apptypechange(appointment_type)" required>
+                                        <option value="">Select Appointment Type</option>
+                                        <option ng-repeat="type in appointmentTypes" value="{{type.Id}}">{{type.Name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="showmandatory =='N'">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                    <select name="appointment_type" id="appointment_type" class="form-control select-dropdown" ng-model="appointment_type" ng-change="apptypechange(appointment_type)" required>
+                                        <option value="">Select Appointment Type</option>
+                                        <option ng-repeat="type in appointmentTypes" value="{{type.Id}}">{{type.Name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 ">
+                            <label class="control-label">SelectBranch</label>
+                            <div class="form-group">
+                                <div class="input-group spinner">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-building-o" aria-hidden="true"></i>
+                                    </span>
+                                    <select class="form-control select-dropdown " name="docAddress" ng-model="hospitalid" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.HospitalName for hospitalData in hospitalDetails track by hospitalData.HospitalInfo.HospitalDetails.HospitalID" ng-change="getDoctorInfoByHospitalId(hospitalid)">
+                                        <option value="">Select Branch</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 ">
+                            <label for="Doctor" class="cols-sm-2 control-label">Doctor</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-user-md" aria-hidden="true"></i>
+                                    </span>
+                                    <select class="form-control select-dropdown" name="docID" ng-change="DocChange(SelectedDoctor)" ng-model="SelectedDoctor" ng-options="s.FullName for s in clinicDoctorList | filter:greaterThan('DoctorID',1)">
+                                        <option value="">Select Doctor</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 ">
+                            <label class="control-label">Date</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                    
+                                    <input class="form-control icons-calendar bg-white z-9999" ng-model="referredappointmentdate" datepickerapnl ng-change="chgDate()" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="uppercase required field-label light-label">Start Time</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                    </span>
+                                    <select class="form-control select-dropdown" name="patinet_appStarttime" id="patinet_appStarttime" ng-options="patinet_appStarttime.startTime for patinet_appStarttime in setValue" ng-model="patinet_appStarttime" ng-change="Endtimechange(patinet_appStarttime)">
+                                        <option value="">Select Start Time</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 ">
+                            <label class="cols-sm-2 control-label">End Time</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                    </span>
+                                 
+                                    <select class="form-control select-dropdown" ng-options="patinet_appEndtime.startTime for patinet_appEndtime in setEndValue" ng-model="EndtimeVAlue">
+                                        <option value="">Select End time</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label class="cols-sm-2 control-label">Referral Source</label>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-medium" aria-hidden="true"></i>
+                                </span>
+                                <select name="Source" class="form-control select-dropdown" id="Source" ng-model="Source">
+                                    <option value="">Select Referral</option>
+                                    
+                                    <option ng-repeat="Ref in ReferralList" value="{{Ref.ReferralID}}">{{Ref.ReferralTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="light-label">Visit Reason</label>
+                            <textarea rows="1" class="form-control p-r-50 overflow-hidden resize-none " placeholder="Enter Visit Reason" ng-model="othervisitrsn" aw-limit-length="200" required=""></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="cols-sm-2 control-label ml-15">&nbsp</label>
+                        <div class="form-group">
+                            <div class="col-lg-12 p-0">
+                                <div class="clearfix float-checkbox margin-bottom-25">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--</div>-->
+                <div class="modal-footer">
+                    <button class="btn danger-btn" ng-click="closeAppointment()">
+                        Cancel
+                    </button>
+                    <button class="btn primary-btn" ng-click="BookAppointment(referredappointmentdate)">Confirm Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

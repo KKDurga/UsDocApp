@@ -1,0 +1,696 @@
+﻿<!--<link href="css/IPOP.css" rel="stylesheet" />-->
+<div ng-controller="USQManagementCtrl">
+
+
+    <div>
+        <div class="col-lg-12" >
+            <div class="text-center">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mainDevDiagnosis">
+                            <ul class=" b-0">
+                                <li ng-class="(MainTab == 1)?'active':''">
+                                    <a class="m-t-0" ng-click="switchMainTab(1)">Single User View</a>
+                                </li>
+                                <li ng-class="(MainTab == 2)?'active':''">
+                                    <a class="m-t-0" ng-click="switchMainTab(2)">Multiple User View</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                        <div class="tab-content">
+                            <div class="col-lg-12" ng-if="MainTab==1">
+                                <!--<div class="text-center">
+                                    <ul class="nav nav-tabs invent-tabs">
+                                        <li ng-class="(SubTab == '1')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('1')">Single Reception View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '2')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('2')"> Single Technician View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '3')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('3')"> Single Optometrist View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '4')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('4')"> Single Doctor View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '5')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('5')"> Single Counsellor View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '6')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('6')">Single Billing View</a>
+                                        </li>
+
+                                    </ul>
+                                </div>-->
+
+
+                                <div class="row" style="display:flex;justify-content:center;flex-wrap:wrap;">
+                                    <!--col-lg-3 mb-10 mt-10-->
+                                    <div class="" ng-repeat="qitem in ActivateRoomsList" style="width:400px;margin:15px;">
+                                        <button class="btn btn-default" ng-click="openDynamicSingleRoom(qitem)" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">{{qitem.RoomTypeName}} - {{qitem.RoomName}}</button>
+                                    </div>
+
+
+                                    <!--<div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openReceptionRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Reception Room</button>
+    </div>
+    <div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openDoctorRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Doctor Room</button>
+    </div>
+    <div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openOptomRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Optom Room</button>
+    </div>
+    <div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openTechnicianRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Technician Room</button>
+    </div>
+    <div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openBillerRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Biller Room</button>
+    </div>
+    <div class="col-lg-3 mb-10 mt-10">
+        <button class="btn btn-default" ng-click="openCounselorRoom()" style=" width: 100%; height: 45px; border-radius: 15px; background: #296c94; color: #fff; font-size: 20px;">Counselor Room</button>
+    </div>-->
+                                </div>
+
+
+                                <div class="row">
+
+                                    <div id="elementSingleReception1" ng-show="queueObj.showSingleReceptionRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleReceptionRoom()" ng-click="closeSingleReceptionRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>{{selectedRoomObj.RoomObj.RoomTypeName}}</h2>
+                                                                        </div>
+
+
+                                                                        <img ng-show="selectedRoomObj.RoomObj.ImageURL==''" class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <img ng-show="selectedRoomObj.RoomObj.ImageURL!=''" class="image-circle-screen" ng-src="{{selectedRoomObj.RoomObj.ImageURL}}" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>{{selectedRoomObj.RoomObj.UserName}}</h2>
+                                                                            <p>({{selectedRoomObj.RoomObj.SpecializationName}})</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>{{selectedRoomObj.RoomObj.RoomName}}</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>{{selectedRoomObj.TotalTokens}}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>{{selectedRoomObj.RoomObj.CurrentToken}}</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="witem in selectedRoomObj.WaitingRoomPatients" ng-show="selectedRoomObj.WaitingRoomPatients.length >0">
+                                                                            <h2>{{witem.TokenNumber}}</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers"ng-show="selectedRoomObj.WaitingRoomPatients.length ===0">
+                                                                            <h2>No Waiting Patients.</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div id="elementSingleReception1" ng-show="queueObj.showSingleReceptionRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleReceptionRoom()" ng-click="closeSingleReceptionRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Reception</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Ramya Reddy</h2>
+                                                                            <p>(Main Receptionist)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>Room 1</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>15</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-1</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div id="elementSingleDoctor" ng-show="queueObj.showSingleDoctorRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleDoctorRoom()" ng-click="closeSingleDoctorRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Doctor</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Dr.sarah williams</h2>
+                                                                            <p>(opthalmology)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>a-107</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>25</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-14</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div id="elementSingleOptom" ng-show="queueObj.showSingleOptomRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleOptomRoom()" ng-click="closeSingleOptomRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Optom</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Dr.sarah williams</h2>
+                                                                            <p>(opthalmology)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>a-107</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>25</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-14</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div id="elementSingleTechnician" ng-show="queueObj.showSingleTechnicianRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleTechnicianRoom()" ng-click="closeSingleTechnicianRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Technician</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Dr.sarah williams</h2>
+                                                                            <p>(opthalmology)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>a-107</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>25</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-14</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div id="elementSingleBiller" ng-show="queueObj.showSingleBillerRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleBillerRoom()" ng-click="closeSingleBillerRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Biller</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Dr.sarah williams</h2>
+                                                                            <p>(opthalmology)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>a-107</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>25</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-14</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div id="elementSingleCounselor" ng-show="queueObj.showSingleCounselorRoom">
+
+                                        <button class="btn btn-link" ng-keydown="$event.keyCode === 27 && closeSingleCounselorRoom()" ng-click="closeSingleCounselorRoom()" style="float:right;color:red;">close</button>
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table table-screenview">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Counselor</h2>
+                                                                        </div>
+                                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Dr.sarah williams</h2>
+                                                                            <p>(opthalmology)</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-roomno">
+                                                                            <h2>room number</h2>
+                                                                            <p>a-107</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-token">
+                                                                            <h2>total tokens</h2>
+                                                                            <p>25</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <div class="dis-block">
+                                                                        <div class="Details-Doctor-currenttoken">
+                                                                            <h2>current token</h2>
+                                                                            <p>w-14</p>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-text">
+                                                                            <h2>Next</h2>
+                                                                        </div>
+                                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                                            <h2>W-15</h2>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-12" ng-if="MainTab==2">
+                                <div class="text-center">
+                                    <ul class="nav nav-tabs invent-tabs">
+                                        <li ng-class="(SubTab == '1')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('1')">Multiple Reception View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '2')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('2')">Multiple Technician View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '3')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('3')">Optometrist View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '4')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('4')"> Multiple Doctor View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '5')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('5')"> Multiple Counsellor View</a>
+                                        </li>
+                                        <li ng-class="(SubTab == '6')?'active':''">
+                                            <a class="btn btn-link" ng-click="switchSubTab('6')">Multiple Billing View</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <div>
+            <div class="page-content" ng-show="SubTab ==='1'">
+                <div class="view-container" ng-show="queueObj.showSingleDoctorQueueList">
+
+          
+                    <div id="elementSingleDoctor1">
+                       
+                        <button class="btn btn-link"  ng-keydown="$event.keyCode === 27 && closeSingleDoctorQueue()"  ng-click="closeSingleDoctorQueue()">close</button>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <table class="table table-screenview">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="dis-block">
+                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Dr.sarah williams</h2>
+                                                            <p>(opthalmology)</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-roomno">
+                                                            <h2>room number</h2>
+                                                            <p>a-107</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-token">
+                                                            <h2>total tokens</h2>
+                                                            <p>25</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2">
+                                                    <div class="dis-block">
+                                                        <div class="Details-Doctor-currenttoken">
+                                                            <h2>current token</h2>
+                                                            <p>w-14</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Next</h2>
+                                                        </div>
+                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                            <h2>W-15</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="elementMultipleDoctor" ng-show="queueObj.showMultipleDoctorQueueList">
+                        <button class="btn btn-link" ng-click="closeMultipleDoctorQueue()"
+                                ng-keydown="$event.keyCode === 27 && closeMultipleDoctorQueue()" style="float:right;color:red;cursor:pointer;margin-right:23px;">
+                            close
+                        </button>
+
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <table class="table table-screenview">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="dis-block">
+                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Dr.sarah williams</h2>
+                                                            <p>(opthalmology)</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-roomno">
+                                                            <h2>room number</h2>
+                                                            <p>a-107</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-token">
+                                                            <h2>total tokens</h2>
+                                                            <p>25</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-currenttoken">
+                                                            <h2>current token</h2>
+                                                            <p>w-14</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Next</h2>
+                                                        </div>
+                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                            <h2>W-15</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="dis-block">
+                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Dr.sarah williams</h2>
+                                                            <p>(opthalmology)</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-roomno">
+                                                            <h2>room number</h2>
+                                                            <p>a-107</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-token">
+                                                            <h2>total tokens</h2>
+                                                            <p>25</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-currenttoken">
+                                                            <h2>current token</h2>
+                                                            <p>w-14</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Next</h2>
+                                                        </div>
+                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                            <h2>W-15</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="dis-block">
+                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Dr.sarah williams</h2>
+                                                            <p>(opthalmology)</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-roomno">
+                                                            <h2>room number</h2>
+                                                            <p>a-107</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-token">
+                                                            <h2>total tokens</h2>
+                                                            <p>25</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-currenttoken">
+                                                            <h2>current token</h2>
+                                                            <p>w-14</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Next</h2>
+                                                        </div>
+                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                            <h2>W-15</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="dis-block">
+                                                        <img class="image-circle-screen" src="img/icon-male-new.png" />
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Dr.sarah williams</h2>
+                                                            <p>(opthalmology)</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-roomno">
+                                                            <h2>room number</h2>
+                                                            <p>a-107</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-token">
+                                                            <h2>total tokens</h2>
+                                                            <p>25</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-currenttoken">
+                                                            <h2>current token</h2>
+                                                            <p>w-14</p>
+                                                        </div>
+                                                        <div class="Details-Doctor-text">
+                                                            <h2>Next</h2>
+                                                        </div>
+                                                        <div class="Details-Doctor-tokennumbers" ng-repeat="i in [1,2,3,4,5,6,7]">
+                                                            <h2>W-15</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,437 @@
+﻿<div class="pos-relative h-100">
+    <div class="adjustable-position slim-scroll">
+        <div class="dis-flex flex-direction-column grid-gap-10 mt-10 height__100--">
+            <div class="section__style--2" ng-show="addedNewProcedure">
+                <div class="section__header--">
+                    <h1> {{ 'ADDNEWPROCEDURES' | translate}}</h1>
+                </div>
+                <div class="section__body--">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive slim-scroll">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="input__group">
+                                                    <label> {{ 'HOSPITALANDCLINIC' | translate}}</label><em>*</em>
+                                                    <div button-dropdown-direction>
+                                                        <button class="form__control" type="button" id="dropdownMenu2" data-toggle="dropdown" ng-disabled="true">
+                                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-32"></i>
+                                                            {{MainOrganizationProcedureObj.BranchObj.ClinicName}}
+                                                        </button>
+                                                        <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu2">
+                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                <span class="input-group-addon">
+                                                                    <span class="mainsearch-App">
+                                                                        <i class="fas fa-search"></i>
+                                                                    </span>
+                                                                </span>
+                                                                <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospitalTxt" />
+                                                            </div>
+                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                <ul>
+                                                                    <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospitalTxt}" ng-click="ChangeHospitalinProcedure(item)">
+                                                                        <a href="javascript:;">{{item.ClinicName}}</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group" typehead-dropdown-direction>
+                                                    <label>{{ 'CPTCODE' | translate}}</label><em>*</em>
+                                                    <!--<input type="text" class="form-control" rows="1" placeholder="Enter CPT Code"
+                                                    maxlength="10" ng-model="MainOrganizationProcedureObj.ProcedureCode"
+                                                    ng-disabled="masterProcedureBtnName === 'Update'"
+                                                    quotes-restrict enter-directive />-->
+
+                                                    <input type="text" maxlength="50"
+                                                           id="input_cptcode"
+                                                           ng-model="MainOrganizationProcedureObj.CPTCodeProcedureObj"
+                                                           typeahead-min-length="1"
+                                                           uib-typeahead="item as item.CPTCode+' - '+ item.ProcedureName for item in GetMasterCPTProcedure($viewValue)"
+                                                           typeahead-on-select="onSelectCptCodeProcedure(MainOrganizationProcedureObj.CPTCodeProcedureObj, MainOrganizationProcedureObj)"
+                                                           ng-change="ChangeCptCodeProcedure(MainOrganizationProcedureObj);"
+                                                           ng-disabled="MainOrganizationProcedureObj.OrganizationProcedureId != 0"
+                                                           placeholder="Enter CPT Code"
+                                                           quotes-restrict enter-directive />
+                                                    <!--<span style="font-size: 10px;" ng-show="MainOrganizationProcedureObj.ProcedureId != 0">Procedure Name : {{MainOrganizationProcedureObj.CPTCodeProcedureObj.ProcedureName}}</span>-->
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label for="inputEmail3" class="control-label">Procedure {{ 'TYPE' | translate}}<em>*</em></label>
+                                                    <select name="proclist-id" id="select_procedure"
+                                                            ng-model="MainOrganizationProcedureObj.ProcedurePayorPlanId"
+                                                            ng-options="item.ProcedurePayorPlanId as item.ProcedurePayorPlanName for item in PayorProcedureTypes"
+                                                            ng-change="changePayorPlanType(MainOrganizationProcedureObj.ProcedurePayorPlanId)"
+                                                            required>
+                                                        <option value="" ng-disabled="true"> {{ 'SELECTTYPE' | translate}}</option>
+                                                    </select>
+
+                                                    <!--<select name="proclist-id"
+                                                            ng-model="MainOrganizationProcedureObj.TypeOfServiceId"
+                                                            ng-options="item.ServicesTypeId as item.ServicesTypeName for item in TOSCodeList"
+                                                            required ng-disabled="MainOrganizationProcedureObj.OrganizationProcedureId != 0">
+                                                        <option value="" ng-disabled="true"> {{ 'SELECTTYPE' | translate}}</option>
+                                                    </select>-->
+                                                    <!-- ng-change="ChangeProcedureNameByType(masterProcedureObj.ServicesTypeId)"-->
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label> {{ 'PROCEDURECODE' | translate}}</label><em>*</em>
+                                                    <input type="text" rows="1" placeholder="Enter Code" id="input_pcode"
+                                                           ng-model="MainOrganizationProcedureObj.ProcedureCode"
+                                                           ng-disabled="MainOrganizationProcedureObj.OrganizationProcedureId != 0"
+                                                           quotes-restrict enter-directive />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{ 'PROCEDURENAME' | translate}}</label><em>*</em>                                              
+                                                    <input type="text" rows="1" placeholder="Enter Procedure Name" id="input_pname" 
+                                                           ng-model="MainOrganizationProcedureObj.ProcedureName" 
+                                                           ng-focus="proceduresFocus" ng-focus-lost="LostSettingsFocus()" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <div class="form__group">
+                                                    <label>{{'PROCEDUREDESCRIPTION' | translate}}</label>
+                                                    <input type="text" id="input_pdiscription" 
+                                                           ng-model="MainOrganizationProcedureObj.ProcedureDescription"
+                                                           placeholder="Enter Procedure Description" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{ 'GENERALCOST' | translate}}</label>
+                                                    <input type="text" id="input_generalcost" ng-model="MainOrganizationProcedureObj.GeneralCost" placeholder="Enter Cost" valid-number />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="form__group" typehead-dropdown-direction>
+                                                    <label>{{'MODIFIER' | translate}}</label>
+                                                    <input type="text" maxlength="10" id="input_modifierobj"
+                                                           ng-model="MainOrganizationProcedureObj.ModifierObj"
+                                                           typeahead-min-length="0"
+                                                           uib-typeahead="item as item.ModifierName for item in getModifier($viewValue)"
+                                                           typeahead-on-select="onSelectModifier(MainOrganizationProcedureObj.ModifierObj, MainOrganizationProcedureObj)"
+                                                           ng-change="ChangeModifier(MainOrganizationProcedureObj);"
+                                                           placeholder="Select Modifier "
+                                                           quotes-restrict enter-directive />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{'REVENUECODE' | translate}}</label>
+                                                    <input type="text" placeholder="Enter Revenue Code" id="input_revenuecode"
+                                                           ng-model="MainOrganizationProcedureObj.RevenueCode" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{'UNITVALUE' | translate}}</label>
+                                                    <input type="text" placeholder="Enter Unit Value" id="input_unitvalue"
+                                                           ng-model="MainOrganizationProcedureObj.UnitValue" numbers-only="numbers-only" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{ 'ANESTHESIABASE' | translate}}</label>
+                                                    <input type="text" placeholder="Enter Anesthesia Base" id="input_anesthesiavalue"
+                                                           ng-model="MainOrganizationProcedureObj.AnesthesiaValue" numbers-only="numbers-only" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <label>{{ 'NDCCODE' | translate}}</label>
+                                                    <input type="text" placeholder="Enter NDC Code" id="input_ndccode"
+                                                           ng-model="MainOrganizationProcedureObj.NDCCode" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                       
+                                            <td colspan="2">
+                                                <div class="form-group">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" id="3" value="" class="checkbox" 
+                                                               ng-model="MainOrganizationProcedureObj.MamographyCertificateRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="usc-remarks">Mammography Certificate required</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td colspan="2">
+                                                <div class="form-group">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" id="3" value="" class="checkbox" 
+                                                               ng-model="MainOrganizationProcedureObj.RefferingProviderRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">Requires Specification Of Referring Provider</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <div class="form-group">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" id="3" value="" class="checkbox"
+                                                               ng-model="MainOrganizationProcedureObj.CliaIDRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'CLIAMIDNUMBERREQUIRED' | translate}}</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td colspan="3">
+                                                <div class="form__group dis-flex">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" id="3" value="" class="checkbox"
+                                                               ng-model="MainOrganizationProcedureObj.PatientRecall">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'PATIENTRECALLTYPICALPERIODFORNEXTRECALLMONTHS' | translate}}</span>
+                                                    </label>
+                                                    <input type="text" class="form-control width-20 m-l-10" id="input_prdays" ng-model="MainOrganizationProcedureObj.PatientRecallDays" numbers-only="numbers-only" />
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                           
+                                                <div class="form__group dis-flex">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" id="3" value="" class="checkbox" ng-model="MainOrganizationProcedureObj.SlidingScaleRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'SLIDINGSCALESLIDINGSCALEMINIMUMCHARGE' | translate}}</span>
+                                                    </label>
+                                                    <input type="text" class="form-control width-20 m-l-10" id="input_ssamount" 
+                                                           ng-model="MainOrganizationProcedureObj.SlidingScaleAmount" numbers-only="numbers-only" />
+                                                </div>
+                                            </td>
+                                            <td colspan="3">
+                                                <div class="form__group dis-flex">
+                                                    <label class="cur-poiter">
+                                                        <input type="checkbox" class="checkbox" id="checkbox_applygp" ng-model="MainOrganizationProcedureObj.ApplyGlobalPeriod">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'APPLYGLOBALPERIODOF' | translate}} </span>
+                                                    </label>
+                                                    <input type="text" class="form-control width-20 m-l-10" id="input_applygpd" ng-model="MainOrganizationProcedureObj.ApplyGlobalPeriodDays" numbers-only="numbers-only" /> &nbsp;day(s)
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <div class="form__group">
+                                                    <label>{{ 'REMARKS' | translate}}</label>
+                                                    <textarea type="text" rows="2" id="textarea_notes" ng-model="MainOrganizationProcedureObj.Notes"
+                                                              maxlength="500" placeholder="Enter Notes"></textarea>
+                                                </div>
+                                            </td>
+                                            <td colspan="3" class="text-right">
+                                                <div class="m-t-25 dis-flex align-items-center justify-content-end grid-gap-10">
+                                                    <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                        <input type="checkbox" id="3" value="" class="checkbox" ng-model="MainOrganizationProcedureObj.IsFrequent">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'FREQUENT' | translate}}</span>
+                                                    </label>
+                                                    <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                        <input type="checkbox" id="3" value="" class="checkbox" ng-model="MainOrganizationProcedureObj.IsActive">
+                                                        <span class="lbl"></span>
+                                                        <span class="text-right usc-remarks">{{ 'ACTIVE' | translate}}</span>
+                                                    </label>
+
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-hide="MainOrganizationProcedureObj.OrganizationProcedureId != 0" ng-click="addUpdateMasterProcClick()" id="btn_save_p"><i class="action__icons--1 action__save--"></i>{{ 'SAVE' | translate}}</button>
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-hide="MainOrganizationProcedureObj.OrganizationProcedureId == 0" ng-click="addUpdateMasterProcClick()" id="btn_update_p"><i class="action__icons--1 action__update--"></i>{{ 'UPDATE' | translate}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--o" ng-click="CancelOrganProcedure()" id="btn_clear_p"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--f" ng-click="closeNewProcedure()" id="btn_cancel_p"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section__style--2 d__f-- fd__c-- height__100--">
+                <div class="section__header--">
+                    <h1>{{ 'PROCEDURESANDLISTS' | translate}}</h1>
+                    <button class="btn__lg-- btn__1d5558--f" ng-click="addNewProcedure()" ng-disabled="addedNewProcedure" id="btn_addnew_p"><i class="action__icons--1 action__add--"></i>Add New</button>
+                </div>
+                <div class="section__body--  height__100--">
+                    <div class="row nocolpad">
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="input__group">
+                                <label> {{ 'HOSPITALANDCLINIC' | translate}}</label>
+                                <div button-dropdown-direction>
+                                    <button class="form__control" type="button" id="dropdownMenu2" data-toggle="dropdown" ng-disabled="true">
+                                        <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-32"></i>
+                                        {{GetOrganizationProcedureObj.BranchObj.ClinicName}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospitalTxt" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospitalTxt}" ng-click="ChangesGetProcedureBranch(item);">
+                                                    <a href="javascript:;">{{item.ClinicName}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="form__group mb-0">
+                                <label>{{ 'CPTCODE' | translate}}</label>
+                                <input type="text" rows="1" placeholder="Enter CPT Code" ng-model="GetOrganizationProcedureObj.CPTCODE" />
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="form__group">
+                                <label for="inputEmail3">{{ 'TYPE' | translate}}</label>
+                                <select name="proclist-id"
+                                        ng-model="GetOrganizationProcedureObj.ServicesTypeId"
+                                        ng-options="item.ServicesTypeId as item.ServicesTypeName for item in TOSCodeList">
+                                    <option value="">Select Type</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="form__group">
+                                <label for="inputEmail3">Procedure {{ 'TYPE' | translate}}</label>
+                                <select name="proclist-id"
+                                        ng-model="GetOrganizationProcedureObj.ProcedurePayorPlanId"
+                                        ng-options="item.ProcedurePayorPlanId as item.ProcedurePayorPlanName for item in PayorProcedureTypes">
+                                    <option value="">Select Type</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="form__group">
+                                <label>{{ 'SEARCHTEXT' | translate}}</label>
+                                <input type="text" rows="1" placeholder="Enter Search Text" ng-model="GetOrganizationProcedureObj.SearchText" quotes-restrict enter-directive />
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="dis-flex align-items-center grid-gap-10 mt-20">
+                                <button class="btn__xl-- btn__1d5558--f" ng-click="GetOrganizationProcedure(1);"><i class="action__icons--1 action__search--"></i>{{ 'SEARCH' | translate}}</button>
+                                <button class="btn__xl-- btn__C71D27--o" ng-click="ClearOrganizationProcedure()"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-show="GetOrganizationProcedureList.length > 0">
+                        <div class="col-lg-12">
+                            <div class="overflow__auto-- slim-scroll">
+                                <table class="table__style--7 w__mc-- min__width100-- max__wnone--" id="s_r_procedures_list">
+                                    <thead>
+                                        <tr>
+                                            <th width="30%">{{ 'PROCEDURENAME' | translate}}</th>
+                                            <th width="8%">Services Type</th>
+                                            <th width="8%">Procedure Type</th>
+                                            <th width="7%">{{ 'COST' | translate}}</th>
+                                            <th ng-show="SpecializationId != 2">CPT Code</th>
+                                            <th ng-show="SpecializationId != 2">Procedure Code</th>
+                                            <!--<th>
+                                                <select class="b-0 width-100" ng-model="OrgListObj" ng-change="changeOrgFilterBranch(OrgListObj)" ng-options="item as item.ClinicName for item in OnlyAllBranchesList"></select>
+                                            </th>-->
+                                            <th>{{ 'BRANCH' | translate}}</th>
+                                            <!--<th>General</th>
+                                            <th>Max Disc.</th>-->
+                                            <th>{{ 'NOTES' | translate}}</th>
+                                            <th>{{ 'STATUS' | translate}}</th>
+                                            <th width="5%" class="table-sticky-column-right">{{ 'ACTION' | translate}}</th>
+                                            <!--<th width="60px" ng-if="RoleId===4 || RoleId===11">Edit</th>
+                                            <th width="60px" ng-if="RoleId===4 || RoleId===11">Delete</th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in GetOrganizationProcedureList">
+                                            <td>
+                                                {{item.ProcedureName}}
+                                                <input type="checkbox" id="3" value="" class="checkbox" ng-model="item.IsFrequentInd" ng-click="ChangeProcedureFrequentStatus(item, item.IsFrequentInd)" title="Frequent ">
+                                                <span class="lbl"></span>
+                                            </td>
+                                            <td>{{item.ServicesTypeName}}</td>
+                                            <td>{{item.ProcedurePayorPlanName}}</td>
+                                            <td>{{item.GeneralCost}}</td>
+                                            <td>{{item.CPTCode}}</td>
+                                            <td>{{item.ProcedureCode}}</td>
+                                            <td>{{item.OrganizationName}}</td>
+                                            <!--<td>{{item.ProcedureGeneralCost}}</td>
+                                            <td>
+                                                <span ng-if="item.ProcedureMaxDiscountType == 'A'">{{item.ProcedureMaxDiscountValue}}</span>
+                                                <span ng-if="item.ProcedureMaxDiscountType == 'P'">{{item.ProcedureGeneralCost*item.ProcedureMaxDiscountValue/100}}</span>
+                                            </td>-->
+                                            <td>{{item.Notes}}</td>
+                                            <td class="text-center column__sm">
+                                                <div ng-if="item.IsActive" class="dis-flex align-items-center grid-gap-5">
+                                                    <i class="fa fa-toggle-on pactive"
+                                                       ng-click="ChangesActiveStatusForProcedure(item, false);">
+                                                    </i>{{ 'ACTIVE' | translate}}
+
+                                                </div>
+                                                <div ng-if="!item.IsActive" class="dis-flex align-items-center grid-gap-5">
+                                                    <i class="fa fa-toggle-on fa-rotate-180 pinactive"
+                                                       ng-click="ChangesActiveStatusForProcedure(item, true);">
+                                                    </i>{{ 'INACTIVE' | translate}}
+                                                </div>
+                                            </td>
+                                            <td class="text-center column__sm table-sticky-column-right">
+                                                <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="editMasterTreatItem1(item,$index)"></i></a>
+                                                <a scroll-to-item="" scroll-to="" class="cur-poiter"></a>
+                                                <!--<a class="cur-poiter" alt="delete" data-tooltip="Delete" data-original-title="" title="" ng-click="deleteMasterTreatItem(item,$index)">
+                                                    <img width="17" src="img/ico-delete-red.svg">
+                                                </a>-->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="EH-pagination text-center">
+                                <uib-pagination total-items="GetOrganizationProcedureObj.TempCount"
+                                                ng-model="GetOrganizationProcedureObj.PageNumber"
+                                                ng-change="MasterProcedurePagechanged(GetOrganizationProcedureObj.PageNumber)"
+                                                ng-show="GetOrganizationProcedureList.length > 0"
+                                                max-size="GetOrganizationProcedureObj.PageSize"
+                                                class=""
+                                                boundary-link-numbers="true"
+                                                rotate="false"></uib-pagination>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-hide="GetOrganizationProcedureList.length > 0">
+                        <a><i class="nodata__1-- e2__nodata--1"></i></a>
+                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Results Found</h1>
+                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please add procedures to display them here.</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

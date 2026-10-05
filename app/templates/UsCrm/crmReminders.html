@@ -1,0 +1,2011 @@
+<link href="js/angularEventCalender/docs/docs.css" rel="stylesheet">
+<link href="js/angularEventCalender/dist/css/angular-bootstrap-calendar.min.css" rel="stylesheet">
+
+<div class="d__f-- fd__c-- gap__5-- h-100 bg__FFFFFF-- height__100--" id="new-calenderas" ng-controller="UsCrmRemindersListCtrl">
+    <div class="row height__100--">
+        <div class="col-lg-12 p-0 height__100--">
+            <div class="d__f-- fd__c-- gap__5-- height__100-- bg__FFFFFF--">
+                <div class="p__5-- bb__dcdcdc--">
+                    <div class="d__f-- jc__sb-- ai__c--">
+                        <label class="fs__xl-- fw__6-- tc__000-- pl__10--">Reminders List</label>
+                        <div class="d__f-- ai__c-- gap__x--8 width__75--">
+                            <div class="d__f-- ai__c-- gap__x--8">
+                                <div class="d__ib--">
+                                    <input type="radio" class="radio-custom width-0" id="CalNameId" name="patSearchType" ng-value="1" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="1">
+                                    <label for="CalNameId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'NAME' | translate}}</label>
+                                </div>
+                                <div class="d__ib--">
+                                    <input type="radio" class="radio-custom width-0" id="CalmrMobileId" name="patSearchType" ng-value="2" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="2">
+                                    <label for="CalmrMobileId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'MRNO' | translate}}</label>
+                                </div>
+                            </div>
+                            <div class="flex width__40--">
+                                <div class="position__relative--">
+                                    <input type="text" class="input__style--1 text-capitalize icons-search" placeholder="{{ 'SEARCHBYNAME' | translate}}" ng-show="patSearchType === 1" ng-class="(SearchObj.searchPatientTxt =='' && SearchObj.searchPatientIdTxt =='') ? 'icons-search' : ''" ng-model="SearchObj.searchPatientTxt" ng-change="onChangeSearchApptinCal(SearchObj.searchPatientTxt,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientTxt,patSearchType)">
+                                    <input type="text" class="input__style--1 text-capitalize icons-search" placeholder="{{ 'SEARCHBYMRNO' | translate}}" ng-show="patSearchType === 2" ng-class="(SearchObj.searchPatientTxt =='' && SearchObj.searchPatientIdTxt =='') ? 'icons-search' : ''" ng-model="SearchObj.searchPatientIdTxt" ng-change="onChangeSearchApptinCal(SearchObj.searchPatientIdTxt,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientIdTxt,patSearchType)">
+                                    <!--<input type="text" class="bg-inputy text-capitalize" placeholder="{{ 'SEARCHBYOLDMRNO' | translate}}" ng-show="patSearchType === 3" ng-model="SearchObj.searchPatientOldMR" ng-change="onChangeSearchApptinCal(SearchObj.searchPatientOldMR,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientOldMR,patSearchType)">-->
+                                    <!--<button type="button"  role="button" tabindex="0"><i class="fas fa-backspace"></i></button>-->
+                                    <a class="position__absolute-- top-6 right-5 b__0--" ng-hide="SearchObj.searchPatientTxt =='' && SearchObj.searchPatientIdTxt =='' && SearchObj.searchPatientOldMR ==''" ng-click="clearPatientApptSearch()" role="button" tabindex="0"><i class="icons__w16-- cancel__w16--o"></i></a>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn__lg-- btn__1d5558--o" ng-show="patSearchType === 1" ng-click="changePatientApptSearchText(SearchObj.searchPatientTxt,patSearchType)">{{ 'SEARCH' | translate}}</button>
+                                <button type="button" class="btn__lg-- btn__1d5558--o" ng-show="patSearchType === 2" ng-click="changePatientApptSearchText(SearchObj.searchPatientIdTxt,patSearchType)">{{ 'SEARCH' | translate}}</button>
+                            </div>
+                            <!--<div ng-if="UserAccessRights.AllAccessRights.CRMReminderBookAppointmentbutton">
+        <button class="appointment-filter-button" ng-click="navtoBookAppointmentv2()" ng-disabled="disableBookApptbtn"> {{ 'BOOKAPPT' | translate}}</button>
+    </div>-->
+                            <div ng-show="UserAccessRights.AllAccessRights.CRMReminderOldBookAppointment">
+                                <button class="btn__lg-- btn__1d5558--f" ng-click="navtoBookAppointmentv2()" ng-disabled="disableBookApptbtn" title="Book Appointment"> {{ 'BOOKAPPT' | translate}}</button>
+                            </div>
+                            <div ng-show="UserAccessRights.AllAccessRights.CRMReminderBookAppointmentbutton">
+                                <button class="btn__lg-- btn__1d5558--f" ng-click="navtoBookAppointmentv2('crm')" ng-disabled="disableBookApptbtn" title="New Book Appointment"> New {{ 'BOOKAPPT' | translate}} </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px__12--">
+                    <table class="table tableno-bordered tableno-padding m-0">
+                        <tbody>
+                            <tr>
+                                <td width="12%">
+                                    <div class="form__group">
+                                        <label> {{ 'FROMDATE' | translate}}</label>
+                                        <input type="text" class="icons-calendar" ng-model="SearchObj.FromDate" datepickerforapplist ng-change="changeFromDate(SearchObj.FromDate,SearchObj.ToDate)" readonly />
+                                    </div>
+                                </td>
+                                <td width="12%">
+                                    <div class="form__group">
+                                        <label> {{ 'TODATE' | translate}}</label>
+                                        <input type="text" class="icons-calendar" ng-model="SearchObj.ToDate" datepickerforapplist ng-change="changeToDate(SearchObj.FromDate,SearchObj.ToDate)" readonly />
+                                    </div>
+                                </td>
+                                <td width="14%">
+                                    <div class="form__group">
+                                        <label>Location</label>
+                                        <div class="dropdown" button-dropdown-direction>
+                                            <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                                <!--{{AppListselectedclinic.ClinicName}}-->
+                                                {{LocationTypeObj.SelectLocationString}}
+                                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                <div class="p-5">
+                                                    <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li ng-repeat="item in AppListdoctoraddress | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="ChangeRemainderBranch(item)">
+                                                                <span class="lbl"></span>
+                                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="14%">
+                                    <div class="form__group">
+                                        <label>{{ 'USER' | translate}}</label>
+                                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                            <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="userLoginDetails.RoleID === 1" title="{{selectedUsers}}">
+                                                {{selectedUsers}}
+                                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                <div class="p-5">
+                                                    <input type="text" class="input-sm bg-inputy width__100--" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt2" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li>
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="SearchObj.AllUsersCheck" ng-click="checkAllUsers(SearchObj.AllUsersCheck)">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small>  {{ 'ALLUSERS' | translate}}</small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                        <li ng-repeat="item in MultiselectUserlist | filter:{'DoctorfullNamewithNPI':searchtxtb.txt2}">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="UsersToggle(item);">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small ng-bind="item.FullName + '-' + item.NPI"></small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="14%" ng-if="SearchObj.ReminderTypeID != 1">
+                                    <div class="form__group ">
+                                        <label>{{ 'DOCTOR' | translate}}</label>
+                                        <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                            <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="userLoginDetails.RoleID === 1 && (!connectedUserObj.Available || connectedUserObj.Users.length == 0)" title="{{selectedDoctors}}">
+                                                {{selectedDoctors}}
+                                                <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app left-auto right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                <div class="p-5">
+                                                    <input type="text" class="input-sm bg-inputy width__100--" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li>
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheck" ng-click="checkAllDoctor(AllDoctorsObj.AllDoctorCheck)">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small>All Doctor</small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                        <li ng-repeat="item in MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtb.txt1}">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="14%">
+                                    <div class="form__group">
+                                        <label>Reminder Type</label>
+                                        <select ng-model="SearchObj.ReminderTypeID"
+                                                ng-options="item.Type as item.Name for item in ReminderTypes">
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="12%">
+                                    <div class="form__group">
+                                        <label>Reminder Status</label>
+                                        <select ng-model="SearchObj.ReminderStatusId" ng-options="item.Type as item.Name for item in ReminderStatusTypes"> </select>
+                                    </div>
+                                </td>
+                                <td width="10%">
+                                    <div class="form__group">
+                                        <label>Priority</label>
+                                        <select ng-model="SearchObj.PriorityStatus"
+                                                ng-options="item.PriorityId as item.PriorityName for item in MasterPriority" ng-change="OnselectAllPriorityStatus(SearchObj.PriorityStatus)">
+                                        </select>
+                                    </div>
+                                </td>
+                                <td width="8%">
+                                    <div class="form__group d__f-- gap__10--x mt__20--">
+                                        <button class="btn__lg-- btn__1d5558--f" title="Search" ng-click="SearchList()">{{ 'APPLY' | translate}}</button>
+                                        <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" role="button" tabindex="0" title="Clear Filters" ng-click="ClearAppointmentDates()">Reset<i class="icons__w16-- refresh__w16--o"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="position__relative-- height__100-- mx__10--">
+                    <div class="adjustable-position slim-scroll">
+                        <div class="d__f-- fd__c-- height__100-- pb__5--">
+                            <table class="table__style--20 table__row--hover bc__c--"  ng-show="filteredAppointmentArray.length!== 0">
+                                <thead>
+                                    <tr>
+                                        <th width="5%" class="text-center position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">S.No</label>
+                                        </th>
+                                        <th width="20%" class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Patient Details</label>
+                                        </th>
+                                        <th class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Doctor & Visit Reason</label>
+                                        </th>
+                                        <th class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Type</label>
+                                        </th>
+                                        <th width="12%" class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Date & Status</label>
+                                        </th>
+                                        <th class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Created By</label>
+                                        </th>
+                                        <th class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Priority</label>
+                                        </th>
+                                        <th width="10%" class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Remarks</label>
+                                        </th>
+                                        <th width="5%" class="position__sticky-- top__0--">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Actions</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="row in filteredAppointmentArray" ng-show="filteredAppointmentArray.length!== 0">
+                                    <tr ng-class="!$last ? 'bb__DDD--' : ''" class="c__p-- hover__f2f2f2--f" ng-if="IsDynamicCheckInMandatory">
+                                        <td class="text-center" ng-show="!isQUeueManagementEnabled">
+                                            <div class="d__f-- fd__c-- gap__5-- ai__c--">
+                                                <span class="fw__5-- fs__lg-- tc__4A4A4A-- fs__normal--" ng-click="ChangeSubcontentNew(row)">{{row.Sno}}</span>
+                                                <div class="d__f-- ai__c-- gap__x--2">
+                                                    <img src="img/appt-list/phone-incoming.svg" width="13" ng-if="row.BookingTypeId===3" />
+                                                    <img src="img/appt-list/app-walkin.svg" height="13" ng-if="row.BookingTypeId===1" />
+                                                    <img src="img/appt-list/app-online.svg" height="13" ng-if="row.BookingTypeId===2" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-left cur-poiter" ng-click="ChangeSubcontent(row)">
+                                            <div class="d__f-- fd__c-- jc__c--">
+                                                <div class="d__f-- ai__c-- width__80-- gap__10--x show__popover--">
+                                                    <label class="fw__6-- fs__xl-- tc__1D1D1D-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{row.PatientDetails.FullName}}"> {{row.PatientDetails.FullName | textUpperCase}}</label>
+                                                    <div popover-template="'templates/UIBPopovers/UspatientProfileBasicPopover.html'" popover-data="row.PatientDetails" popover-class="opprofile__popover" dynamic-us-patient-profile-basic-popover>
+                                                        <a>
+                                                            <i class="icons__w16-- drawarrow__w16--o"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="d__f--">
+                                                    <span title="{{row.PatientDetails.PatientDisplayId}}" class="fs__lg-- fw__5-- tc__F37123-- no-wrapappt">{{row.PatientDetails.PatientDisplayId}} | </span>
+                                                    <span class="tc__4A4A4A-- cur-poiter fs__lg-- fw__4--">
+                                                        {{row.PatientDetails.DOB |date:'MM-dd-yyyy'}} </span>
+                                                </div>
+
+                                                <ul class="d__f-- ai__c-- gap__5-- list__unstyled-- m__0--">
+                                                    <li>
+                                                        <label class="tc__4A4A4A-- cur-poiter fs__lg-- fw__4--">
+                                                            {{row.PatientDetails.MobileNoformate}}
+                                                        </label>
+                                                    </li>
+                                                    <li ng-repeat="Aitem in row.PatientTagList track by $index" ng-if="item.HospitalEquipmentId !== 17 && item.HospitalEquipmentId !== 18" ng-class="Aitem.HospitalEquipmentId===17 || Aitem.HospitalEquipmentId===18 || Aitem.HospitalEquipmentId===21 || Aitem.HospitalEquipmentId===22 || Aitem.HospitalEquipmentId===23 || Aitem.HospitalEquipmentId===26? 'b-0 bg-none width__auto--' : ''">
+                                                        <i ng-if="Aitem.HospitalEquipmentId===1  || Aitem.HospitalEquipmentId=== 25" class="icons__w16-- wheelchair__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===2" class="icons__w16-- autism__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===3" class="icons__w16-- hearing__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===4" class="icons__w16-- oneeye__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===6" class="icons__w16-- heartdisease__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===5" class="icons__w16-- anxiety__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===7  || Aitem.HospitalEquipmentId===24" class="icons__w16-- vip__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===8" class="icons__w16-- epllepsy__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===9" class="icons__w16-- emotional__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===10" class="icons__w16-- alzheimer__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===11" class="icons__w16-- blood__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===12" class="icons__w16-- supportstick__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===13" class="icons__w16-- boat__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===14" class="icons__w16-- newborn__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===15" class="icons__w16-- oxygenmask__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <i ng-if="Aitem.HospitalEquipmentId===16" class="icons__w16-- publictransport__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                        <!-- <i ng-if="Aitem.HospitalEquipmentId===17" class="icons__w16-- hiv__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>
+                                                             <i ng-if="Aitem.HospitalEquipmentId===18" class="icons__w16-- hep__w16--" title="{{Aitem.HospitalEquipmentName}}"></i>-->
+                                                        <i class="icons__w16-- hep__w16--" ng-if="Aitem.HospitalEquipmentId===26" title="HOH"></i>
+                                                        <span class="px__6-- py__2-- br__100-- text-center bg__A5884F-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="Aitem.HospitalEquipmentId===19" title="{{Aitem.HospitalEquipmentName}}">{{Aitem.HospitalEquipmentName}}</span>
+                                                        <span class="px__6-- py__2-- br__100-- text-center bg__9D9D4D-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="Aitem.HospitalEquipmentId===20" title="{{Aitem.HospitalEquipmentName}}">{{Aitem.HospitalEquipmentName}}</span>
+                                                        <span class="px__6-- py__2-- br__100-- text-center bg__537ACF-- fs__sm-- lh__16-- tc__FFFFFF--" ng-if="Aitem.HospitalEquipmentId===21">ICL</span>
+                                                        <span class="px__6-- py__2--  fs__sm-- lh__16-- br__100-- text-center bg__D35DE7-- tc__FFFFFF--" ng-if="Aitem.HospitalEquipmentId===22">Durysta</span>
+                                                        <span class="px__6-- py__2--  fs__sm-- lh__16-- br__100-- text-center bg__71585B-- tc__FFFFFF--" ng-if="Aitem.HospitalEquipmentId===23">LASIK</span>
+                                                    </li>
+                                                </ul>
+
+                                                <label class="tc__4A4A4A-- cur-poiter fs__lg-- fw__4-- no-wrapappt" title="{{row.PatientDetails.Location}}" ng-show="row.PatientDetails.Location !== ''">
+                                                    {{row.PatientDetails.Location}}
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d__f-- fd__c--">
+                                                <label class="tc__4A4A4A-- fs__lg-- fw__5--">{{row.DoctorFullName}}</label>
+                                                <span class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.VisitReasonName}}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.ReminderType}}</label>
+                                        </td>
+                                        <td>
+                                            <div class="d__f-- fd__c--">
+                                                <label class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.ReminderDate  | date:'MM-dd-yyyy'}}</label>
+                                                <span class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.ReminderStatus}}</span>
+                                                <label class="tc__4A4A4A-- fs__lg-- fw__5--" ng-show="row.ReminderAppointmentDate!=''">appt date:</label><span>{{row.ReminderAppointmentDate  | date:'MM-dd-yyyy'}}</span>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <label class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.CreatedBy}}</label>
+                                        </td>
+                                        <td>
+                                            <label class="tc__4A4A4A-- fs__lg-- fw__4--">{{row.PriorityName}}</label>
+                                        </td>
+                                        <td>
+                                            <label class="tc__4A4A4A-- fs__lg-- fw__4-- no-wrapappt cur-poiter" title="{{row.ReminderRemarks}}">  {{row.ReminderRemarks}}</label>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d__f-- jc__c-- ai__c--">
+                                                <a href="javascript:;" ng-click="ClickRemindersPopup(row);" class="cur-poiter">
+                                                    <i class="icons__w16-- edit__w16--o"  tooltip-placement="top" uib-tooltip="Edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                            <table class="table__style--20 height__100--" ng-show="filteredAppointmentArray.length == 0 || SearchPatientfilter.IsPatientNameInd == true">
+                                <thead >
+                                    <tr>
+                                        <th width="5%" >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">S.No</label>
+                                        </th>
+                                        <th width="20%" >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Patient Details</label>
+                                        </th>
+                                        <th >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Doctor & Visit Reason</label>
+                                        </th>
+                                        <th >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Type</label>
+                                        </th>
+                                        <th width="12%" >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Date & Status</label>
+                                        </th>
+                                        <th >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Created By</label>
+                                        </th>
+                                        <th width="10%" >
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Remarks</label>
+                                        </th>
+                                        <th width="5%">
+                                            <label class="fs__md-- fw__5-- tc__1D1D1D--">Actions</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                                <a><i class="nodata__1-- c1__nodata--1"></i></a>
+                                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Reminders Added</h1>
+<!--                                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">You haven’t created any reminders yet. Add one to keep track of follow-ups, medications, or patient actions.</label>
+-->                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                            <span class="popover-overlay" ng-show="popoveropenoverlay"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="refdoc" ng-show="cancelAppPopup || CancelAppointmentobj.Ispopup"></div>
+<div class="modal-common" ng-show="cancelAppPopup || CancelAppointmentobj.Ispopup" id="cancelAppModal">
+    <div class="modal-common-dialog w-600">
+        <div class="model-popup-header">
+            <h4 class="modal-title" id="myModalLabel"> {{ 'CANCELAPPOINTMNT' | translate}}</h4>
+            <a id="close_popup" ng-click="closeCancelPopup()" class="light-font pull-right fclosepopup m-t-0">x</a>
+        </div>
+        <form name="Cancelform" class="bg-white" novalidate>
+            <div class="form_wrapper">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger mt-10">
+                            <p>  {{ 'AREYOUSUREYOUWANTTOCANCELTHISAPPOINTMENTFOR' | translate}} </p>
+                            <!--<p> Are you sure you want to cancel the appointment?</p>-->
+                        </div>
+
+                        <div class="form__group">
+                            <table class="table tableno-bordered m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            {{Patientname}}
+                                        </td>
+                                        <td>
+                                            {{AppointmentDate_Time | date:'MMM dd yyyy, hh:mm a'}}
+                                        </td>
+                                        <td>
+                                            Dr.{{DoctorFullName}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form__group">
+                            <label for="recipient-name" class="control-label"> {{ 'REASONFORCANCELLATION' | translate}}</label>
+
+                            <select class="form-control" ng-model="CancelAppointmentobj.CancelReason"
+                                    ng-options="item.CancelReason as item.CancelReason for item in CancelAppointmentobj.CancelAppReason">
+                                <option value="" ng-selected="true"> {{ 'SELECTCANCELREASON' | translate}}</option>
+                                <!--<option ng-repeat="item in CancelAppointmentobj.CancelAppReason" value="{{item.CancelReason}}">{{item.CancelReason}}</option>-->
+                            </select>
+                            <input type="text" class="form-control mt-10" ng-model="CancelAppointmentobj.OtherCancelReason" placeholder="{{ 'ENTEROTHERCANCELREASON' | translate}}" ng-show="CancelAppointmentobj.CancelReason == 'Others'" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p class="m-0"><label> {{ 'SENDSMSTO' | translate}}</label></p>
+                        <div class="form__group">
+                            <div class="checkbox cn mr-10">
+                                <label>
+                                    <input name="checkbox-1" type="checkbox" ng-model="sendDocSms" />
+                                    <span class="checkbox-material">
+                                        <span class="check"></span>
+                                    </span>
+                                    <small> {{ 'DOCTOR' | translate}}</small>
+                                </label>
+                            </div>
+                            <!-- / -->
+                            <div class="checkbox cn">
+                                <label>
+                                    <input name="checkbox-1" type="checkbox" ng-model="sendPatientSms" />
+                                    <span class="checkbox-material">
+                                        <span class="check"></span>
+                                    </span>
+                                    <small> {{ 'PATIENT' | translate}}</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <p class="m-0"><label>{{ 'SENDEMAILTO' | translate}}</label></p>
+                        <div class="form__group">
+                            <div class="checkbox cn mr-10">
+                                <label>
+                                    <input name="checkbox-1" type="checkbox" ng-model="sendDocEmail" />
+                                    <span class="checkbox-material">
+                                        <span class="check"></span>
+                                    </span>
+                                    <small> {{ 'DOCTOR' | translate}}</small>
+                                </label>
+                            </div>
+                            <!-- / -->
+                            <div class="checkbox cn">
+                                <label>
+                                    <input name="checkbox-1" type="checkbox" ng-model="sendPatientEmail" />
+                                    <span class="checkbox-material">
+                                        <span class="check"></span>
+                                    </span>
+                                    <small> {{ 'PATIENT' | translate}}</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pull-right cancel-app">
+                    <div class="col-md-12 col-sm-12 col-xs-12 mb-10 mt-5">
+                        <button class="btn danger-btn light-font" ng-click="closeCancelPopup()">  {{ 'NO' | translate}}</button>
+                        <button class="btn primary-btn" ng-click="Update(Cancelform,CancelAppointmentobj.CancelReason,CancelAppointmentobj.OtherCancelReason)"> {{ 'YES' | translate}} </button>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+
+
+
+<script type="text/ng-template" id="ViewAvaliableSlots.html">
+    <!--<div class="modal-header">
+        <h4 class="modal-title">Room Selection</h4>
+    </div>-->
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="patients-profile clearfix">
+                    <ul>
+
+                        <li>
+                            <h3><i class="fas fa-user"></i>  {{ 'PATIENTNAME' | translate}}</h3>
+                            <p><span>{{Patientlistdata.PatientDetails.Title}} .</span> <span>{{Patientlistdata.PatientDetails.FullName}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-barcode"></i> {{ 'MRNO' | translate}}</h3>
+                            <p><span>{{Patientlistdata.PatientDetails.PatientDisplayId}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-venus-mars"></i> {{ 'AGEANDGENDER' | translate}}</h3>
+                            <p ng-if="Patientlistdata.PatientDetails.AgeInYears!=0"> <span>{{Patientlistdata.PatientDetails.AgeInYears}}Y</span><span>{{Patientlistdata.PatientDetails.AgeInMonths}}M</span>| <span>{{Patientlistdata.PatientDetails.Gender}}</span></p>
+                            <p ng-if="Patientlistdata.PatientDetails.AgeInYears ===0"> <span>{{Patientlistdata.PatientDetails.AgeInMonths}}M</span> <span>{{Patientlistdata.PatientDetails.AgeInDays}}D</span>| <span>{{Patientlistdata.PatientDetails.Gender}}</span></p>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- / -->
+        <div class="row m-t-10">
+            <div class="col-lg-4">
+                <div class="form__group">
+                    <label>{{ 'SELECTROOMTYPE' | translate}}<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.RoomTypeobj"
+                            ng-change="ChangesDynamicRoomType(RoomSearchObj.RoomTypeobj)"
+                            ng-options="item as item.Name for item in RoomTypeList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===2">
+                <div class="form__group">
+                    <label>{{ 'OPTOMETRIST' | translate}}<em>*</em></label>
+
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Opthamobj"
+                            ng-change="ChangesOptham(RoomSearchObj.Opthamobj)"
+                            ng-options="item as item.FullName for item in AllOpthaList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===3">
+                <div class="form__group">
+                    <label>{{ 'DILATION' | translate}}<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.DilationAssistantobj"
+                            ng-change="ChangesDilation(RoomSearchObj.DilationAssistantobj)"
+                            ng-options="item as item.FullName for item in AllDilationList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===4">
+                <div class="form__group">
+                    <label>{{ 'COUNSELLOR' | translate}}<em>*</em></label>
+
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Counsellorobj"
+                            ng-change="ChangesCounsellor(RoomSearchObj.Counsellorobj)"
+                            ng-options="item as item.FullName for item in AllCounsollerList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===5">
+                <div class="form__group">
+                    <label>{{ 'INVESTIGATION' | translate}}<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Technicianobj"
+                            ng-change="ChangesTechnician(RoomSearchObj.Technicianobj)"
+                            ng-options="item as item.FullName for item in AllTechnicianList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===8">
+                <div class="form__group">
+                    <label>{{ 'AR' | translate}}<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.ARobj"
+                            ng-change="ChangesAR(RoomSearchObj.ARobj)"
+                            ng-options="item as item.FullName for item in AllARList">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form__group" ng-show="RoomSearchObj.RoomTypeId !==7">
+                    <label>{{ 'SELECTROOM' | translate}}<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Roomobj"
+                            ng-change="ChangesRoom(RoomSearchObj.Roomobj)"
+                            ng-options="item as item.RoomName for item in RoomListarray">
+                        <option value="">{{ 'SELECT' | translate}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer text-right">
+        <button class="btn btn-danger p-l-25 p-r-25" ng-click="closeAvaliableSlots()">{{ 'CLOSE' | translate}}</button>
+        <button class="btn btn-success p-l-25 p-r-25" ng-click="AddToWaitingRoom()">{{ 'SAVE' | translate}}</button>
+    </div>
+</script>
+<script type="text/ng-template" id="sendToTemplate1.html">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <table class="table m-b-0">
+                    <tbody>
+                        <tr>
+                            <td class="border-right b-t-0" width="30%">
+                                <fieldset>
+                                    <div>
+                                        <input type="radio" class="radio-custom width-0" id="" name="" value="1">
+                                        <label for="" class="radio-custom-label cur-poiter mb-0"> {{ 'DOCTORNAME' | translate}}</label>
+                                    </div>
+                                    <div class="m-t-10">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" value="1">
+                                        <label for="" class="radio-custom-label cur-poiter mb-0">{{ 'OPTOMETRIST' | translate}}</label>
+                                    </div>
+                                    <div class="m-t-10">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" value="1">
+                                        <label for="" class="radio-custom-label cur-poiter mb-0">{{ 'DILATION' | translate}}</label>
+                                    </div>
+                                    <div class="m-t-10">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" value="1">
+                                        <label for="" class="radio-custom-label cur-poiter mb-0">{{ 'COUNSELLOR' | translate}}</label>
+                                    </div>
+                                    <div class="m-t-10">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" value="1">
+                                        <label for="" class="radio-custom-label cur-poiter mb-0">{{ 'AR' | translate}}</label>
+                                    </div>
+                                </fieldset>
+                            </td>
+                            <td class="b-t-0">
+                                <div class="form__group">
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" />
+                                </div>
+                                <div class="SelectDoctorSendto">
+                                    <ul class="over-scrol-y h-225">
+                                        <li ng-repeat="i in [1,2,3,4,5,6,7,8,9]">
+                                            <a href="javascript:;"><i class="fas fa-user-md fs-12 text-info"></i>  {{ 'DOCTORNAME' | translate}}</a>
+                                        </li>
+                                        <li ng-repeat="i in [1,2,3,4,5,6,7,8,9]">
+                                            <a href="javascript:;"><i class="fas fa-user-md fs-12 text-info"></i>  {{ 'DOCTORNAME' | translate}}</a>
+                                        </li>
+                                        <li ng-repeat="i in [1,2,3,4,5,6,7,8,9]">
+                                            <a href="javascript:;"><i class="fas fa-user-md fs-12 text-info"></i>  {{ 'DOCTORNAME' | translate}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="dis-flex align-items-center justify-space-between bt-1 p-t-5">
+                                    <div>
+                                        <div class="btn-group" role="group" aria-label="...">
+                                            <button type="button" class="btn btn-warning">{{ 'AC' | translate}}</button>
+                                            <button type="button" class="btn btn-default">{{ 'NONAC' | translate}}</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-ehnote p-l-25 p-r-25">{{ 'SEND' | translate}}</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="sendToTemplate.html">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-lg-12 p-0">
+                <table class="table m-b-0">
+                    <tbody>
+                        <tr>
+                            <td class="border-right b-t-0" width="30%">
+                                <fieldset>
+                                    <div class="m-t-3 dis-flex" ng-repeat="item in RoomTypeList" ng-if="item.Id != 7">
+                                        <input type="radio" class="form-control w-15" id="normal3{{$index}}" name="normal3" ng-value="{{item.Id}}" ng-model="RoomSearchObj.RoomTypeobj" ng-change="ChangesRoomType(RoomSearchObj.RoomTypeobj)">
+                                        <label for="normal3{{$index}}" class="radio-custom-label m-t-7 cur-poiter mb-0">{{item.Name}}</label>
+                                    </div>
+                                </fieldset>
+                            </td>
+                            <td class="b-t-0 p-t-0 p-b-0">
+                                <div class="billing-cominsoon text-center" ng-if="RoomSearchObj.RoomTypeId ===0">
+                                    <img src="img/no-data/no-doctor-care.png">
+                                    <div class="msg">
+                                        <p class="goback-text"> {{ 'PLEASESELECTPROVIDERTOSHOWTHEDATA' | translate}}</p>
+                                        <p class="no-records-txt-line2">
+                                            {{ 'NOPROVIDERYOUHAVESELECTED' | translate}}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="form__group">
+                                    <!--<input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===1" ng-model="searchfilterforRoom.txt1" />-->
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===2" ng-model="searchfilterforRoom.txt2" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId === 8" ng-model="searchfilterforRoom.txt8" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===3" ng-model="searchfilterforRoom.txt3" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===4" ng-model="searchfilterforRoom.txt4" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===5" ng-model="searchfilterforRoom.txt5" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===9" ng-model="searchfilterforRoom.txt9" />
+                                    <input class="form-control" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===10" ng-model="searchfilterforRoom.txt10" />
+                                </div>
+                                <div class="well p-6 bg-warning m-b-5" ng-show="RoomSearchObj.SelectDoctor!=''">
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===1">{{ 'DOCTOR' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===2">{{ 'OPTOMETRIST' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===8">{{ 'AR' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===3">{{ 'DILATION' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===4">{{ 'COUNSELLOR' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===5">{{ 'INVESTIGATION' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===9">{{ 'BILLING' | translate}}: </span>
+                                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===10">{{ 'RECEPTION' | translate}}: </span>
+                                    <b>{{RoomSearchObj.SelectDoctor}}</b>
+                                </div>
+                                <div class="SelectDoctorSendto">
+                                    <!--<ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===1">
+                                        <li ng-repeat="item in AllDoctorList | filter:{'FullName': searchfilterforRoom.txt1} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesRoomDoctor(item)"><i class="fas fa-user-md fs-12"></i> {{item.FullName}}</a>
+                                        </li>
+                                    </ul>-->
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===2">
+                                        <li ng-repeat="item in AllOpthaList | filter:{'FullName':searchfilterforRoom.txt2} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesOptham(item)"><i class="fas fa-user-md fs-12"></i>  {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId === 8">
+                                        <li ng-repeat="item in AllARList | filter:{'FullName':searchfilterforRoom.txt8} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesAR(item)"><i class="fas fa-user-md fs-12"></i>  {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===3">
+                                        <li ng-repeat="item in AllDilationList | filter:{'FullName':searchfilterforRoom.txt3} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesDilation(item)"><i class="fas fa-user-md fs-12"></i> {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===4">
+                                        <li ng-repeat="item in AllCounsollerList | filter:{'FullName':searchfilterforRoom.txt4} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesCounsellor(item)"><i class="fas fa-user-md fs-12"></i>  {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===5">
+                                        <li ng-repeat="item in AllTechnicianList | filter:{'FullName':searchfilterforRoom.txt5} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesTechnician(item)"><i class="fas fa-user-md fs-12"></i> {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId === 9">
+                                        <li ng-repeat="item in AllBillingList | filter:{'FullName':searchfilterforRoom.txt9} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesBillingUser(item)"><i class="fas fa-user-md fs-12"></i>  {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                    <ul class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId === 10">
+                                        <li ng-repeat="item in AllReceptionList | filter:{'FullName':searchfilterforRoom.txt10} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                                            <a ng-click="ChangesReceptionUser(item)"><i class="fas fa-user-md fs-12"></i>  {{item.UserFullName}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="over-scrol-y height-150" ng-show="RoomSearchObj.RoomTypeId ===1">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input name="checkbox-1" type="checkbox" ng-model="RoomSearchObj.otherDocInd" ng-change="changeOtherDocOption(RoomSearchObj)">
+                                            <span class="checkbox-material">
+                                                <span class="check"></span>
+                                            </span>
+                                            <small> {{ 'OTHERDOCTORS' | translate}}</small>
+                                        </label>
+                                    </div>
+                                    <div class="dis-flex" ng-show="RoomSearchObj.otherDocInd">
+                                        <div class="form__group ui-select-bg flex">
+                                            <label> {{ 'SUBSPECIALIZATIONS' | translate}}</label>
+                                            <ui-select ng-model="RoomSearchObj.SubSpecialityObj" theme="bootstrap" on-select="changeRoomSubSpecialization(RoomSearchObj.SubSpecialityObj)">
+                                                <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{RoomSearchObj.SubSpecialityObj.SubSpecializationName}}</ui-select-match>
+                                                <ui-select-choices repeat="item in newAllSubSpecializationsArray | filter: $select.search" null-option="EmptySelect" loose-null>
+                                                    <span ng-bind-html="item.SubSpecializationName | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="dis-flex" ng-show="RoomSearchObj.otherDocInd">
+                                        <div class="form__group ui-select-bg flex">
+                                            <label> {{ 'DOCTORS' | translate}}</label>
+                                            <ui-select ng-model="RoomSearchObj.Doctorobj" theme="bootstrap" on-select="changeRoomDoctor(RoomSearchObj.Doctorobj)">
+                                                <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{RoomSearchObj.Doctorobj.FirstName}}</ui-select-match>
+                                                <ui-select-choices repeat="item in FilteredRoomDoctorsList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                                    <span ng-bind-html="item.FullName | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dis-flex align-items-center justify-space-between bt-1 p-t-4 p-l-3 p-r-3">
+                                    <div ng-show="RoomSearchObj.RoomTypeId !==7">
+
+                                    </div>
+                                    <!--<div ng-repeat="item in RoomTypeList" ng-if="item.Id == 7">
+                                        <div class="checkbox cn">
+                                            <label>
+                                                <input name="checkbox-1" type="checkbox" ng-model="RoomType.IsSelectedCheckout" ng-change="ChangesCheckItem(7,RoomType.IsSelectedCheckout)">
+                                                <span class="checkbox-material">
+                                                    <span class="check"></span>
+                                                </span>
+                                                <small ng-bind="item.Name"></small>
+                                            </label>
+                                        </div>
+                                    </div>-->
+                                    <div>
+                                        <button class="btn btn-danger" ng-click="closeRoom(Patientlistdata)">
+                                            <!--<i class="fas fa-times"></i>--> {{ 'CLOSE' | translate}}
+                                        </button>
+                                        <button class="btn btn-ehnote p-l-25 p-r-25" ng-click="SendToRoom(Patientlistdata)">{{submitbutton}}</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</script>
+
+<script type="text/ng-template" id="dynamicCheckInStatus.html">
+    <div class="form__group">
+        <div class="col-lg-12 p-0">
+            <ul class="list-unstyled">
+                <li>
+                    <label class="control control--checkbox">
+                        <span>{{ 'ALL' | translate}}</span>
+                        <input type="checkbox" ng-model="AllCheckInStatusCheck" ng-click="checkAllCheckInStatus(AllCheckInStatusCheck)">
+                        <div class="control__indicator top-0"></div>
+                    </label>
+                </li>
+                <li ng-repeat="item in CheckInFilterArray">
+                    <label class="control control--checkbox">
+                        <span ng-bind="item.Name"></span>
+                        <input type="checkbox" ng-model="item.isChecked" ng-click="CheckInToggle(item)">
+                        <div class="control__indicator top-0"></div>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="viewpatienttracking.html">
+    <div class="modal-header">
+        <h4 class="modal-title dis-inline-block"> {{ 'PATIENTTRACKING' | translate}}</h4>
+        <button type="button" class="close" data-dismiss="modal" ng-click="closeTrackingPopup()">&times;</button>
+    </div>
+
+
+
+    <section class="tracking-timeline">
+        <ol>
+            <li ng-repeat="option in PatientTrackingList">
+                <div class="dynamic-inside">
+                    <div class="p-l-15 p-r-15 p-t-5 p-b-5">
+                        <time ng-bind="option.AppointmentDate | date:'MMM dd yyyy'"></time>
+                        <p><b class="text-eh" ng-bind="option.RoomType">Billing</b></p>
+                        <p>
+                            <b class="text-dark" ng-bind="option.AssignedUser"></b>
+                            <span> - {{option.Status}}</span>
+                        </p>
+                        <p class="m-b-0"><span class="text-muted">In Time :</span> <b ng-bind="option.StartTime">03:30 PM</b> - <span class="text-muted">Out Time :</span> <b ng-bind="option.EndTime">03:50 PM</b></p>
+                    </div>
+                    <label class="show-time-dynamic text-white">
+                        <span>{{ 'WAITTIME' | translate}} :</span>
+                        <b ng-bind="option.AvgTime |date:'HH:mm'"></b>
+                    </label>
+                </div>
+                <section class="waittime-min"></section>
+            </li>
+
+        </ol>
+    </section>
+</script>
+
+
+
+
+<script type="text/ng-template" id="LablePrint.html">
+
+    <div class="modal-header">
+        <h4 class="modal-title">{{ 'PRINTIDCARD' | translate}}</h4>
+        <button type="button" class="btn btn-link" ng-click="closePrintIdcard()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="row" id="printSectionId">
+            <div class="col-lg-12">
+                <style>
+                    * {
+                        box-sizing: border-box;
+                        -moz-box-sizing: border-box;
+                    }
+
+                    .paperlabelprint {
+                        width: 9cm;
+                        min-height: 4cm;
+                        padding: 2px;
+                        margin: 0mm auto;
+                        border: 1px red solid;
+                        border-radius: 0;
+                        background: white;
+                    }
+
+                    .subpageprint {
+                        height: 4cm;
+                        margin: auto 0;
+                    }
+
+                    @page {
+                        size: A4;
+                        size: landscape;
+                        margin: 0;
+                    }
+
+                    @media print {
+                        html, body {
+                            width: 9cm;
+                            height: 4cm;
+                        }
+
+                        .paperlabelprint {
+                            margin: 0;
+                            border: initial;
+                            border-radius: initial;
+                            width: initial;
+                            min-height: initial;
+                            box-shadow: initial;
+                            background: initial;
+                            page-break-after: always;
+                        }
+                    }
+
+                    .id-table-print {
+                        margin: auto;
+                        height: 4cm;
+                    }
+
+                    .barcodeimg {
+                        width: 8cm;
+                        height: 2cm;
+                        display: block;
+                    }
+
+                        .barcodeimg > img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                            object-position: left;
+                        }
+                </style>
+                <div class="paperlabelprint">
+                    <div class="subpageprint">
+                        <div class="barcodeimg">
+                            <img src="{{BarCode}}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <button class="btn btn-success" ng-click="printToCart('printSectionId')">Print</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="BarCodePrint.html">
+
+    <div class="modal-header">
+        <h4 class="modal-title">Print ID Card</h4>
+        <button type="button" class="btn btn-link" ng-click="closePrintIdcard()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="row" id="printSectionId">
+            <div class="col-lg-12">
+                <style>
+                    * {
+                        box-sizing: border-box;
+                        -moz-box-sizing: border-box;
+                    }
+
+                    .paperlabelprint {
+                        width: 9cm;
+                        min-height: 4cm;
+                        padding: 2px;
+                        margin: 0mm auto;
+                        border: 1px red solid;
+                        border-radius: 0;
+                        background: white;
+                    }
+
+                    .subpageprint {
+                        height: 4cm;
+                        margin: auto 0;
+                    }
+
+                    @page {
+                        size: A4;
+                        size: landscape;
+                        margin: 0;
+                    }
+
+                    @media print {
+                        html, body {
+                            width: 9cm;
+                            height: 4cm;
+                        }
+
+                        .paperlabelprint {
+                            margin: 0;
+                            border: initial;
+                            border-radius: initial;
+                            width: initial;
+                            min-height: initial;
+                            box-shadow: initial;
+                            background: initial;
+                            page-break-after: always;
+                        }
+                    }
+
+                    .id-table-print {
+                        margin: auto;
+                        height: 4cm;
+                    }
+
+                    .barcodeimg {
+                        width: 8cm;
+                        height: 2cm;
+                        display: block;
+                    }
+
+                        .barcodeimg > img {
+                            width: 100%;
+                            height: 90%;
+                            object-fit: contain;
+                            object-position: left;
+                        }
+                </style>
+                <div class="paperlabelprint">
+                    <div class="subpageprint">
+                        <table class="id-table-print">
+                            <tbody>
+                                <tr>
+                                    <td width="35%" style="font-size: 12px; font-family: Verdana;"><b>{{ 'NAME' | translate}} </b></td>
+                                    <td width="5%" style="font-size: 12px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 12px; font-family: Verdana;"><b>{{PatientData.PatientName}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td width="35%" style="font-size: 12px; font-family: Verdana;"><b>{{ 'AGEANDGENDER' | translate}} </b></td>
+                                    <td width="5%" style="font-size: 12px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 12px; font-family: Verdana;"><b>{{PatientData.Age}} & {{PatientData.Gender}}</b></td>
+
+                                </tr>
+                                <tr>
+                                    <td width="35%" style="font-size: 12px; font-family: Verdana;"><b>{{ 'ADDRESS' | translate}}</b></td>
+                                    <td width="5%" style="font-size: 12px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 12px; font-family: Verdana;"><b>{{PatientData.Address}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td width="48%" style="font-size: 12px; font-family: Verdana;"><b>{{ 'FROM' | translate}} : {{PatientData.ConsultationDt}}</b></td>
+                                    <td width="4%" style="font-size: 12px; font-family: Verdana;"></td>
+                                    <td width="48%" style="font-size: 12px; font-family: Verdana;"><b>{{ 'TO' | translate}} : {{PatientData.Today}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="barcodeimg">
+                                            <img src="{{BarCode}}" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!--<div class="id-section" style="width: 340px; height: 151px; display: block; margin: 0 auto;" id="printSectionId">
+                    <div class="id-body">
+                        <table class="id-table">
+                            <tbody>
+                                <tr>
+                                    <td width="35%" style="font-size: 14px; font-family: Verdana;"><b>Name </b></td>
+                                    <td width="5%" style="font-size: 14px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 14px; font-family: Verdana;"><b>{{PatientData.PatientName}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td width="35%" style="font-size: 14px; font-family: Verdana;"><b>Age & Gender </b></td>
+                                    <td width="5%" style="font-size: 14px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 14px; font-family: Verdana;"><b>{{PatientData.Age}} & {{PatientData.Gender}}</b></td>
+
+                                </tr>
+                                <tr>
+                                    <td width="35%" style="font-size: 14px; font-family: Verdana;"><b>MRNo</b></td>
+                                    <td width="5%" style="font-size: 14px; font-family: Verdana;"><b>:</b></td>
+                                    <td width="60%" style="font-size: 14px; font-family: Verdana;"><b>{{PatientData.MRNo}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <img src="{{BarCode}}" style="width: 340px; height: auto; margin-top: 5px; display: block;" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <button class="btn btn-success" ng-click="printToCart('printSectionId')">{{ 'PRINT' | translate}}</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="SuperBill.html">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="CloseDefaultTemplate()">&times;</button>
+        <h4 class="modal-title">{{ 'PRINTPREVIEW' | translate}}</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tr>
+                        <td colspan="3"><h4>{{SelectedSuperBillPatientDetails.PatientDetails.Title}}.{{SelectedSuperBillPatientDetails.PatientDetails.FullName}}</h4></td>
+                        <td colspan="3"><h4>{{SelectedSuperBillPatientDetails.PatientDetails.DOB | date:'dd-MM-yyyy'}}</h4></td>
+                        <td colspan="1" ng-show="SelectedSuperBillPatientDetails.PatientDetails.AgeInYears ===0"><h4>{{SelectedSuperBillPatientDetails.PatientDetails.AgeInMonths}}M {{ SelectedSuperBillPatientDetails.PatientDetails.AgeInDays}}D - {{SelectedSuperBillPatientDetails.PatientDetails.Gender}}</h4></td>
+                        <td colspan="1" ng-show="SelectedSuperBillPatientDetails.PatientDetails.AgeInYears!=0"><h4> {{SelectedSuperBillPatientDetails.PatientDetails.AgeInYears}}Y {{SelectedSuperBillPatientDetails.PatientDetails.AgeInMonths}}M {{ SelectedSuperBillPatientDetails.PatientDetails.AgeInDays}}D - {{SelectedSuperBillPatientDetails.PatientDetails.Gender}}</h4></td>
+
+                        <td colspan="2" class="text-right"><h5>{{ 'CORPORATION' | translate}}</h5></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered" ng-repeat="item in SuperBillList">
+                    <!--<tr>
+                        <td colspan="3"><h4>Jhon Dee</h4></td>
+                        <td colspan="3"><h4>01/01/1944</h4></td>
+                        <td colspan="1"><h4>77 M</h4></td>
+                        <td colspan="2" class="text-right"><h5>corporation</h5></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Office</td>
+                        <td colspan="3" class="text-center"><b>Tuesday 05/05/2021 9:50AM</b></td>
+                        <td colspan="3">Fleming Token:ASDGD123</td>
+                    </tr>
+                    <tr>
+                        <td colspan="9" class="bg-ehnote text-white">
+                            <h5>Office Visit</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <p>Account</p>
+                            <span><b>1</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Home</p>
+                            <span></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Primary</p>
+                            <span><b>Aetna</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Physician</p>
+                            <span><b>Provider provider</b></span>
+                        </td>
+                        <td colspan="4" rowspan="2" class="p-0">
+                            <table class="table table-border m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>First Visit </b>: 01-01-2021
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Last Visit </b>: 01-05-2021
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Next Visit </b>: 01-07-2021
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <p>Chart</p>
+                            <span><b>11221</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Work</p>
+                            <span><b>9491771017</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Secondary</p>
+                            <span><b>Aetna</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Provider2</p>
+                            <span><b>Provider provider</b></span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <p>Other Id</p>
+                            <span><b>11221</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Cell</p>
+                            <span><b>9491771017</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Insurance</p>
+                            <span><b>Aetna</b></span>
+                        </td>
+                        <td colspan="2">
+                            <p>Referring</p>
+                            <span><b>Provider provider</b></span>
+                        </td>
+                        <td colspan="3" rowspan="4" class="p-0">
+                            <table class="table table-border m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Next Recall </b>: 01-09-2021
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Billing Type </b>:
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Today's Charges</b>:10,000
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Today's Payment</b>: Card/Cheq/Cash
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>Payment Recived By </b>: 01-07-2021
+                                            </p>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <h4>100st</h4>
+                            <span><b>Edison 00606</b></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Other Insurence</p>
+                            <span><b></b></span>
+                        </td>
+                        <td colspan="2">
+                            <p>PCP</p>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <p>Referral</p>
+                            <span></span>
+                        </td>
+                        <td colspan="1">
+                            <p>Comments</p>
+                            <span><b>Edison 08820</b></span>
+                        </td>
+                        <td colspan="2">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Balence</th>
+                                        <th>patient</th>
+                                        <th>Insurence</th>
+                                        <th>Total</th>
+                                        <th>Credits</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>200</td>
+                                        <td>23</td>
+                                        <td>500</td>
+                                        <td>900</td>
+                                        <td>222</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td colspan="2">
+                            <p>Next Appointment Recal</p>
+                            <span><b>Edison 00606</b></span>
+                        </td>
+
+                    </tr>-->
+                    <tr>
+                        <th colspan="9" class="bg-ehnote text-white text-center">Diagnosis</th>
+                    </tr>
+                    <!--<tr ng-repeat="column in chunkedData">
+
+                        <td ng-repeat="mitem in column">
+
+                            <span>
+
+                            </span>
+                            <span>
+                                {{mitem.ICD10CODE}}
+                            </span>
+                            <span>
+                                {{mitem.ICD10DIAGDESCRIPTION}}
+                            </span>
+                        </td>
+
+
+
+                    </tr>-->
+
+                    <tr ng-repeat="mitem in item.SuperBillDiagnosis |  filter:{'DeleteInd':'N'}">
+                        <!--<td>S.No</td>
+                        <td>Typoid</td>
+                        <td></td>
+                        <td>A01.05</td>
+                        <td></td>
+                        <td>Typoid</td>-->
+                        <td></td>
+                        <td>{{mitem.ICD10CODE}}</td>
+                        <td>{{mitem.ICD10DIAGDESCRIPTION}}</td>
+                    </tr>
+
+                    <tr>
+                        <th colspan="9" class="bg-ehnote text-white text-center">Procedures</th>
+                    </tr>
+                    <tr ng-repeat="nitem in item.SuperBillProcedure">
+                        <!--<td>S.No</td>
+                        <td>Typoid</td>
+                        <td></td>
+                        <td>A01.05</td>
+                        <td></td>
+                        <td>Typoid</td>-->
+                        <td></td>
+                        <td>{{nitem.ProcedureCode}}</td>
+                        <td>{{nitem.ProcedureName}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="CloseDefaultTemplate()">Close</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="PrintSuperBill()">Print</button>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="registerappointMentPopupId.html">
+    <registerappointment-directive date-val="calenderDate" is-patient-exist="ispatientExistsval" app-condate="AppDate" pagename="PageName" is-show-entry-form="true"></registerappointment-directive>
+</script>
+<script type="text/ng-template" id="appointMentPopupId.html">
+    <appointment-directive date-val="calenderDate" is-patient-exist="ispatientExistsval" app-condate="AppDate" pagename="PageName" is-show-entry-form="true"></appointment-directive>
+</script>
+
+
+
+<script type="text/ng-template" id="sendToPatientTemplate.html">
+    <div class="modal-header">
+        <h4 class="modal-title"> {{ 'TRANSFERROOM' | translate}}</h4>
+        <button type="button" class="btn btn-link" ng-click="closeRoom()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="border-right b-t-0">
+                    <fieldset>
+                        <div class="m-l-5 dis-flex m-b-5" ng-repeat="item in RoomTypeList" ng-if="item.Id != 7">
+                            <input type="radio" class="form-control w-15" id="normal3{{$index}}" name="normal3" ng-value="{{item.Id}}" ng-model="RoomSearchObj.RoomTypeobj" ng-change="ChangesRoomType(RoomSearchObj.RoomTypeobj)">
+                            <label for="normal3{{$index}}" class="text-s14w600C000 m-t-4 m-l-5 cur-poiter mb-0">{{item.Name}}</label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="billing-cominsoon text-center" ng-show="RoomSearchObj.RoomTypeId ===0">
+                    <img src="img/no-data/no-doctor-care.png">
+                    <div class="msg">
+                        <p class="goback-text"> {{ 'PLEASESELECTPROVIDERTOSHOWTHEDATA' | translate}}</p>
+                        <p class="no-records-txt-line2">
+                            {{ 'NOPROVIDERYOUHAVESELECTED' | translate}}
+                        </p>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <input class="form-control input-color icons-search" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===1" ng-model="searchfilterforRoom.txt1" />
+                    <input class="form-control input-color icons-search hide" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===2" ng-model="searchfilterforRoom.txt2" />
+                    <input class="form-control input-color icons-search" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId === 8" ng-model="searchfilterforRoom.txt8" />
+                    <input class="form-control input-color icons-search" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===3" ng-model="searchfilterforRoom.txt3" />
+                    <input class="form-control input-color icons-search hide" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===4" ng-model="searchfilterforRoom.txt4" />
+                    <input class="form-control input-color icons-search" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===5" ng-model="searchfilterforRoom.txt5" />
+                    <input class="form-control input-color icons-search hide" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===9" ng-model="searchfilterforRoom.txt9" />
+                    <input class="form-control input-color icons-search hide" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===10" ng-model="searchfilterforRoom.txt10" />
+                    <input class="form-control input-color icons-search" type="text" placeholder="{{ 'SEARCH' | translate}}" ng-show="RoomSearchObj.RoomTypeId ===12" ng-model="searchfilterforRoom.txt11" />
+                </div>
+                <div class="well p-6 bg-warning m-b-5" ng-show="RoomSearchObj.SelectDoctor!=''">
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===1"> {{ 'DOCTOR' | translate}}: </span>
+                    <span class="m-r-5 hide" ng-if="RoomSearchObj.RoomTypeId ===2">{{ 'TECHNICIAN' | translate}}: </span>
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===8">AR{{ 'AR' | translate}}: </span>
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===3">{{ 'DILATION' | translate}}: </span>
+                    <span class="m-r-5 hide" ng-if="RoomSearchObj.RoomTypeId ===4">{{ 'COUNSELLOR' | translate}}: </span>
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===5">{{ 'INVESTIGATION' | translate}}: </span>
+                    <span class="m-r-5 hide" ng-if="RoomSearchObj.RoomTypeId ===9">{{ 'BILLING' | translate}}: </span>
+                    <span class="m-r-5 hide" ng-if="RoomSearchObj.RoomTypeId ===10">{{ 'RECEPTION' | translate}}: </span>
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===12">{{ 'OPTOMETRIST' | translate}}:</span>
+                    <span class="m-r-5" ng-if="RoomSearchObj.RoomTypeId ===11">ASC:</span>
+                    <b>{{RoomSearchObj.SelectDoctor}}</b>
+                </div>
+                <div class="SelectDoctorSendto overflow-y-scroll height-150" ng-hide="RoomSearchObj.RoomTypeId ===0">
+                    <ul class=" m-t-10">
+                        <li ng-show="RoomSearchObj.RoomTypeId ===1" ng-repeat="item in AllDoctorList | filter:{'FullName': searchfilterforRoom.txt1} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangesRoomDoctor(item)"><i class="fas fa-user-md"></i> {{item.UserFullName}}</a>
+                        </li>
+                        <li ng-show="RoomSearchObj.RoomTypeId ===4" ng-repeat="item in AllCounsollerList | filter:{'FullName':searchfilterforRoom.txt4} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangesCounsellor(item)"><i class="fas fa-user-md"></i>  {{item.FullName}}</a>
+                        </li>
+                        <li ng-show="RoomSearchObj.RoomTypeId ===2" ng-repeat="item in AllTechnicianList | filter:{'FullName':searchfilterforRoom.txt2} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangesTechnician(item)"><i class="fas fa-user-md"></i> {{item.FullName}}</a>
+                        </li>
+                        <li ng-show="RoomSearchObj.RoomTypeId ===9" ng-repeat="item in AllBillingList | filter:{'FullName':searchfilterforRoom.txt9} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangesBillingUser(item)"><i class="fas fa-user-md"></i>{{item.FullName}}</a>
+                        </li>
+                        <li class="hide" ng-show="RoomSearchObj.RoomTypeId ===10" ng-repeat="item in AllReceptionList | filter:{'FullName':searchfilterforRoom.txt10} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangesReceptionUser(item)"><i class="fas fa-user-md"></i>{{item.FullName}}</a>
+                        </li>
+                        <li ng-show="RoomSearchObj.RoomTypeId ===12" ng-repeat="item in AllOpthaList | filter:{'FullName':searchfilterforRoom.txt11} track by $index" ng-class="{ active: RoomSearchObj.SelectDoctor===item.FullName}">
+                            <a href="javascript:;" ng-click="ChangeOpthaUser(item)"><i class="fas fa-user-md"></i>{{item.UserFullName}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="dis-flex align-items-center justify-space-between bt-1 p-t-4 p-l-3 p-r-3">
+            <div ng-show="RoomSearchObj.RoomTypeId !==7">
+
+            </div>
+            <div ng-repeat="item in RoomTypeList" ng-if="item.Id == 7">
+                <div class="checkbox cn">
+                    <label>
+                        <input name="checkbox-1" type="checkbox" ng-model="RoomType.IsSelectedCheckout" ng-change="ChangesCheckItem(7,RoomType.IsSelectedCheckout)">
+                        <span class="checkbox-material">
+                            <span class="check"></span>
+                        </span>
+                        <small ng-bind="item.Name"></small>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-danger p-l-15 p-r-15" ng-click="closeRoom(Patientlistdata)">
+                    <!--<i class="fas fa-times"></i>-->
+                    {{ 'CLOSE' | translate}}
+                </button>
+                <button class="btn btn-ehnote p-l-25 p-r-25" ng-click="SendToRoom(Patientlistdata)">{{ 'SEND' | translate}}</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="PatientTrackerTemplate.html">
+    <div class="modal-header">
+        <h4 class="modal-title">{{ 'PATIENTTRACKER' | translate}}</h4>
+        <button type="button" class="btn btn-link" ng-click="closeTracker()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive patient-tracking-table" ng-show="mainPatientTrackersArray.length > 0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="7%"> {{ 'PATIENTNAME' | translate}}</th>
+                                <th width="5%">{{ 'APPTTIME' | translate}}</th>
+                                <th width="12%">{{ 'VISITREASON' | translate}}</th>
+                                <th width="6%"> {{ 'CHECKIN' | translate}} </th>
+                                <th>{{ 'STATUS' | translate}}</th>
+                                <th width="6%">{{ 'CHECKOUT' | translate}}</th>
+                                <th width="8%">{{ 'TOTALWAITING' | translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in mainPatientTrackersArray track by $index">
+                                <td width="7%">
+
+                                    <div class="profile-show-timetracking">
+                                        <span>{{item.PatientName}}</span>
+                                        <p class="m-0">{{ 'MRNO' | translate}}: {{item.PatientMrNo}}</p>
+                                    </div>
+                                    <span class="tracking-doctor-text border-top m-t-3">{{item.AppointmentDoctorName}}</span>
+                                </td>
+                                <td width="5%">
+                                    <div class="tracker-time appt-time-tracker">
+                                        <!--{{item.AppointmentStartTime}}-->
+                                        {{item.ConvertAppointmentStartTime}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="tracker-notes-time word-brk cur-poiter" title=" {{item.VisitReason}}">
+                                        {{item.VisitReason}}
+                                    </p>
+                                </td>
+
+                                <td width="6%">
+                                    <div class="dis-block">
+                                        <!--<p class="text-tracker-time text-left" ng-bind="item.CheckInTime"></p>-->
+                                        <p class="text-tracker-time text-left" ng-bind="item.ConvertAppointmentCheckInTime"></p>
+                                    </div>
+                                    <div class="dis-block border-top m-t-3">
+                                        <p class="mb-0" ng-class="item.IsDelayTimeInd == true?'text-red':'text-green'" title="Arrival Delay" ng-bind="item.AppointmentCheckInDelayTime"></p>
+                                    </div>
+                                </td>
+                                <td>
+
+                                    <ul class="time-tracker-list">
+                                        <li ng-class="getFavClassIcon(Subitem)" ng-repeat="Subitem in item.TrackerDetails">
+                                            <label>{{Subitem.RoomType}}</label>
+
+                                            <div class="dis-flex" ng-if="Subitem.isWaitingSlot">
+                                                <div class="flex text-center">
+                                                    <p class="text-waiting-active">{{ 'WAITING' | translate}}</p>
+                                                    <span class="text-tracker-time">{{Subitem.WaitTime}}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="dis-flex" ng-if="!Subitem.isWaitingSlot">
+                                                <div class="flex text-center">
+                                                    <p class="text-waiting-active">{{ 'WAITED' | translate}}</p>
+                                                    <span class="text-tracker-time">{{Subitem.WaitTime}}</span>
+                                                </div>
+                                                <div class="flex text-center">
+                                                    <p class="text-waiting-active">{{ 'ACTIVE' | translate}}</p>
+                                                    <span class="text-tracker-time">{{Subitem.ActiveTime}}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </td>
+                                <td width="6%">
+                                    <div class="dis-block">
+                                        <p class="text-tracker-time text-left" ng-bind="item.AppointmentCheckOutTime"></p>
+                                    </div>
+                                </td>
+                                <td width="8%">
+                                    <div class="tracker-time waiting-time-tracker">
+                                        {{item.AppointmentTotalWaitingTime}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="row" ng-show="mainPatientTrackersArray.length === 0">
+                    <div class="billing-cominsoon text-center fs-15">
+                        <img src="img/no-data/no-results.png">
+                        <div class="msg">
+                            <p class="goback-text">{{ 'NORESULTSFOUND' | translate}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-header">
+                        <h1> {{ 'APPOINTMENTREMARKS' | translate}}</h1>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <div class="ehr-input pop-ehr-input">
+                                    <label>{{ 'REMARKS' | translate}}</label>
+                                    <textarea class="register-input msd-elastic: \n;"
+                                              quotes-restrict placeholder="{{ 'REMARKS' | translate}}"
+                                              ng-model="objApptRemarks.Remarks" maxlength="1000"></textarea>
+
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 m-t-20">
+                                <div class="dis-flex align-items-center">
+                                    <button type="submit" class="btn btn-search m-r-3 p-l-10 p-r-10" ng-click="Submit()">{{ 'SAVE' | translate}}</button>
+                                    <button class="btn warning-btn m-l-3 flex" ng-click="ClearApptRemarks()">{{ 'CLEAR' | translate}}</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- / -->
+
+                    </div>
+                    <div class="row" ng-show="ApptTrackerRemarksArray.length > 0">
+                        <div class="col-lg-12">
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered m-b-10">
+                                    <thead>
+                                        <tr>
+
+                                            <th> {{ 'REMARKS' | translate}} </th>
+                                            <th width="20%">{{ 'CREATEDBY' | translate}}</th>
+                                            <th width="18%">{{ 'MODIFYDATE' | translate}}</th>
+                                            <th width="5%">{{ 'ACTION' | translate}}</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="appointment-row" ng-repeat="Ritem in ApptTrackerRemarksArray">
+
+                                            <td>{{Ritem.Remarks}}</td>
+                                            <td>
+                                                {{Ritem.CreatedBy}}
+                                            </td>
+                                            <td>
+                                                {{Ritem.CreatedDateTime | date:'MM-dd-yyyy h:mm a'}}
+                                            </td>
+                                            <td>
+                                                <!--<a class="cur-poiter" alt="edit" data-tooltip="Edit" ng-click="EditMedicalHistory(compitem)" >
+                                                    <img width="17" src="img/ehnote-edit.svg">
+                                                </a>-->
+                                                <a class="cur-poiter" alt="delete" data-tooltip="Delete" ng-click="DeleteApptRemark(Ritem)">
+                                                    <img width="17" src="img/ico-delete-red.svg">
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!--<div class="EH-pagination text-center m-t-10">
+                                    <uib-pagination total-items="visitReasonListcount"
+                                                    ng-model="VisitReasonListObj.PageNumber"
+                                                    ng-change="ChangevisitPagination(VisitReasonListObj.PageNumber)"
+                                                    max-size="VisitReasonListObj.PageSize"
+                                                    ng-show="visitReasonList.length > 0"
+                                                    boundary-link-numbers="true">
+
+                                    </uib-pagination>
+
+                                </div>-->
+                            </div>
+                        </div>
+                        <!-- / -->
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="ConfirmBox.html">
+    <div class="modal-header">
+        <h4 class="modal-title text-center"></h4>
+        <button type="button" class="btn btn-link" ng-click="CloseConfirmBoxInCalendar();"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center font-weight-500 fs-16 text-uppercase">{{ 'DOYOUWISHTO' | translate}}</p>
+                <p class="text-center text-bold fs-18">
+                    <a href="javascript:;" class="font-weight-500 fs-18 text-success text-underline" ng-click="BookApptFromCalendarConfirm();">{{ 'BOOKANAPPOINTMENT' | translate}}</a> or <a class="font-weight-500 fs-18 text-primary text-underline" href="javascript:;" ng-click="AddBreakFromCalendarConfirm();">{{ 'BLOCKTHESLOT' | translate}}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="BreakSlotsRemarksPopUp.html">
+    <div>
+        <div class="modal-common-dialog">
+            <div class="model-popup-header">
+                <h4 class="modal-title" id="myModalLabel" ng-if="IsForAddingBreakSlot"> {{ 'BLOCKSLOT' | translate}}</h4>
+                <h4 class="modal-title" id="myModalLabel" ng-if="!IsForAddingBreakSlot"> {{ 'UNBLOCKSLOT' | translate}}</h4>
+                <a id="close_popup" ng-click="closePopup()" class="light-font pull-right fclosepopup m-t-0">x</a>
+            </div>
+            <div class="row m-l-10 m-t-10" ng-show="IsForAddingBreakSlot">
+                <div class="col-md-12">
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Break">
+                        <span>{{ 'BREAK' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Emergency Surgery">
+                        <span> {{ 'EMERGENCYSURGERY' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Personal Emergency">
+                        <span>{{ 'PERSONALEMERGENCY' | translate}}</span>
+                    </label>
+                    <label class="m-r-10">
+                        <input type="radio" ng-model="SelectedReasonforBlockSlot" value="Others">
+                        <span>{{ 'OTHERS' | translate}}</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form__group m-10">
+                        <label class="control-label">{{ 'ENTERREMARKS' | translate}}</label>
+                        <textarea type="text" class="form-control mt-10" rows="5" ng-model="Remarks" />
+                    </div>
+                </div>
+            </div>
+            <div class="row pull-right">
+                <div class="col-md-12 col-sm-12 col-xs-12 mb-10 mt-5 mr-10">
+                    <button class="btn danger-btn light-font" ng-click="closePopup()"> {{ 'CLOSE' | translate}}</button>
+                    <button class="btn primary-btn" ng-click="SaveRemarksAndBlockSlot();" ng-if="IsForAddingBreakSlot">{{ 'SAVE' | translate}} </button>
+                    <button class="btn primary-btn" ng-click="SaveRemarksAndUnBlockSlot();" ng-if="!IsForAddingBreakSlot">{{ 'SAVE' | translate}} </button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="AppointmentStatusSelectPopOver.html">
+    <div class="form__group">
+        <div class="col-lg-12 p-0">
+            <ul class="list-unstyled">
+                <li ng-repeat="item in confirmationStatusArray">
+                    <label>
+                        <input type="radio" ng-model="SelectedStatus.StatusId" value="{{item.ConfirmationStatusId}}" ng-click="ToggleApptStatus(SelectedStatus.StatusId)">
+                        <span ng-bind="item.ConfirmationStatusName"></span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="ProfileStatusSelectPopOver.html">
+    <div class="row">
+        <div class="col-lg-12">
+            <ul class="list-unstyled">
+                <li ng-repeat="item in ProfileStatusList">
+                    <label>
+                        <input type="radio" ng-model="SelectedProfileStatus.StatusId" value="{{item.Id}}" ng-click="ToggleApptStatus(SelectedStatus.StatusId)">
+                        <span ng-bind="item.Name"></span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="ReceptionistSelectPopOver.html">
+    <div class="row">
+        <div class="col-lg-12">
+            <ul class="list-unstyled">
+                <li ng-repeat="item in ProfileStatusList">
+                    <label>
+                        <input type="radio" ng-model="SelectedProfileStatus.StatusId" value="{{item.Id}}" ng-click="ToggleApptStatus(SelectedStatus.StatusId)">
+                        <span ng-bind="item.Name"></span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="ConfirmBoxforNotCheckIn.html">
+    <div class="d__f-- fd__c-- gap__5--">
+        <div class="d__f-- ai__c-- jc__sb-- bb__DDD-- p__5--">
+            <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">{{ 'CONFIRM' | translate}}?</h1>
+            <ul class="flex-flow-list">
+                <li>
+                    <a class="fs__lg-- fw__5-- tc__C71D27--" ng-click="ConfirmClosepopup();">{{ 'NO' | translate}}</a>
+                </li>
+                <li>
+                    <button class="btn__lg-- btn__1d5558--f" ng-click="onClickUpdateNotCheckIn();">{{ 'YES' | translate}}</button>
+                </li>
+                <li>
+                    <a class="btn__close--" ng-click="ConfirmClosepopup()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="row px__15-- py__10--">
+            <div class="col-lg-12">
+                <div class="form__group">
+                    <label>{{ShowConfirmString}}</label>
+                    <textarea rows="5" ng-model="NotcheckInObj.Remarks" placeholder="{{ 'ENTERREMARKS' | translate}}" quotes-restrict maxlength="200"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<style>
+    .healthcare-border li {
+        border: 1px solid #ddd;
+    }
+</style>
+<!--
+<style>
+    .work-order-checkbox-label.mbsc-checkbox {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .fc-view-container {
+        overflow-x: scroll !important;
+    }
+
+
+    .popper,
+    .tooltip {
+        position: absolute;
+        z-index: 9999;
+        background: #FFC107;
+        color: black;
+        width: 150px;
+        border-radius: 3px;
+        box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        padding: 10px;
+        text-align: center;
+    }
+
+    .style5 .tooltip {
+        background: #1E252B;
+        color: #FFFFFF;
+        max-width: 200px;
+        width: auto;
+        font-size: .8rem;
+        padding: .5em 1em;
+    }
+
+    .popper .popper__arrow,
+    .tooltip .tooltip-arrow {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        position: absolute;
+        margin: 5px;
+    }
+
+    .tooltip .tooltip-arrow,
+    .popper .popper__arrow {
+        border-color: #FFC107;
+    }
+
+    .style5 .tooltip .tooltip-arrow {
+        border-color: #1E252B;
+    }
+
+    .popper[x-placement^="top"],
+    .tooltip[x-placement^="top"] {
+        margin-bottom: 5px;
+    }
+
+        .popper[x-placement^="top"] .popper__arrow,
+        .tooltip[x-placement^="top"] .tooltip-arrow {
+            border-width: 5px 5px 0 5px;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            bottom: -5px;
+            left: calc(50% - 5px);
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+    .popper[x-placement^="bottom"],
+    .tooltip[x-placement^="bottom"] {
+        margin-top: 5px;
+    }
+
+        .tooltip[x-placement^="bottom"] .tooltip-arrow,
+        .popper[x-placement^="bottom"] .popper__arrow {
+            border-width: 0 5px 5px 5px;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            top: -5px;
+            left: calc(50% - 5px);
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+    .tooltip[x-placement^="right"],
+    .popper[x-placement^="right"] {
+        margin-left: 5px;
+    }
+
+        .popper[x-placement^="right"] .popper__arrow,
+        .tooltip[x-placement^="right"] .tooltip-arrow {
+            border-width: 5px 5px 5px 0;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            left: -5px;
+            top: calc(50% - 5px);
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+    .popper[x-placement^="left"],
+    .tooltip[x-placement^="left"] {
+        margin-right: 5px;
+    }
+
+        .popper[x-placement^="left"] .popper__arrow,
+        .tooltip[x-placement^="left"] .tooltip-arrow {
+            border-width: 5px 0 5px 5px;
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            right: -5px;
+            top: calc(50% - 5px);
+            margin-left: 0;
+            margin-right: 0;
+        }
+</style>
+
+-->

@@ -1,0 +1,628 @@
+<!-- Admin > Users > Time Slots (New). Controller: TimeSlotsV2Ctrl (js/controllers/TimeSlotsV2Ctrl.js) -->
+<style>
+    .tsv2 { --ink:#1E2A25; --soft:#5C685F; --line:#DFE5DF; --grid:#EEF2ED; --accent:#146356; --accent-bg:#E4F0EC; --accent-line:#C7DFD7;
+            --warn:#8A5A12; --warn-bg:#FBF0DE; --warn-line:#EFDBAF; --blue:#2F5D9C; --blue-bg:#E7EEF8; --danger:#A3432F;
+            color:var(--ink); font-size:12.5px; width:100%; }
+    .tsv2 h2 { font-size:15px; font-weight:650; margin:0 0 4px; }
+    .tsv2 .sub { font-size:12.5px; color:var(--soft); margin:0 0 16px; }
+    .tsv2 .muted { color:var(--soft); }
+    .tsv2 .panel-v2 { background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px; }
+    .tsv2 .head-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
+    .tsv2 .divider { display:flex; align-items:center; gap:10px; margin:22px 0 10px; color:var(--soft); font-weight:650; }
+    .tsv2 .divider:before, .tsv2 .divider:after { content:""; flex:1; border-top:1px solid var(--line); }
+    .tsv2 .btn2 { padding:8px 15px; border-radius:7px; font-size:12.5px; font-weight:600; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; }
+    .tsv2 .btn2.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .tsv2 .btn2.ghost { color:var(--soft); }
+    .tsv2 .btn2.sm { padding:5px 10px; font-size:11.5px; }
+    .tsv2 .btn2[disabled] { opacity:.6; cursor:default; }
+    .tsv2 .link { background:none; border:none; padding:0; font:inherit; font-weight:650; color:#2B7BB9; cursor:pointer; }
+    .tsv2 .link:hover { text-decoration:underline; }
+    .tsv2 .icon-btn { background:none; border:none; padding:4px; border-radius:5px; cursor:pointer; color:var(--soft); }
+    .tsv2 .icon-btn:hover { background:var(--grid); color:var(--ink); }
+    .tsv2 .icon-btn.danger:hover { background:var(--warn-bg); color:var(--danger); }
+    .tsv2 .badge2 { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:650; padding:2px 9px; border-radius:12px; margin-left:4px; }
+    .tsv2 .badge2.on { background:var(--accent-bg); color:var(--accent); }
+    .tsv2 .badge2.off { background:var(--grid); color:var(--soft); }
+    .tsv2 .badge2.payer { background:var(--blue-bg); color:var(--blue); }
+    .tsv2 .badge2.classic { background:var(--warn-bg); color:var(--warn); }
+    .tsv2 .dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .tsv2 .card2 { border:1px solid var(--line); border-radius:9px; padding:13px 15px; margin-bottom:10px; background:#fff; }
+    .tsv2 .card2 .top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+    .tsv2 .card2 .title { font-size:13.5px; font-weight:650; }
+    .tsv2 .grp { padding:9px 0; border-top:1px solid var(--grid); }
+    .tsv2 .grp:first-of-type { border-top:none; }
+    .tsv2 .grp-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .tsv2 .dchips { display:flex; gap:4px; }
+    .tsv2 .dchip { min-width:30px; height:22px; padding:0 4px; border-radius:5px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; }
+    .tsv2 .dchip.light { background:var(--accent-bg); color:var(--accent); }
+    .tsv2 .created { margin-left:10px; font-size:11px; color:var(--soft); white-space:nowrap; }
+    .tsv2 .grp-meta { margin-left:auto; font-size:11.5px; color:var(--soft); white-space:nowrap; }
+    .tsv2 .summary { margin-top:8px; border-top:1px solid var(--grid); }
+    .tsv2 .summary-row { display:grid; grid-template-columns:120px 1fr 110px; gap:8px; padding:6px 0; border-top:1px solid var(--grid); font-size:11.5px; }
+    .tsv2 .summary-row:first-child { border-top:none; }
+    .tsv2 .summary-row b { font-weight:650; }
+    .tsv2 .summary-row .r { text-align:right; color:var(--soft); }
+    .tsv2 .tsv2-title { font-size:19px; font-weight:650; margin:0 0 3px; letter-spacing:-0.01em; }
+    .tsv2 .tsv2-stepper { display:flex !important; flex-direction:row; flex-wrap:nowrap; gap:6px; margin:18px 0 18px; width:100%; }
+    .tsv2 .tsv2-step { flex:1 1 0; min-width:0; display:flex; align-items:center; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer; float:none; width:auto; }
+    .tsv2 .tsv2-step .n { display:inline-flex; align-items:center; justify-content:center; flex:none; width:18px; height:18px; border-radius:50%; background:var(--line); color:var(--soft); font-size:10.5px; font-weight:650; margin-right:6px; }
+    .tsv2 .tsv2-step .lbl { font-size:12px; font-weight:600; color:var(--soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tsv2 .tsv2-step.active { border-color:var(--accent); background:var(--accent-bg); }
+    .tsv2 .tsv2-step.active .n, .tsv2 .tsv2-step.done .n { background:var(--accent); color:#fff; }
+    .tsv2 .tsv2-step.active .lbl { color:var(--accent); }
+    .tsv2 .tsv2-step.done .lbl { color:var(--ink); }
+    .tsv2 .field { margin-bottom:12px; min-width:0; }
+    .tsv2 .field label { display:block; font-size:11.5px; font-weight:600; color:var(--soft); margin-bottom:4px; }
+    .tsv2 .field input, .tsv2 .field select { width:100%; padding:7px 9px; border-radius:7px; border:1px solid var(--line); font-size:12.5px; background:#fff; height:34px; }
+    .tsv2 .row-fields { display:flex; gap:10px; flex-wrap:wrap; }
+    .tsv2 .row-fields .field { min-width:110px; }
+    .tsv2 .row-fields .wide { flex:2.4; min-width:200px; }
+    .tsv2 .row-fields .narrow { flex:.6; min-width:80px; }
+    .tsv2 .pills { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+    .tsv2 .pill { padding:7px 14px; border-radius:7px; border:1px solid var(--line); background:#fff; font-weight:650; cursor:pointer; color:var(--soft); }
+    .tsv2 .pill.sel { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .tsv2 .pill.taken { opacity:.4; cursor:not-allowed; text-decoration:line-through; }
+    .tsv2 .switch { position:relative; width:34px; height:19px; background:var(--line); border-radius:10px; cursor:pointer; display:inline-block; vertical-align:middle; }
+    .tsv2 .switch.on { background:var(--accent); }
+    .tsv2 .switch .knob { position:absolute; top:2px; left:2px; width:15px; height:15px; background:#fff; border-radius:50%; transition:transform .15s; }
+    .tsv2 .switch.on .knob { transform:translateX(15px); }
+    .tsv2 .toggle-label { display:inline-flex; align-items:center; gap:8px; font-weight:600; color:var(--soft); cursor:pointer; position:relative; }
+    .tsv2 .popover2 { position:absolute; top:calc(100% + 6px); right:0; z-index:30; width:290px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 13px; font-weight:400; line-height:1.5; box-shadow:0 4px 14px rgba(0,0,0,.08); }
+    .tsv2 .slot-block { border-top:1px solid var(--grid); padding:8px 0; }
+    .tsv2 .slot-block:first-child { border-top:none; }
+    /* rows just added (single or bulk) flash so it is clear where they landed */
+    .tsv2 .slot-block.is-new { background:#FFFBEA; box-shadow:inset 3px 0 0 #E2B33C; transition:background .4s ease; }
+    .tsv2 .slot-row { display:grid; grid-template-columns:96px 14px 96px 76px 108px minmax(160px,1fr) 60px 24px; gap:6px; align-items:center; }
+    .tsv2 .slot-row.payer { grid-template-columns:96px 14px 96px 76px 108px minmax(140px,1fr) minmax(120px,.8fr) 60px 24px; }
+    .tsv2 .slot-row > input, .tsv2 .slot-row > select { padding:5px 6px; border-radius:6px; border:1px solid var(--line); font-size:11.5px; height:30px; width:100%; }
+    .tsv2 .slot-dur { margin:4px 0 0; font-size:10.5px; color:var(--soft); }
+    .tsv2 .cap-box { display:flex; align-items:center; gap:10px; flex:none; }
+    .tsv2 .cap-warn { margin:8px 0 0; }
+    .tsv2 .cap-line { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+    .tsv2 .cap-input { width:56px; height:26px; padding:3px 6px; border-radius:6px; border:1px solid var(--line); font-size:11.5px; background:#fff; color:var(--ink); }
+    .tsv2 .warn { margin:5px 0 0; font-size:11px; color:var(--warn); background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:6px; padding:4px 8px; }
+    .tsv2 .picker { position:relative; }
+    .tsv2 .picker-btn { width:100%; text-align:left; padding:5px 8px; border-radius:6px; border:1px solid var(--line); font-size:11.5px; background:#fff; cursor:pointer; display:flex; justify-content:space-between; gap:6px; height:30px; align-items:center; overflow:hidden; white-space:nowrap; }
+    .tsv2 .picker-btn span:first-child { overflow:hidden; text-overflow:ellipsis; }
+    .tsv2 .all { color:var(--accent); font-weight:650; }
+    .tsv2 .picker-panel { position:absolute; top:calc(100% + 4px); left:0; z-index:20; min-width:250px; max-height:280px; overflow:auto; background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px; box-shadow:0 4px 14px rgba(0,0,0,.08); }
+    .tsv2 .picker-panel label { display:flex; align-items:center; justify-content:flex-start; text-align:left; gap:8px; padding:6px 6px; font-size:12px; font-weight:400; color:var(--ink); cursor:pointer; border-radius:5px; margin:0; width:100%; }
+    .tsv2 .picker-panel input[type=checkbox] { width:14px; height:14px; min-width:14px; margin:0; padding:0; flex:none; position:static; opacity:1; accent-color:var(--accent); }
+    .tsv2 .picker-panel .search { width:100%; height:30px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; font-size:12px; margin-bottom:6px; background:#FFFDF3; }
+    .tsv2 .picker-panel label:hover { background:var(--accent-bg); }
+    .tsv2 .picker-panel .sep { border-top:1px solid var(--grid); margin:4px 0; }
+    .tsv2 .picker-panel .done-row { border-top:1px solid var(--grid); margin-top:4px; padding-top:6px; text-align:right; }
+    .tsv2 .rm { background:none; border:none; color:var(--soft); cursor:pointer; }
+    .tsv2 .mode { display:inline-flex; border:1px solid var(--line); border-radius:7px; overflow:hidden; }
+    .tsv2 .mode button { padding:7px 16px; font-weight:600; border:none; background:#fff; color:var(--soft); cursor:pointer; }
+    .tsv2 .mode button.on { background:var(--accent); color:#fff; }
+    .tsv2 .cal-wrap { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+    .tsv2 .cal { border:1px solid var(--line); border-radius:9px; padding:12px; width:340px; max-width:100%; }
+    .tsv2 .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:650; }
+    .tsv2 .wk { display:grid; grid-template-columns:44px repeat(7,1fr); gap:2px; padding:2px; align-items:center; border-top:1px solid var(--grid); }
+    .tsv2 .wk.headrow { border-top:none; background:#FAFBFA; }
+    .tsv2 .wk label { display:flex; align-items:center; gap:3px; font-size:9.5px; font-weight:650; color:var(--soft); margin:0; cursor:pointer; }
+    .tsv2 .wk .dow { font-size:9.5px; font-weight:650; color:var(--soft); text-align:center; }
+    .tsv2 .cell { height:26px; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:11px; cursor:pointer; }
+    .tsv2 .cell:hover { background:var(--grid); }
+    .tsv2 .cell.out { opacity:.45; }
+    .tsv2 .cell.nohours { color:#B9B9B9; }
+    .tsv2 .cell.sel { background:var(--accent); color:#fff; font-weight:650; opacity:1; }
+    .tsv2 .picked { border:1px solid var(--line); border-radius:9px; padding:12px; flex:1; min-width:220px; }
+    .tsv2 .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .tsv2 .chip { display:inline-flex; align-items:center; gap:6px; padding:3px 6px 3px 10px; border-radius:6px; background:var(--accent-bg); color:var(--accent); font-size:11.5px; font-weight:600; }
+    .tsv2 .chip.bad { background:var(--warn-bg); color:var(--warn); }
+    .tsv2 .chip button { background:none; border:none; color:inherit; cursor:pointer; font-size:11px; padding:0; }
+    .tsv2 .bulk { margin-top:12px; border:1px solid var(--accent-line); background:var(--accent-bg); border-radius:9px; padding:12px 14px; }
+    .tsv2 .bulk .bulk-head { margin:0 0 8px; font-weight:650; }
+    .tsv2 .bulk .bulk-head .muted { font-weight:400; }
+    .tsv2 .bulk .field label { color:var(--soft); }
+    .tsv2 .bulk .field input, .tsv2 .bulk .field select { background:#fff; }
+    .tsv2 .time-grid { display:flex; flex-wrap:wrap; gap:6px; max-height:230px; overflow:auto; background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px; }
+    .tsv2 .time-opt { display:inline-flex; align-items:center; gap:6px; margin:0; padding:5px 9px; border:1px solid var(--line); border-radius:6px; font-size:11.5px; font-weight:600; color:var(--ink); cursor:pointer; background:#fff; white-space:nowrap; }
+    .tsv2 .time-opt input[type=checkbox] { width:13px; height:13px; min-width:13px; margin:0; padding:0; flex:none; position:static; opacity:1; accent-color:var(--accent); }
+    .tsv2 .time-opt.sel { background:var(--accent-bg); border-color:var(--accent-line); color:var(--accent); }
+    .tsv2 .time-opt.taken { opacity:.45; cursor:not-allowed; text-decoration:line-through; }
+    .tsv2 .foot { display:flex; justify-content:space-between; margin-top:20px; }
+    .tsv2 .empty-v2 { text-align:center; padding:40px 16px 28px; }
+    .tsv2 .empty-v2 img { max-width:160px; margin-bottom:14px; }
+    .tsv2 .empty-v2 h3 { font-size:14px; font-weight:650; margin:0 0 6px; color:var(--ink); }
+    .tsv2 .clear-btn { display:inline-flex; align-items:center; gap:5px; background:none; border:none; padding:4px 6px; font-weight:600; color:var(--accent); cursor:pointer; }
+    .tsv2 .clear-btn:hover { text-decoration:underline; }
+    .tsv2 .btn2.outline { border-color:var(--accent); color:var(--accent); }
+    .tsv2 .req { color:var(--danger); font-weight:700; }
+    .tsv2 .section-head { font-size:13px; font-weight:650; color:var(--ink); margin:18px 0 4px; }
+    .tsv2 .section-head.m-b-10 { margin:0 0 10px; }
+    .tsv2 .group-box { background:#F6FAF8; border:1px solid var(--accent-line); border-radius:10px; padding:14px 16px; margin-top:10px; }
+    .tsv2 .group-box .field input, .tsv2 .group-box .field select { background:#fff; }
+    .tsv2 .group-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:4px; }
+    .tsv2 .empty-box { text-align:center; border:1px dashed var(--line); border-radius:10px; padding:28px 16px; }
+    .tsv2 .empty-box img { max-width:110px; margin-bottom:8px; }
+    .tsv2 .empty-box svg { color:var(--soft); margin-bottom:8px; }
+    .tsv2 .empty-box p { margin:0; color:var(--soft); }
+    .tsv2 .note { font-size:11.5px; color:var(--warn); background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:7px; padding:7px 10px; margin-bottom:12px; }
+</style>
+
+<div class="tsv2" ng-click="tsv2.openPicker = null">
+
+    <!-- Schedule card (list view) - declared first so it is cached before ng-include asks for it -->
+    <script type="text/ng-template" id="tsv2-card.html">
+        <div class="card2">
+            <div class="top">
+                <div>
+                    <div class="title">{{s.name || 'Untitled schedule'}}</div>
+                    <div class="muted">
+                        {{tsv2.dateSummary(s)}}
+                        <span class="badge2" ng-class="s.status === 'Active' ? 'on' : 'off'"><span class="dot" ng-if="s.status === 'Active'"></span>{{s.status}}</span>
+                        <span class="badge2 payer" ng-if="s.payerRestricted">Payer-restricted</span>
+                        <span class="badge2 classic" ng-if="s.isLegacyOnly" title="Uses Online slots or visit-type ranges - edit it in the classic Time Slots tab">Classic &mdash; edit in Time Slots tab</span>
+                        <span class="badge2 payer" ng-if="tsv2.capSummary(s)" title="Overall max bookings allowed per day">{{tsv2.capSummary(s)}}</span>
+                        <span class="created" ng-if="tsv2.createdSummary(s)">{{tsv2.createdSummary(s)}}</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px">
+                    <button class="icon-btn" ng-if="!s.isLegacyOnly" ng-click="tsv2.edit(s)" title="Edit">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="M15 5l4 4" /></svg>
+                    </button>
+                    <button class="icon-btn danger" ng-click="tsv2.deleteSchedule(s)" title="Delete">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="grp" ng-repeat="g in s.groups" ng-init="key = s.id + '_' + $index">
+                <div class="grp-head">
+                    <div class="dchips"><span class="dchip" ng-repeat="d in g.days">{{tsv2.dayName(d)}}</span></div>
+                    <span class="muted">
+                        {{tsv2.fmtTime(g.start)}} &ndash; {{tsv2.fmtTime(g.end)}} &middot; {{g.branchName}}
+                        <span ng-if="g.maxPerDay > 0"> &middot; max {{g.maxPerDay}}/day</span>
+                        <span ng-if="g.slots.length"> &middot; <button type="button" class="link" ng-click="tsv2.toggleExpanded(key)">{{g.slots.length}} custom slots configured {{tsv2.expanded[key] ? '&#9652;' : '&#9662;'}}</button></span>
+                        <span ng-if="!g.slots.length"> &middot; all visit reasons</span>
+                    </span>
+                    <!-- slot length stays visible while the list is collapsed -->
+                    <span class="grp-meta">{{tsv2.durationSummary(g)}}</span>
+                </div>
+                <div class="summary" ng-if="g.slots.length && tsv2.expanded[key]">
+                    <div class="summary-row" ng-repeat="r in tsv2.summaryRows(g) track by $index"><b>{{r.time}}</b><span class="muted">{{r.text}}</span><span class="r">{{r.meta}}</span></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <!-- ======================================================= LIST -->
+    <div ng-if="tsv2.view === 'list'" class="panel-v2">
+        <div class="head-row">
+            <div>
+                <h2>Active now</h2>
+                <p class="sub m-b-0">All schedules for this provider &mdash; the active one is highlighted; edit or add new below.</p>
+            </div>
+            <button class="btn2 primary" ng-click="tsv2.startNew()">+ Add new schedule</button>
+        </div>
+
+        <p class="muted" ng-if="tsv2.loading">Loading schedules&hellip;</p>
+        <div class="empty-v2" ng-if="!tsv2.loading && !tsv2.schedules.length">
+            <img src="img/no-data/no-data-icon.png" alt="No schedules" />
+            <h3>No Schedule Created Yet</h3>
+            <p class="muted m-b-0"><button type="button" class="link" ng-click="tsv2.startNew()">Click here</button> to add new schedule</p>
+        </div>
+
+        <div ng-if="tsv2.schedules.length">
+            <p class="sub" ng-if="!tsv2.loading && !tsv2.activeSchedules().length">No active schedule right now.</p>
+
+            <div ng-repeat="s in tsv2.activeSchedules()" ng-include="'tsv2-card.html'"></div>
+
+            <div class="divider" ng-if="tsv2.otherSchedules().length"><span>All other schedules ({{tsv2.otherSchedules().length}})</span></div>
+            <div ng-repeat="s in tsv2.otherSchedules() | limitTo: tsv2.otherVisibleCount" ng-include="'tsv2-card.html'"></div>
+            <button class="btn2 sm" ng-if="tsv2.otherSchedules().length > tsv2.otherVisibleCount" ng-click="tsv2.showMore()">
+                Show {{ (tsv2.otherSchedules().length - tsv2.otherVisibleCount) > 3 ? 3 : (tsv2.otherSchedules().length - tsv2.otherVisibleCount) }} more
+            </button>
+        </div>
+    </div>
+
+    <!-- ======================================================= WIZARD -->
+    <div ng-if="tsv2.view === 'wizard'">
+        <div class="tsv2-title">{{tsv2.model.id ? 'Edit schedule' : 'Add schedule'}}</div>
+        <p class="sub" style="margin-bottom:0">One flow &mdash; basics &amp; hours, slot detail, applies, review</p>
+
+        <!-- tsv2-* class names: the app already has global .step/.stepper styles -->
+        <div class="tsv2-stepper">
+            <div class="tsv2-step" ng-repeat="l in tsv2.stepLabels" ng-class="{active: $index + 1 === tsv2.step, done: $index + 1 < tsv2.step}" ng-click="tsv2.goStep($index + 1)">
+                <span class="n">{{ $index + 1 < tsv2.step ? '&#10003;' : $index + 1 }}</span><span class="lbl">{{l}}</span>
+            </div>
+        </div>
+
+        <!-- ---------------- Step 1: basics & day groups -->
+        <div class="panel-v2" ng-if="tsv2.step === 1">
+            <button class="link" style="margin-bottom:10px" ng-click="tsv2.backToList()">&larr; Back to schedules</button>
+            <div class="head-row">
+                <h2>Schedule basics &amp; day groups</h2>
+                <span class="toggle-label">
+                    <span class="switch" ng-class="{on: tsv2.model.payerRestricted}" ng-click="tsv2.model.payerRestricted = !tsv2.model.payerRestricted"><span class="knob"></span></span>
+                    <span ng-click="tsv2.model.payerRestricted = !tsv2.model.payerRestricted">Payer-restricted scheduling</span>
+                    <button type="button" class="icon-btn" ng-click="tsv2.showPayerInfo = !tsv2.showPayerInfo; $event.stopPropagation()" title="What does this do?">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-5" /><path d="M12 8h.01" /></svg>
+                    </button>
+                    <span class="popover2" ng-if="tsv2.showPayerInfo">When on, each availability slot in Slot detail can be limited to specific payors (including Self Pay). A slot with no payors picked stays open to all payors.</span>
+                </span>
+            </div>
+
+            <p class="sub">Enter a schedule name and define which days, duration and working hours will apply. You can create multiple day groups with the same settings.</p>
+
+            <div class="field">
+                <label>Schedule Name <span class="req">*</span></label>
+                <input type="text" ng-model="tsv2.model.name" maxlength="200" placeholder="e.g. Clinic full week" />
+            </div>
+
+            <div class="section-head">Select Days</div>
+            <p class="sub">Choose the days that will share the same branch, duration and working hours.</p>
+
+            <div class="pills">
+                <span class="pill" ng-repeat="d in tsv2.days" ng-class="{sel: tsv2.building.days.indexOf(d.id) >= 0, taken: tsv2.dayTaken(d.id)}" ng-click="tsv2.toggleBuildingDay(d.id)">{{d.name}}</span>
+            </div>
+
+            <div class="group-box">
+                <div class="section-head m-b-10">Day Group Details</div>
+
+
+                <div class="row-fields">
+                    <div class="field expand flex__1--">
+                        <label>Branch <span class="req">*</span></label>
+                        <select ng-model="tsv2.building.branchId" ng-change="tsv2.onBuildingBranch()" ng-options="b.BranchId as b.BranchName for b in tsv2.branches"></select>
+                    </div>
+                    <div class="field">
+                        <label>Duration <span class="req">*</span></label>
+                        <select ng-model="tsv2.building.duration" ng-options="d as (d + 'm') for d in tsv2.durationOptions(tsv2.building.duration)"></select>
+                    </div>
+                    <div class="field"><label>Start Time <span class="req">*</span></label><input type="time" lang="en-US" ng-model="tsv2.building.start" /></div>
+                    <div class="field"><label>End Time <span class="req">*</span></label><input type="time" lang="en-US" ng-model="tsv2.building.end" /></div>
+                    <div class="field"><label title="Overall max bookings for the day — the classic screen's Max Slots. 0 = no limit">Overall Max / Day</label><input type="number" min="0" ng-model="tsv2.building.maxPerDay" placeholder="0" /></div>
+                    <div class="d__f-- ai__c-- gap__10-- mt__15--">
+                        <button class="btn2 sm primary" ng-click="tsv2.saveGroup()">{{tsv2.editingGroupIndex !== null ? 'Update Day Group' : '+ Add Day Group'}}</button>
+                        <button type="button" class="clear-btn" ng-click="tsv2.cancelEditGroup()" title="{{tsv2.editingGroupIndex !== null ? 'Stop editing this day group' : 'Clear the entered day group details'}}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 6l12 12" />
+                                <path d="M18 6L6 18" />
+                            </svg>
+                            {{tsv2.editingGroupIndex !== null ? 'Cancel edit' : 'Cancel'}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-head">Added Day Groups</div>
+            <div style="margin-top:10px">
+                <div class="empty-box" ng-if="!tsv2.model.groups.length">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>
+                    <p>No day groups yet &mdash; build one above.</p>
+                </div>
+                <div class="card2" ng-repeat="g in tsv2.model.groups">
+                    <div class="top">
+                        <div>
+                            <div class="dchips m-b-5"><span class="dchip light" ng-repeat="d in g.days">{{tsv2.dayName(d)}}</span></div>
+                            <div class="muted">{{tsv2.fmtTime(g.start)}} &ndash; {{tsv2.fmtTime(g.end)}} &middot; {{g.branchName}} &middot; {{g.duration}}-min<span ng-if="g.maxPerDay > 0"> &middot; max {{g.maxPerDay}}/day</span></div>
+                            <span class="badge2" ng-class="g.slots.length ? 'payer' : 'classic'" style="margin:6px 0 0">{{g.slots.length ? g.slots.length + ' custom slots' : 'even default slots'}}</span>
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <button class="icon-btn" ng-click="tsv2.editGroup($index)" title="Edit">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="M15 5l4 4" /></svg>
+                            </button>
+                            <button class="icon-btn danger" ng-click="tsv2.removeGroup($index)" title="Delete">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="foot">
+                <span></span>
+                <div class="d__f-- gap__10--">
+                    <button type="button" class="btn2 outline" ng-click="tsv2.cancelSchedule()">Cancel Schedule Creation</button>
+                    <button class="btn2 primary" ng-click="tsv2.goStep(2)">Save &amp; Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ---------------- Step 2: slot detail -->
+        <div class="panel-v2" ng-if="tsv2.step === 2">
+            <h2>Slot detail <span class="muted" style="font-weight:400;font-size:12px">(optional)</span></h2>
+            <p class="sub">Leave a group as-is and it's open to every visit reason at its duration &mdash; no setup needed. Only customize it if a window needs specific reasons, mixed durations, or a labeled break.</p>
+
+            <div class="card2" ng-repeat="g in tsv2.model.groups" ng-init="gi = $index">
+                <div class="top">
+                    <div>
+                        <div class="dchips m-b-5"><span class="dchip light" ng-repeat="d in g.days">{{tsv2.dayName(d)}}</span></div>
+                        <div class="muted">
+                            {{tsv2.fmtTime(g.start)}} &ndash; {{tsv2.fmtTime(g.end)}} &middot; {{g.branchName}}
+                            <span ng-if="tsv2.editingSlotsGroup !== gi && g.slots.length"> &middot; <button type="button" class="link" ng-click="tsv2.toggleSummary(gi)">{{g.slots.length}} custom slots configured {{tsv2.expandedSummary === gi ? '&#9652;' : '&#9662;'}}</button></span>
+                            <span ng-if="tsv2.editingSlotsGroup !== gi && !g.slots.length"> &middot; {{g.duration}}-min slots, all visit reasons (default)</span>
+                        </div>
+                    </div>
+                    <!-- running total and the day cap sit beside Done so they stay in view while slots are edited -->
+                    <div class="cap-box">
+                        <span class="muted cap-line" ng-if="tsv2.editingSlotsGroup === gi">
+                            Bookings this day: <b>{{tsv2.dayTotal(g)}}</b> of max
+                            <input type="number" min="0" class="cap-input" ng-model="g.maxPerDay" placeholder="0"
+                                   title="Overall max bookings for this day (the classic screen's Max Slots) — 0 = no limit" />
+                            <span ng-if="!(g.maxPerDay > 0)">(no limit)</span>
+                        </span>
+                        <button class="btn2 sm" ng-class="{ghost: tsv2.editingSlotsGroup !== gi}" ng-click="tsv2.toggleEditSlots(gi)">
+                            {{tsv2.editingSlotsGroup === gi ? 'Done' : (g.slots.length ? 'Edit slots' : 'Customize slots')}}
+                        </button>
+                    </div>
+                </div>
+                <p class="warn cap-warn" ng-if="tsv2.editingSlotsGroup === gi && g.maxPerDay > 0 && tsv2.dayTotal(g) > g.maxPerDay">Maximum {{g.maxPerDay}} slots are allowed per day.</p>
+
+                <div class="summary" ng-if="tsv2.editingSlotsGroup !== gi && g.slots.length && tsv2.expandedSummary === gi">
+                    <div class="summary-row" ng-repeat="r in tsv2.summaryRows(g) track by $index"><b>{{r.time}}</b><span class="muted">{{r.text}}</span><span class="r">{{r.meta}}</span></div>
+                </div>
+
+                <div ng-if="tsv2.editingSlotsGroup === gi" style="margin-top:12px">
+                    <p class="sub" ng-if="!g.slots.length">No slots yet &mdash; add one below. Until then the whole group stays open to all visit reasons.</p>
+                    <div class="slot-block" ng-repeat="s in tsv2.sortedSlots(g)" ng-class="{'is-new': s.isNew}">
+                        <div class="slot-row" ng-class="{payer: tsv2.model.payerRestricted}">
+                            <input type="time" lang="en-US" ng-model="s.start" />
+                            <span class="muted" style="text-align:center">&rarr;</span>
+                            <input type="time" lang="en-US" ng-model="s.end" ng-change="s.type === 'Break' && tsv2.onSlotType(s)" />
+                            <select ng-model="s.duration" ng-options="d as (d + 'm') for d in tsv2.durationOptions(s.duration)"></select>
+                            <select ng-model="s.type" ng-change="tsv2.onSlotType(s)">
+                                <option value="Availability">Availability</option>
+                                <option value="Online">Online</option>
+                                <option value="Break">Break</option>
+                            </select>
+
+                            <!-- visit reasons -->
+                            <div class="picker" ng-if="s.type === 'Availability'" ng-click="$event.stopPropagation()">
+                                <button type="button" class="picker-btn" ng-click="tsv2.togglePicker('r' + gi + '_' + $index)">
+                                    <span ng-class="{all: tsv2.allReasons(s, g)}" title="{{tsv2.reasonSummary(s)}}">{{tsv2.reasonLabel(s, g)}}</span>
+                                    <span class="muted">&#9662;</span>
+                                </button>
+                                <div class="picker-panel" ng-if="tsv2.openPicker === 'r' + gi + '_' + $index">
+                                    <input type="text" class="search" ng-model="tsv2.pickerSearch.text" placeholder="Search" />
+                                    <label style="font-weight:650"><input type="checkbox" ng-checked="tsv2.allReasons(s, g)" ng-click="tsv2.setAllReasons(s, g)" /> All visit reasons <span class="muted">(any reason accepted)</span></label>
+                                    <div class="sep"></div>
+                                    <label ng-repeat="r in tsv2.reasonsFor(g) | filter:{Reason: tsv2.pickerSearch.text}"><input type="checkbox" ng-checked="tsv2.hasReason(s, r)" ng-click="tsv2.toggleReason(g, s, r)" /> {{r.Reason}}<span class="muted" ng-if="r.DefaultDurationMinutes"> &middot; {{r.DefaultDurationMinutes}}m</span></label>
+                                    <p class="muted m-b-0" ng-if="!tsv2.reasonsFor(g).length">No active visit reasons for this branch.</p>
+                                    <div class="done-row"><button class="btn2 sm" ng-click="tsv2.openPicker = null">Done</button></div>
+                                </div>
+                            </div>
+                            <!-- online visit reasons -->
+                            <div class="picker" ng-if="s.type === 'Online'" ng-click="$event.stopPropagation()">
+                                <button type="button" class="picker-btn" ng-click="tsv2.togglePicker('o' + gi + '_' + $index)">
+                                    <span ng-class="{all: tsv2.allOnlineReasons(s)}" title="{{tsv2.onlineReasonSummary(s)}}">{{tsv2.onlineReasonLabel(s)}}</span>
+                                    <span class="muted">&#9662;</span>
+                                </button>
+                                <div class="picker-panel" ng-if="tsv2.openPicker === 'o' + gi + '_' + $index">
+                                    <input type="text" class="search" ng-model="tsv2.pickerSearch.text" placeholder="Search" />
+                                    <label style="font-weight:650"><input type="checkbox" ng-checked="tsv2.allOnlineReasons(s)" ng-click="tsv2.setAllOnlineReasons(s)" /> All online visit reasons</label>
+                                    <div class="sep"></div>
+                                    <label ng-repeat="r in tsv2.onlineReasons | filter:{OnlineVisitReason: tsv2.pickerSearch.text}"><input type="checkbox" ng-checked="tsv2.hasOnlineReason(s, r)" ng-click="tsv2.toggleOnlineReason(s, r)" /> {{r.OnlineVisitReason}}</label>
+                                    <p class="muted m-b-0" ng-if="!tsv2.onlineReasons.length">No online visit reasons set up.</p>
+                                    <div class="done-row"><button class="btn2 sm" ng-click="tsv2.openPicker = null">Done</button></div>
+                                </div>
+                            </div>
+                            <span class="muted" ng-if="s.type === 'Break'" style="font-style:italic;font-size:11px">Splits into individually-unblockable segments</span>
+
+                            <!-- payors -->
+                            <div class="picker" ng-if="tsv2.model.payerRestricted" ng-click="$event.stopPropagation()">
+                                <button type="button" class="picker-btn" ng-if="s.type === 'Availability'" ng-click="tsv2.togglePicker('p' + gi + '_' + $index)">
+                                    <span ng-class="{all: tsv2.allPayors(s)}" title="{{tsv2.payorSummary(s)}}">{{tsv2.payorLabel(s)}}</span>
+                                    <span class="muted">&#9662;</span>
+                                </button>
+                                <div class="picker-panel" ng-if="tsv2.openPicker === 'p' + gi + '_' + $index">
+                                    <label style="font-weight:650"><input type="checkbox" ng-checked="tsv2.allPayors(s)" ng-click="tsv2.setAllPayors(s)" /> All payors</label>
+                                    <div class="sep"></div>
+                                    <label ng-repeat="p in tsv2.payors"><input type="checkbox" ng-checked="tsv2.hasPayor(s, p)" ng-click="tsv2.togglePayor(s, p)" /> {{p.PayorName}}</label>
+                                    <div class="done-row"><button class="btn2 sm" ng-click="tsv2.openPicker = null">Done</button></div>
+                                </div>
+                            </div>
+
+                            <input type="number" min="0" ng-model="s.maxSlots" ng-disabled="s.type === 'Break'"
+                                   placeholder="{{s.type === 'Break' ? '—' : ''}}"
+                                   title="{{s.type === 'Break' ? 'A break takes no bookings' : 'Max bookings per slot'}}" />
+                            <button class="rm" ng-click="tsv2.removeSlot(g, s)" title="Remove">&#10005;</button>
+                        </div>
+                        <p class="slot-dur" ng-if="tsv2.slotInfo(g, s).span > 0">
+                            Runs {{tsv2.fmtTime(s.start)}} &rarr; {{tsv2.fmtTime(s.end)}} &middot; {{tsv2.slotInfo(g, s).span}} min &middot;
+                            {{ tsv2.slotInfo(g, s).count === 1 ? ('one ' + s.duration + '-min ' + (s.type === 'Break' ? 'break segment' : 'slot')) : ('splits into ' + tsv2.slotInfo(g, s).count + ' × ' + s.duration + '-min ' + (s.type === 'Break' ? 'break segments' : 'slots')) }}
+                        </p>
+                        <p class="warn" ng-repeat="w in tsv2.slotInfo(g, s).warnings track by $index">{{w}}</p>
+                    </div>
+                    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                        <button class="btn2 sm" ng-click="tsv2.addSlot(g)">+ Add slot</button>
+                        <button class="btn2 sm" ng-click="tsv2.openBulk(g, gi)">+ Pick times</button>
+                    </div>
+
+                    <!-- add several slots at once, like the classic "Select Timeslot" list -->
+                    <div class="bulk" ng-if="tsv2.bulk && tsv2.bulk.gi === gi" ng-click="$event.stopPropagation()">
+                        <p class="bulk-head">
+                            Settings for the slots you pick
+                            <span class="muted">&mdash; these apply to every time ticked below, and each one becomes a row above that you can still edit.</span>
+                        </p>
+                        <div class="row-fields">
+                            <div class="field">
+                                <label>Slot type</label>
+                                <select ng-model="tsv2.bulk.type">
+                                    <option value="Availability">Availability</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Break">Break</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Duration</label>
+                                <select ng-model="tsv2.bulk.duration" ng-change="tsv2.onBulkDuration()" ng-options="d as (d + 'm') for d in tsv2.durationOptions(tsv2.bulk.duration)"></select>
+                            </div>
+                            <div class="field">
+                                <label title="How far apart the offered start times are. Step 5m on a 60-min slot offers 9:00, 9:05, 9:10 ... so a window like 9:30 – 10:30 can be built.">Start every</label>
+                                <select ng-model="tsv2.bulk.step" ng-change="tsv2.onBulkStep()" ng-options="d as (d + 'm') for d in tsv2.bulkStepOptions()"></select>
+                            </div>
+                            <div class="field" ng-if="tsv2.bulk.type === 'Availability'">
+                                <label>Visit reasons</label>
+                                <div class="picker">
+                                    <button type="button" class="picker-btn" ng-click="tsv2.togglePicker('br' + gi)">
+                                        <span ng-class="{all: tsv2.allReasons(tsv2.bulk, g)}" title="{{tsv2.reasonSummary(tsv2.bulk)}}">{{tsv2.reasonLabel(tsv2.bulk, g)}}</span>
+                                        <span class="muted">&#9662;</span>
+                                    </button>
+                                    <div class="picker-panel" ng-if="tsv2.openPicker === 'br' + gi">
+                                        <input type="text" class="search" ng-model="tsv2.pickerSearch.text" placeholder="Search" />
+                                        <label style="font-weight:650"><input type="checkbox" ng-checked="tsv2.allReasons(tsv2.bulk, g)" ng-click="tsv2.setAllReasons(tsv2.bulk, g)" /> All visit reasons</label>
+                                        <div class="sep"></div>
+                                        <label ng-repeat="r in tsv2.reasonsFor(g) | filter:{Reason: tsv2.pickerSearch.text}"><input type="checkbox" ng-checked="tsv2.hasReason(tsv2.bulk, r)" ng-click="tsv2.toggleReason(g, tsv2.bulk, r)" /> {{r.Reason}}</label>
+                                        <div class="done-row"><button class="btn2 sm" ng-click="tsv2.openPicker = null">Done</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field" ng-if="tsv2.bulk.type === 'Online'">
+                                <label>Online visit reasons</label>
+                                <div class="picker">
+                                    <button type="button" class="picker-btn" ng-click="tsv2.togglePicker('bo' + gi)">
+                                        <span ng-class="{all: tsv2.allOnlineReasons(tsv2.bulk)}" title="{{tsv2.onlineReasonSummary(tsv2.bulk)}}">{{tsv2.onlineReasonLabel(tsv2.bulk)}}</span>
+                                        <span class="muted">&#9662;</span>
+                                    </button>
+                                    <div class="picker-panel" ng-if="tsv2.openPicker === 'bo' + gi">
+                                        <input type="text" class="search" ng-model="tsv2.pickerSearch.text" placeholder="Search" />
+                                        <label style="font-weight:650"><input type="checkbox" ng-checked="tsv2.allOnlineReasons(tsv2.bulk)" ng-click="tsv2.setAllOnlineReasons(tsv2.bulk)" /> All online visit reasons</label>
+                                        <div class="sep"></div>
+                                        <label ng-repeat="r in tsv2.onlineReasons | filter:{OnlineVisitReason: tsv2.pickerSearch.text}"><input type="checkbox" ng-checked="tsv2.hasOnlineReason(tsv2.bulk, r)" ng-click="tsv2.toggleOnlineReason(tsv2.bulk, r)" /> {{r.OnlineVisitReason}}</label>
+                                        <div class="done-row"><button class="btn2 sm" ng-click="tsv2.openPicker = null">Done</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field narrow" ng-if="tsv2.bulk.type !== 'Break'"><label>Max / slot</label><input type="number" min="0" ng-model="tsv2.bulk.maxSlots" /></div>
+                        </div>
+
+                        <label class="muted" style="font-weight:650;display:block;margin:4px 0 6px">
+                            Select timeslots ({{tsv2.bulkPickedCount()}} picked)
+                            <button class="link" style="margin-left:8px" ng-click="tsv2.bulkSelectAll(g)">{{tsv2.bulkPickedCount() ? 'None' : 'Fill the day'}}</button>
+                            <span class="muted" style="font-weight:400" ng-if="tsv2.bulk.step < tsv2.bulk.duration"> &mdash; start times overlap, so picking one greys out the ones it would clash with</span>
+                        </label>
+                        <div class="time-grid">
+                            <label class="time-opt" ng-repeat="t in tsv2.bulkTimesCached(g)" ng-class="{taken: tsv2.bulkBlocked(g, t), sel: tsv2.bulk.picked[t.key]}"
+                                   title="{{t.taken ? 'Already covered by a slot' : (tsv2.bulkBlocked(g, t) ? 'Overlaps a time already ticked' : '')}}">
+                                <input type="checkbox" ng-checked="tsv2.bulk.picked[t.key]" ng-disabled="tsv2.bulkBlocked(g, t)" ng-click="tsv2.toggleBulkTime(g, t)" />{{t.label}}
+                            </label>
+                        </div>
+                        <div style="margin-top:10px;display:flex;gap:8px">
+                            <button class="btn2 sm primary" ng-click="tsv2.bulkAdd(g)">Add {{tsv2.bulkPickedCount() || ''}} slot{{tsv2.bulkPickedCount() === 1 ? '' : 's'}}</button>
+                            <button class="btn2 sm ghost" ng-click="tsv2.closeBulk()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="foot">
+                <button class="btn2 ghost" ng-click="tsv2.goStep(1)">Back</button>
+                <button class="btn2 primary" ng-click="tsv2.goStep(3)">Save &amp; Continue</button>
+            </div>
+        </div>
+
+        <!-- ---------------- Step 3: applies -->
+        <div class="panel-v2" ng-if="tsv2.step === 3">
+            <h2>Applies</h2>
+            <p class="sub">Decide how this schedule maps onto the calendar &mdash; a recurring weekly pattern, or specific one-off dates.</p>
+
+            <div class="field">
+                <div class="mode">
+                    <button type="button" ng-class="{on: tsv2.model.dateMode === 'recurring'}" ng-click="tsv2.setDateMode('recurring')">Recurring</button>
+                    <button type="button" ng-class="{on: tsv2.model.dateMode === 'custom'}" ng-click="tsv2.setDateMode('custom')">Custom dates</button>
+                </div>
+            </div>
+
+            <div ng-if="tsv2.model.dateMode === 'recurring'">
+                <div class="note" ng-if="tsv2.model.repeatNeedsReview">This schedule used a repeat option the new screen doesn't offer (e.g. "1st week of month"). Pick one of the options below before saving.</div>
+                <div class="row-fields">
+                    <div class="field">
+                        <label>Repeat</label>
+                        <select ng-model="tsv2.model.everyType" ng-change="tsv2.model.repeatNeedsReview = false" ng-options="r.id as r.name for r in tsv2.repeats"></select>
+                    </div>
+                    <!-- same picker as the rest of the app: text input, MM-DD-YYYY -->
+                    <div class="field"><label>From</label>
+                        <input type="text" placeholder="MM-DD-YYYY" uib-datepicker-popup="MM-dd-yyyy" ng-model="tsv2.model.fromDate"
+                               readonly ng-click="tsv2.fromOpen = !tsv2.fromOpen" is-open="tsv2.fromOpen"
+                               showWeeks="false" show-button-bar="false" />
+                    </div>
+                    <div class="field"><label>To</label>
+                        <input type="text" placeholder="MM-DD-YYYY" uib-datepicker-popup="MM-dd-yyyy" ng-model="tsv2.model.toDate"
+                               readonly ng-click="tsv2.toOpen = !tsv2.toOpen" is-open="tsv2.toOpen"
+                               showWeeks="false" show-button-bar="false" min-date="tsv2.model.fromDate" />
+                    </div>
+                </div>
+                <p class="sub">Even / odd weeks count weeks within each month (weeks start on Sunday), the same as the classic Connect screen. Alternate repeats every other week starting from the From date.</p>
+            </div>
+
+            <div ng-if="tsv2.model.dateMode === 'custom'" class="cal-wrap">
+                <div class="cal">
+                    <div class="cal-head">
+                        <button type="button" class="btn2 sm ghost" ng-click="tsv2.navCal(-1)">&lsaquo;</button>
+                        <span>{{tsv2.monthTitle()}}</span>
+                        <button type="button" class="btn2 sm ghost" ng-click="tsv2.navCal(1)">&rsaquo;</button>
+                    </div>
+                    <div style="border:1px solid var(--line);border-radius:7px;overflow:hidden">
+                        <div class="wk headrow">
+                            <label><input type="checkbox" ng-checked="tsv2.monthAllPicked()" ng-click="tsv2.toggleMonth()" />All</label>
+                            <div class="dow" ng-repeat="d in tsv2.days">{{d.name}}</div>
+                        </div>
+                        <div class="wk" ng-repeat="week in tsv2.weeks()">
+                            <label><input type="checkbox" ng-checked="tsv2.weekAllPicked(week)" ng-click="tsv2.toggleWeek(week)" />Wk{{$index + 1}}</label>
+                            <div class="cell" ng-repeat="c in week" ng-class="{sel: tsv2.isPicked(c.ds), out: !c.inMonth, nohours: !c.hasHours}" title="{{c.hasHours ? '' : 'No day group covers this weekday'}}" ng-click="tsv2.toggleDate(c.ds)">{{c.day}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="picked">
+                    <label class="muted" style="font-weight:650;display:block;margin-bottom:8px">Selected dates ({{tsv2.model.customDates.length}})</label>
+                    <div class="chips">
+                        <span class="chip" ng-repeat="ds in tsv2.model.customDates" ng-class="{bad: tsv2.datesWithoutHours().indexOf(ds) >= 0}">{{tsv2.fmtDate(ds)}}<button ng-click="tsv2.toggleDate(ds)">&#10005;</button></span>
+                        <span class="muted" ng-if="!tsv2.model.customDates.length">Check a week to select all 7 days, or click individual dates &mdash; e.g. a half day for one specific Tuesday.</span>
+                    </div>
+                    <p class="warn" ng-if="tsv2.datesWithoutHours().length">{{tsv2.datesWithoutHours().length}} picked date(s) fall on a weekday with no day group and won't be bookable.</p>
+                </div>
+            </div>
+
+            <div class="foot">
+                <button class="btn2 ghost" ng-click="tsv2.goStep(2)">Back</button>
+                <button class="btn2 primary" ng-click="tsv2.goStep(4)">Save &amp; Continue</button>
+            </div>
+        </div>
+
+        <!-- ---------------- Step 4: review & save -->
+        <div class="panel-v2" ng-if="tsv2.step === 4">
+            <h2>Review &amp; save</h2>
+            <p class="sub">This is exactly what will appear in the schedule list once saved.</p>
+
+            <div class="card2">
+                <div class="title">{{tsv2.model.name || 'Untitled schedule'}}</div>
+                <div class="muted m-b-5">
+                    <span ng-if="tsv2.model.dateMode === 'recurring'">{{tsv2.model.fromDate |date:'MM-dd-yyyy'}} &rarr; {{tsv2.model.toDate |date:'MM-dd-yyyy'}} &middot; {{tsv2.repeatName(tsv2.model.everyType)}}</span>
+                    <span ng-if="tsv2.model.dateMode === 'custom'">{{tsv2.model.customDates.length}} one-off date{{tsv2.model.customDates.length === 1 ? '' : 's'}}</span>
+                    <span class="badge2" ng-class="tsv2.model.active ? 'on' : 'off'">{{tsv2.model.active ? 'Active' : 'Inactive'}}</span>
+                    <span class="badge2 payer" ng-if="tsv2.model.payerRestricted">Payer-restricted</span>
+                </div>
+                <div class="chips m-b-10" ng-if="tsv2.model.dateMode === 'custom'"><span class="chip" style="padding:3px 10px" ng-repeat="ds in tsv2.model.customDates">{{tsv2.fmtDate(ds)}}</span></div>
+                <div class="grp" ng-repeat="g in tsv2.model.groups" ng-init="gi = $index">
+                    <div class="grp-head">
+                        <div class="dchips"><span class="dchip" ng-repeat="d in g.days">{{tsv2.dayName(d)}}</span></div>
+                        <span class="muted">
+                            {{tsv2.fmtTime(g.start)}} &ndash; {{tsv2.fmtTime(g.end)}} &middot; {{g.branchName}}
+                            <span ng-if="g.slots.length"> &middot; <button type="button" class="link" ng-click="tsv2.toggleSummary(gi)">{{g.slots.length}} custom slots configured {{tsv2.expandedSummary === gi ? '&#9652;' : '&#9662;'}}</button></span>
+                            <span ng-if="!g.slots.length"> &middot; {{g.duration}}-min slots, all visit reasons (default)</span>
+                        </span>
+                    </div>
+                    <div class="summary" ng-if="g.slots.length && tsv2.expandedSummary === gi">
+                        <div class="summary-row" ng-repeat="r in tsv2.summaryRows(g) track by $index"><b>{{r.time}}</b><span class="muted">{{r.text}}</span><span class="r">{{r.meta}}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toggle-label" style="margin-top:6px">
+                <span class="switch" ng-class="{on: tsv2.model.active}" ng-click="tsv2.model.active = !tsv2.model.active"><span class="knob"></span></span>
+                <span ng-click="tsv2.model.active = !tsv2.model.active">{{tsv2.model.active ? 'Active' : 'Inactive'}}</span>
+                <span class="muted" style="font-weight:400">&mdash; {{tsv2.model.active ? 'bookable dates are created on save; a date already used by another schedule of this provider on the same branch moves to this one.' : 'saved but not bookable.'}}</span>
+            </div>
+
+            <div class="foot">
+                <button class="btn2 ghost" ng-click="tsv2.goStep(3)">Back</button>
+                <button class="btn2 primary" ng-disabled="tsv2.saving" ng-click="tsv2.save()">{{tsv2.saving ? 'Saving&hellip;' : 'Save schedule'}}</button>
+            </div>
+        </div>
+    </div>
+</div>

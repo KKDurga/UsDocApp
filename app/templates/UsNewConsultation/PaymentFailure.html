@@ -1,0 +1,176 @@
+﻿<div class="height__100-- mx__10--" ng-controller="UsPatientPaymentctrl">
+    <div class="wrapper height__100--">
+        <div id="header__main--">
+            <div id="header__logo--">
+                <!--ng-click="switchMainProfileTab(5)"-->
+                <img src="img/logo/logo-white.svg" ng-click="NavigateToMainScreen()" />
+            </div>
+            <div id="header__Details--">
+                <div id="header__Search--" class="dropdown">
+                    <button type="button"
+                            data-toggle="dropdown"
+                            class="dropdown-toggle button__search--"
+                            ng-click="focusPatientSearchInput()">
+                        Patient search <i class="icons__w16-- search__w16--w"></i>
+                    </button>
+                    <div class="dropdown-menu" ng-click="stopClosingDropDown($event)">
+                        <div class="section__style--4 height__100-- box-shadow-1">
+                            <div class="section__header-- p-8">
+                                <ul class="flex-flow-list">
+                                    <li>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom" id="oldmrId1" name="patientSearch" ng-value="1" ng-model="selectedPatientObj.FollwuppatSearchType" aria-invalid="false" enter-directive ng-change="ChangePatientSearch(selectedPatientObj.FollwuppatSearchType)">
+                                            <label for="oldmrId1" class="radio-custom-label cur-poiter mb-0">{{ 'PATIENTMRNO' | translate}}</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom" id="OldNameId1" name="patientSearch" ng-value="2" ng-model="selectedPatientObj.FollwuppatSearchType" aria-invalid="false" enter-directive ng-change="ChangePatientSearch(selectedPatientObj.FollwuppatSearchType)">
+                                            <label for="OldNameId1" class="radio-custom-label cur-poiter mb-0">{{ 'NAMEMOBILE' | translate}}</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom" id="DOBlist" name="patientSearch" ng-model="selectedPatientObj.FollwuppatSearchType" ng-value="4" ng-change="ChangePatientSearch(selectedPatientObj.FollwuppatSearchType)">
+                                            <label for="DOBlist" class="radio-custom-label cur-poiter mb-0 ">{{ 'DOB' | translate}}</label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="section__body-- height__100-- p-0">
+                                <div class="dis-flex align-items-center justify-space-between border-bottom p-6 gap-x-10">
+                                    <input class="input__style--3  text-capitalize" id="single-button" type="text" ng-focus="true" uib-dropdown-toggle="" ng-if="selectedPatientObj.FollwuppatSearchType==1" ng-model="selectedPatientObj.PatientDisplayId" ng-change="SearchByText(selectedPatientObj.PatientDisplayId,'DisplayId')" placeholder="{{ 'SEARCHMRNO' | translate}}" enter-directive autocomplete="off" maxlength="20" allowhyphen>
+                                    <input class="input__style--3  text-capitalize" id="single-button" type="text" ng-focus="true" uib-dropdown-toggle="" ng-if="selectedPatientObj.FollwuppatSearchType==2" ng-model="selectedPatientObj.PatientName" ng-model-options="{ debounce: 500 }" ng-change="SearchByText(selectedPatientObj.PatientName,'Name')" placeholder="{{ 'SEARCHPATIENTANDMOBILE' | translate}}" special-Only autocomplete="off" maxlength="30">
+                                    <input type="text" class="input__style--3 text-capitalize " id="single-button" ng-model="selectedPatientObj.DOBSearch" ng-focus="true" autocomplete="off" ng-if="selectedPatientObj.FollwuppatSearchType==4" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-change="SearchByText(selectedPatientObj.DOBSearch,'DOBSearch')" />
+
+                                    <button class="btn__lg-- btn__1d5558--o grid-gap-5 align-items-center white-nowrap" ng-click="navtoAddPatientProfilePopup(1);">
+                                        <i class="asc__icons--w12 add-icon"></i>
+                                        {{ 'ADDNEWPATIENT' | translate}}
+                                    </button>
+                                </div>
+                                <div class="dis-flex flex-direction-column height__100--">
+                                    <div class="pos-relative height__100--">
+                                        <div class="adjustable-position slim-scroll">
+                                            <div class="dis-flex flex-direction-column gap-y-5 px-12" ng-show="patients.length > 0">
+                                                <p class="text-s13w5d1d1d1 color-656565 p-l-10 font-weight-600"> {{patients.length}} Results Found</p>
+                                                <ul class="d__f-- ai__c-- fw__w-- list__unstyled-- m__0--" auto-focus-items items="patients" on-select="RefreshProfile(item)">
+                                                    <li class="hover__f5f5f5--f width__100-- bbw__1-- bs__s-- bw__1-- bc__f2f2f2-- c__p--" ng-repeat="patientitem in patients" ng-click="RefreshProfile(patientitem)">
+                                                        <table class="table tableno-bordered m-0 table-layout-fix" id="tblPatientResults">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="dis-flex align-items-center grid-gap-10">
+                                                                            <img ng-show="patientitem.S3URL != ''" width="100" height="100" src="{{patientitem.S3URL}}" image-viewer />
+                                                                            <img ng-show="patientitem.S3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                                                                            <div class="vs__list--1 min-w-0">
+                                                                                <p class="font-weight-500">{{patientitem.FullName}}</p>
+                                                                                <span>{{patientitem.DisplayID}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="valign-middle text-center">
+                                                                        <span class="text-s13w5d1d1d1 font-weight-400 color-656565">{{patientitem.DOB |  date:'MM-dd-yyyy'}}</span>
+                                                                    </td>
+                                                                    <td class="valign-middle text-center">
+                                                                        <span class="text-s13w5d1d1d1 font-weight-400 color-656565">{{patientitem.UsMobileNoFormate}}</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <!-- No Match Found Div-->
+                                            <div class="dis-flex align-items-center justify-content-center height__100--" ng-show="patients.length == 0">
+                                                <div class="dis-inline-flex grid-gap-10 flex-direction-column m-auto w-300 text-center">
+                                                    <p class="text-s14w600c000 m-0 text-center">Who's coming today? Let's find them!</p>
+                                                    <span class="text-s12w400C000 text-4a4a4a text-center fs-13"> Search by name, MR number, or mobile number to find the right patient and schedule their next visit.</span>
+                                                    <!--<div class="dis-flex">
+                                            <button class="btn__lg-- btn__1d5558--f m-auto grid-gap-5">
+                                                <i class="asc__icons--w12 add-icon"></i>
+                                                Add New Patient
+                                            </button>
+                                        </div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--ng-click="emailReferal()"-->
+                <div id="header__email--">
+                    <a href="javascript:;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M11.334 13.6667H4.66732C2.66732 13.6667 1.33398 12.6667 1.33398 10.3333V5.66666C1.33398 3.33333 2.66732 2.33333 4.66732 2.33333H11.334C13.334 2.33333 14.6673 3.33333 14.6673 5.66666V10.3333C14.6673 12.6667 13.334 13.6667 11.334 13.6667Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M11.3327 6L9.24601 7.66667C8.55935 8.21333 7.43268 8.21333 6.74601 7.66667L4.66602 6" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+                <div id="header__notifications--">
+                    <a href="javascript:;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8.01437 1.94011C5.8077 1.94011 4.01437 3.73344 4.01437 5.94011V7.86678C4.01437 8.27344 3.84103 8.89344 3.63437 9.24011L2.8677 10.5134C2.39437 11.3001 2.72104 12.1734 3.5877 12.4668C6.46103 13.4268 9.56103 13.4268 12.4344 12.4668C13.241 12.2001 13.5944 11.2468 13.1544 10.5134L12.3877 9.24011C12.1877 8.89344 12.0144 8.27344 12.0144 7.86678V5.94011C12.0144 3.74011 10.2144 1.94011 8.01437 1.94011Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" />
+                            <path d="M9.24792 2.13427C9.04125 2.07427 8.82792 2.0276 8.60792 2.00093C7.96792 1.92093 7.35458 1.9676 6.78125 2.13427C6.97458 1.64093 7.45458 1.29427 8.01458 1.29427C8.57458 1.29427 9.05458 1.64093 9.24792 2.13427Z" stroke="white" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.0098 12.7057C10.0098 13.8057 9.10977 14.7057 8.00977 14.7057C7.4631 14.7057 6.95643 14.4791 6.59643 14.1191C6.23643 13.7591 6.00977 13.2524 6.00977 12.7057" stroke="white" stroke-width="1.2" stroke-miterlimit="10" />
+                        </svg>
+                    </a>
+                </div>
+                <div id="header__hospital--">
+                    <a href="javascript:;" data-toggle="dropdown" class="dropdown-toggle">
+                        <div class="dis-flex align-items-center gap-x-10">
+                            <img ng-if="userProfilePic==''" ng-src="img/register-defaultuser-ico.png" width="26" height="26" class="bradius-20" />
+                            <img ng-if="userProfilePic!=''" src="{{userProfilePic}}" width="26" height="26" class="bradius-20" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="7" viewBox="0 0 14 7" fill="none">
+                                <path d="M13 1L8.06061 5.89938C7.47727 6.47799 6.52273 6.47799 5.93939 5.89938L1 1" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="profile-dropdown dropdown-menu">
+                        <div class="pd-aup"></div>
+                        <div class="pd-inner-top">
+
+                            <img ng-if="userProfilePic==''" ng-src="img/register-defaultuser-ico.png" class="user-photo" alt="Doctor Name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" />
+
+                            <img ng-if="userProfilePic!=''" src="{{userProfilePic}}" class="user-photo" alt="Doctor Name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" />
+                            <div class="pd-name">
+                                <span class="dropdown-toggle name" id="profileMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="spn-address" ng-bind="lRName"></span> <span class="spn-address" ng-bind="mainDisplayName"></span>
+                                </span>
+                                <span>
+                                    <span ng-bind="orgUsersData[0].ClinicName"></span>
+                                </span>
+                                <span>
+                                    <span ng-bind="orgUsersData[0].Address2"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="dis-flex align-items-center m-t-0 m-b-10">
+                            <b class="font-weight-500 m-l-15">{{ 'LANGUAGE' | translate}}: </b>
+                            <button class="btn btn-translation m-l-5" ng-class="(languageObj.selectedLang == 'en') ? 'btn-translation-active' : 'btn-translation'" ng-click="activeLanguageChange('en')">English</button>
+                            <button class="btn btn-translation m-l-5" ng-class="(languageObj.selectedLang == 'sp') ? 'btn-translation-active' : 'btn-translation'" ng-click="activeLanguageChange('sp')">Spanish</button>
+                            <button class="btn btn-translation m-l-5" ng-class="(languageObj.selectedLang == 'fr') ? 'btn-translation-active' : 'btn-translation'" ng-click="activeLanguageChange('fr')">French</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="height__100-- pt__44--">
+            <div class="view-container height__100--">
+                <div class="height__100-- bg__FFFFFF--">
+                    <div class="height__100-- p__6--x d__f-- fd__c--">
+                        <div class="payment-success">
+                            <h2>Payment Failure</h2>
+                            <p>Go to HOME</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  

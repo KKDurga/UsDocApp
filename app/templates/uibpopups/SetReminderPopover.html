@@ -1,0 +1,302 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <div class="us-consultation-tabs">
+            <ul id="myTab" role="tablist">
+                <li ng-class="ReminderTab == 1 ?'active':''">
+                    <a id="home-tab" data-bs-toggle="tab"
+                       aria-controls="home-tab-pane" ng-click="switchReminderTab(1)">
+                        General Reminder
+                    </a>
+                </li>
+                <li ng-class="ReminderTab == 2?'active':''">
+                    <a id="profile-tab" data-bs-toggle="tab"
+                       aria-controls="profile-tab-pane" ng-click="switchReminderTab(2)">
+                        Appointment Reminder
+                    </a>
+                </li>
+                <li ng-class="ReminderTab == 5?'active':''">
+                    <a id="profile-tab" data-bs-toggle="tab"
+                       aria-controls="profile-tab-pane" ng-click="switchReminderTab(5)">
+                        Glass Reminder
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <a class="btn__close--2" ng-click="navtoClearReminderObj()">
+            <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- fd__c-- gap__10--" ng-if="false">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form__group">
+                        <label>{{ 'SELECTDOCTOR' | translate}}</label>
+                        <div>
+                            <ui-select ng-model="ReminderObj.DocObj" theme="bootstrap" on-select="OnReminderDocSelect(ReminderObj.DocObj)" class="form__uiselect">
+                                <ui-select-match placeholder="{{ 'SELECT' | translate}}" data-toggle="dropdown">{{ReminderObj.DocObj.SecondUserFullName?ReminderObj.DocObj.SecondUserFullName:"Select Doctors"}}</ui-select-match>
+                                <ui-select-choices repeat="item in clinicDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                    <span ng-bind-html="item.SecondUserFullName | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form__group">
+                        <label>{{ 'VISITREASON' | translate}}</label>
+                        <div class="dropdown width__100-- ">
+                            <button class="form__control width__100-- text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                {{ReminderObj.VisitReasonName != "" ? ReminderObj.VisitReasonName : 'Select'}} <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                            </button>
+                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3">
+                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                    <span class="input-group-addon">
+                                        <span class="mainsearch-App">
+                                            <i class="fas fa-search"></i>
+                                        </span>
+                                    </span>
+                                    <input type="text" class="form-control" placeholder=" {{ 'SEARCHVISITREASON' | translate}}" ng-model="ReminderObj.SearchText" />
+                                </div>
+                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                    <ul>
+                                        <li role="presentation" ng-repeat="item in GetVisitReasonsArray | filter:{'Reason':ReminderObj.SearchText}"
+                                            ng-click="onSelectReminderVisitReason(item)">
+                                            <a href="javascript:;" ng-bind="item.Reason"> </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <fieldset class="pos-relative">
+                        <div class="dis-inline-block">
+                            <input id="doctempInv20" class="radio-custom" btn-radio="'Y'" value="Date" type="radio"
+                                   ng-checked="ReminderObj.Type =='Date'"
+                                   ng-click="ReminderObj.Type='Date'"
+                                   ng-model="ReminderObj.Type"
+                                   ng-change="changeReminderType(ReminderObj.Type)">
+                            <label for="doctempInv20" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'DATE' | translate}}</label>
+                        </div>
+                        <div class="dis-inline-block m-l-10">
+                            <input id="doctempInv10" class="radio-custom" btn-radio="'N'" value="Duration" type="radio"
+                                   ng-checked="ReminderObj.Type =='Duration'"
+                                   ng-click="ReminderObj.Type='Duration'"
+                                   ng-model="ReminderObj.Type"
+                                   ng-change="changeReminderType(ReminderObj.Type)">
+                            <label for="doctempInv10" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'DURATION' | translate}}</label>
+                        </div>
+                    </fieldset>
+                    <div class="form__group" ng-Show="ReminderObj.Type =='Date'">
+                        <label>Reminder Date</label>
+                        <input type="text" placeholder="MM-DD-YYYY" class="icons-calendar" ng-model="ReminderObj.ReminderDate" datepickeruniversaldate readonly/>
+                    </div>
+                    <div class="input__group" ng-Show="ReminderObj.Type =='Duration'">
+                        <label>{{ 'DURATION' | translate}}</label>
+                        <div class="d__f-- ai__c--">
+                            <input type="text" ng-model="ReminderObj.Duration" ng-change="ChangeDurationstep()" placeholder="0" numbers-only maxlength="3"/>
+                            <select ng-model="ReminderObj.DurationType" class="width-40">
+                                <option value="">{{ 'SELECT' | translate}}</option>
+                                <option value="D">{{ 'DAYS' | translate}}</option>
+                                <option value="W">{{ 'WEEK' | translate}}</option>
+                                <option value="M">{{ 'MONTH' | translate}}</option>
+                                <option value="Y">{{ 'YEAR' | translate}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form__group">
+                        <textarea ng-model="ReminderObj.ReminderRemarks" placeholder="{{ 'ENTERREMINDERREMARKS' | translate}}" maxlength="500"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row height__100--">
+            <div class="col-lg-12 ">
+                <div class="ehr-tabs m-l-5">
+                   
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" ng-if="ReminderTab == 2">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form__group">
+                                        <label>{{ 'SELECTDOCTOR' | translate}}</label>
+                                    </div>
+                                    <ui-select ng-model="ReminderObj.DocObj" theme="bootstrap" on-select="OnReminderDocSelect(ReminderObj.DocObj)" class="form__uiselect width__100-- ">
+                                        <ui-select-match placeholder="{{ 'SELECT' | translate}}" data-toggle="dropdown">{{ReminderObj.DocObj.SecondUserFullName?ReminderObj.DocObj.SecondUserFullName:"Select Doctors"}}</ui-select-match>
+                                        <ui-select-choices repeat="item in clinicDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                            <span ng-bind-html="item.SecondUserFullName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form__group">
+                                        <label>{{ 'VISITREASON' | translate}}</label>
+                                        <div class="dropdown width__100-- " button-dropdown-direction>
+                                            <button class="form__control width__100-- text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                {{ReminderObj.VisitReasonName != "" ? ReminderObj.VisitReasonName : 'Select'}} <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3">
+                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                    <span class="input-group-addon">
+                                                        <span class="mainsearch-App">
+                                                            <i class="fas fa-search"></i>
+                                                        </span>
+                                                    </span>
+                                                    <input type="text" class="form-control" placeholder=" {{ 'SEARCHVISITREASON' | translate}}" ng-model="ReminderObj.SearchText" />
+                                                </div>
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li role="presentation" ng-repeat="item in GetVisitReasonsArray | filter:{'Reason':ReminderObj.SearchText}"
+                                                            ng-click="onSelectReminderVisitReason(item)">
+                                                            <a href="javascript:;" ng-bind="item.Reason"> </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade active in">
+                            <div class="row">
+                                <div class="col-lg-4" ng-Show="ReminderObj.Type =='Date'">
+                                    <div class="form__group">
+                                        <!--<label>{{ 'DATE' | translate}}</label>-->
+                                        <label>Reminder Date</label>
+                                        <input type="text" class="icons-calendar" ng-model="ReminderObj.ReminderDate" placeholder="MM-DD-YYYY" datepickeruniversaldate readonly ng-change="onReminderDateChange()" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" ng-Show="ReminderObj.Type =='Duration'">
+                                    <div class="form__group">
+                                        <label>{{ 'DURATION' | translate}}</label>
+                                        <div class="d__f-- ai__e-- gap__10--x">
+                                            <input class="form__control" type="text" ng-model="ReminderObj.Duration" ng-change="ChangeDurationstep()" placeholder="0" numbers-only maxlength="3" />
+                                            <select ng-model="ReminderObj.DurationType" class="w-90 form__control" ng-change="ChangeDurationstep()">
+                                                <option value="">{{ 'SELECT' | translate}}</option>
+                                                <option value="D">{{ 'DAYS' | translate}}</option>
+                                                <option value="W">{{ 'WEEK' | translate}}</option>
+                                                <option value="M">{{ 'MONTH' | translate}}</option>
+                                                <option value="Y">{{ 'YEAR' | translate}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <div class="switch-toggle well b-r-100 m-t-22">
+                                            <input id="doctempInv20" btn-radio="'Y'" value="Date" type="radio"
+                                                   ng-checked="ReminderObj.Type =='Date'"
+                                                   ng-click="ReminderObj.Type='Date'"
+                                                   ng-model="ReminderObj.Type"
+                                                   ng-change="changeReminderType(ReminderObj.Type)">
+                                            <label for="doctempInv20" onclick="" class="fs-10">  {{ 'DATE' | translate}}</label>
+                                            <input id="doctempInv10" btn-radio="'N'" value="Duration" type="radio"
+                                                   ng-checked="ReminderObj.Type =='Duration'"
+                                                   ng-click="ReminderObj.Type='Duration'"
+                                                   ng-model="ReminderObj.Type"
+                                                   ng-change="changeReminderType(ReminderObj.Type)">
+                                            <label for="doctempInv10" class="fs-10">  {{ 'DURATION' | translate}}</label>
+                                            <a class="btn btn-primary"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" ng-hide="ReminderTab == 1">
+                                    <div class="form__group">
+                                        <!--<label>{{ 'DATE' | translate}}</label>-->
+                                        <label>Appointment Date</label>
+                                        <input type="text" class="icons-calendar" ng-model="ReminderObj.ReminderAppointmentDate" placeholder="MM-DD-YYYY" datepickeruniversaldate mindate="minAppointmentDate" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 col-lg-3">
+                                    <div class="form__group">
+                                        <label>Select Priority<em>*</em></label>
+                                        <div class="dropdown cstm-dropdown width-100">
+                                            <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                                {{ ReminderObj.PriorityName || 'Select' }}
+                                                <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                            </button>
+                                            <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li role="presentation" ng-repeat="item in MasterPriority" ng-click="ChangePrioritylist(item)">
+                                                            <a class="d__f-- ai__c-- gap__x--4 fs__md-- tc__1D1D1D-- tx__h--d3d3d3 fw__5--">
+                                                                <i ng-class="item.PriorityId==1?'icons__w16-- alert__imp--red': item.PriorityId == 2 ? 'icons__w16-- alert__info--' : item.PriorityId == 3 ? 'icons__w16-- alert__warning--' :'' "></i>
+                                                                {{item.PriorityName}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form__group">
+                                        <label>Enter Notes</label>
+                                        <textarea rows="5" class="msd-elastic: \n" ng-model="ReminderObj.ReminderRemarks" placeholder="{{ 'ENTERREMINDERREMARKS' | translate}}" maxlength="500"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal__footer--">
+        <button class="btn__lg-- btn__1d5558--o" ng-click="navtoSaveReminder()">{{ 'ADD' | translate}}</button>
+    </div>
+</div> 
+
+
+<!-- AR New Design -->
+<div class="section__style--4" ng-if="false">
+    <div class="section__header--">
+        <h1>Appointment Reminder</h1>
+    </div>
+    <div class="section__body--">
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="form__group">
+                    <label>Doctor  Name</label>
+                    <select class="">
+                        <option>select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="form__group">
+                    <label>Visit Reason</label>
+                    <select class="">
+                        <option>select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="input__group">
+                    <label>Reminder Date *</label>
+                   <div>
+                       <input />
+                       <select class="width-35">
+                           <option>Days</option>
+                       </select>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/AR New Design -->

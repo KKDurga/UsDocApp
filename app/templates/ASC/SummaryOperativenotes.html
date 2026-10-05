@@ -1,0 +1,154 @@
+﻿
+<div class="two-sections" ng-controller="USOperativeNotesCtrl">
+    <div class="bg-white flex p-6 overflow-hidden">
+        <div class="bg-DDDDDD bradius-6 p-6 m-b-8 bg-white flex overflow-x-hidden overflow__auto--y" style="height: calc(100vh - 128px)">
+            <div class="asc-panel">
+                <div class="asc-panel-header">
+                    <h1>Operative notes <i class="fa fa-chevron-down m-l-5"></i></h1>                 
+                </div>
+
+                <div class="asc-panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Patient : </span>
+                                    <label>{{cacheStorageItem.PatientName}}</label>
+                                </li>
+                                <li>
+                                    <span>MR.No : </span>
+                                    <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                                </li>
+                                <li>
+                                    <span>DOB : </span>
+                                    <label>{{cacheStorageItem.PatientDOB | date: "MM-dd-yyyy"}}</label>
+                                </li>
+                                <li>
+                                    <span>Date : </span>
+                                    <label>{{SurgeryDiagnosisObj.SurgeryDate | date: "MM-dd-yyyy"}}</label>
+                                </li>
+                            </ul>
+
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Procedure : </span>
+                                    <label>{{SurgeryDiagnosisObj.OperativeProcedure}}</label>
+                                </li>
+                            </ul>
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Operated Eye : </span>
+                                    <label> {{SurgeryDiagnosisObj.OrganId === 1 ? 'OD' : (SurgeryDiagnosisObj.OrganId === 2 ? 'OS': (SurgeryDiagnosisObj.OrganId === 3 ? 'OU':(SurgeryDiagnosisObj.OrganId === 4 ? 'General':''))) }}</label>
+                                </li>
+                            </ul>
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Surgeon : </span>
+                                    <label>{{SurgeryDiagnosisObj.Surgeon}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="asc-panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <table class="asc-table-admission">
+                                <tbody>
+                                    <tr>
+                                        <th width="16%">
+                                            Pre-op Dx
+                                        </th>
+                                        <td>
+                                            <ul class="referral-summary-list">
+                                                <li>
+                                                    {{SurgeryDiagnosisObj.Diagnosis}}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Post-op Dx
+                                        </th>
+                                        <td>
+                                            <div ng-repeat="item in PostOpDiagnosis | filter:{DeleteInd: 'N'} track by $index">
+                                                <span class="text-s12w400C000">{{$index+1}}.{{item.ICD10CODE}}-{{item.ICD10DIAGNAME}}</span>
+                                                <ul class="referral-summary-list" ng-repeat="Litem in item.StatusList">
+                                                    <li class="text-s12w500c000" ng-if="Litem.SeverityId!=null">
+                                                        <label>Severity:</label>
+                                                        <span ng-if="Litem.SeverityId==1">Mild</span>
+                                                        <span ng-if="Litem.SeverityId==3">Moderate</span>
+                                                        <span ng-if="Litem.SeverityId==5">Severe</span>
+                                                    </li>
+                                                    <li class="text-s12w500c000" ng-if="Litem.DiagnosisStatusId!=null">
+                                                        <label>Status:</label>
+                                                        <span ng-if="Litem.DiagnosisStatusId==1">Provisional</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==2">Active</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==3">InActive</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==4">Resolved</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==5">RuledOut</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==6">Not Examined</span>
+                                                        <span ng-if="Litem.DiagnosisStatusId==7">Entered In Error</span>
+                                                    </li>
+                                                    <li class="text-s12w500c000" ng-if="Litem.OrganId!=null">
+                                                        <label>Eye:</label>
+                                                        <span ng-if="Litem.OrganId==1">OD</span>
+                                                        <span ng-if="Litem.OrganId==2">OS</span>
+                                                        <span ng-if="Litem.OrganId==3">OU</span>
+                                                        <span ng-if="Litem.OrganId==4">General</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Lens Used
+                                        </th>
+                                        <td>
+                                            <ul class="referral-summary-list dis-block" ng-repeat="imp in ImplantsDetailsArray| filter:{'DeleteInd':'N'} track by $index">
+
+                                                <li>
+                                                    {{imp.LensType}}
+                                                </li>
+                                                <li>
+                                                    <label>Power: </label>
+                                                    <span>{{imp.Power}}</span>
+                                                </li>
+                                                <li>
+                                                    <label>Serial No:</label>
+                                                    <span>{{imp.SerialNumber}}</span>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Procedure Notes
+                                        </th>
+                                        <td>
+                                            <textarea class="form-outline msd-elastic: \n;" placeholder="Enter Notes" ng-model="OperativeNotesObj.ProcedureDetails" maxlength="200" rows="3"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Complications
+                                        </th>
+                                        <td>
+                                            <textarea class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="OperativeNotesObj.Complications" maxlength="200"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <!--class="overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 600px)"-->
+    
+</div>

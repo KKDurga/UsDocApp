@@ -1,0 +1,573 @@
+﻿<div class="modal-body p-0">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="dis-flex align-items-center justify-space-between border-bottom p-10">
+                <div>
+                    <h1 class="text-ocularhist">Orders</h1>
+                </div>
+                <div class="eh-header justify-flex-start m-l-10">
+                    <fieldset>
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom width-0" id="Surgery" value="Surgery" ng-model="Orderobj.Type">
+                            <label for="Surgery" class="radio-custom-label cur-poiter text-s12w500C068cb0">Surgeries</label>
+                        </div>
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom width-0" id="Investigations" value="Investigations" ng-model="Orderobj.Type">
+                            <label for="Investigations" class="radio-custom-label cur-poiter text-s12w500C068cb0">Investigations</label>
+                        </div>
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom width-0" id="Procedures" value="Procedures" ng-model="Orderobj.Type">
+                            <label for="Procedures" class="radio-custom-label cur-poiter text-s12w500C068cb0">Procedures</label>
+                        </div>
+                    </fieldset>
+                    <div class="width-40 m-l-10 pos-relative">
+                        <input type="text" class="input-color icons-search form-control"
+                               maxlength="100"
+                               ng-model="Orderobj.SearchProcedureObj"
+                               placeholder="Select Procedure"
+                               typeahead-min-length="0"
+                               typeahead-focus-on-select="false"
+                               uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                               typeahead-on-select="OnClickAdvisedProcedure(Orderobj.SearchProcedureObj,Orderobj.Type)" 
+                               ng-focus="ProcedureListFocus===true"
+                               ng-blur="ChangeProcedureList()"/>
+
+                    </div>
+                </div>
+                <div class="dis-flex align-items-center m-l-10">
+                    <button class="btn btn-discard-us m-r-5" ng-click="closeuib()">Close</button>
+                    <button class="btn btn-save-us" ng-click="SaveOrderssData()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-body p-t-0">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="overflow-x-hideen overflow-y-scroll" ng-style="heightAHO()" resize>
+
+                <table class="table tableno-bordered m-0 table-layout-fix" ng-show="Orderobj.Type =='Surgery'">
+                    <tbody class="b-0" ng-show="(Orderobj.SurgeriesDetails|filter: { DeleteInd:'N'}).length!=0">
+                        <tr>
+                            <td class="valign-top bg-templates width-20 p-0">
+                                <table class="table tableno-bordered table-layout-fix m-b-0">
+
+                                    <tbody class="b-0">
+                                        <tr>
+                                            <td class="bg-templates width-20 valign-top">
+                                                <ul class="templates-list-grid overflow-x-hideen overflow-y-scroll" ng-style="heightBAO()" resize>
+                                                    <li class="dis-flex" ng-class="item.IsEditData ?'active':''"
+                                                        ng-model="selecteditem"
+                                                        ng-click="ChangeAdvisedOrder(item,'Surgery')"
+                                                        ng-repeat="item in Orderobj.SurgeriesDetails| filter: { DeleteInd: 'N' } track by $index">
+                                                        <a href="javascript:;">{{item.Description}}</a>
+                                                        <a href="javascript:;" ng-click="RemoveProcedure(item, $index, Orderobj.Type)" title="Remove">
+                                                            <i class="eh-close eh-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <td class="valign-top" width="45%">
+                                <!-- / -->
+                                <div ng-repeat="Aitem in Orderobj.SurgeriesDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <!--<p class="text-s14w600c000 m-t-10">90912 DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</p>-->
+                                    <p class="text-s14w600c000 m-t-10">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</p>
+                                    <!-- / -->
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                        ng-model="Aitem.OrganId">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" ng-show="Aitem.OrderType =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                        ng-model="Aitem.CoordinatorId">
+                                                    <option value="">Select Coordinator</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" ng-show="Aitem.OrderType =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.FullName for Citem in clinicDoctorList"
+                                                        ng-model="Aitem.InternalCoManagerId">
+                                                    <option value="">Select Internal Co-Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6" ng-show="Aitem.OrderType =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.DoctorName for Citem in ExternalManegerDoctorsList"
+                                                        ng-model="Aitem.ExternalCoManagerId">
+                                                    <option value="">Select External Co-Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset" ng-show="!Aitem.ShowDateFormat">
+                                                <li class="w-100">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li class="w-120">
+                                                    <input type="text" class="form-control btr-radius bbr-radius" ng-model="Aitem.Duration" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4">
+                                                </li>
+                                                <li>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='D'" ng-class="Aitem.DurationType === 'D'? 'active' :''">Days</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='W'" ng-class="Aitem.DurationType === 'W'? 'active' :''">Wek.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='M'" ng-class="Aitem.DurationType === 'M'? 'active' :''">Mnth.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='Y'" ng-class="Aitem.DurationType === 'Y'? 'active' :''">Yr.</button>
+
+                                                </li>
+                                                <li class="w-80">
+                                                    <button class="btn btn-keyboard w-80" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard w-80" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                            <ul class="input-select-onset" ng-show="Aitem.ShowDateFormat">
+                                                <li class="width-30">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li>
+                                                    <input type="text" placeholder="MM-DD-YYYY" ng-focus="Aitem.ShowDateFormat == true && Aitem.DurationDate == ''" ng-model="Aitem.DurationDate" datepickerforapplist readonly
+                                                           ng-change="ChangeFormatDate(Aitem)" />
+                                                </li>
+                                                <li class="w-50">
+                                                    <button class="btn btn-keyboard" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset">
+                                                <li>
+                                                    <textarea class="msd-elastic: \n;" placeholder="Enter Notes" ng-model="Aitem.Remarks" maxlength="500"></textarea>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+
+                            <td class="valign-top">
+                                <section class="section-eh tile-default" ng-repeat="Aitem in Orderobj.SurgeriesDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <div class="section-eh-header">
+                                        <h1>Diagnosis</h1>
+                                    </div>
+                                    <div class="section-eh-body h-225">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group adviced-dropdown">
+                                                    <input type="text" class="form-control icons-search input-color"
+                                                           name="Diagnosise"
+                                                           placeholder="Search Diagnosis"
+                                                           ng-model="Orderobj.DiagnosisObject"
+                                                           maxlength="100"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(Orderobj.DiagnosisObject, Aitem)"
+                                                           ng-blur="changefocusOption();" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="list-unstyled m-t-10">
+                                                    <li class="lh-2-5" ng-repeat="item in Aitem.DiagnosisList track by $index">
+                                                        <label class="cur-poiter">
+                                                            <!--<input type="checkbox" id="1" value="Diagnosis" class="checkbox" ng-model="item.Diagnosis">-->
+                                                            <span class="lbl"></span>                                                           
+                                                            <span class="text-right text-s12w600C000">{{item.ICDCode}} | {{item.DiagnosisName}}</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    <tbody ng-show="(Orderobj.SurgeriesDetails| filter: { DeleteInd: 'N' }).length==0">
+                        <tr>
+                            <td colspan="3">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-12 text-center bg-white">
+                                        <div class="billing-cominsoon m-20">
+                                            <img src="img/no-data/no-data-icon.png">
+                                            <div class="msg m-t-20">
+                                                <p class="nodata-text">Oops!!</p>
+                                                <p class="nodata-txt-line2">
+                                                    No Adviced Orders added. <a href="javascript:;" ng-click="ProcedureListFocus = true">Click here</a> or on search box to add Adviced Orders.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table tableno-bordered m-0 table-layout-fix" ng-show="Orderobj.Type =='Procedures'">
+                    <tbody class="b-0" ng-show="(Orderobj.ProceduresDetails|filter: { DeleteInd:'N'}).length!=0">
+                        <tr>
+                            <td class="valign-top bg-templates width-20 p-0">
+                                <table class="table tableno-bordered table-layout-fix m-b-0">
+                                    <tbody class="b-0">
+                                        <tr>
+                                            <td class="bg-templates width-20 valign-top">
+                                                <ul class="templates-list-grid overflow-x-hideen overflow-y-scroll" ng-style="heightBAO()" resize>
+                                                    <li class="dis-flex" ng-class="item.IsEditData ?'active':''"
+                                                        ng-model="selecteditem"
+                                                        ng-click="ChangeAdvisedOrder(item,'Procedure')"
+                                                        ng-repeat="item in Orderobj.ProceduresDetails| filter: { DeleteInd: 'N' } track by $index">
+                                                        <a href="javascript:;">{{item.Description}}</a>
+                                                        <a href="javascript:;" ng-click="RemoveProcedure(item, $index, Orderobj.Type)" title="Remove">
+                                                            <i class="eh-close eh-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <td class="valign-top" width="45%">
+                                <!-- / -->
+                                <div ng-repeat="Aitem in Orderobj.ProceduresDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <!--<p class="text-s14w600c000 m-t-10">90912 DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</p>-->
+                                    <p class="text-s14w600c000 m-t-10">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</p>
+                                    <!-- / -->
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                        ng-model="Aitem.OrganId">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset" ng-show="!Aitem.ShowDateFormat">
+                                                <li class="w-100">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li class="w-120">
+                                                    <input type="text" class="form-control btr-radius bbr-radius" ng-model="Aitem.Duration" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4">
+                                                </li>
+                                                <li>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='D'" ng-class="Aitem.DurationType === 'D'? 'active' :''">Days</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='W'" ng-class="Aitem.DurationType === 'W'? 'active' :''">Wek.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='M'" ng-class="Aitem.DurationType === 'M'? 'active' :''">Mnth.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='Y'" ng-class="Aitem.DurationType === 'Y'? 'active' :''">Yr.</button>
+
+                                                </li>
+                                                <li class="w-80">
+                                                    <button class="btn btn-keyboard w-80" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard w-80" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                            <ul class="input-select-onset" ng-show="Aitem.ShowDateFormat">
+                                                <li class="width-30">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li>
+                                                    <input type="text" placeholder="MM-DD-YYYY" ng-focus="Aitem.ShowDateFormat == true && Aitem.DurationDate == ''" ng-model="Aitem.DurationDate" datepickerforapplist readonly
+                                                           ng-change="ChangeFormatDate(Aitem)" />
+                                                </li>
+                                                <li class="w-50">
+                                                    <button class="btn btn-keyboard" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset">
+                                                <li>
+                                                    <textarea class="msd-elastic: \n;" placeholder="Enter Notes" ng-model="Aitem.Remarks" maxlength="500"></textarea>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+
+                            <td class="valign-top">
+                                <section class="section-eh tile-default" ng-repeat="Aitem in Orderobj.ProceduresDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <div class="section-eh-header">
+                                        <h1>Diagnosis</h1>
+                                    </div>
+                                    <div class="section-eh-body h-225">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group adviced-dropdown">
+                                                    <input type="text" class="form-control icons-search input-color"
+                                                           name="Diagnosise"
+                                                           placeholder="Search Diagnosis"
+                                                           ng-model="Orderobj.DiagnosisObject"
+                                                           maxlength="100"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(Orderobj.DiagnosisObject, Aitem)"
+                                                           ng-blur="changefocusOption();" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="list-unstyled m-t-10">
+                                                    <li class="lh-2-5" ng-repeat="item in Aitem.DiagnosisList track by $index">
+                                                        <label class="cur-poiter">
+                                                            <!--<input type="checkbox" id="1" value="Diagnosis" class="checkbox" ng-model="item.Diagnosis">-->
+                                                            <span class="lbl"></span>
+                                                            <!--<span class="text-right text-s12w600C000">DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</span>-->
+                                                            <span class="text-right text-s12w600C000">{{item.ICDCode}} | {{item.DiagnosisName}}</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    <tbody ng-show="(Orderobj.ProceduresDetails|filter:{ DeleteInd:'N'}).length==0">
+                        <tr>
+                            <td colspan="3">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-12 text-center bg-white">
+                                        <div class="billing-cominsoon m-20">
+                                            <img src="img/no-data/no-data-icon.png">
+                                            <div class="msg m-t-20">
+                                                <p class="nodata-text">Oops!!</p>
+                                                <p class="nodata-txt-line2">
+                                                    No Adviced Orders added. <a href="javascript:;" ng-click="ProcedureListFocus = true">Click here</a> or on search box to add Adviced Orders.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table tableno-bordered m-0 table-layout-fix" ng-show="Orderobj.Type =='Investigations'">
+                    <tbody class="b-0" ng-show="(Orderobj.InvestigationsDetails|filter: { DeleteInd:'N'}).length!=0">
+                        <tr>
+                            <td class="valign-top bg-templates width-20 p-0">
+                                <table class="table tableno-bordered table-layout-fix m-b-0">
+
+                                    <tbody class="b-0">
+                                        <tr>
+                                            <td class="bg-templates width-20 valign-top">
+                                                <ul class="templates-list-grid overflow-x-hideen overflow-y-scroll" ng-style="heightBAO()" resize>
+                                                    <li class="dis-flex" ng-class="item.IsEditData ?'active':''"
+                                                        ng-model="selecteditem"
+                                                        ng-click="ChangeAdvisedOrder(item,'Investigation')"
+                                                        ng-repeat="item in Orderobj.InvestigationsDetails| filter: { DeleteInd: 'N' } track by $index">
+                                                        <a href="javascript:;">{{item.Description}}</a>
+                                                        <a href="javascript:;" ng-click="RemoveProcedure(item, $index, Orderobj.Type)" title="Remove">
+                                                            <i class="eh-close eh-icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                            <td class="valign-top" width="45%">
+                                <!-- / -->
+                                <div ng-repeat="Aitem in Orderobj.InvestigationsDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <!--<p class="text-s14w600c000 m-t-10">90912 DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</p>-->
+                                    <p class="text-s14w600c000 m-t-10">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</p>
+                                    <!-- / -->
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                        ng-model="Aitem.OrganId">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" ng-show="FinalObj =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                        ng-model="Aitem.CoordinatorId">
+                                                    <option value="">Coordinator</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" ng-show="FinalObj =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                        ng-model="Aitem.ExternalCoManagerId">
+                                                    <option value="">External Co-Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" ng-show="FinalObj =='Surgery'">
+                                            <div class="form-group">
+                                                <select class="form-control bg-f9f9f9"
+                                                        ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                        ng-model="Aitem.InternalCoManagerId">
+                                                    <option value="">Internal Co-Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset" ng-show="!Aitem.ShowDateFormat">
+                                                <li class="w-100">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li class="w-120">
+                                                    <input type="text" class="form-control btr-radius bbr-radius" ng-model="Aitem.Duration" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4">
+                                                </li>
+                                                <li>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='D'" ng-class="Aitem.DurationType === 'D'? 'active' :''">Days</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='W'" ng-class="Aitem.DurationType === 'W'? 'active' :''">Wek.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='M'" ng-class="Aitem.DurationType === 'M'? 'active' :''">Mnth.</button>
+                                                    <button ng-model="Aitem.DurationType" ng-click="Aitem.DurationType ='Y'" ng-class="Aitem.DurationType === 'Y'? 'active' :''">Yr.</button>
+
+                                                </li>
+                                                <li class="w-80">
+                                                    <button class="btn btn-keyboard w-80" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard w-80" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                            <ul class="input-select-onset" ng-show="Aitem.ShowDateFormat">
+                                                <li class="width-30">
+                                                    <label>Schedule</label><em>*</em>
+                                                </li>
+                                                <li>
+                                                    <input type="text" placeholder="MM-DD-YYYY" ng-focus="Aitem.ShowDateFormat == true && Aitem.DurationDate == ''" ng-model="Aitem.DurationDate" datepickerforapplist readonly
+                                                           ng-change="ChangeFormatDate(Aitem)" />
+                                                </li>
+                                                <li class="w-50">
+                                                    <button class="btn btn-keyboard" ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                    <button class="btn btn-keyboard" ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <ul class="input-select-onset">
+                                                <li>
+                                                    <textarea class="msd-elastic: \n;" placeholder="Enter Notes" ng-model="Aitem.Remarks" maxlength="500"></textarea>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+
+                            <td class="valign-top">
+                                <section class="section-eh tile-default" ng-repeat="Aitem in Orderobj.InvestigationsDetails| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                    <div class="section-eh-header">
+                                        <h1>Diagnosis</h1>
+                                    </div>
+                                    <div class="section-eh-body h-225">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group adviced-dropdown">
+                                                    <input type="text" class="form-control icons-search input-color"
+                                                           name="Diagnosise"
+                                                           placeholder="Search Diagnosis"
+                                                           ng-model="Orderobj.DiagnosisObject"
+                                                           maxlength="100"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(Orderobj.DiagnosisObject, Aitem)"
+                                                           ng-blur="changefocusOption();" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="list-unstyled m-t-10">
+                                                    <li class="lh-2-5" ng-repeat="item in Aitem.DiagnosisList track by $index">
+                                                        <label class="cur-poiter">
+                                                            <!--<input type="checkbox" id="1" value="Diagnosis" class="checkbox" ng-model="item.Diagnosis">-->
+                                                            <span class="lbl"></span>
+                                                            <!--<span class="text-right text-s12w600C000">DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</span>-->
+                                                            <span class="text-right text-s12w600C000">{{item.ICDCode}} | {{item.DiagnosisName}}</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    <tbody ng-show="(Orderobj.InvestigationsDetails|filter: {DeleteInd:'N'}).length==0">
+                        <tr>
+                            <td colspan="3">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-12 text-center bg-white">
+                                        <div class="billing-cominsoon m-20">
+                                            <img src="img/no-data/no-data-icon.png">
+                                            <div class="msg m-t-20">
+                                                <p class="nodata-text">Oops!!</p>
+                                                <p class="nodata-txt-line2">
+                                                    No Adviced Orders added. <a href="javascript:;" ng-click="ProcedureListFocus = true">Click here</a> or on search box to add Adviced Orders.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+     
+</div>

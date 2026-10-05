@@ -1,0 +1,1494 @@
+﻿<div class="wrapper" ng-controller="EhnoteMainAppointmentListCtrl as canvasctrl">
+    <div id="patientAppointpopup" class="modal fade" role="dialog">
+        <div class="modal-dialog ">
+            <div class="modal-content modal-common-dialog bg-white">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body pt-0 mt-5">
+                    <div class="row">
+                        Do you want to book an appointment ?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn danger-btn" ng-click="selectedPatient();" data-dismiss="modal">Start Consultation</button>
+                    <button class="btn primary-btn" ng-click="bookAppointment();" data-dismiss="modal">Book Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/ng-template" id="ShowEhnoteVitals.html">
+        <div class="modal-header">
+            <button class="close" data-dismiss="modal" ng-click="CloseVitalspopup()">&times;</button>
+            <h4 class="modal-title">Vitals</h4>
+        </div>
+        <div class="modal-body p-b-0">
+            <div class="row">
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[10].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2">
+                                <img src="img/vitals/icon-temp-black.png" />
+                            </div>
+                            <div class="count">
+                                <h4>Temperature (F)</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[10].Value" maxlength="5" numbers-only-temp="numbers-only-temp">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[3].ActiveIND === 'Y' || vitalsArray[4].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2">
+                                <img src="img/vitals/icon-bp-black.png" />
+                            </div>
+                            <div class="count">
+                                <h4>BP (Mm/Hg)</h4>
+                                <input placeholder="Systolic" type="text" class="form-control form-control width-40 dis-inline-block" ng-model="vitalsArray[4].Value" maxlength="3" onpaste="return false" numbers-only="numbers-only" id="bplow">
+                                <input placeholder="Diastolic" type="text" class="form-control form-control width-50 m-l-10 dis-inline-block" maxlength="3" ng-model="vitalsArray[3].Value" numbers-only="numbers-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[11].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/pulse-vitals.png"></div>
+                            <div class="count">
+                                <h4>Pulse Rate (Bpm)</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[11].Value" maxlength="3" numbers-only="numbers-only" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[1].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/icon-height-black.png" /></div>
+                            <div class="count">
+                                <h4>Height (Cm)</h4>
+                                <input type="text" placeholder="0" ng-change="bmiValueCal(vitalsArray[1].Value,vitalsArray[0].Value)" class="form-control" ng-model="vitalsArray[1].Value" maxlength="6" numbersdots-only="numbersdots-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[0].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2">
+                                <img src="img/vitals/icon-weight-black.png" />
+                            </div>
+                            <div class="count">
+                                <h4>Weight (Kg)</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-change="bmiValueCal(vitalsArray[1].Value,vitalsArray[0].Value)" ng-model="vitalsArray[0].Value" maxlength="6" numbersdots-only="numbersdots-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[16].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/bmi.png" /></div>
+                            <div class="count">
+                                <h4>BMI</h4>
+                                <!--<input type="text" placeholder="0" class="form-control" ng-model="vitalsArray.Bmivalue" readonly style="width: 120px;">-->
+                                <input type="text" placeholder="0" class="form-control w-120" ng-model="vitalsArray[16].Value" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[2].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/icon-bloodgroup-black.png" /></div>
+                            <div class="count">
+                                <h4>Blood Group</h4>
+                                <select class="form-control select-dropdown p-0-5 fs-14 color-ligt" ng-model="vitalsArray[2].Value">
+                                    <option value="">Select</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[6].ActiveIND === 'Y' || vitalsArray[7].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/icon-sugar-black.png" /></div>
+                            <div class="count">
+                                <h4>Fasting &amp; PP</h4>
+                                <input type="text" placeholder="0" class="form-control form-control width-35 dis-inline-block" maxlength="3" ng-model="vitalsArray[6].Value" numbers-only="numbers-only" onpaste="return false" id="sugarfast">
+                                <input type="text" placeholder="0" class="form-control form-control width-35 dis-inline-block m-l-10" maxlength="3" ng-model="vitalsArray[7].Value" numbers-only="numbers-only" id="sugarpp">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[8].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/icon-sugar-black.png" /></div>
+                            <div class="count">
+                                <h4>Sugar Random</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[8].Value" maxlength="3" numbers-only="numbers-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[12].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/head_circumference.png" /></div>
+                            <div class="count">
+                                <h4>Head Circumference (Cm)</h4>
+                                <input type="text" placeholder="0" class="form-control form-control" ng-model="vitalsArray[12].Value" maxlength="6" numbersdots-only="numbersdots-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[9].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/Serum-creatinine.png" /></div>
+                            <div class="count">
+                                <h4>Serum creatinine (Mg/DL)</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[9].Value" maxlength="6" numbersdots-only="numbersdots-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[5].ActiveIND === 'Y'">
+                    <div class="mini-charts-item bg-global">
+                        <div class="clearfix">
+                            <div class="chart stats-line-2"><img src="img/vitals/Lipid-Profile.png" /></div>
+                            <div class="count">
+                                <h4>Lipid Profile (Mg/DL)</h4>
+                                <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[5].Value" maxlength="6" numbersdots-only="numbersdots-only">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[13].ActiveIND === 'Y'">
+                    <div class="mini-charts-item custom-item bgm-lightgreen">
+                        <div class="mini-charts-item bg-global">
+                            <div class="clearfix">
+                                <div class="chart stats-line-2"><img src="img/vitals/respiratory.png" /></div>
+                                <div class="count">
+                                    <h4>Respiratory Rate (Per Min)</h4>
+                                    <input type="text" placeholder="0" class="form-control form-control" ng-model="vitalsArray[13].Value" maxlength="2" numbers-only="numbers-only">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[14].ActiveIND === 'Y'">
+                    <div class="mini-charts-item custom-item bgm-lightgreen">
+                        <div class="mini-charts-item bg-global">
+                            <div class="clearfix">
+                                <div class="chart stats-line-2"><img src="img/vitals/spo2a.png" /></div>
+                                <div class="count">
+                                    <h4>SpO2 (%)</h4>
+                                    <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[14].Value" maxlength="2" numbers-only="numbers-only">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[15].ActiveIND === 'Y'">
+                    <div class="mini-charts-item custom-item bgm-lightgreen">
+                        <div class="mini-charts-item bg-global">
+                            <div class="clearfix">
+                                <div class="chart stats-line-2"><img src="img/vitals/flow-rate.png" /></div>
+                                <div class="count">
+                                    <h4>PEFR ( L/Min)</h4>
+                                    <input type="text" placeholder="0" class="form-control" ng-model="vitalsArray[15].Value" maxlength="3" numbers-only="numbers-only">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[17].ActiveIND === 'Y'">
+                    <div class="mini-charts-item custom-item bgm-lightgreen">
+                        <div class="mini-charts-item bg-global">
+                            <div class="clearfix">
+                                <div class="chart stats-line-2"><img src="img/vitals/Duct.jpg" /></div>
+                                <div class="count">
+                                    <h4>Duct</h4>
+                                    <input type="text" placeholder="" class="form-control" ng-model="vitalsArray[17].Value" maxlength="30">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 vital-hgt" ng-show="vitalsArray[18].ActiveIND === 'Y'">
+                    <div class="mini-charts-item custom-item bgm-lightgreen">
+                        <div class="mini-charts-item bg-global">
+                            <div class="clearfix">
+                                <div class="chart stats-line-2">
+                                    <img src="img/vitals/Tension.jfif" />
+                                </div>
+                                <div class="count">
+                                    <h4>Tension</h4>
+                                    <input type="text" placeholder="" class="form-control" ng-model="vitalsArray[18].Value" maxlength="30">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer text-right">
+            <button class="btn danger-btn" ng-click="CloseVitalspopup()">Close</button>
+            <button class="btn primary-btn" ng-click="submitVitalParams(vitalsArray)">Submit</button>
+        </div>
+    </script>
+
+  
+
+    <div class="container-fluid">
+
+        <!--<div class="row">
+            <div class="col-lg-12">
+                <ol class="trackerprogress" data-steps="4">
+                    <li class="done">
+                        <span class="name">Reception</span>
+                        <span class="step"><span>In</span></span>
+                        <span class="name">10.30 Am</span>
+                    </li>
+                    <li class="done">
+                        <span class="name">Optom</span>
+                        <span class="step"><span>In</span></span>
+                    </li>
+                    <li class="active">
+                        <span class="name">Doctor</span>
+                        <span class="step"><span>In</span></span>
+                    </li>
+                    <li>
+                        <span class="name">Counsellor</span>
+                        <span class="step"><span>In</span></span>
+                    </li>
+                </ol>
+            </div>
+        </div>-->
+
+
+        <div class="col-lg-12 p-0">
+            <center>
+                <i class="ion-loading-c fs-25" ng-show="referredshowloading"></i>
+            </center>
+            <!--ng-hide="mainBookedAppointmentList.length == 0"-->
+            <div class="row">
+                <div class="col-lg-12 p-0">
+                    <div class="table-container data-grid appintment_view_pane p-0 m-0" ng-class="item.active" style="overflow: inherit">
+                        <table st-table="rowCollection" class="table dis-moz-group">
+                            <thead>
+                                <!--ng-hide="mainBookedAppointmentList.length==0"-->
+                                <tr>
+                                    <th width="3%">Sl.no</th>
+                                    <th class="cur-poiter" width="5%" ng-show="userLoginDetails.RoleID == 2 ||userLoginDetails.RoleID === 11 || !IsDynamicCheckInMandatory" ng-click="SortByAppointmentList(3,CheckInDesc)">
+
+                                        <!--<a href="javascript:;" ng-click="orderByField='IscheckedIn'; reverseSort = !reverseSort" class="appoint-status">
+                                            In
+                                            <img src="img/satus.png" />
+                                        </a>-->
+                                        <!--ng-click="SortByAppointmentList(3,CheckInDesc)"-->
+                                        Walk-In <i ng-class="CheckInDesc == 'desc' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"></i>
+
+                                    </th>
+                                    <th width="5%" ng-show="userLoginDetails.RoleID != 2 && userLoginDetails.RoleID != 11 && IsDynamicCheckInMandatory">
+
+                                        <a href="javascript:;" class="appoint-status white-nowrap" ng-click="SortByAppointmentList(3,CheckInDesc)">
+                                            Check-In <i ng-class="CheckInDesc == 'desc' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"></i>
+                                        </a>
+
+
+                                    </th>
+                                    <th width="5%">
+                                        <a href="javascript:;" class="white-nowrap">
+                                            Visit Type
+                                            <i class="fa fa-chevron-down" popover-class="increase-popover-width-bottom"
+                                               popover-placement="bottom-right"
+                                               uib-popover-template="dynamicVisitStatus.templateUrl"
+                                               popover-trigger="outsideClick"></i>
+                                        </a>
+                                    </th>
+                                    <th class="app-pa-name" width="14%">
+                                        Patient Name
+                                    </th>
+                                    <th width="6%">
+                                        <a href="javascript:;" class="white-nowrap">
+                                            Appt Type <!--<i ng-class="TimeDesc == 'desc' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"></i>-->
+                                            <i class="fa fa-chevron-down" popover-class="increase-popover-width-bottom"
+                                               popover-placement="bottom-right"
+                                               uib-popover-template="dynamicApointmentTypeStatus.templateUrl"
+                                               popover-trigger="outsideClick"></i>
+                                        </a>
+                                    </th>
+                                    <th width="10%">Doc & Branch</th>
+
+                                    <th width="8%" ng-if="Tab==='appointments'">Referred</th>
+
+                                    <th width="6%">
+                                        <!--<a href="javascript:;" ng-click="orderByField='StartTime'; reverseSort = !reverseSort" class="appoint-status">Time<img src="img/satus.png"></a>-->
+                                        <a href="javascript:;" ng-click="SortByAppointmentList(1,TimeDesc)" class="appoint-status">
+                                            Time<i ng-class="TimeDesc == 'desc' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"></i>
+                                        </a>
+                                    </th>
+                                    <th width="7%">
+                                        <a href="javascript:;" class="white-nowrap">
+                                            Status & Billing
+                                            <i class="fa fa-chevron-down" popover-class="increase-popover-width-bottom"
+                                               popover-placement="bottom-right"
+                                               uib-popover-template="dynamicApointmentStatus.templateUrl"
+                                               popover-trigger="outsideClick"></i>
+                                        </a>
+                                    </th>
+
+
+                                    <th width="6%" ng-if="Tab==='appointments'">Follow Up</th>
+                                    <th width="6%" ng-if="Tab==='teleappointments'">Pre Consultation</th>
+
+                                    <th width="6%" ng-if="(SpecializationId === 3 || SpecializationId === 20) && (Tab==='appointments')">Dilation</th>
+                                   
+                                    <!--<th width="5%" ng-if="SpecializationId == 3 && !(userLoginDetails.RoleID == '1' || userLoginDetails.RoleID == '4'||userLoginDetails.RoleID == '43')">Due</th>-->
+                                    <!--<th width="8%" ng-if="(SpecializationId == 3 || SpecializationId === 20) && (userLoginDetails.RoleID == '1' || userLoginDetails.RoleID == '4' ||userLoginDetails.RoleID == '43')">Optom</th>-->
+                                    <!--<th width="7%" class="text-left">Referrals</th>-->
+                                    <!--<th width="3%"></th>-->
+                                </tr>
+                            </thead>
+                            <tbody class="headermainscroll animated fadeInDown nlyforscrool" ng-style="tabletilestyle()" resize id="accordion">
+                                <tr>
+                                    <td class="p-0" colspan="11">
+                                        <table class="mb-0 table-hover table table-condensed appointmentTableThBg appointmentlist">
+                                            <!--<tbody ng-repeat="row in mainBookedAppointmentList | orderBy:orderByField:reverseSort ">-->
+                                            <!--<Pre>{{mainBookedAppointmentList}}</Pre>-->
+                                            <tbody ng-repeat="row in mainBookedAppointmentList track by $index">
+
+                                                <tr class="appointment-row" style="height: 55px; width: 100%; display: inline-table; table-layout: fixed;"
+                                                    ng-class="{'expandtr': row.ShowSubcontent}">
+
+                                                    <td class="cur-poiter applist-popoevr" width="3%">
+
+                                                        <span>
+                                                            <span class="patient-category-appt" title="{{row.InsuranceType}}" style="background: {{row.PatientDetails.ColorCode}}"></span>
+                                                            <span ng-bind="row.Sno" class="p-l-10"></span>
+                                                        </span>
+
+
+
+                                                    </td>
+
+
+
+                                                    <!--userLoginDetails.RoleID === 2 ||userLoginDetails.RoleID === 11 ||-->
+                                                    <td width="5%" class="applist-popoevr pos-relative" ng-show="!IsDynamicCheckInMandatory">
+
+
+                                                        <button title="CheckIn" ng-disabled="row.AppointmentStatus =='C'" style="background:#1110;"
+                                                                class="checkin btn-dafult"
+                                                                ng-show="row.IscheckedIn=='N'"
+                                                                ng-click="row.AppointmentStatus =='C' ? angular.noop():showCheckInPopupClick(row,$index)"
+                                                                uib-popover-template="dynamicPopover.templateUrl"
+                                                                popover-placement="right"
+                                                                popover-trigger="outsideClick"
+                                                                popover-is-open="row.showcheckinPopup">
+                                                            <p>IN</p>
+                                                        </button>
+                                                        <div class="checkedin" ng-show="row.IscheckedIn=='Y'" ng-disabled="row.AppointmentStatus =='C'"
+                                                             ng-click="updateCheckInStatus(checkInObj.VisitReason,'N',row,checkInObj.AttenderName)">
+                                                            <p>IN</p>
+                                                        </div>
+                                                        <!--<div title="CheckOut" class="checkin" ng-show="row.CheckInTime!='' && row.CheckOutTime==''"
+                                                             ng-click="row.AppointmentStatus =='C' ? angular.noop():updateAppCheckInStatus(row,'Y')">
+                                                            <p>Out</p>
+                                                        </div>-->
+                                                        <p class="m-b-0 fs-10">
+                                                            <span class="fs-10 text-dark" style="display:inline !important">Covid: </span>
+                                                            <span class="mb-0 fs-10 text-danger font-weight-600" ng-if="row.masterQuestionInd==='2'">&nbsp; HIGH RISK</span>
+                                                            <span class="mb-0 fs-10 text-warning font-weight-600" ng-if="row.masterQuestionInd==='1'">&nbsp; MEDIUM RISK</span>
+                                                            <span class="mb-0 fs-10 text-success font-weight-600" ng-if="row.masterQuestionInd==='0'">&nbsp; LOW RISK</span>
+                                                        </p>
+                                                        <!--<p class="font-weight-600 text-warning m-b-0 m-t-5 text-left" ng-show="row.ISFastTrackAppointment">FastTrack</p>-->
+                                                    </td>
+                                                    <!--ng-show="userLoginDetails.RoleID != 2 && userLoginDetails.RoleID != 11"-->
+                                                    <td width="5%" class="applist-popoevr pos-relative" ng-show="IsDynamicCheckInMandatory ===true">
+                                                        <div ng-show="IsDynamicCheckInMandatory ===true">
+                                                            <div ng-show="row.IsCheckedOut !==true" title="CheckIn" class="checkin" ng-click="SendToPatientRoomType(row)">
+                                                                <p>IN</p>
+                                                            </div>
+                                                            <div title="CheckOut" class="checkin" ng-show="row.IsCheckedOut ===true">
+                                                                <p>Out</p>
+                                                            </div>
+                                                            <p class="m-b-0 fs-10">
+                                                                <label class="fs-10 text-dark dis-block" style="display:inline !important">Covid: </label>
+                                                                <label class="mb-0 fs-10 text-danger font-weight-600" ng-if="row.masterQuestionInd==='2'">HIGH RISK</label>
+                                                                <label class="mb-0 fs-10 text-warning font-weight-600" ng-if="row.masterQuestionInd==='1'">MEDIUM RISK</label>
+                                                                <label class="mb-0 fs-10 text-success font-weight-600" ng-if="row.masterQuestionInd==='0'">LOW RISK</label>
+                                                            </p>
+                                                        </div>
+
+                                                    </td>
+
+                                                    <td width="5%" class="cur-poiter">
+                                                        <p class="mb-0 fs-12 text-black" title="Visit Type">
+                                                            {{row.BookingType}}
+                                                        </p>
+                                                        <p class="mb-0 fs-13 text-danger" ng-bind="row.HospitalEquipmentName"></p>
+                                                    </td>
+
+
+                                                    <td width="14%" class="app-pa-name cur-poiter pos-relative" ng-click="ChangeSubcontent(row)">
+                                                        <a>
+                                                            <div class="profile-show">
+                                                                <!--<div class="profile-avatar-image">
+                                                                    <span ng-show="row.S3URL ===''" style="background:{{row.colors}}">{{row.PatientDetails.FullName | limitTo:2}} </span>
+                                                                    <img ng-show="row.S3URL !==''" image-viewer isarraychanged="0" ngf-thumbnail="row.S3URL" class="img-responsive" width="50" height="50" />
+                                                                </div>-->
+                                                                <div class="profile-avatar-image">
+                                                                    <span ng-show="row.S3URL ==''" style="background:{{row.colors}}">{{row.PatientDetails.FullName | limitTo:2}} </span>
+                                                                    <div ng-show="row.S3URL !==''" image-viewer isarraychanged="0">
+                                                                        <img ngf-thumbnail="row.S3URL" class="img-responsive" width="50" height="50" />
+                                                                    </div>
+                                                                </div>
+                                                                <!--{{row.PatientDetails.FullName}},{{row.PatientDetails.PatientDisplayId}},-->
+
+                                                                <span ng-if="row.PatientDetails.AgeInYears ===0" title="Age: {{ row.PatientDetails.AgeInMonths}}M {{ row.PatientDetails.AgeInDays}}D , Gender: {{row.PatientDetails.Gender}}">
+
+                                                                    <span>{{(row.PatientDetails.Title.length > 0)? (row.PatientDetails.Title + '. '):"Mr"}}</span>
+                                                                    <span>{{row.PatientDetails.FullName | textUpperCase}}</span>
+                                                                    <!--<div class="dis-flex">
+                                                                        <span ng-hide="row.PatientDetails.AgeInYears == 0 && row.PatientDetails.AgeInMonths == 0">
+                                                                            <span>
+                                                                                <span>{{row.PatientDetails.AgeInYears}}</span><span>Y | &nbsp;</span>
+                                                                            </span>
+                                                                            <span> <span>{{row.PatientDetails.AgeInMonths}}</span><span>M | &nbsp;</span> </span>
+                                                                        </span>
+                                                                        <span ng-show="row.PatientDetails.AgeInYears == 0 && row.PatientDetails.AgeInMonths == 0">
+                                                                            <span><span> {{row.PatientDetails.AgeInDays}}</span> <span> Days &nbsp;|&nbsp;</span> </span>
+                                                                        </span>
+                                                                        <span ng-bind="row.PatientDetails.Gender"></span>
+                                                                    </div>-->
+                                                                    <p class="mb-0 fs-13 text-danger" ng-hide="row.PatientDetails.MobileNo==''||userLoginDetails.RoleID === 1">+91 {{row.PatientDetails.MobileNo}}</p>
+                                                                    <p class="mb-0 fs-13 text-black" ng-bind="row.PatientDetails.PatientDisplayId"> </p>
+                                                                    <p class="mb-0 fs-12 text-black" ng-show="row.PatientDetails.AgeInYears ===0">
+                                                                        {{ row.PatientDetails.AgeInMonths}}M {{ row.PatientDetails.AgeInDays}}D - {{row.PatientDetails.Gender}}
+                                                                    </p>
+                                                                    <p class="m-b-0 fs-10 text-ehnote" ng-if="row.AppointmentPatientTypeId==1">
+                                                                        <span class="fs-10 text-ehnote" style="display:inline !important">New Patient</span>
+                                                                        <span class="mb-0 fs-10 error" ng-if="row.PaidFollowup">&nbsp; (Pay)</span>
+                                                                    </p>
+                                                                    <!--<p class="mb-0 fs-13 text-danger" ng-bind="row.HospitalEquipmentName"></p>-->
+                                                                </span>
+
+                                                                <!--title-->
+                                                                <span ng-if="row.PatientDetails.AgeInYears !==0" title="">
+
+                                                                    <span>{{(row.PatientDetails.Title.length > 0)? (row.PatientDetails.Title + '. '):"Mr"}}</span>
+                                                                    <span>{{row.PatientDetails.FullName | textUpperCase}}</span>
+                                                                    <p class="mb-0 fs-13 text-danger" ng-hide="row.PatientDetails.MobileNo=='' ||userLoginDetails.RoleID === 1">+91 {{row.PatientDetails.MobileNo}}</p>
+                                                                    <p class="mb-0 fs-13 text-black" ng-bind="row.PatientDetails.PatientDisplayId"> </p>
+                                                                    <p class="mb-0 fs-12 text-black" ng-show="row.PatientDetails.AgeInYears !==0">
+                                                                        {{row.PatientDetails.AgeInYears}}Y {{ row.PatientDetails.AgeInMonths}}M - {{row.PatientDetails.Gender}}
+                                                                    </p>
+                                                                    <p class="mb-0 fs-12 text-black" ng-show="row.PatientDetails.AgeInYears ===0">
+                                                                        {{ row.PatientDetails.AgeInMonths}}M {{ row.PatientDetails.AgeInDays}}D - {{row.PatientDetails.Gender}}
+                                                                    </p>
+                                                                    <!--<p class="m-0 divider" style="border: 0.5px solid #efefef !important"></p>-->
+                                                                    <!--<p class="mb-0 fs-12 text-black">
+                                                                    </p>-->
+                                                                    <!--<p class="mb-0 fs-13 text-danger" ng-bind="row.HospitalEquipmentName"></p>-->
+                                                                </span>
+                                                                <!--title-->
+
+
+                                                            </div>
+                                                        </a>
+                                                        <div class="app-vip-research">
+                                                            <div class="vip-appt app-research-width vip-patient m-b-5" ng-if="row.IsVIPInd">
+                                                                <label>VIP</label>
+                                                            </div>
+
+                                                            <div class="highrisk-patient app-research-width" ng-if="row.IsHighRiskInd">
+                                                                <label>High Risk</label>
+                                                            </div>
+
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="cur-poiter" width="6%" ng-click="ChangeSubcontent(row)">
+
+                                                        <p class="m-b-0 fs-10 text-ehnote" ng-if="row.AppointmentPatientTypeId==2">
+                                                            <span class="fs-10 text-ehnote" style="display:inline !important">Old Patient</span> - <span ng-bind="row.AppointmentType" class="fs-10 text-ehnote" style="display:inline !important"></span>
+                                                            <span class="mb-0 fs-10 error" ng-if="row.PaidFollowup">&nbsp; (Pay)</span>
+                                                        </p>
+                                                        <p class="m-b-0 fs-10 text-ehnote" ng-if="row.AppointmentPatientTypeId==1">
+                                                            <span class="fs-10 text-ehnote" style="display:inline !important">New Patient</span>
+                                                            <span class="mb-0 fs-10 error" ng-if="row.PaidFollowup">&nbsp; (Pay)</span>
+                                                        </p>
+                                                    </td>
+
+                                                    <td class="cur-poiter" width="10%" ng-click="ChangeSubcontent(row)">
+                                                        <p class="no-wrapappt mb-0 text-info" title="Dr. {{row.DoctorFullName}}">
+                                                            <i class="fas fa-user-md"></i>  Dr. {{row.DoctorFullName}}
+                                                        </p>
+                                                        <p class="no-wrapappt mb-0 text-gray" title="{{row.BranchName}}"> <i class="far fa-hospital"></i> {{row.BranchName}} </p>
+                                                        <p class="no-wrapappt mb-0 text-gray" title="{{row.SubSpecializationName}}"> <i class="far fa-hospital"></i> {{row.SubSpecializationName}} </p>
+                                                        <p class="no-wrapappt mb-0" ng-show="row.OptometristName!=''"><span>Optom: </span><b>{{row.OptometristName}}</b></p>
+                                                        <p class="no-wrapappt mb-0" ng-show="row.ARassistantName!=''"><span>AR: </span><b>{{row.ARassistantName}}</b></p>
+                                                    </td>
+
+                                                    <td class="cur-poiter text-left" width="8%" ng-click="ChangeSubcontent(row)" ng-if="Tab==='appointments'">
+                                                        <div class="dropdown ophove-dropdown">
+                                                            <p ng-bind="row.PatientDetails.MasterRererralSource == '' ? '--':row.PatientDetails.MasterRererralSource" class="no-wrapappt m-b-0"></p>
+                                                            <p ng-bind="row.PatientDetails.ReferralSourceName == '' ? '--':row.PatientDetails.ReferralSourceName" class="no-wrapappt m-b-0"></p>
+                                                            <!--<span ng-bind="row.ReferralMobileNo == 0 ? '--':row.ReferralMobileNo" class="no-wrapappt"></span>-->
+                                                            <p ng-bind="row.PatientReferralMobileNo == '' ? '--':row.PatientReferralMobileNo" class="no-wrapappt m-b-0"></p>
+                                                            <ul class="dropdown-menu p-15 w-250 m-t-14 bg-lite">
+                                                                <li>
+                                                                    <b>Referral: </b>
+                                                                    <p ng-bind="row.PatientDetails.MasterRererralSource == '' ? '--':row.PatientDetails.MasterRererralSource" class="no-wrapappt"></p>
+                                                                    <p ng-bind="row.PatientDetails.ReferralSourceName == '' ? '--':row.PatientDetails.ReferralSourceName"></p>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+
+
+                                                    <td class="cur-poiter" width="6%">
+                                                        <p class="mb-0 fs-12 text-black" title="Appointment Time: {{row.StartTime}}">
+                                                            <span>A.: {{row.StartTime}}</span>
+                                                        </p>
+                                                        <p class="m-0 divider" style="border: 0.5px solid #efefef !important"></p>
+                                                        <p class="mb-0 fs-12 text-black" title="In Time: {{row.WalkInTime?(row.WalkInTime | date:'HH:mm a'):'N/A'}}">
+                                                            <b ng-hide="row.WalkInTime==''">
+                                                                In: {{row.WalkInTime?(row.WalkInTime | date:'HH:mm a'):'N/A'}}
+                                                            </b>
+                                                            <b ng-hide="row.WalkOutTime==''">
+                                                                Out: {{row.WalkOutTime?(row.WalkOutTime | date:'HH:mm a'):'N/A'}}
+                                                            </b>
+                                                        </p>
+                                                    </td>
+
+                                                     
+                                                    <td class="cur-poiter" width="7%" ng-click="ChangeSubcontent(row)">
+                                                        <span class="appointment-booked" ng-show="row.AppointmentStatus=='B' && !row.IsPaymentPending">{{row.AppointmentStatus =='B' ? "Booked" :""}}</span>
+                                                        <span class="appointment-booked" ng-show="row.AppointmentStatus=='B' && row.IsPaymentPending">{{row.AppointmentStatus =='B' ? "Payment Pending" :""}}</span>
+                                                        <span class="appointment-cancelled" ng-show="row.AppointmentStatus=='C'">{{row.AppointmentStatus =='C' ? "Cancelled" :""}}</span>
+                                                        <span class="appointment-completed" ng-show="row.AppointmentStatus=='E'">{{row.AppointmentStatus =='E' ? "Completed" :""}}</span>
+                                                        <span class="appointment-started" ng-show="row.AppointmentStatus=='S'">{{row.AppointmentStatus =='S' ? "Started" :""}}</span>
+                                                        <span class="appointment-checked" ng-show="row.AppointmentStatus=='I'">{{row.AppointmentStatus =='I' ? "Checked-In" :""}}</span>
+                                                        <span class="appointment-paused" ng-show="row.AppointmentStatus=='P'">{{row.AppointmentStatus =='P' ? "Paused" :""}}</span>
+                                                        <span class="appointment-paused" ng-show="row.AppointmentStatus=='O'">{{row.AppointmentStatus =='O' ? "Ongoing" :""}}</span>
+                                                        <span class="appointment-paused" ng-show="row.AppointmentStatus=='D'">{{row.AppointmentStatus =='D' ? "Saved" :""}}</span>
+                                                        <p class="no-wrapappt mb-0 text-gray" ng-class="row.IsBilled ? 'BillPaid':'BillNotPaid'">
+                                                            <i class="fas fa-money-bill-alt"></i> Billing
+                                                        </p>
+                                                        <p class="font-weight-600 text-warning m-b-0 m-t-5 text-left" ng-show="row.ISFastTrackAppointment">FastTrack</p>
+                                                    </td>
+
+                                                    <td class="cur-poiter text-left" width="6%" ng-if="Tab==='appointments'">
+                                                        <span ng-show="row.FollowUpDate!=''">{{row.FollowUpDate | date:'dd-MM-yyyy' }}</span>
+                                                        <span ng-show="row.FollowUpDate==''">-</span>
+                                                        <span class="appointment-booked white-nowrap" ng-if="row.ChildAppointmentId!=0">Booked</span>
+                                                        <span class="appointment-checked white-nowrap" ng-if="row.ChildAppointmentId===0">Not Booked</span>
+                                                    </td>
+                                                    <td class="cur-poiter text-left" ng-if="Tab==='teleappointments'" width="6%">
+
+                                                        <span class="appointment-booked white-nowrap" ng-if="row.PreConsultationFormStatusId===2">{{row.PreConsultationFormStatus}}</span>
+                                                        <span class="appointment-incomplete white-nowrap" ng-if="row.PreConsultationFormStatusId===1">{{row.PreConsultationFormStatus}}</span>
+                                                    </td>
+                                                    <td class="cur-poiter text-left" width="6%" ng-if="SpecializationId!=2 && SpecializationId!=16 && Tab ==='appointments'">
+
+                                                        <div class="appt-dltnhover">
+                                                            <div class="mt-0 mb-0">
+                                                                <!--<button class="btn  btn-fill-horz-o p-t-2 p-b-2 btn-sm  fs-12 text-uppercase text-center" ng-click="(SpecializationId ==3 || SpecializationId===20) &&!row.isDilationstarted ? StratDilation(row) :StopDilation(row)" ng-class="(row.Conunter=='00:00') ?'dilation-start':(row.Conunter=='Done')?'dilation-done':'dilation-timer'" ng-disabled="row.AppointmentStatus =='C'|| row.AppointmentStatus =='E'|| row.IscheckedIn ==='N'">
+                                                                    <i class="far fa-clock" ng-hide="row.Conunter=='00:00' ||row.Conunter=='Done'"></i> {{row.Conunter=="00:00" ?'Start':row.Conunter}}
+                                                                </button>-->
+                                                                <div class="input-group">
+                                                                    <button class="btn  btn-fill-horz-o p-t-2 p-b-2 btn-sm  fs-12 text-uppercase text-center" ng-click="(SpecializationId ==3 || SpecializationId===20) &&!row.isDilationstarted ? StratDilation(row) :StopDilation(row)" ng-class="(row.Conunter=='00:00') ?'dilation-start':(row.Conunter=='Done')?'dilation-done':'dilation-timer'" ng-disabled="row.AppointmentStatus =='C' || row.AppointmentStatus =='E' || row.IscheckedIn ==='N'">
+                                                                        {{(row.Conunter=='00:00') ?'Start':(row.Conunter=='Done')?'Done':'Stop'}}
+                                                                    </button>
+                                                                    <span class="input-group-btn">
+                                                                        <button href="javascript:;" ng-click="ViewDilationHistory(row)" class="btn btn-default" uib-tooltip="History" placement="top" title="History" ng-if="row.Conunter==='Done' || row.IsDilationDone"><i class="fas fa-history"></i></button>
+                                                                    </span>
+                                                                   
+                                                                    <!--<a class="bookappbt" ng-show="ShowLabelprint !=false||ShowBarCodeprint !=false" ng-click="patientBarcodeprint(row)"><i class="fas fa-sync-alt"></i> print Barcode</a>-->
+                                                                </div>
+
+                                                                <label ng-hide="row.Conunter=='00:00' ||row.Conunter=='Done'">
+                                                                    {{row.Conunter}}
+                                                                </label>
+                                                                <p class="m-b-0 m-t-5 no-wrapappt fs-13" title="{{row.OrganId == '1'?'OD':row.OrganId == '2'?'OS':row.OrganId == '3'?'OU':''}} -  {{row.DilationMedicationName}}">
+                                                                    {{row.OrganId == '1'?'OD':row.OrganId == '2'?'OS':row.OrganId == '3'?'OU':''}}<span ng-show="row.OrganId != ''"> - </span> {{row.DilationMedicationName}}
+                                                                </p>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    <!--<td class="cur-poiter text-left" width="6%" ng-hide="SpecializationId===2">
+                                                        <span>-</span>
+                                                    </td>-->
+                                                 
+
+
+                                                </tr>
+                                                <tr class="actions-accbdr" ng-if="row.ShowSubcontent">
+                                                    <td colspan="9" class="appt-actions">
+                                                        <ul class="list-unstyled">
+
+                                                            <li ng-show="UserAccessRights.AllAccessRights.ConsultationStart">
+                                                                <a ng-class="!row.startConsultationEntryAccess ? 'DisableDiv':''"
+                                                                   ng-click="!row.startConsultationEntryAccess ?angular.noop():PreStartDirectConsultation(row)"
+                                                                   ng-if="!row.EditConsultationAccess">
+                                                                    <i class="ui-menu-icons Start-Cons"></i> Start Consultation
+                                                                </a>
+                                                            </li>
+
+                                                            <li ng-show="UserAccessRights.AllAccessRights.ConsultationEdit">
+                                                                <a ng-if="row.EditConsultationAccess"
+                                                                   ng-click="!row.EditConsultationAccess ?angular.noop():PreStartDirectConsultation(row)">
+                                                                    <i class="ui-menu-icons Start-Cons"></i> Edit Consultation
+                                                                </a>
+                                                            </li>
+
+                                                            <li ng-show="UserAccessRights.AllAccessRights.ViewPatientCaseHistory">
+                                                                <a ng-class="!row.caseHistoryAccess ? 'DisableDiv':''"
+                                                                   ng-click="!row.caseHistoryAccess ?angular.noop():navtoCaseHistory(row)">
+                                                                    <i class="ui-menu-icons Case-Cons"></i> Case History
+                                                                </a>
+                                                            </li>
+                                                            <li ng-if="row.AppointmentType =='Investigation'">
+                                                                <a ng-class=""
+                                                                   ng-click="NavToStartInvestigation(row)" ng-show="UserAccessRights.AllAccessRights.InvListStartInvestigation">
+                                                                    <i class="ui-menu-icons Start-Cons"></i>Start Investigations
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListFileUploadsList">
+                                                                <a ng-class="!row.FileUploadsAcces ? 'DisableDiv':''"
+                                                                   ng-click="!row.FileUploadsAcces ?angular.noop():openPatientNoteFile(row)">
+                                                                    <i class="ui-menu-icons File-Cons"></i> File Uploads
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListVitalsAccess">
+                                                                <a ng-class="!row.EnterVitalsAcces ? 'DisableDiv':''"
+                                                                   ng-click="!row.EnterVitalsAcces ?angular.noop():openVitalParamspopUp(row)">
+                                                                    <i class="ui-menu-icons Enter-Cons"></i> Vitals
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.OpBilling">
+                                                                <a ng-class="!row.billingAccess ? 'DisableDiv':''"
+                                                                   ng-click="!row.billingAccess ?angular.noop():CallPreBilling(row)">
+                                                                    <i class="ui-menu-icons Billing-Cons"></i> Billing
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListEditAppointment">
+                                                                <a ng-class="!row.EditAppointmentAccess ? 'DisableDiv':''"
+                                                                   ng-click="!row.EditAppointmentAccess ?angular.noop():EditAppointmentPopup(row)">
+                                                                    <i class="ui-menu-icons Edit-Cons"></i> Edit Appointment
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListCancelAppointment">
+                                                                <a ng-class="!row.CancelAppointmentAccess ? 'DisableDiv':''"
+                                                                   ng-click="!row.CancelAppointmentAccess ?angular.noop():CancelAppointmentPatient(row)">
+                                                                    <i class="ui-menu-icons Cancel-Cons"></i> Cancel Appointment
+                                                                </a>
+                                                            </li>
+
+                                                            <li ng-click="editPatientPopup(row)" ng-show="UserAccessRights.AllAccessRights.PatientEdit">
+                                                                <a><i class="ui-menu-icons Case-Cons"></i>Edit Patient</a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListInputCaseSheet">
+                                                                <a ng-class="(!row.CaseSheetAccess || SpecializationId===20) ? 'DisableDiv':''"
+                                                                   ng-click="!row.CaseSheetAccess ?angular.noop():PreStartDirectConsultation(row,'Receptionist')"><i class="ui-menu-icons Case-Cons"></i>Input Case Sheet</a>
+                                                            </li>
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListFollowUpAppointment && SpecializationId != 2">
+                                                                <a ng-class="(row.AppointmentStatus !== 'E' || userLoginDetails.RoleID == '10') ? 'DisableDiv':''"
+                                                                   ng-click="(row.AppointmentStatus !== 'E' || userLoginDetails.RoleID == '10') ? angular.noop():AssignedDoctorFollowup(row)" ng-hide="row.AppointmentStatus==='B'">
+                                                                    <i class="ui-menu-icons Case-Cons"></i> Follow-up
+                                                                </a>
+                                                                <a ng-class="userLoginDetails.RoleID == '10' ? 'DisableDiv':''"
+                                                                   ng-click="DirectBookFollowup(row)" ng-show="row.AppointmentStatus==='B' ">
+                                                                    <i class="ui-menu-icons Case-Cons"></i> Follow-up
+                                                                </a>
+                                                            </li>
+
+
+
+
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListConsultationEntryForm">
+                                                                <a title="Consultation Entry Form"
+                                                                   ng-click="PrintConsultationEntryForm(row)">
+                                                                    <i class="ui-menu-icons Case-Cons"></i> Consultation Entry Form
+                                                                </a>
+                                                            </li>
+
+                                                            <li ng-show="UserAccessRights.AllAccessRights.APPListFollowUpAppointment && SpecializationId == 2">
+                                                                <a ng-click="ShowTreatmentsDocList(row)" ng-class="(row.AppointmentStatus == 'C') ? 'DisableDiv':''">
+                                                                    <i class="fa fa-medkit m-r-5 fa-lg" aria-hidden="true"></i> Follow-up
+                                                                </a>
+                                                            </li>
+                                                            <li ng-show="ShowLabelprint !=false||ShowBarCodeprint !=false">
+                                                                <a class="bookappbt" ng-click="patientBarcodeprint(row)">
+                                                                    <i class="fa fa-medkit m-r-5 fa-lg" aria-hidden="true"></i> Barcode Print
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="bookappbt" ng-click="PatientProfile(row)">
+                                                                    <i class="fa fa-medkit m-r-5 fa-lg" aria-hidden="true"></i> Patient Profile
+                                                                </a>
+                                                            </li>
+
+                                                            <!--<li ng-show="UserAccessRights.AllAccessRights.APPListConsultationEntryForm">
+                                                                <a ng-click="PreRequisteConsultation(row)">
+                                                                    <i class="ui-menu-icons Start-Cons"></i>Pre-Consultation
+                                                                </a>
+                                                            </li>-->
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="billing-cominsoon norecords-found-patients text-center" ng-if="showSearchList">
+                <img src="img/no-data/no-results.png">
+                <div class="msg">
+                    <p class="goback-text"> Sorry, no results found! </p>
+                </div>
+            </div>
+
+
+
+            <div class="billing-cominsoon text-center" style="margin: 80px 0;color:#b3b3b3;font-size:15px;" ng-if="showAppointmtlistError">
+                <img src="img/no-data/no-results-appointment.png">
+                <div class="msg">
+                    <p class="goback-text">No Appointments Booked</p>
+                    <p class="no-records-txt-line2">
+                        No appointments available with selected day, Please
+                        book an appointment now
+                    </p>
+                    <!--<p>
+                        <a href="javascript:;" class="appt-list-link" ng-click="loadCalenderEvent('day')">Book Appointment</a>
+                    </p>-->
+                </div>
+            </div>
+        </div>
+        <div ng-if="mainBookedAppointmentList.length > 0" class="ab-b-r mr-20 EH-pagination text-center left-0">
+            <uib-pagination total-items="mainBookedAppointmentListCount"
+                            ng-model="Pagination.currentPagePatient"
+                            ng-change="changePatientPage()"
+                            items-per-page="Pagination.Patientitemsperpage"
+                            class="mt-0 mb-10"
+                            boundary-link-numbers="true"
+                            boundary-links="true"
+                            max-size="Pagination.Patientmaxsize"
+                            rotate="false"></uib-pagination>
+        </div>
+        <!-- File Upload -->
+        <!-- Modal -->
+        <div id="fileupload" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-md">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Upload Files</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="input-group">
+                                    <div class="browse-wrap">
+                                        <div class="title">Select Files</div>
+                                        <input type="file" name="upload" class="upload"
+                                               ngf-select="onSelectFilesUpload($files)"
+                                               ngf-pattern="'image/*,application/pdf'"
+                                               ngf-accept="'image/*,application/pdf'"
+                                               id="signedChooseBtn"
+                                               multiple="multiple"
+                                               title="Choose a file to upload">
+                                    </div>
+                                    <div class="files-formats">
+                                        <span class="dis-block">Upload only .png, .jpg, .jpeg, .pdf files &amp; Max individual file size : 5 mb</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <button class="btn btn-primary-green btn-block" ng-click="uploadPatientFiles()">Upload</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul tabindex="15" id="ulFileUpload" class="All-diagnosis Observations--DiagnosisUL" ng-hide="FileUploadImageArray.length == 0 && FileUploadPDfArray.length == 0">
+                                    <li class="Observations--Diagnosish3 tile-header">
+                                        <h1>File Uploads</h1>
+                                    </li>
+                                    <li class="dis-content">
+                                        <div class="all_team-members" ng-repeat='item in FileUploadImageArray'>
+                                            <div class="p-5 am-memb-15">
+                                                <div class="imags-surgary" ng-click="openLightboxFileUpload($index,item.DocURL)">
+                                                    <img ng-src="{{item.DocURL}}" class="img-thumbnail" />
+                                                </div>
+                                                <div class="file-mtext">
+                                                    <h2 ng-bind="item.docNameDisplay" title="{{item.DocName}}"></h2>
+                                                    <a ng-click='deleteFileUploads(item)' ng-hide="item.SubmitInd">Remove</a>
+                                                </div>
+                                            </div>
+                                            <div class="p-l-18" ng-show="item.Remarks != ''">
+                                                <article><strong>Remarks :</strong> {{item.Remarks}}</article>
+                                            </div>
+                                        </div>
+                                        <!-- / -->
+                                        <div class="all_team-members" ng-repeat='item in FileUploadPDfArray'>
+                                            <div class="p-15 am-memb-15">
+                                                <div class="file-surgary">
+                                                    <i class="fa fa-file-pdf text-reed fs-40" aria-hidden="true" ng-click="openPdfFileUploads(item.DocURL,$index)"></i>
+                                                </div>
+                                                <div class="file-mtext">
+                                                    <h2 ng-bind="item.docNameDisplay" title="{{item.DocName}}"></h2>
+                                                    <a ng-click='deleteFileUploads(item)' ng-hide="item.SubmitInd">Remove</a>
+                                                </div>
+                                            </div>
+                                            <div ng-show="item.Remarks != ''">
+                                                <label>Remarks</label>
+                                                <article ng-bind="item.Remarks"></article>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="modal-footer text-center">
+                        <ul class="pagination pagination-sm m-0">
+                            <li>
+                                <a aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li><a>1</a></li>
+                            <li><a>2</a></li>
+                            <li><a>3</a></li>
+                            <li><a>4</a></li>
+                            <li><a>5</a></li>
+                            <li>
+                                <a aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+        <!-- / -->
+        <!-- Modal -->
+        <div ng-show="Showtreatments" class="pop-treatments">
+            <div class="select-treatment-left">
+                <div class="treatment-header">
+                    <h1>Treatments</h1>
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="treatments-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="90%">Treatment Name</th>
+
+                                            <th width="10%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="i in [1,2,3]">
+                                            <td>
+                                                <p class="m-t-0 m-b-5 text-bold">Root Canal Treatment</p>
+                                                <p class="appointment-paused m-0">
+
+                                                    <span class="appointment-started fs-13 w-auto">Adviced</span>
+                                                    <span class="fs-13">- For - </span>
+                                                    <span class="text-info fs-13" title="Dr. Durga Reddy K">
+                                                        <i class="fas fa-user-md"></i>  Dr. Durga Reddy K
+                                                    </span>
+                                                    <span class="fs-13">- on -</span>
+                                                    <span class="text-dark fs-13"> 30/07/2019</span>
+                                                </p>
+                                            </td>
+                                            <td class="valign-middle text-center">
+                                                <div class="checkbox cn m-0">
+                                                    <label>
+                                                        <input type="checkbox">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <!-- <small></small> -->
+                                                    </label>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-repeat="i in [1,2,3]">
+                                            <td>
+                                                <p class="m-t-0 m-b-5 text-bold">Organiza Implaints Treatment</p>
+                                                <p class="appointment-paused m-0">
+                                                    <span class="appointment-booked fs-13 w-auto">Booked</span>
+                                                    <span class="fs-13">- For - </span>
+                                                    <span class="text-info fs-13" title="Dr. Durga Reddy K">
+                                                        <i class="fas fa-user-md"></i>  Dr. Durga Reddy K
+                                                    </span>
+                                                    <span class="fs-13">- on -</span>
+                                                    <span class="text-dark fs-13"> 30/07/2019</span>
+                                                </p>
+                                            </td>
+                                            <td class="valign-middle text-center">
+                                                <button class="btn btn-block btn-sm btn-link">
+                                                    <i class="fas fa-edit fa-lg text-info"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row -->
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button class="btn p-l-50 p-r-60 btn-danger">Cancel</button>
+                            <button class="btn p-l-50 p-r-60 book-btn">Book Appointment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /select-treatment-left -->
+            <div class="book-appt-right">
+                
+                <!-- /row -->
+                <div class="text-center">
+                    <h1 class="m-b-0 fs-20 text-ehnote">Book Appointment</h1>
+                </div>
+                <div class="treatments-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="well well-sm bg-success">
+                                <b class="text-dark">Selected Treatments : </b>
+                                <span class="m-r-5 fs-14" ng-repeat="i in [1,2,3,4,5,6,7,8,9]">Treatment {{$index+1}} ,</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Date</label>
+                                                <input type="text" class="form-control" name="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <input type="text" class="form-control" name="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /row -->
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <input type="text" class="form-control" name="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Start Time</label>
+                                                <input type="text" class="form-control" name="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>End Time</label>
+                                                <input type="text" class="form-control" name="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / -->
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button class="btn p-l-50 p-r-60 btn-danger">Cancel</button>
+                            <button class="btn p-l-50 p-r-60 book-btn">Confirm Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / -->
+    <script type="text/ng-template" id="customTemplateMedHistory.html">
+        <a class="searchByResultTEst">
+            <span ng-bind-html="match.model.VisitRsnTitle | uibTypeaheadHighlight:query" class="width-100"></span>
+        </a>
+    </script>
+    <script type="text/ng-template" id="myPopoverTemplate.html">
+        <div class="panel panel-default b-0 mb-0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label>Visit Reason</label>
+                    <textarea ng-model="checkInObj.VisitReason" class="form-control ng-pristine ng-valid ng-touched" placeholder="Enter Visit Reason" type="text" uib-typeahead="item.Reason for item in GetVisitReason($viewValue)" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Attender</label>
+                    <input type="text" ng-model="checkInObj.AttenderName" class="form-control ng-pristine ng-valid ng-touched" placeholder="Enter Attender name">
+                </div>
+                <button class="btn btn-primary  btn-fill-horz-o btn-sm btn-block" ng-click="updateCheckInStatus(checkInObj.VisitReason,'Y',row,checkInObj.AttenderName)">Submit</button>
+            </div>
+        </div>
+    </script>
+    <script type="text/ng-template" id="DilationMedicationpopup.html">
+        <div class="modal-header">
+            <h4 class="modal-title text-black">{{ 'DILATIONMEDICATION' | translate}}</h4>
+            <button type="button" class="btn btn-link m-r-10 m-b-3" ng-click="Closemed()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body b-0 popall-body pt-4 pb-3 bg-default">
+            <div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>{{ 'MEDICATION' | translate}}</label>
+                            <select class="form-control " ng-model="MedicationObj" ng-options="item as item.MedicationName for item in DilationList">
+                                <option value="">{{ 'SELECT' | translate}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12  bg-info">
+                        <fieldset class="text-center">
+                            <div class="dis-inline-block" ng-show="SpecializationId == 3 || SpecializationId == 2">
+                                <input type="radio" class="radio-custom" id="RightEye" name="SelectedEye" ng-value="1" ng-model="DilationSelectedEye" />
+                                <label for="RightEye" class="radio-custom-label cur-poiter mb-0">{{ 'OD' | translate}}</label>
+                            </div>
+                            <div class="ml-15 dis-inline-block" ng-show="SpecializationId == 3 || SpecializationId == 2">
+                                <input type="radio" class="radio-custom" id="LeftEye" name="SelectedEye" ng-value="2" ng-model="DilationSelectedEye" />
+                                <label for="LeftEye" class="radio-custom-label cur-poiter mb-0">{{ 'OS' | translate}}</label>
+                            </div>
+                            <div class="ml-15 dis-inline-block" ng-show="SpecializationId == 3 || SpecializationId == 2">
+                                <input type="radio" class="radio-custom" id="BothEyes" name="SelectedEye" ng-value="3" ng-model="DilationSelectedEye" />
+                                <label for="BothEyes" class="radio-custom-label cur-poiter mb-0">{{ 'OU' | translate}}</label>
+                            </div>
+
+                        </fieldset>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row pt-3 mt-10">
+                <div class="col text-right">
+
+                    <button class="btn-success btn pl-50 pr-50" ng-click="SaveDilation(MedicationObj,DilationSelectedEye)" ng-disabled="MedicationObj==''">{{ 'CONTINUE' | translate}}</button>
+                </div>
+            </div>
+        </div>
+    </script>
+
+
+    <script type="text/ng-template" id="DilationRemarkspopup.html">
+        <div class="modal-header">
+            <div class="">
+                <button type="button" class="close text-black" ng-click="Closemed()">&times;</button>
+                <h4 class="modal-title text-black">Dilation Remarks</h4>
+            </div>
+        </div>
+        <div class="modal-body b-0 popall-body pt-4 pb-3 bg-default">
+            <div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            <textarea class="form-control" rows="2" ng-model="DilationRemarks"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row pt-3 mt-10">
+                <div class="col text-right">
+
+                    <button class="btn-success btn pl-50 pr-50" ng-click="SaveRemarks(DilationRemarks)">Save</button>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var date = new Date();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            if (month < 10) month = "0" + month;
+            if (day < 10) day = "0" + day;
+            var today = year + "-" + month + "-" + day;
+            $("#getDateValueList").attr("value", today);
+        });
+    </script>
+
+    <script type="text/ng-template" id="dynamicApointmentTypeStatus.html">
+        <div class="form-group">
+            <div class="col-lg-12 p-0">
+                <ul class="list-unstyled">
+                    <li>
+                        <label class="control control--checkbox">
+                            <span>All</span>
+                            <input type="checkbox" ng-model="AllAppointmentTypeStatusCheck" ng-click="checkAllAppointmenTypeStatus(AllAppointmentTypeStatusCheck)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                    <li ng-repeat="item in appointmentTypes">
+                        <label class="control control--checkbox">
+                            <span ng-bind="item.Name"></span>
+                            <input type="checkbox" ng-model="item.isChecked" ng-click="AppointmentTypeToggle(item)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+
+
+
+    <script type="text/ng-template" id="mypatienttypeTemplate.html">
+        <div class="panel panel-default b-0 mb-0 pb-0">
+            <div class="panel-body p-0">
+                <p class="mb-0">
+                    <b>Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </b>
+                    <span>{{(Patienttypelist.Title.length > 0)? (Patienttypelist.Title + '. '):"Mr"}}</span>
+                    <span>{{Patienttypelist.FullName | textUpperCase}}</span>
+                </p>
+                <!--<p class="mb-0"><b>Age &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : </b> {{Patienttypelist.AgeInYears}}Y {{ Patienttypelist.AgeInMonths}}M </p>
+                <p class="mb-0"><b>Gender &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : </b> {{Patienttypelist.Gender}}</p>-->
+                <p class="mb-0">
+                    <b> MobileNo &nbsp;&nbsp;&nbsp;&nbsp;  : </b> {{
+Patienttypelist.MobileNo? Patient
+typelist.MobileNo : ''
+                    }}
+
+                </p>
+                <p class="mb-0"><b>PatientType : </b><span ng-bind="Patienttypelist.PatientTypeId === 1 ?'General':Patienttypelist.PatientTypeId === 2 ?'Central Govt Scheme':Patienttypelist.PatientTypeId === 3 ?'State Govt Scheme':Patienttypelist.PatientTypeId === 4 ?'Private Insurance':''"></span></p>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="dynamicVisitStatus.html">
+        <div class="form-group">
+            <div class="col-lg-12 p-0">
+                <ul class="list-unstyled">
+                    <li>
+                        <label class="control control--checkbox">
+                            <span>All</span>
+                            <input type="checkbox" ng-model="AllAppointmentVisitStatusCheck" ng-click="checkAllVisitStatus(AllAppointmentVisitStatusCheck)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                    <li ng-repeat="item in AppointmentVisitFilterArray">
+                        <label class="control control--checkbox">
+                            <span ng-bind="item.Name"></span>
+                            <input type="checkbox" ng-model="item.isChecked" ng-click="VisitToggle(item)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="dynamicApointmentStatus.html">
+        <div class="form-group">
+            <div class="col-lg-12 p-0">
+                <ul class="list-unstyled">
+                    <li>
+                        <label class="control control--checkbox">
+                            <span>All</span>
+                            <input type="checkbox" ng-model="AllAppointmentStatusCheck" ng-click="checkAllAppointmentStatus(AllAppointmentStatusCheck)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                    <li ng-repeat="item in AppointmentStatusFilterArray">
+                        <label class="control control--checkbox">
+                            <span ng-bind="item.Name"></span>
+                            <input type="checkbox" ng-model="item.isChecked" ng-click="toggle(item)">
+                            <div class="control__indicator top-0"></div>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+
+    <style>
+        /* Progress Tracker v2 */
+        ol.trackerprogress[data-steps="2"] li {
+            width: 49%;
+        }
+
+        ol.trackerprogress[data-steps="3"] li {
+            width: 33%;
+        }
+
+        ol.trackerprogress[data-steps="4"] li {
+            width: 24%;
+        }
+
+        ol.trackerprogress[data-steps="5"] li {
+            width: 19%;
+        }
+
+        ol.trackerprogress[data-steps="6"] li {
+            width: 16%;
+        }
+
+        ol.trackerprogress[data-steps="7"] li {
+            width: 14%;
+        }
+
+        ol.trackerprogress[data-steps="8"] li {
+            width: 12%;
+        }
+
+        ol.trackerprogress[data-steps="9"] li {
+            width: 11%;
+        }
+
+        .trackerprogress {
+            width: 100%;
+            list-style: none;
+            list-style-image: none;
+            margin: 20px 0 20px 0;
+            padding: 0;
+        }
+
+            .trackerprogress li {
+                float: left;
+                text-align: center;
+                position: relative;
+            }
+
+            .trackerprogress .name {
+                display: block;
+                vertical-align: bottom;
+                text-align: center;
+                margin-bottom: 1em;
+                color: black;
+                opacity: 0.3;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .trackerprogress .step {
+                color: black;
+                border: 3px solid silver;
+                background-color: silver;
+                border-radius: 50%;
+                line-height: 1.4;
+                width: 2.0em;
+                height: 2.0em;
+                display: inline-block;
+                z-index: 0;
+            }
+
+                .trackerprogress .step span {
+                    opacity: 0.3;
+                }
+
+            .trackerprogress .active .name,
+            .trackerprogress .active .step span {
+                opacity: 1;
+            }
+
+            .trackerprogress .step:before {
+                content: "";
+                display: block;
+                background-color: silver;
+                height: 0.4em;
+                width: 50%;
+                position: absolute;
+                bottom: 0.6em;
+                left: 0;
+                z-index: -1;
+            }
+
+            .trackerprogress .step:after {
+                content: "";
+                display: block;
+                background-color: silver;
+                height: 0.4em;
+                width: 50%;
+                position: absolute;
+                bottom: 0.6em;
+                right: 0;
+                z-index: -1;
+            }
+
+            .trackerprogress li:first-of-type .step:before {
+                display: none;
+            }
+
+            .trackerprogress li:last-of-type .step:after {
+                display: none;
+            }
+
+            .trackerprogress .done .step,
+            .trackerprogress .done .step:before,
+            .trackerprogress .done .step:after,
+            .trackerprogress .active .step,
+            .trackerprogress .active .step:before {
+                background-color: yellowgreen;
+            }
+
+            .trackerprogress .done .step,
+            .trackerprogress .active .step {
+                border: 3px solid yellowgreen;
+            }
+    </style>
+</div>
+
+<script type="text/ng-template" id="ViewAvaliableSlots.html">
+    <div class="modal-header">
+        <h4 class="modal-title">Room Selection</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="patients-profile clearfix">
+                    <ul>
+                        <li>
+                            <!--<div class="profile-avatar-image">
+                                <div ng-show="Patientlistdata.S3URL !==''" image-viewer isarraychanged="0">
+                                    <img ngf-thumbnail="Patientlistdata.S3URL" class="img-responsive" width="50" height="50" />
+                                </div>
+                            </div>-->
+                        </li>
+
+                        <li>
+                            <h3><i class="fas fa-user"></i> Patient Name</h3>
+                            <p><span>{{Patientlistdata.PatientDetails.Title}} .</span> <span>{{Patientlistdata.PatientDetails.FullName}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-barcode"></i> M.R.No.</h3>
+                            <p><span>{{Patientlistdata.PatientDetails.PatientDisplayId}}</span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-venus-mars"></i> Age&amp;Gender</h3>
+                            <p ng-if="Patientlistdata.PatientDetails.AgeInYears !==0"> <span>{{Patientlistdata.PatientDetails.AgeInYears}}Y</span><span>{{Patientlistdata.PatientDetails.AgeInMonths}}M</span>| <span>{{Patientlistdata.PatientDetails.Gender}}</span></p>
+                            <p ng-if="Patientlistdata.PatientDetails.AgeInYears ===0"> <span>{{Patientlistdata.PatientDetails.AgeInMonths}}M</span> <span>{{Patientlistdata.PatientDetails.AgeInDays}}D</span>| <span>{{Patientlistdata.PatientDetails.Gender}}</span></p>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- / -->
+        <div class="row m-t-10">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Select Room Type<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.RoomTypeobj"
+                            ng-change="ChangesRoomType(RoomSearchObj.RoomTypeobj)"
+                            ng-options="item as item.Name for item in RoomTypeList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===2">
+                <div class="form-group">
+                    <label>Optometrist<em>*</em></label>
+                    <!--<pre>{{cacheStorageItem.AllOpthaList}}</pre>-->
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Opthamobj"
+                            ng-change="ChangesOptham(RoomSearchObj.Opthamobj)"
+                            ng-options="item as item.FullName for item in AllOpthaList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===3">
+                <div class="form-group">
+                    <label>Dilation<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.DilationAssistantobj"
+                            ng-change="ChangesDilation(RoomSearchObj.DilationAssistantobj)"
+                            ng-options="item as item.FullName for item in AllDilationList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===4">
+                <div class="form-group">
+                    <label>Counsellor<em>*</em></label>
+
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Counsellorobj"
+                            ng-change="ChangesCounsellor(RoomSearchObj.Counsellorobj)"
+                            ng-options="item as item.FullName for item in AllCounsollerList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="col-lg-4" ng-show="RoomSearchObj.RoomTypeId ===5">
+                <div class="form-group">
+                    <label>Investigation<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Technicianobj"
+                            ng-change="ChangesTechnician(RoomSearchObj.Technicianobj)"
+                            ng-options="item as item.FullName for item in AllTechnicianList">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group" ng-show="RoomSearchObj.RoomTypeId !==7">
+                    <label>Select Room<em>*</em></label>
+                    <select class="form-control"
+                            ng-model="RoomSearchObj.Roomobj"
+                            ng-change="ChangesRoom(RoomSearchObj.Roomobj)"
+                            ng-options="item as item.RoomName for item in RoomListarray">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer text-right">
+        <button class="btn btn-danger p-l-25 p-r-25" ng-click="closeAvaliableSlots()">Close</button>
+        <button class="btn btn-success p-l-25 p-r-25" ng-click="AddToWaitingRoom()">Save</button>
+    </div>
+</script>

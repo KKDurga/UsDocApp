@@ -1,0 +1,287 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1> {{ 'APPTNOTES' | translate}} </h1>
+
+        <div class="asc-patient-profile" ng-if="false">
+            <ul>
+                <li>
+                    <img image-viewer ng-if="PatientImageS3URL != ''" src="{{PatientImageS3URL}}" />
+                    <img ng-if="PatientImageS3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                    <p class="text-capitalize" title="{{PatientName}}">{{PatientName}}</p>
+                </li>
+                <li>
+                    <span>MR No.:</span>
+                    <label>{{PatientDisplayId}}</label>
+                </li>
+                <li>
+                    <span>Sex:</span>
+                    <label>{{PatientGender}}</label>
+                </li>
+                <li>
+                    <span>Age:</span>
+                    <label>{{PatientAge}}</label>
+                </li>
+                <li>
+                    <span>DOB:</span>
+                    <label>{{PatientDOB | date:"MM-dd-yyyy"}}</label>
+                </li>
+            </ul>
+        </div>
+        <ul class="us-controls">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                    <img ng-if="cacheStorageItem.S3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.S3URL}}" />
+                    <img ng-if="cacheStorageItem.S3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span>{{cacheStorageItem.PatientName}}</span>
+                        <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                    </div>
+                    <span><i class="icons__w16-- info__w16--f"></i></span>
+                </div>
+            </li>
+            <li>
+                <a class="btn__close--2" ng-click="closeuibpopup()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table__style--5" id="tblApptDetails">
+                    <thead>
+                        <tr>
+                            <th> {{ 'PATIENTNAME' | translate}} </th>
+                            <th> {{ 'VISITREASON' | translate}} </th>
+                            <th>{{ 'DOCTOR' | translate}}  </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{PatientName}}</td>
+                            <td>{{VistReasonName}}</td>
+                            <td>{{DoctorName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">            
+            <div class="col-lg-12">
+                <!--<label>{{ 'ADDNOTE' | translate}}</label>
+    <textarea rows="2" ng-model="AppointmentNotes" class="form-control bookapt-textarea bg-f6f6f6 notes-border msd-elastic: \n" placeholder="{{ 'ENTERNOTES' | translate}}" maxlength="500"></textarea>-->
+                <div class="mainDevDiagnosis m-t-10">
+                    <ul class="">
+                        <!--class="tab-active"-->
+                        <li ng-class="selectedAppointmentObject.NotesTab === 1? 'active':''">
+                            <a href="javascript:;" ng-click="Notestabchanges(1);">{{ 'ADDNOTE' | translate}}</a>
+                        </li>
+                        <li ng-class="selectedAppointmentObject.NotesTab === 2? 'active':''">
+                            <a href="javascript:;" ng-click="Notestabchanges(2);">Routslip Notes</a>
+                        </li>
+                    </ul>
+                </div>
+                 
+                <div class="row" ng-show="selectedAppointmentObject.NotesTab === 1">
+                    <div class="col-lg-12">
+                        <div class="form__group">
+                            <textarea rows="2" id="AddNotes" ng-model="AppointmentNotes" ng-focus="selectedAppointmentObject.NotesTab === 1" class="msd-elastic: \n" placeholder="{{ 'ENTERNOTES' | translate}}" maxlength="500"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 text-right my__10--">
+                        <div class="d__f-- ai__c-- jc__e-- gap__10--x">
+                            <!--<button class="btn btn-info" ng-click="addNotestoAppointment()">{{ 'SAVE' | translate}}</button>-->
+                            <button class="btn__lg-- btn__C71D27--" ng-click="clearNotestoAppointment()" id="ClearNotes">{{ 'CLEAR' | translate}}</button>
+                            <button class="btn__lg-- btn__1d5558--f" ng-click="addNotestoAppointment()" id="SaveOrUpdateNotes">{{ApptSubmitText}}</button>
+                            <!--<button class="btn btn-info" ng-click="addNotestoAppointment()">{{ApptSubmitText}}</button>-->
+                        </div>
+                    </div>
+                </div>
+            </div>             
+        </div>
+        <div class="row" ng-show="selectedAppointmentObject.NotesTab === 1">
+            <div class="col-lg-12" >
+                <div class="table-responsive">
+                    <table class="table__style--5" id="tblNotesDetails" ng-show="AppointmentNotesArray.length > 0">
+                        <thead>
+                            <tr>
+                                <th> {{ 'NOTES' | translate}} </th>
+                                <th width="20%">{{ 'CREATEDBY' | translate}}</th>
+                                <th width="20%">{{ 'MODIFYDATE' | translate}}</th>
+                                <th width="10%">Edit</th>
+                                <th width="10%">{{ 'ACTION' | translate}}</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="appointment-row" ng-repeat="item in AppointmentNotesArray | filter:{'DeleteInd':'N'} track by $index" >
+
+                                <td>{{item.Notes}}</td>
+                                <td>
+                                    {{item.CreatedBy}}
+                                </td>
+                                <td>
+                                    {{item.ModifiedDt | date:'MM-dd-yyyy,hh:mm a'}}
+                                </td>
+                                <td>
+                                    <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" ng-hide="item.UserId !== UserId" ng-click="EditApptNote(item,$index)">
+                                        <img width="17" src="img/ehnote-edit.svg">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="cur-poiter"  tooltip-placement="top" uib-tooltip="Delete" ng-hide="item.UserId !== UserId" ng-click="DeleteApptNote(item,$index)">
+                                        <img width="17" src="img/ico-delete-red.svg">
+                                    </a>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table__style--5" ng-show="AppointmentNotesArray.length === 0">
+                        <thead>
+                            <tr>
+                                <th> {{ 'NOTES' | translate}} </th>
+                                <th width="20%">{{ 'CREATEDBY' | translate}}</th>
+                                <th width="20%">{{ 'MODIFYDATE' | translate}}</th>
+                                <th width="10%">Edit</th>
+                                <th width="10%">{{ 'ACTION' | translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="bg__none--" colspan="5">
+                                    <div class="d__f-- jc__c-- p__23--">
+                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- text-center p__15--">
+                                            {{ 'NOPREVIOUSAPPOINTMENTNOTESADDEDFORTHEPATIENT' | translate}}
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--<div class="row" ng-show="AppointmentNotesArray.length > 0">
+        <div class="col-lg-12">
+            <ul class="list-none">
+                <li class="bookapt-textarea p-10" ng-repeat="item in AppointmentNotesArray | filter:{'DeleteInd':'N'} track by $index">
+                    <p class="m-b-0"><b>{{item.Notes}}</b></p>
+                    <span class="pull-right dis-flex">
+                        <span>{{item.CreatedBy}}</span>
+                        <span>,{{item.CreatedDt | date:'MM-dd-yyyy,HH:mm'}}</span>
+
+                        <i class="fas fa-trash text-danger fa-lg m-l-15" ng-hide="item.UserId !== UserId" ng-click="DeleteApptNote(item,$index)"></i>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>-->
+        <div class="row" ng-show="selectedAppointmentObject.NotesTab === 2">
+            <div class="col-lg-12">
+                <div class="form__group">
+                    <textarea rows="2" class=" msd-elastic: \n" id="RoutslipNotes" ng-show="selectedAppointmentObject.OtherNotes == ''" placeholder="{{ 'ENTERNOTES' | translate}}" ng-model="selectedAppointmentObject.Routeslipnotes" maxlength="25" ng-if="selectedAppointmentObject.NotesTab === 2" ng-focus="selectedAppointmentObject.autoFocusTrigger = true" autofocus></textarea>
+                </div>
+                <div class="d__f-- jc__e-- gap__10--x my__10--">
+                    <button class="btn__lg-- btn__1d5558--f" id="SaveRoutslipNotes" ng-show="selectedAppointmentObject.OtherNotes == ''&& !IsOtherUpdate" ng-click="AddOtherNotes()">Save</button>
+                    <button class="btn__lg-- btn__2D2D47--o" id="UpdateRoutslipNotes" ng-show="IsOtherUpdate" ng-click="AddOtherNotes()">Update</button>
+                </div>
+                <!--<div>
+                <ul class="us-controls">
+                    <li class="">
+                        <a href="javascript:;" uib-popover-template="OtherNotesLog.templateUrl" popover-placement="left" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width m-l-0 m-t-0" ng-click="getOtherNotesLog();">
+                            <i class="fa fa-info-circle fa-lg"></i>
+                        </a>
+                    </li>
+                    </ul>
+            </div>-->
+                <!--<ul class="notesyellowshow m-t-5">
+                <li class="justify-space-between" ng-show="selectedAppointmentObject.OtherNotes!=''">
+                    <p class="m-0">-->
+                <!--<label class="text-s12w600c079aca"><span class="text-s12w500c3f5fb0">12-06-2023,03:44 PM | </span>Dr. OPH Michael Gross Ronald</label>-->
+                <!--<label class="text-s12w600c079aca"><span class="text-s12w500c3f5fb0">{{selectedAppointmentObject.OtherNotesCreatedDt | date:'MM-dd-yyyy,hh:mm a'}} | </span>{{selectedAppointmentObject.OtherNotesCreatedBy}}</label>
+                        <span class="text-s12w500c000 dis-block">{{selectedAppointmentObject.OtherNotes}}</span>
+                    </p>
+                    <p class="m-b-0 dis-flex">
+                        <a href="javascript:;" ng-click="Editothernotes()"><img width="17" src="img/ehnote-edit.svg"></a>
+                        <a href="javascript:;" ng-click="DeleteOtherNotes()"><img width="17" src="img/ico-delete-red.svg"></a>
+                    </p>
+                </li>
+            </ul>-->
+
+
+
+                <div class="row" ng-show="selectedAppointmentObject.OtherNotes!=''">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered m-b-10" id="tblRoutslipNotesDetails">
+                                <thead>
+                                    <tr>
+                                        <th> {{ 'NOTES' | translate}} </th>
+                                        <th width="20%">{{ 'CREATEDBY' | translate}}</th>
+                                        <th width="20%">{{ 'MODIFYDATE' | translate}}</th>
+                                        <th width="5%">Edit</th>
+                                        <th width="5%">{{ 'ACTION' | translate}}</th>
+                                        <th width="5%">Log</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="appointment-row">
+
+                                        <td>{{selectedAppointmentObject.OtherNotes}}</td>
+                                        <td>
+                                            {{selectedAppointmentObject.OtherNotesCreatedBy}}
+                                        </td>
+                                        <td>
+                                            {{selectedAppointmentObject.OtherNotesCreatedDt | date:'MM-dd-yyyy,hh:mm a'}}
+                                        </td>
+                                        <td>
+                                            <a class="cur-poiter"  tooltip-placement="top" uib-tooltip="Edit" ng-click="Editothernotes()">
+                                                <img width="17" src="img/ehnote-edit.svg">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="cur-poiter"  tooltip-placement="top" uib-tooltip="Delete" ng-click="DeleteOtherNotes()">
+                                                <img width="17" src="img/ico-delete-red.svg">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:;"  tooltip-placement="top" uib-tooltip="Log" uib-popover-template="OtherNotesLog.templateUrl" popover-placement="left" popover-trigger="outsideClick" popover-class="popover-auto suggestions-popover-width m-l-0 m-t-0" ng-click="getOtherNotesLog();">
+                                                <i class="fa fa-info-circle fa-lg"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+ 
+
+
+
+
+     
+
+
+
+
+
+    <!--<div class="modal-footer">
+        <div class="row">
+            <div class="col-lg-12 pull-right">
+                <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="ClearDetails();"> {{ 'CLEAR' | translate}}</button>
+                <button type="button" class="etn btn-ehnote p-l-25 p-r-25" ng-click="SaveProfiledetails();"> {{ 'SAVE' | translate}}</button>
+            </div>
+        </div>
+    </div>-->

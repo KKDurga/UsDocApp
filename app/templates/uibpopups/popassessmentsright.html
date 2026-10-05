@@ -1,0 +1,1783 @@
+﻿<div class="modal-header justify-space-between dis-flex">
+    <h4 class="modal-title" ng-show="ShowTab =='Order'">Orders</h4>
+    <h4 class="modal-title" ng-show="ShowTab =='Referral'">Orders</h4>
+    <h4 class="modal-title" ng-show="ShowTab =='AllOrders'">All Orders</h4>
+    <h4 class="modal-title" ng-show="ShowTab =='AllOrdersReferral'">All Orders</h4>
+    <h4 class="modal-title" ng-show="ShowTab =='MedicalRx'">Medical Rx</h4>
+    <ul class="us-controls">
+        <li>
+            <button type="button" class="btn btn-discard-us" ng-click="uibclose();">close</button>
+        </li>
+        <li>
+            <button class="btn btn-save-us" ng-click="AssesmentPlanPopupSave();">Save</button>
+        </li>
+    </ul>
+</div>
+<div class="modal-body p-6 overflow-y-auto overflow-x-hidden" style="height: calc(100vh - 31px)">
+    <div>
+        <div class="row" ng-repeat="item in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N',IsShowPirticularItem:true} track by $index">
+            <div class="col-lg-12">
+                <ul class="flex-flow-ulli-mb0 m-b-8" ng-if="$first">
+                    <li class="flex" ng-show="ShowTab =='Order'">
+                        <div class="form-group pos-relative m-0">
+                            <input type="text"
+                                   class="form-control icons-search input-color"
+                                   maxlength="100"
+                                   ng-model="assonj.SearchProcedureObj"
+                                   placeholder="Select Order"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                                   typeahead-on-select="OnClickAdvisedProcedure(assonj.SearchProcedureObj,item,7)"
+                                   ng-focus="ProcedureListFocus===true"
+                                   ng-blur="ChangeAdvisedOrders()"
+                                   ng-model-options="{ debounce: 500 }"/>
+                        </div>
+                    </li>
+                    <li class="flex" ng-show="ShowTab =='Referral'">
+                        <div class="form-group pos-relative m-0">
+                            <input type="text"
+                                   class="form-control icons-search input-color"
+                                   maxlength="100"
+                                   ng-model="assonj.SearchReferralObj"
+                                   placeholder="Select Referral"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.Referral for item in GetReferralMasterData($viewValue)"
+                                   typeahead-on-select="OnClickReferralSearch(assonj.SearchReferralObj,item)"
+                                   ng-focus="ProcedureListFocus===true"
+                                   ng-blur="ChangeAdvisedOrders()" />
+                        </div> 
+                    </li>
+                    <li class="w-100">
+                        <button class="btn btn-block btn-appt-color height-30" ng-show="ShowTab =='Order'" ng-click="ChangeReferralTab('Referral');">Referral</button>
+                        <button class="btn btn-block btn-ehnote-outline height-30" ng-show="ShowTab =='Referral'" ng-click="ChangeReferralTab('Order');">Orders</button>
+                    </li>
+                    <li class="w-50" ng-if="ShowTab =='Referral'">
+                        <button class="btn btn-save-us height-30" tooltip-placement="bottom-right" uib-tooltip="Add New Provider" ng-model="Referralobj.IsnewProvider" ng-click="ChangeProvider(Referralobj.IsnewProvider)">
+                            <i class="fas fa-plus fa-lg"></i>
+                        </button>
+                    </li>
+                </ul>
+                
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="ShowTab =='Referral' || ShowTab =='Order'">
+                    <label ng-show="(item.InvestigationsArray | filter:{DeleteInd: 'N'}).length > 0">Investigation</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open" ng-repeat="Iitem in item.InvestigationsArray| filter: { DeleteInd: 'N' } track by $index">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000 fs-12 p-2 no-wrapappt dis-inline-block cur-poiter width-65" title="{{Iitem.ProcedureCode}} | {{Iitem.InvestigationName}}">{{Iitem.ProcedureCode}} | {{Iitem.InvestigationName}}</span>
+                            <span class="pull-right">
+                                <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                            </span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="dgnosispopoverinvest.templateUrl" ng-click="AddDiagnosisinInvClick(item, Iitem, 'Investigaction');" popover-is-open="Iitem.IsAddDiagnosisinInvSavePopOver">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAssInvestigation(Iitem, item)">
+                            </span>
+                        </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesInvEye(Iitem,Iitem.OrganId,'Investigation')"
+                                                    ng-model="Iitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="mitem.ModalityId as mitem.ModalityName for mitem in Modalities"
+                                                    ng-model="Iitem.ModalityId" ng-change="ChangeModalities(Iitem,Iitem.ModalityId)">
+                                                <option value="">Select Modality</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <div class="ehr-input-group" ng-show="!Iitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-disabled="Iitem.DurationType === 'SD' || Iitem.DurationType === 'NV' || Iitem.DurationType === 'T'|| Iitem.DurationType === 'ASAP'" ng-model="Iitem.Duration" placeholder="0" numbers-only>
+                                                <select ng-model="Iitem.DurationType" ng-change="ChangeDurationType(Iitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="Iitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="Iitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(Iitem)" />
+                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                    ng-model="Iitem.StatusId"
+                                                    ng-change="ChangeProcedureStatus(Iitem);">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" tooltip-placement="right" uib-tooltip="Notes" ng-click="Iitem.IsEdit=true">
+                                            <img src="img/ros-chart/ros-notes.svg" width="24">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" tooltip-placement="right" uib-tooltip="Clear" ng-click="ClearInvestigationDetails(Iitem)">
+                                            <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                        </a>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="Iitem.IsEdit==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" rows="1" ng-model="Iitem.InvestigationNotes" placeholder="Add Notes" maxlength="500" ng-focus="Iitem.IsEdit==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+                    
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="ShowTab =='Referral' || ShowTab =='Order'">
+                    <label ng-show="(item.SurgeryArray | filter:{DeleteInd: 'N'}).length > 0">Surgery</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open" ng-repeat="Sitem in item.SurgeryArray| filter: { DeleteInd: 'N' } track by $index">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000 fs-12 p-2 dis-inline-block">{{Sitem.ProcedureCode}} | {{Sitem.SurgeryName}}</span>
+                            <span class="pull-right">
+                                <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                            </span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="dgnosispopoverSurgery.templateUrl" ng-click="AddDiagnosisinInvClick(item, Sitem, 'Surgery');" popover-is-open="Sitem.IsAddDiagnosisinSurgSavePopOver">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAssSurgery(Sitem, item);">
+                            </span>
+                        </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-75">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Organ</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesSurgerEye(Sitem,Sitem.OrganId)"
+                                                    ng-model="Sitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Schedule</label>
+
+
+
+                                            <div class="ehr-input-group" ng-show="!Sitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-model="Sitem.Duration" placeholder="0" numbers-only ng-disabled="Sitem.DurationType === 'SD' || Sitem.DurationType === 'NV' || Sitem.DurationType === 'T'|| Sitem.DurationType === 'ASAP'">
+                                                <select ng-model="Sitem.DurationType" ng-change="ChangeDurationType(Sitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="Sitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="Sitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(Sitem)" />
+                                                <button ng-show="!Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+
+
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Coordinator</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                    ng-change="ChangesCoordinator(Sitem, Sitem.CoordinatorId)"
+                                                    ng-model="Sitem.CoordinatorId">
+                                                <option value="">Coordinator</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>External Co-Manager</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllExternalCoordinatorList"
+                                                    ng-change="ChangesExternalCoManager(Sitem, Sitem.ExternalCoManagerId)"
+                                                    ng-model="Sitem.ExternalCoManagerId">
+                                                <option value="">External Co-Manager</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Internal Co-Manager</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllInternalCoordinatorList"
+                                                    ng-change="ChangesInternalCoManager(Sitem, Sitem.InternalCoManagerId)"
+                                                    ng-model="Sitem.InternalCoManagerId">
+                                                <option value="">Internal Co-Manager</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="ehr-input pop-ehr-input w-150">
+                                        <label>Status</label>
+                                        <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                ng-model="Sitem.StatusId"
+                                                ng-change="ChangeProcedureStatus(Sitem);">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <div class="form-group m-t-20">
+                                            <a href="javascript:;" tooltip-placement="left" uib-tooltip="Notes" ng-click="Sitem.IsExternalCoManagerRemarks=true">
+                                                <img src="img/ros-chart/ros-notes.svg" width="24">
+                                            </a>
+                                            <a href="javascript:;" tooltip-placement="right" uib-tooltip="Clear" ng-click="ClearSurgeriesDetails(Sitem)">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="Sitem.IsExternalCoManagerRemarks==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" placeholder="Add Notes" maxlength="500" ng-model="Sitem.ExternalCoManagerRemarks" ng-focus="Sitem.IsExternalCoManagerRemarks==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="ShowTab =='Referral' || ShowTab =='Order'">
+                    <label ng-show="(item.ProceduresArray | filter:{DeleteInd: 'N'}).length > 0">Procedure</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open" ng-repeat="pitem in item.ProceduresArray track by $index" ng-if="pitem.DeleteInd == 'N'">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000  p-2 dis-inline-block">{{pitem.ProcedureCode}} | {{pitem.ProcedureName}}</span>
+                            <span class="pull-right">
+                                <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                            </span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="dgnosispopoverprocedure.templateUrl" ng-click="AddDiagnosisinInvClick(item, pitem, 'Procedure');" popover-is-open="pitem.IsAddDiagnosisinProcSavePopOver">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAssProcedure(pitem, item)">
+                            </span>
+                </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesProcedurEye(pitem,pitem.OrganId)"
+                                                    ng-model="pitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+
+
+
+                                        <div class="ehr-input pop-ehr-input">
+                                            <div class="ehr-input-group" ng-show="!pitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-disabled="pitem.DurationType === 'SD' || pitem.DurationType === 'NV' || pitem.DurationType === 'T'|| pitem.DurationType === 'ASAP'" ng-model="pitem.Duration" placeholder="0" numbers-only>
+                                                <select ng-model="pitem.DurationType" ng-change="ChangeDurationType(pitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="pitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="pitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(pitem)" />
+                                                <button ng-show="!pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                    ng-model="pitem.StatusId"
+                                                    ng-change="ChangeProcedureStatus(pitem);">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            <a href="javascript:;" tooltip-placement="left" uib-tooltip="Notes" ng-click="pitem.IsEdit=true">
+                                                <img src="img/ros-chart/ros-notes.svg" width="24">
+                                            </a>
+                                            <a href="javascript:;" tooltip-placement="right" uib-tooltip="Clear" ng-click="ClearProcedureDetails(pitem)">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="pitem.IsEdit==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" placeholder="Add Notes" rows="1" ng-model="pitem.ProcedureNotes" maxlength="500" ng-focus="pitem.IsEdit==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+          
+                <div class="col-lg-12 p-l-0 p-r-0" ng-show="ShowTab =='Referral' || ShowTab =='Order'">
+                    <label ng-show="(item.ReferralArray | filter:{DeleteInd: 'N'}).length > 0">Referral</label>
+                    <div class="col-lg-12 p-l-0 p-r-0">
+                        <uib-accordion close-others="true" ng-show="$first" class="Referral-accordion-assmnts">
+                            <div uib-accordion-group class="panel-default" is-open="status.open" ng-repeat="ritem in item.ReferralArray|filter:{'DeleteInd':'N'} track by $index">
+                                <ul class="flex-flow-ulli-mb0 m-b-8" ng-if="ritem.ReferralId==14">
+                                    <li class="flex">
+                                        <div class="form-group pos-relative m-0">
+                                            <input type="text" class="form-control border-radius-0 m-l-10 w-400 icons-search input-color"
+                                                   autocomplete="off"
+                                                   ng-model="Referralobj.referralDoctorObj"
+                                                   placeholder="Search Hospital Name"
+                                                   typeahead-min-length="0"
+                                                   typeahead-focus-on-select="false"
+                                                   typeahead-on-select="OnSelectReferalHospital(Referralobj.referralDoctorObj,ritem)"
+                                                   uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchPCPDOClist($viewValue,4,ritem)"
+                                                   ng-change="changeReferalDoctor(Referralobj.referralDoctorOb)" />
+                                        </div>
+                                    </li>
+                                </ul>
+                                <uib-accordion-heading>
+                                    <span class="text-s12w500c000" ng-if="ritem.ReferralId!=14">Referral: </span>
+                                    <span class="text-s12w600c079aca" ng-if="ritem.ReferralId!=14">{{ritem.Referral}}<span ng-hide="ritem.ReferralDoctorName ==''">,</span>{{ritem.ReferralDoctorName}}</span>
+                                    <ul class="flex-flow-ulli-mb0 pull-right">
+                                        <li>
+                                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="diagnosispopoverInReferral.templateUrl" ng-click="AddDiagnosisinInvClick(item, ritem, 'Referral');" popover-is-open="ritem.IsAddDiagnosisinRefSavePopOver">+ Additional Diagnosis</a>
+                                            </span>
+                                        </li>
+                                        <li ng-click="$event.stopPropagation();">
+                                            <a href="javascript:;">
+                                                <img src="img/ros-chart/ros-close.svg" width="24" uib-tooltip="Delete" role="button" tabindex="0" ng-click="DelectAssReferral(ritem,item)">
+                                            </a>
+                                        </li>
+                                        <li ng-click="$event.stopPropagation();">
+                                            <a href="javascript:;">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24" role="button" tabindex="0" ng-click="ClearReferalDetails(ritem)">
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                        </li>
+                                    </ul>
+                                </uib-accordion-heading>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <!--<article class="text-s12w500c313131 m-b-8">
+                <b>Reason:</b> lorem ipsum ipsum dolor sit amet lorem ipsum ipsum dolor sit amet lorem ipsum ipsum dolor sit amet lorem ipsum ipsum dolor sit amet lorem ipsum ipsum dolor sit amet
+            </article>-->
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Reason for Referral</label>
+                                            <textarea class="form-control" rows="3" placeholder="Reason" ng-model="ritem.ReferralReason" maxlength="500"></textarea>
+                                        </div>
+                                        <ul class="flex-flow-ulli-mb0 m-t-8" ng-if="ritem.ReferralId!=14">
+                                            <li>
+                                                <input type="radio" class="radio-custom width-0" id="isCardwise2" ng-model="Referralobj.Type" value="Internal" ng-change="ChangeReferalType(Referralobj, ritem);">
+                                                <label for="isCardwise2" class="radio-custom-label cur-poiter mb-0 text-black" title="Internal Doctor">Internal</label>
+                                            </li>
+                                            <li>
+                                                <input type="radio" class="radio-custom width-0" id="isCardwise3" ng-model="Referralobj.Type" value="External" ng-change="ChangeReferalType(Referralobj, ritem);">
+                                                <label for="isCardwise3" class="radio-custom-label cur-poiter mb-0 text-black" title="External Doctor">External</label>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='External'">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SpecializationObj"
+                                                            ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                            ng-change="changereferalSpecialization(Referralobj.SpecializationObj);">
+                                                        <option value="">Select Specialization</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='External' && SelectSpecializationObj == true">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SubSpecializationObj"
+                                                            ng-options="Oitem as Oitem.SubSpecializationName for Oitem in allSubSpecializationsArray"
+                                                            ng-change="changereferalSubSpecialization(Referralobj.SubSpecializationObj);">
+                                                        <option value="">Select SubSpeciality</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='Internal'">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SubSpecializationObj"
+                                                            ng-options="Oitem as Oitem.SubSpecializationName for Oitem in allSubSpecializationsArray"
+                                                            ng-change="changereferalSubSpecialization(Referralobj.SubSpecializationObj);">
+                                                        <option value="">Select SubSpeciality</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li ng-show="Referralobj.Type =='Internal'">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-radius-0 m-l-10 w-200 icons-search input-color"
+                                                           autocomplete="off"
+                                                           ng-model="Referralobj.referralDoctorObj"
+                                                           placeholder="Select Internal Doctor Name"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,ritem)"
+                                                           uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchInternalDOClist($viewValue)"
+                                                           ng-change="changeReferalDoctor(Referralobj.referralDoctorObj)" />
+                                                    <!--typeahead-on-select="OnSelectDoctor(Referralobj.referralDoctorObj,item)"-->
+                                                </div>
+                                            </li>
+                                            <li ng-show="Referralobj.Type =='External'">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-radius-0 m-l-10 w-200 icons-search input-color"
+                                                           autocomplete="off"
+                                                           ng-model="Referralobj.referralDoctorObj"
+                                                           placeholder="Select External Doctor Name"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,ritem)"
+                                                           uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchPCPDOClist($viewValue)"
+                                                           ng-change="changeReferalDoctor(Referralobj.referralDoctorObj, )" />
+                                                    <!--typeahead-on-select="OnSelectDoctor(Referralobj.referralDoctorObj,item)"-->
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                        <ul class="flex-flow-ulli-mb0 m-t-8">
+                                            <li>
+                                                <b>Schedule: </b>
+                                            </li>
+                                            <li class="w-200">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <div class="ehr-input-group" ng-show="!ritem.ShowDateFormat">
+                                                        <input type="text" class="form-control btr-radius bbr-radius" ng-model="ritem.Duration" placeholder="0" maxlength="3" ng-disabled="ritem.DurationType === 'SD' || ritem.DurationType === 'NV' || ritem.DurationType === 'T'|| ritem.DurationType === 'ASAP'">
+                                                        <select class="form-control b-radius-0" ng-model="ritem.DurationType" ng-change="ChangeDurationType(ritem)">
+                                                            <option value="">Select</option>
+                                                            <option value="D">Days</option>
+                                                            <option value="W">Weeks</option>
+                                                            <option value="M">Months</option>
+                                                            <option value="Y">Years</option>
+                                                            <option value="SD">Same Day</option>
+                                                            <option value="NV">Next visit</option>
+                                                            <option value="T">Tomorrow</option>
+                                                            <option value="ASAP">ASAP</option>
+                                                        </select>
+                                                        <button ng-show="!ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-keyboard"></i></button>
+                                                        <button ng-show="ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-calendar-alt"></i></button>
+                                                    </div>
+                                                    <div class="ehr-input-group" ng-show="ritem.ShowDateFormat">
+                                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="ritem.DurationDate" datepickeruniversal readonly />
+                                                        <button ng-show="!ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-keyboard"></i></button>
+                                                        <button ng-show="ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-calendar-alt"></i></button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <label class="cur-poiter">
+                                                    <input type="checkbox" id="1" class="checkbox" ng-model="ritem.IsUrgency">
+                                                    <span class="lbl"></span>
+                                                    <span class="text-s12w500C068cb0 lh-2-0 fs-12">Urgency</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="cur-poiter">
+                                                    <input type="checkbox" id="1" class="checkbox" ng-model="ritem.IsFollowUpAfterReferral">
+                                                    <span class="lbl"></span>
+                                                    <span class="text-s12w500C068cb0 lh-2-0 fs-12">Follow up after referral</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </uib-accordion>
+                        <div class="bg-e7e7e7 p-6 m-b-8" ng-if="Referralobj.IsnewProvider">
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="w-80">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Suffix</label>
+                                        <select ng-model="PCPObj.SuffixId" ng-options="pitem.Id as pitem.Name for pitem in SuffixList" ng-change="changeSuffix(PCPObj.SuffixId);">
+                                            <option value="">Select Suffix</option>
+                                        </select>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>First Name <em>*</em></label>
+                                        <input type="text" ng-model="PCPObj.FirstName" placeholder="First Name" maxlength="30" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Last Name</label>
+                                        <input type="text" ng-model="PCPObj.LastName" placeholder="Last Name" maxlength="30" />
+                                    </div>
+                                </li>
+                                <li class="w-200">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Gender <em>*</em></label>
+                                        <select ng-model="PCPObj.Gender">
+                                            <option value="">Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Mobile <em>*</em></label>
+                                        <div class="ehr-input-group">
+                                            <select ng-model="PCPObj.countrycode"
+                                                    ng-options="item.InternationalDialing as item.InternationalDialing for item in Allcountries">
+                                                <option value="">Select countrycode</option>
+                                            </select>
+                                            <input type="text" class="flux" numeric-duration maxlength="14" ng-model="PCPObj.MobileNo" placeholder="Mobile No" ng-change="changePhNumber(PCPObj.MobileNo)" />
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Email <em>*</em></label>
+                                        <input type="email" name="EmailID" class="" placeholder="Enter Email Id" ng-model="PCPObj.EmailId" required ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" maxlength="40" />
+                                        <div class="" ng-show="ReferalForm.EmailID.$error.required && ReferalForm.$submitted"><span>Enter Email </span></div>
+                                        <div class="" ng-show="ReferalForm.EmailID.$error.email && ReferalForm.$submitted"><span>Enter valid Email </span></div>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Organization Name</label>
+                                        <input type="text" class="" placeholder="Organization Name" ng-model="PCPObj.PcpOrganizationName" maxlength="100" />
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>NPI <em>*</em></label>
+                                        <input type="text" class="form-admission" maxlength="10" ng-model="PCPObj.NPI" placeholder="NPI" numbers-only/>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Specialization</label>
+                                        <select ng-model="ExtSpecializationObj" ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                ng-change="ChangereExtSpecialization(ExtSpecializationObj);">
+                                            <option value="">Select Specialization</option>
+                                        </select>
+                                    </div>
+                                </li>
+                                <li class="flex" ng-show="SelectExtSpecializationObj == true || ExtSpecializationObj == 3">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Sub Specialization</label>
+                                        <select name="speciality" ng-model="PCPObj.SubSpecializationId"
+                                                ng-options="value.SubSpecializationId as value.SubSpecializationName for value in allSubSpecializationsArray" required>
+                                            <option class="text-success" value="">select</option>
+                                        </select>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Address Line 1</label>
+                                        <input type="text" ng-model="PCPObj.Address1" placeholder="Address Line 1" maxlength="100" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Address Line 2</label>
+                                        <input type="text" ng-model="PCPObj.Address2" placeholder="Address Line 2" maxlength="100" />
+                                    </div>
+                                </li>
+                                <li class="w-200">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Location Name</label>
+                                        <input type="text" ng-model="PCPObj.LocationName" placeholder="LocationName" />
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5 align-flex-end">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Ciy</label>
+                                        <input type="text" ng-model="PCPObj.CityName" placeholder="City" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>State</label>
+                                        <input type="text" ng-model="PCPObj.StateName" placeholder="State" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Enter Zip Code <em>*</em></label>
+                                        <input type="text" name=""
+                                               autocomplete="off"
+                                               ng-model="PCPObj.ZipCode"
+                                               placeholder="Enter ZipCode"
+                                               typeahead-min-length="0"
+                                               required
+                                               uib-typeahead="item as item.ZipCode for item in SearchLocationByZipcode($viewValue)"
+                                               typeahead-on-select="SearchZipcodebyCounty(PCPObj.ZipCode)"
+                                               ng-change="changeZipcodetoProcedure(item)" />
+                                    </div>
+                                </li>
+                                <li>
+                                    <button class="btn btn-discard-us" ng-click="Referralobj.IsnewProvider =false">Close</button>
+                                    <button class="btn btn-clear-us" ng-click="ClearNewProvider();">Clear</button>
+                                    <button class="btn btn-save-us" ng-click="AddReferalPCPDoctor();">Save</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="flex-flow-ulli-mb0 m-b-8">
+                    <li class="flex" ng-show="ShowTab =='AllOrders'">
+                        <div class="form-group pos-relative">
+                            <input type="text"
+                                   class="form-control icons-search input-color"
+                                   maxlength="100"
+                                   ng-model="assonj.SearchOrdersProcedureObj"
+                                   placeholder="Select Order"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                                   typeahead-on-select="OnClickAdvisedProcedureInOrders(assonj.SearchOrdersProcedureObj, '' ,7)"
+                                   ng-focus="ProcedureListFocus===true"
+                                   ng-blur="ChangeAdvisedOrders()"
+                                   ng-model-options="{ debounce: 500 }"/>
+                        </div>
+                    </li>
+                    <li class="flex" ng-show="ShowTab =='AllOrdersReferral'">
+                        <div class="form-group pos-relative m-0">
+                            <input type="text"
+                                   class="form-control icons-search input-color"
+                                   maxlength="100"
+                                   ng-model="assonj.SearchReferralObj"
+                                   placeholder="Select Referral"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.Referral for item in GetReferralMasterData($viewValue)"
+                                   typeahead-on-select="OnClickAllOrdersReferralSearch(assonj.SearchReferralObj)"
+                                   ng-focus="ProcedureListFocus===true"
+                                   ng-blur="ChangeAdvisedOrders()" />
+                        </div>
+                    </li>
+                    <li class="w-100">
+                        <button class="btn btn-block btn-appt-color height-30" ng-show="ShowTab =='AllOrders'" ng-click="ChangeReferralTab('AllOrdersReferral');">Referral</button>
+                        <button class="btn btn-block btn-ehnote-outline height-30" ng-show="ShowTab =='AllOrdersReferral'" ng-click="ChangeReferralTab('AllOrders');">Orders</button>
+                    </li>
+                    <li class="w-50" ng-if="ShowTab =='AllOrdersReferral'">
+                        <button class="btn btn-save-us height-30" tooltip-placement="bottom-right" uib-tooltip="Add New Provider" ng-model="Referralobj.IsnewProvider" ng-click="ChangeProvider(Referralobj.IsnewProvider)">
+                            <i class="fas fa-plus fa-lg"></i>
+                        </button>
+                    </li>
+                </ul>
+
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="Iitem.OrderTypeId == 1 && (ShowTab =='AllOrders' || ShowTab =='AllOrdersReferral')" ng-repeat="Iitem in AssessmentplanpopupObj.OrdersInvestigationArray | filter:{DeleteInd: 'N'} track by $index">
+                    <label ng-show="$first">Investigation</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000 p-2 dis-inline-block">{{Iitem.ProcedureCode}} | {{Iitem.Description}}</span>
+                            <span class="pull-right"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-is-open="Iitem.IsAllOrderspopoverInv" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="Orderdignosispopoverinvest.templateUrl" ng-click="AllOrderInvestigationtoggle('Investigation', Iitem)">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAllOrdersInvestigation(Iitem)">
+                            </span>
+                        </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesInvEye(Iitem,Iitem.OrganId,'Investigation')"
+                                                    ng-model="Iitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="mitem.ModalityId as mitem.ModalityName for mitem in Modalities"
+                                                    ng-model="Iitem.ModalityId" ng-change="ChangeModalities(Iitem,Iitem.ModalityId)">
+                                                <option value="">Select Modality</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <div class="ehr-input-group" ng-show="!Iitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-disabled="Iitem.DurationType === 'SD' || Iitem.DurationType === 'NV' || Iitem.DurationType === 'T'|| Iitem.DurationType === 'ASAP'" ng-model="Iitem.Duration" placeholder="0" numbers-only>
+                                                <select ng-model="Iitem.DurationType" ng-change="ChangeDurationType(Iitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="Iitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="Iitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(Iitem)" />
+                                                <button ng-show="!Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Iitem.ShowDateFormat" ng-click="ChangeItem(Iitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                    ng-model="Iitem.StatusId"
+                                                    ng-change="ChangeProcedureStatus(Iitem);">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Notes" ng-click="Iitem.IsEdit=true">
+                                            <img src="img/ros-chart/ros-notes.svg" width="24">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Clear" ng-click="ClearInvestigationDetails(Iitem)">
+                                            <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                        </a>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="Iitem.IsEdit==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" rows="1" ng-model="Iitem.Remarks" placeholder="Add Notes" maxlength="500" ng-focus="Iitem.IsEdit==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="Sitem.OrderTypeId == 3 && (ShowTab =='AllOrders' || ShowTab =='AllOrdersReferral')" ng-repeat="Sitem in AssessmentplanpopupObj.OrdersSurgeryArray  | filter:{DeleteInd: 'N'} track by $index">
+                    <label ng-show="$first">Surgery</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000 p-2 dis-inline-block">{{Sitem.ProcedureCode}} | {{Sitem.Description}}</span>
+                            <span class="pull-right"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-is-open="Sitem.IsAllOrderspopoverSurg" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="OrdersdignosispopoverinSurgery.templateUrl" ng-click="Surgertytoggle('Surgery', Sitem)">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAllOrderSurgery(Sitem);">
+                            </span>
+                        </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-75">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Organ</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesSurgerEye(Sitem,Sitem.OrganId)"
+                                                    ng-model="Sitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Schedule</label>
+
+
+
+                                            <div class="ehr-input-group" ng-show="!Sitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-model="Sitem.Duration" placeholder="0" numbers-only ng-disabled="Sitem.DurationType === 'SD' || Sitem.DurationType === 'NV' || Sitem.DurationType === 'T'|| Sitem.DurationType === 'ASAP'">
+                                                <select ng-model="Sitem.DurationType" ng-change="ChangeDurationType(Sitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="Sitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="Sitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(Sitem)" />
+                                                <button ng-show="!Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="Sitem.ShowDateFormat" ng-click="ChangeItem(Sitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+
+
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Coordinator</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                    ng-change="ChangesCoordinator(Sitem, Sitem.CoordinatorId)"
+                                                    ng-model="Sitem.CoordinatorId">
+                                                <option value="">Coordinator</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>External Co-Manager</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllExternalCoordinatorList"
+                                                    ng-change="ChangesExternalCoManager(Sitem, Sitem.ExternalCoManagerId)"
+                                                    ng-model="Sitem.ExternalCoManagerId">
+                                                <option value="">External Co-Manager</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-200">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Internal Co-Manager</label>
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Citem.DoctorID as Citem.FullName for Citem in AllInternalCoordinatorList"
+                                                    ng-change="ChangesInternalCoManager(Sitem, Sitem.InternalCoManagerId)"
+                                                    ng-model="Sitem.InternalCoManagerId">
+                                                <option value="">Internal Co-Manager</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="ehr-input pop-ehr-input w-150">
+                                        <label>Status</label>
+                                        <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                ng-model="Sitem.StatusId"
+                                                ng-change="ChangeProcedureStatus(Sitem);">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <div class="form-group m-t-20">
+                                            <a href="javascript:;" tooltip-placement="left" uib-tooltip="Notes" ng-click="Sitem.IsExternalCoManagerRemarks=true">
+                                                <img src="img/ros-chart/ros-notes.svg" width="24">
+                                            </a>
+                                            <a href="javascript:;" tooltip-placement="right" uib-tooltip="Clear" ng-click="ClearSurgeriesDetails(Sitem)">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="Sitem.IsExternalCoManagerRemarks==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" placeholder="Add Notes" maxlength="500" ng-model="Sitem.ExternalCoManagerRemarks" ng-focus="Sitem.IsExternalCoManagerRemarks==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+
+                <uib-accordion close-others="true" class="investigation-accordion" ng-show="pitem.OrderTypeId == 2 && (ShowTab =='AllOrders' || ShowTab =='AllOrdersReferral')" ng-repeat="pitem in AssessmentplanpopupObj.OrdersProcedureArray  | filter:{DeleteInd: 'N'} track by $index">
+                    <label ng-show="$first">Procedure</label>
+                    <div uib-accordion-group class="panel-default" is-open="status.open">
+                        <uib-accordion-heading>
+                            <span class="text-s12w500c000 p-2 dis-inline-block">{{pitem.ProcedureCode}} | {{pitem.Description}}</span>
+                            <span class="pull-right"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></span>
+                            <span class="pull-right" ng-click="$event.stopPropagation();">
+                                <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" popover-is-open="pitem.IsAllOrderspopoverprocedure" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="OrdersdignosispopoverInProcedure.templateUrl" ng-click="proceduretoggle1('Procedure', pitem)">+ Additional Diagnosis</a>
+                                <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DelectAllOrdersProcedure(pitem)">
+                            </span>
+                        </uib-accordion-heading>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select class="form-control bg-f9f9f9"
+                                                    ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-change="ChangesProcedurEye(pitem,pitem.OrganId)"
+                                                    ng-model="pitem.OrganId">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+
+
+
+                                        <div class="ehr-input pop-ehr-input">
+                                            <div class="ehr-input-group" ng-show="!pitem.ShowDateFormat">
+                                                <input type="text" class="w-60" ng-disabled="pitem.DurationType === 'SD' || pitem.DurationType === 'NV' || pitem.DurationType === 'T'|| pitem.DurationType === 'ASAP'" ng-model="pitem.Duration" placeholder="0" numbers-only>
+                                                <select ng-model="pitem.DurationType" ng-change="ChangeDurationType(pitem)">
+                                                    <option value="">Select</option>
+                                                    <option value="D">Days</option>
+                                                    <option value="W">Weeks</option>
+                                                    <option value="M">Months</option>
+                                                    <option value="Y">Years</option>
+                                                    <option value="SD">Same Day</option>
+                                                    <option value="NV">Next visit</option>
+                                                    <option value="T">Tomorrow</option>
+                                                    <option value="ASAP">ASAP</option>
+                                                </select>
+                                                <button ng-show="!pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                            <div class="ehr-input-group" ng-show="pitem.ShowDateFormat">
+                                                <input type="text" placeholder="MM-DD-YYYY" class="" ng-model="pitem.DurationDate" datepickeruniversal readonly
+                                                       ng-change="ChangeFormatDate(pitem)" />
+                                                <button ng-show="!pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-keyboard"></i></button>
+                                                <button ng-show="pitem.ShowDateFormat" ng-click="ChangeItem(pitem)"><i class="far fa-calendar-alt"></i></button>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+                                    </li>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select ng-options="stitem.StatusId as stitem.Status for stitem in GetProcedureStatusList"
+                                                    ng-model="pitem.StatusId"
+                                                    ng-change="ChangeProcedureStatus(pitem);">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-group">
+                                            <a href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Notes" ng-click="pitem.IsEdit=true">
+                                                <img src="img/ros-chart/ros-notes.svg" width="24">
+                                            </a>
+                                            <a href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Clear" ng-click="ClearProcedureDetails(pitem)">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="pitem.IsEdit==true">
+                            <div class="col-lg-12">
+                                <textarea class="bg-dbf6ff form-control msd-elastic: \n;" placeholder="Add Notes" rows="1" ng-model="pitem.Remarks" maxlength="500" ng-focus="pitem.IsEdit==true"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </uib-accordion>
+
+                <div class="row" ng-show="ShowTab =='AllOrdersReferral' || ShowTab =='AllOrders'">
+                    <label ng-show="(AssessmentplanpopupObj.ReferralDetails | filter:{DeleteInd: 'N'}).length > 0">Referral</label>
+                    <div class="col-lg-12">
+                        <uib-accordion close-others="true" class="Referral-accordion-assmnts">
+                            <div uib-accordion-group class="panel-default" is-open="status.open" ng-repeat="ritem in AssessmentplanpopupObj.ReferralDetails | filter:{DeleteInd: 'N'} track by $index">
+                                <uib-accordion-heading>
+                                    <span class="text-s12w500c000">Referral: </span>
+                                    <span class="text-s12w600c079aca">{{ritem.Referral}}<span ng-hide="ritem.ReferralDoctorName ==''">,</span>{{ritem.ReferralDoctorName}}</span>
+                                    <ul class="flex-flow-ulli-mb0 pull-right">
+                                        <li ng-click="$event.stopPropagation();">
+                                            <a href="javascript:;" popover-placement="auto" popover-trigger="outsideClick" ng-click="AllOrderReftoggle('Referral', ritem)" popover-is-open="ritem.IsAllOrderspopoverRefferal" popover-class="popover-auto ros-popover-width popover-width-30" uib-popover-template="OrderdignosispopoverRefferal.templateUrl">+ Additional Diagnosis</a>
+                                        </li>
+                                        <li ng-click="$event.stopPropagation();">
+                                            <a href="javascript:;">
+                                                <img src="img/ros-chart/ros-close.svg" width="24" uib-tooltip="Delete" role="button" tabindex="0" ng-click="DelectAllOrdersReferral(ritem)">
+                                            </a>
+                                        </li>
+                                        <li ng-click="$event.stopPropagation();">
+                                            <a href="javascript:;">
+                                                <img src="img/ros-chart/ros-refresh.svg" width="24" role="button" tabindex="0" ng-click="ClearReferalDetails(ritem)">
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                        </li>
+                                    </ul>
+                                </uib-accordion-heading>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Reason for Referral</label>
+                                            <textarea class="form-control" rows="3" placeholder="Reason" ng-model="ritem.ReferralReason" maxlength="500"></textarea>
+                                        </div>
+                                        <ul class="flex-flow-ulli-mb0 m-t-8">
+                                            <li>
+                                                <input type="radio" class="radio-custom width-0" id="isCardwise2" ng-model="Referralobj.Type" value="Internal" ng-change="ChangeReferalType(Referralobj, ritem);">
+                                                <label for="isCardwise2" class="radio-custom-label cur-poiter mb-0 text-black" title="Internal Doctor">Internal</label>
+                                            </li>
+                                            <li>
+                                                <input type="radio" class="radio-custom width-0" id="isCardwise3" ng-model="Referralobj.Type" value="External" ng-change="ChangeReferalType(Referralobj, ritem);">
+                                                <label for="isCardwise3" class="radio-custom-label cur-poiter mb-0 text-black" title="External Doctor">External</label>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='External'">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SpecializationObj"
+                                                            ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                            ng-change="changereferalSpecialization(Referralobj.SpecializationObj);">
+                                                        <option value="">Select Specialization</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='External' && SelectSpecializationObj == true">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SubSpecializationObj"
+                                                            ng-options="Oitem as Oitem.SubSpecializationName for Oitem in allSubSpecializationsArray"
+                                                            ng-change="changereferalSubSpecialization(Referralobj.SubSpecializationObj);">
+                                                        <option value="">Select SubSpeciality</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li class="flex" ng-show="Referralobj.Type =='Internal'">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <select ng-model="Referralobj.SubSpecializationObj"
+                                                            ng-options="Oitem as Oitem.SubSpecializationName for Oitem in allSubSpecializationsArray"
+                                                            ng-change="changereferalSubSpecialization(Referralobj.SubSpecializationObj);">
+                                                        <option value="">Select SubSpeciality</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                            <li ng-show="Referralobj.Type =='Internal'">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-radius-0 m-l-10 w-200 icons-search input-color"
+                                                           autocomplete="off"
+                                                           ng-model="Referralobj.referralDoctorObj"
+                                                           placeholder="Select Internal Doctor Name"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,ritem)"
+                                                           uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchInternalDOClist($viewValue)"
+                                                           ng-change="changeReferalDoctor(Referralobj.referralDoctorObj)" />
+                                                    <!--typeahead-on-select="OnSelectDoctor(Referralobj.referralDoctorObj,item)"-->
+                                                </div>
+                                            </li>
+                                            <li ng-show="Referralobj.Type =='External'">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control border-radius-0 m-l-10 w-200 icons-search input-color"
+                                                           autocomplete="off"
+                                                           ng-model="Referralobj.referralDoctorObj"
+                                                           placeholder="Select External Doctor Name"
+                                                           typeahead-min-length="0"
+                                                           typeahead-focus-on-select="false"
+                                                           typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,ritem)"
+                                                           uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchPCPDOClist($viewValue)"
+                                                           ng-change="changeReferalDoctor(Referralobj.referralDoctorObj, )" />
+                                                    <!--typeahead-on-select="OnSelectDoctor(Referralobj.referralDoctorObj,item)"-->
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                        <ul class="flex-flow-ulli-mb0 m-t-8">
+                                            <li>
+                                                <b>Schedule: </b>
+                                            </li>
+                                            <li class="w-200">
+                                                <div class="ehr-input pop-ehr-input">
+                                                    <div class="ehr-input-group" ng-show="!ritem.ShowDateFormat">
+                                                        <input type="text" class="form-control btr-radius bbr-radius" ng-model="ritem.Duration" placeholder="0" maxlength="3" ng-disabled="ritem.DurationType === 'SD' || ritem.DurationType === 'NV' || ritem.DurationType === 'T'|| ritem.DurationType === 'ASAP'">
+                                                        <select class="form-control b-radius-0" ng-model="ritem.DurationType" ng-change="ChangeDurationType(ritem)">
+                                                            <option value="">Select</option>
+                                                            <option value="D">Days</option>
+                                                            <option value="W">Weeks</option>
+                                                            <option value="M">Months</option>
+                                                            <option value="Y">Years</option>
+                                                            <option value="SD">Same Day</option>
+                                                            <option value="NV">Next visit</option>
+                                                            <option value="T">Tomorrow</option>
+                                                            <option value="ASAP">ASAP</option>
+                                                        </select>
+                                                        <button ng-show="!ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-keyboard"></i></button>
+                                                        <button ng-show="ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-calendar-alt"></i></button>
+                                                    </div>
+                                                    <div class="ehr-input-group" ng-show="ritem.ShowDateFormat">
+                                                        <input type="text" placeholder="MM-DD-YYYY" ng-model="ritem.DurationDate" datepickeruniversal readonly />
+                                                        <button ng-show="!ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-keyboard"></i></button>
+                                                        <button ng-show="ritem.ShowDateFormat" ng-click="ChangeReferalDateFormet(ritem)"><i class="far fa-calendar-alt"></i></button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <label class="cur-poiter">
+                                                    <input type="checkbox" id="1" class="checkbox" ng-model="ritem.IsUrgency">
+                                                    <span class="lbl"></span>
+                                                    <span class="text-s12w500C068cb0 lh-2-0 fs-12">Urgency</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="cur-poiter">
+                                                    <input type="checkbox" id="1" class="checkbox" ng-model="ritem.IsFollowUpAfterReferral">
+                                                    <span class="lbl"></span>
+                                                    <span class="text-s12w500C068cb0 lh-2-0 fs-12">Follow up after referral</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </uib-accordion>
+                        <div class="bg-e7e7e7 p-6 m-b-8" ng-if="Referralobj.IsnewProvider">
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="w-80">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Suffix</label>
+                                        <select ng-model="PCPObj.SuffixId" ng-options="pitem.Id as pitem.Name for pitem in SuffixList" ng-change="changeSuffix(PCPObj.SuffixId);">
+                                            <option value="">Select Suffix</option>
+                                        </select>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>First Name <em>*</em></label>
+                                        <input type="text" ng-model="PCPObj.FirstName" placeholder="First Name" maxlength="30" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Last Name</label>
+                                        <input type="text" ng-model="PCPObj.LastName" placeholder="Last Name" maxlength="30" />
+                                    </div>
+                                </li>
+                                <li class="w-200">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Gender</label>
+                                        <select ng-model="PCPObj.Gender">
+                                            <option value="">Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Mobile</label>
+                                        <div class="ehr-input-group">
+                                            <select ng-model="PCPObj.countrycode"
+                                                    ng-options="item.InternationalDialing as item.InternationalDialing for item in Allcountries">
+                                                <option value="">Select countrycode</option>
+                                            </select>
+                                            <input type="text" class="flux" numeric-duration maxlength="14" ng-model="PCPObj.MobileNo" placeholder="Mobile No" ng-change="changePhNumber(PCPObj.MobileNo)" />
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Email</label>
+                                        <input type="email" name="EmailID" class="" placeholder="Enter Email Id" ng-model="PCPObj.EmailId" required ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" maxlength="40" />
+                                        <div class="" ng-show="ReferalForm.EmailID.$error.required && ReferalForm.$submitted"><span>Enter Email </span></div>
+                                        <div class="" ng-show="ReferalForm.EmailID.$error.email && ReferalForm.$submitted"><span>Enter valid Email </span></div>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Organization Name</label>
+                                        <input type="text" class="" placeholder="Organization Name" ng-model="PCPObj.PcpOrganizationName" maxlength="100" />
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>NPI</label>
+                                        <input type="text" class="form-admission" maxlength="10" ng-model="PCPObj.NPI" placeholder="NPI" numbers-only/>
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Specialization</label>
+                                        <select ng-model="ExtSpecializationObj" ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                ng-change="ChangereExtSpecialization(ExtSpecializationObj);">
+                                            <option value="">Select Specialization</option>
+                                        </select>
+                                    </div>
+                                </li>
+                                <li class="flex" ng-show="SelectExtSpecializationObj == true || ExtSpecializationObj == 3">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Select Sub Specialization</label>
+                                        <select name="speciality" ng-model="PCPObj.SubSpecializationId"
+                                                ng-options="value.SubSpecializationId as value.SubSpecializationName for value in allSubSpecializationsArray" required>
+                                            <option class="text-success" value="">select</option>
+                                        </select>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Address Line 1</label>
+                                        <input type="text" ng-model="PCPObj.Address1" placeholder="Address Line 1" maxlength="100" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Address Line 2</label>
+                                        <input type="text" ng-model="PCPObj.Address2" placeholder="Address Line 2" maxlength="100" />
+                                    </div>
+                                </li>
+                                <li class="w-200">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Location Name</label>
+                                        <input type="text" ng-model="PCPObj.LocationName" placeholder="LocationName" />
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="flex-flow-ulli-mb0 m-b-5 align-flex-end">
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Ciy</label>
+                                        <input type="text" ng-model="PCPObj.CityName" placeholder="City" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>State</label>
+                                        <input type="text" ng-model="PCPObj.StateName" placeholder="State" />
+                                    </div>
+                                </li>
+                                <li class="flex">
+                                    <div class="ehr-input pop-ehr-input">
+                                        <label>Enter Zip Code</label>
+                                        <input type="text" name=""
+                                               autocomplete="off"
+                                               ng-model="PCPObj.ZipCode"
+                                               placeholder="Enter ZipCode"
+                                               typeahead-min-length="0"
+                                               required
+                                               uib-typeahead="item as item.ZipCode for item in SearchLocationByZipcode($viewValue)"
+                                               typeahead-on-select="SearchZipcodebyCounty(PCPObj.ZipCode)"
+                                               ng-change="changeZipcodetoProcedure(item)" />
+                                    </div>
+                                </li>
+                                <li>
+                                    <button class="btn btn-discard-us" ng-click="Referralobj.IsnewProvider =false">Close</button>
+                                    <button class="btn btn-clear-us" ng-click="ClearNewProvider();">Clear</button>
+                                    <button class="btn btn-save-us" ng-click="AddReferalPCPDoctor();">Save</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row" ng-show="ShowTab =='MedicalRx'" ng-repeat="item in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N',IsShowPirticularItem:true} track by $index">
+            <div class="col-lg-12">
+                <ul class="flex-flow-ulli-mb0" ng-show="$first">
+                    <li class="flex">
+                        <div class="form-group">
+                            <input type="text" class="form-control input-color icons-search " placeholder="Enter Medicine Name"
+                                   ng-model="medicineGetObj.MedicineObject" ng-show="MedicalrxObj.IsRcopiaa ==false"
+                                   typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Ehnote',item)"
+                                   typeahead-focus-on-select="false"
+                                   typeahead-min-length="0"
+                                   uib-typeahead="Medlist as Medlist.MedicineNameWithStock for Medlist in getOrgMedicines($viewValue)"
+                                   ng-change="PrescriptionChange(medicineGetObj.SearchText)" />
+
+                            <!--Global Medicnies-->
+                            <div ng-show="MedicalrxObj.IsRcopiaa !==false">
+                                <input type="text" class="form-control input-color icons-search " ng-model="medicineGetObj.MedicineObject"
+                                       typeahead-focus-on-select="false"
+                                       typeahead-min-length="3"
+                                       typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Rcopia',item)"
+                                       placeholder="Enter Rcopia Medicine Name"
+                                       uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength  +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)"
+                                       ng-change="PrescriptionChange(MedicineObject)" />
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="checkbox cn">
+                            <label>
+                                <input name="checkbox-1" type="checkbox"
+                                       ng-model="MedicalrxObj.IsRcopiaa" />
+                                <span class="checkbox-material">
+                                    <span class="check"></span>
+                                </span>
+                                <small>Is Rcopia</small>
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+
+
+
+
+
+                <table class="table tableno-bordered tableno-padding m-0 table-striped">
+                    
+                    <tbody ng-if="item.MedicalPrescriptionDetails.length>0" ng-repeat="presc in item.MedicalPrescriptionDetails|filter:{'DeleteInd':'N'} track by $index">
+                        <tr>
+                            <td>
+                                <span class="text-s12w500c000 p-2 dis-inline-block">{{$index+1}}.{{presc.MedicationName}}</span>                                
+                            </td>
+                            <td width="20%">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="text" class="form-control icons-calendar" ng-model="presc.StartDate" datepickerregpatient readonly />
+                                </div>
+                            </td>
+                            <td width="12%" class="text-center">
+                                <span>
+                                    <img src="img/ros-chart/ros-close.svg" width="24" ng-click="RemovePrescriptionDetailObj($index,presc);" uib-tooltip="Remove">
+                                </span>
+                                <span>
+                                    <a href="javascript:;" ng-click="ClearMedicalRxItem(presc)" tooltip-placement="bottom-right" uib-tooltip="Clear">
+                                        <img src="img/ros-chart/ros-refresh.svg" width="24">
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <label class="text-s12w400c767575">Fast Sig</label>
+                                    </li>
+                                    <li class="">
+                                        <div class="ehr-input pop-ehr-input">                                            
+                                            <div class="ehr-input-group">
+                                                <input type="text" class="form-control" ng-model="presc.SigObj"
+                                                       placeholder="Search "
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       typeahead-on-select="ONSigDetails(presc.SigObj,presc)"
+                                                       ng-change="changeSigForMedicine(presc)"
+                                                       uib-typeahead="Medlist as Medlist.Sig for Medlist in getParticularSigMedicationitems(presc.SigObj,presc)" />
+                                                <button ng-click="addnewOrganizationSig(presc)">+Add</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <button class="btn btn-secondary p-l-20 p-r-20" ng-click="ShowSigSearch()">Show Sig Search</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn btn-secondary p-l-20 p-r-20" ng-click="ShowSigFields(presc)">Show Sig Fields</button>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+
+                        <tr ng-show="SigSearch.Shows == true;">
+                            <td colspan="3">
+                                <ul class="flex-flow-ulli-mb0">
+                                    <li>
+                                        <label class="text-s12w400c767575">Sig</label>
+                                    </li>
+                                    <li class="flex pos-relative">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <input type="text" class="form-control ui-icon-search" ng-model="presc.SigObj"
+                                                   placeholder="Search "
+                                                   typeahead-focus-on-select="false"
+                                                   typeahead-min-length="0"
+                                                   typeahead-on-select="ONSigDetails(presc.SigObj,presc)"
+                                                   ng-change="changeSigForMedicine(presc)"
+                                                   uib-typeahead="Medlist as Medlist.Sig for Medlist in getOrganizationMedicationSigitems(presc.SigObj)" />
+                                        </div>
+                                    </li>
+                                </ul>                                
+                            </td>
+                        </tr>
+                         
+                        <tr ng-show="presc.SigFields == true">
+                            <td colspan="3">
+                                <ul class="referral-summary-list">
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Action</label>
+                                            <select ng-model="presc.ActionId" ng-change="changePrescAction(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in actionArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Dose</label>
+                                            <select ng-model="presc.DoseId" ng-change="changePrescDose(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Dose Unit</label>
+                                            <select ng-model="presc.DoseUnitId" ng-change="changePrescDoseUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseUnitArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <ul class="referral-summary-list">
+                                    
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Route</label>
+                                            <select  ng-model="presc.RouteId" ng-change="changePrescRoute(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in routeArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Dose Timing</label>
+                                            <select  ng-model="presc.FrequencyId" ng-change="changePrescFrequency(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in frequencyArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Other</label>
+                                            <select  ng-model="presc.DoseOtherId" ng-change="changePrescDoseOther(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseOtherArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr ng-show="presc.SigFields == true">
+                            <td colspan="3">
+                                <ul class="referral-summary-list">
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Days Supply</label>
+                                            <select ng-model="presc.DaysSupplyId" ng-change="changePrescDaysSupply(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in durationArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-60">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Quantity</label>
+                                            <input type="text" ng-model="presc.Quantity" placeholder="1" />
+                                        </div>
+                                    </li>
+                                    <li class="flex">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Quantity Unit</label>
+                                            <select ng-model="presc.QuantityUnitId" ng-change="changePrescQuantityUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in quantityUnitArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-90">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Refill</label>
+                                            <select ng-model="presc.RefillId" ng-change="changePrescRefill(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in refillsArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                    <li class="w-90">
+                                        <div class="ehr-input pop-ehr-input width-100">
+                                            <label>Substitution</label>
+                                            <select ng-model="presc.SubstitutionPermitted" ng-change="changePrescSubmission(presc)">
+                                                <option value="y">Yes</option>
+                                                <option value="n">No</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                   
+                                </ul>
+
+                            </td>
+                        </tr>
+                        <tr ng-show="presc.SigFields == true">
+                            <td colspan="3">
+                                <ul>
+                                    <li>
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Medication Instructions</label>
+                                            <textarea rows="2" class="form-control" maxlength="500" ng-model="presc.PatientInstructions" placeholder="Additional directions to Patient" ng-focus="presc.SigFields == true"></textarea>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/ng-template" id="diagnosispopoverscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Suitem in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N'}" ng-show="Suitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Suitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Suitem.ICD10CODE}}|{{Suitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="additionaldiagnosisaddedSurgery(Sitem,'Surgery', 'Order')" ng-disabled="(AssessmentplanpopupObj.AssessmentListArray | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-show="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="investdiagnosispopoverscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="additionaldiagnosisInvestigationadded(Iitem,'Investigation', 'Order')" ng-disabled="(AssessmentplanpopupObj.AssessmentListArray | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="procedurediagnosispopoverscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="additionaldiagnosisaddedProcedure(pitem,'Procedure')" ng-disabled="(AssessmentplanpopupObj.AssessmentListArray | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="Referraldiagnosispopoverscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in AssessmentplanpopupObj.AssessmentListArray| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="AdditionaldiagnosisaddedReferral(ritem,'Referral')" ng-disabled="(AssessmentplanpopupObj.AssessmentListArray | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<!--<div class="modal-body overflow-y-auto p-5 overflow-x-hidden" style="height: calc(100vh - 31px) ">
+    
+</div>-->
+<script type="text/ng-template" id="OrdersdiagnosispopoverscriptPro.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in TempAssessmentListArrayForAllOrdersTab| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-show="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="AddProceduresToDiagnosisInAllOrders('','Procedure', Sitem)" ng-disabled="(TempAssessmentListArrayForAllOrdersTab | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="Ordersdiagnosispopoversurgscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in TempAssessmentListArrayForAllOrdersTab| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-show="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="AddSugeryToDiagnosisInAllOrders('','Surgery', Sitem)" ng-disabled="(TempAssessmentListArrayForAllOrdersTab | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="OrdersdiagnosispopoverInvscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in TempAssessmentListArrayForAllOrdersTab| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="AddInvestigationToDiagnosisInAllOrders('','Investigation', Sitem)" ng-disabled="(TempAssessmentListArrayForAllOrdersTab | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/ng-template" id="OrdersdiagnosispopoverReferalscript.html">
+    <table class="table tableno-bordered tableno-padding">
+        <tbody>
+            <tr ng-repeat="Sitem in TempAssessmentListArrayForAllOrdersTab| filter:{DeleteInd: 'N'}" ng-show="Sitem.ActiveInd ==true">
+                <td>
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small><b> {{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</b></small>
+                        </label>
+                    </div>
+                </td>
+                <td ng-if="$last">
+                    <button class="btn btn-ehnote w-150" ng-click="AddReferalToDiagnosisInAllOrders('','Referral', Sitem)" ng-disabled="(TempAssessmentListArrayForAllOrdersTab | filter:{IsCheckedDiagnosis:true}).length == 0">Add</button>
+                </td>
+            </tr>
+            <tr ng-if="ActiveCount == 0">
+                <td colspan="2">
+                    <label>No Active Diagnosis is Added</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>

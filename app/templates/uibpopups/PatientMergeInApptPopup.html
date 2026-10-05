@@ -1,0 +1,333 @@
+﻿<div class="modal__style--1" ng-if="false">
+    <div class="modal__header--">
+        <h1>{{ 'MERGEPATIENT' | translate}}</h1>
+        <ul class="list__unstyled-- mb__0--">
+            <li>
+                <a class="btn__close--" ng-click="closeuibpopup()">
+                    <i class="close__w32--"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- ai__c-- bg__F2F2F2-- p__5--  br__4-- gap__5-- mb__10--">
+            <fieldset class="m-b-5">
+                <div class="dis-inline-block ml-5">
+                    <input type="radio" class="radio-custom width-0" id="Name23" ng-model="patientsearchInd" ng-value="1" ng-change="ChangePatientSearch()">
+                    <label for="Name23" class="radio-custom-label radio-label-white">{{ 'NAME' | translate}}</label>
+                </div>
+                <div class="dis-inline-block ml-5">
+                    <input type="radio" class="radio-custom width-0" id="Mobile23" ng-model="patientsearchInd" ng-value="3" ng-change="ChangePatientSearch()">
+                    <label for="Mobile23" class="radio-custom-label radio-label-white">{{ 'MOBILENO' | translate}}</label>
+                </div>
+                <!--<div class="dis-inline-block ml-5">
+                <input type="radio" class="radio-custom width-0" id="OldMR23" ng-model="patientsearchInd" ng-value="4" ng-change="ChangePatientSearch()">
+                <label for="OldMR23" class="radio-custom-label radio-label-white">{{ 'OLDMRNO' | translate}}</label>
+            </div>-->
+                <div class="dis-inline-block ml-5">
+                    <input type="radio" class="radio-custom width-0" id="MR23" ng-model="patientsearchInd" ng-value="2" ng-change="ChangePatientSearch()">
+                    <label for="MR23" class="radio-custom-label radio-label-white">{{ 'MRNO' | translate}}</label>
+                </div>
+                <div class="dis-inline-block ml-5">
+                    <input type="radio" class="radio-custom width-0" id="DOB23" ng-model="patientsearchInd" ng-value="5" ng-change="ChangePatientSearch()">
+                    <label for="DOB23" class="radio-custom-label radio-label-white">DOB</label>
+                </div>
+            </fieldset>
+            <div class="ehr-input pop-ehr-input m-l-15 flex">
+                <div class="ehr-input-group form-group">
+                    <input type="text" class="dropdown-toggle bg-inputy text-capitalize" autocomplete="off" ng-if="patientsearchInd === 1" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYNAME' | translate}}" ng-model="PatientSearchobj.SearchText" ng-model-options="{ debounce: 500 }" />
+                    <input type="text" class="dropdown-toggle bg-inputy text-capitalize" autocomplete="off" ng-if="patientsearchInd === 2" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYMRNO' | translate}}" ng-model="PatientSearchobj.SearchText" ng-enter="SearchPatientByMrNO();" />
+                    <input type="text" class="dropdown-toggle bg-inputy text-capitalize" autocomplete="off" ng-if="patientsearchInd === 3" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYMOBILENUMBER' | translate}}" ng-model="PatientSearchobj.SearchText" numbers-only ng-enter="SearchPatientByMrNO();" />
+                    <!--<input type="text" class="dropdown-toggle bg-inputy text-capitalize" autocomplete="off" ng-if="patientsearchInd === 4" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYOLDMRNO' | translate}}" ng-model="PatientSearchobj.SearchText" ng-enter="SearchPatientByMrNO();" />-->
+                    <input type="text" class="dropdown-toggle bg-inputy" ng-model="PatientSearchobj.SearchText" autocomplete="off" ng-if="patientsearchInd === 5" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-focus="patSearchType === 5" />
+
+                    <button ng-hide="PatientSearchobj.SearchText ==''" ng-click="clearSearchDetails();" type="button" role="button" tabindex="0"><i class="fas fa-backspace"></i></button>
+                    <ul class="dis-block dropdown-menu menupatient p-10 bg-al-blue overflow-y-scroll height-250" ng-show="ShowPatientListDrop">
+                        <li class="app-pa-name cur-poiter p-t-8 p-b-8" ng-repeat="patientitem in PatientsArray" ng-click="SelectedMergepatient(patientitem);" ng-show="PatientsArray.length > 0" style="position:relative;display: block;margin: 0px;float: initial; border-bottom: 1px solid #d5d5d5">
+                            <div class="profile-show profile-head">
+                                <div class="profile-avatar-image">
+                                    <span ng-show="patientitem.S3URL ==''" style="background:{{patientitem.colors}}">{{patientitem.FullName | limitTo:2}} </span>
+                                    <div ng-show="patientitem.S3URL !==''" image-viewer isarraychanged="0">
+                                        <img ngf-thumbnail="patientitem.S3URL" class="img-responsive" width="50" height="50" />
+                                    </div>
+                                </div>
+                                <div class="dis-block">
+                                    <p class="m-0 text-capitalize font-weight-600 cur-poiter no-wrapappt w-250" ng-bind="patientitem.FullName" title="{{patientitem.FullName}}"></p>
+                                    <p ng-hide="patientitem.AltHomeNumber == '' || patientitem.AltHomeNumber == null" class="mb-0">
+                                        <span class="fs-11" ng-if="patientitem.MobileNoWithUsFormate != ''">
+                                            {{patientitem.MobileNoWithUsFormate}}
+                                        </span>
+                                        <!--<span class="fs-11" ng-if="patientitem.AltCountryCode != '' && patientitem.AltCountryCode != null">
+                                       {{patientitem.AltCountryCode}}
+                                               </span>
+                                    <span class="fs-11 text-gray" ng-if="patientitem.Altareacode != '' && patientitem.Altareacode != null">
+                                     {{patientitem.Altareacode}}
+                                     </span>
+                                    <span class="fs-11 text-gray" ng-if="patientitem.AltHomeNumber != '' && patientitem.AltHomeNumber != null">
+                                     -{{patientitem.AltHomeNumber}}
+                                       </span>-->
+                                        <span>&nbsp;</span>
+                                        <span class="fs-11 text-gray">
+                                            - {{patientitem.patientdisplayid}}
+                                        </span>
+                                    </p>
+                                    <p ng-hide="patientitem.PhoneNumber == 0 || patientitem.PhoneNumber == null" class="mb-0">
+                                        <span class="fs-11 text-gray">
+                                            {{ 'DOB' | translate}} : {{patientitem.DOB | date:'MM-dd-yyyy'}}
+                                        </span>
+                                        <span>&nbsp;</span>
+                                        <span class="fs-11 text-gray">
+                                            | {{patientitem.Gender}}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="searchbar-vipresearch">
+                                    <span class="vip-patient" ng-if="patientitem.IsVIPInd"></span>
+                                    <span class="research-patient" ng-if="patientitem.IsResearchInd"></span>
+                                    <span class="highrisk-patient" ng-if="patientitem.IsHighRiskInd"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li ng-show="PatientsArray.length == 0" class="text-center">
+                            <div class="billing-cominsoon">
+                                <img src="img/no-data/no-data-icon.png">
+                                <div class="msg">
+                                    <p class="nodata-text">{{ 'OOPS' | translate}}</p>
+                                    <p class="nodata-txt-line2">
+                                        {{ 'LOOKSLIKETHEREISNOPATIENTS' | translate}}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div>
+                <button class="btn-search btn" ng-click="SearchPatientByMrNO();">
+                    {{ 'SEARCH' | translate}}
+                </button>
+            </div>
+        </div>
+        <section class="section__style--2">
+            <div class="section__header--">
+                <h1>{{ 'PATIENTDETAILS' | translate}}</h1>
+            </div>
+            <div class="section__body--">
+                <div class="table-responsive">
+                    <table class="table__style--22">
+                        <thead>
+                            <tr>
+                                <th width="20%"></th>
+                                <th>{{ 'NAME' | translate}}</th>
+                                <th width="12%">{{ 'AGEANDGENDER' | translate}}</th>
+                                <th width="10%">{{ 'MOBILENO' | translate}}</th>
+                                <th width="10%">{{ 'MRNO' | translate}}</th>
+                                <!--<th width="10%">{{ 'OLDMRNO' | translate}}</th>-->
+                                <th>{{ 'EMAIL' | translate}}</th>
+                                <th width="15%">{{ 'CREATEDON' | translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="color:red;font-weight:600">{{ 'SELECTEDPATIENT' | translate}}</span> </td>
+                                <td>{{SelectedPatient.FullName}}</td>
+                                <td>{{SelectedPatient.Age}} / {{SelectedPatient.Gender}}</td>
+                                <td>{{SelectedPatient.MobileNo}}</td>
+                                <td>{{SelectedPatient.PatientDisplayId}}</td>
+                                <!--<td>{{SelectedPatient.OldMrno}}</td>-->
+                                <td>{{SelectedPatient.EmailId}}</td>
+                                <td><span style="color:darkgoldenrod;font-weight:400">{{SelectedPatient.CreatedDt |date:'MM-dd-yyyy'}} by {{SelectedPatient.CreatedBy}}  </span></td>
+                            </tr>
+                            <tr ng-hide="MergingPatient.PatientId==0">
+                                <td><span style="color: Green; font-weight: 600">{{ 'MERGEDPATIENT' | translate}}</span></td>
+                                <td>{{MergingPatient.FullName}}</td>
+                                <td>{{MergingPatient.Age}} / {{MergingPatient.Gender}}</td>
+                                <td>{{MergingPatient.MobileNo}}</td>
+                                <td>{{MergingPatient.PatientDisplayId}}</td>
+                                <!--<td>{{MergingPatient.OldMrno}}</td>-->
+                                <td>{{MergingPatient.EmailId}}</td>
+                                <td><span style="color:darkgoldenrod;font-weight:400">{{MergingPatient.CreatedDt |date:'MM-dd-yyyy'}} by {{MergingPatient.CreatedBy}} </span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form__group">
+                    <label>{{ 'REMARKS' | translate}} :</label>
+                    <textarea rows="2" ng-model="MergeAddReqObj.MergeRemarks" class="form__control bookapt-textarea bg-f6f6f6 notes-border msd-elastic: \n" placeholder="{{ 'ENTERNOTES' | translate}}" maxlength="500"></textarea>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="modal__footer--">
+        <div class="d__f-- ai__c-- jc__e-- gap__10--">
+            <button type="button" class="btn__lg-- btn__C71D27--o" ng-click="ClearDetails();"> {{ 'CLOSE' | translate}}</button>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="savePatientMerge()">{{ 'MERGEDPATIENT' | translate}}</button>
+        </div>
+    </div>
+</div>
+
+<!--Merge popup new design start-->
+<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>{{ 'MERGEPATIENT' | translate}}</h1>
+        <div class="d__f-- ai__c-- gap__x--8">
+            <button class="btn__lg-- btn__1d5558--f" ng-click="savePatientMerge()">{{ 'MERGEDPATIENT' | translate}}</button>
+            <button class="btn__lg-- btn__C71D27--o" ng-click="closeuibpopup()">Close</button>
+        </div>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- fd__c-- gap__10-- py__10-- px__15--">
+            <div class="d__f-- jc__c-- ai__c-- h__250--">
+                <a class="position__absolute-- left__70-- zindex-1"><i class="icons__w28-- merge__w28--f"></i></a>
+                <div class="bs__dashed-- bw__1-- bc__9D9D9D-- border-right-0 h__130-- width__90-- position__relative--">
+
+                </div>
+                <div class="d__f-- fd__c-- gap__5-- border__E4E4E4-- bradius__5-- bg__F9F9F9-- position__absolute-- top__28-- px__10-- py__5-- width__86-- right__50--">
+                    <label class="fs__xl-- fw__6-- tc__1D5558--">{{ 'SELECTEDPATIENT' | translate}}</label>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'NAME' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{SelectedPatient.FullName}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'DOB' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{ SelectedPatient.DOB | date:'dd/MM/yyyy' }}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'MOBILENO' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{SelectedPatient.MobileNo}}</span></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'MRNO' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{SelectedPatient.PatientDisplayId}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'EMAIL' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{SelectedPatient.EmailId}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'CREATEDON' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{SelectedPatient.CreatedDt |date:'MM-dd-yyyy'}} by {{SelectedPatient.CreatedBy}} </span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d__f-- fd__c-- border__E4E4E4-- bradius__5-- bg__F9F9F9-- position__absolute-- px__10-- py__5-- width__86-- top__156-- right__50--" ng-class="MergingPatient.PatientId==0 ? 'gap__24--' : ' gap__5--'">
+                    <div class="d__f-- jc__sb--">
+                        <label class="fs__xl-- fw__6-- tc__1D5558--">{{ 'MERGEDPATIENT' | translate}}</label>
+                        <a ng-hide="MergingPatient.PatientId==0" ng-click="MergingPatient.PatientId=0"><i class="icons__w16-- cancel__w16--o"></i></a>
+                    </div>
+                    <div class="row" ng-show="MergingPatient.PatientId==0">
+                        <div class="col-lg-7">
+                            <div class="d__f-- ai__c-- gap__10--">
+                                <fieldset class="mb__5--">
+                                    <div class="d__ib-- ml__5--">
+                                        <input type="radio" class="radio-custom width-0" id="Name23" ng-model="patientsearchInd" ng-value="1" ng-change="ChangePatientSearch()">
+                                        <label for="Name23" class="radio-custom-label radio-label-white">{{ 'NAME' | translate}}</label>
+                                    </div>
+                                    <div class="d__ib-- ml__5--">
+                                        <input type="radio" class="radio-custom width-0" id="Mobile23" ng-model="patientsearchInd" ng-value="3" ng-change="ChangePatientSearch()">
+                                        <label for="Mobile23" class="radio-custom-label radio-label-white">{{ 'MOBILENO' | translate}}</label>
+                                    </div>
+                                    <div class="d__ib-- ml__5--">
+                                        <input type="radio" class="radio-custom width-0" id="MR23" ng-model="patientsearchInd" ng-value="2" ng-change="ChangePatientSearch()">
+                                        <label for="MR23" class="radio-custom-label radio-label-white">{{ 'MRNO' | translate}}</label>
+                                    </div>
+                                    <div class="d__ib-- ml__5--">
+                                        <input type="radio" class="radio-custom width-0" id="DOB23" ng-model="patientsearchInd" ng-value="5" ng-change="ChangePatientSearch()">
+                                        <label for="DOB23" class="radio-custom-label radio-label-white">DOB</label>
+                                    </div>
+                                </fieldset>
+                                <div class="ml__15-- flex">
+                                    <div class="form-group">
+                                        <input type="text" class="dropdown-toggle input__style--1 text-capitalize" ng-class="PatientSearchobj.SearchText =='' ? 'icons-search' : ''" autocomplete="off" ng-if="patientsearchInd === 1" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYNAME' | translate}}" ng-model="PatientSearchobj.SearchText" ng-model-options="{ debounce: 500 }" />
+                                        <input type="text" class="dropdown-toggle input__style--1 text-capitalize" ng-class="PatientSearchobj.SearchText =='' ? 'icons-search' : ''" autocomplete="off" ng-if="patientsearchInd === 2" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYMRNO' | translate}}" ng-model="PatientSearchobj.SearchText" ng-enter="SearchPatientByMrNO();" />
+                                        <input type="text" class="dropdown-toggle input__style--1 text-capitalize" ng-class="PatientSearchobj.SearchText =='' ? 'icons-search' : ''" autocomplete="off" ng-if="patientsearchInd === 3" ng-change="changeMergePatientSearch()" placeholder="{{ 'SEARCHBYMOBILENUMBER' | translate}}" ng-model="PatientSearchobj.SearchText" numbers-only ng-enter="SearchPatientByMrNO();" />
+                                        <input type="text" class="dropdown-toggle input__style--1" ng-class="PatientSearchobj.SearchText =='' ? 'icons-search' : ''" ng-model="PatientSearchobj.SearchText" autocomplete="off" ng-if="patientsearchInd === 5" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-focus="patSearchType === 5" />
+                                        <a class="position__absolute-- right__5-- top__5--" ng-hide="PatientSearchobj.SearchText ==''" ng-click="clearSearchDetails();"><i class="icons__w16-- cancel__w16--f"></i></a>
+                                        <ul class="d__b-- dropdown-menu menupatient p__10-- bg-al-blue overflow-y-scroll height-250" ng-show="ShowPatientListDrop">
+                                            <li class="app-pa-name cur-poiter pt__8-- pb__8--" ng-repeat="patientitem in PatientsArray" ng-click="SelectedMergepatient(patientitem);" ng-show="PatientsArray.length > 0" style="position:relative;display: block;margin: 0px;float: initial; border-bottom: 1px solid #d5d5d5">
+                                                <div class="profile-show profile-head">
+                                                    <div class="profile-avatar-image">
+                                                        <span ng-show="patientitem.S3URL ==''" ng-style="{'background': patientitem.colors}">{{patientitem.FullName | limitTo:2}} </span>
+                                                        <div ng-show="patientitem.S3URL !==''" image-viewer isarraychanged="0">
+                                                            <img ngf-thumbnail="patientitem.S3URL" class="img-responsive" width="50" height="50" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="d__b--">
+                                                        <p class="m__0-- text-capitalize fw__6-- cur-poiter no-wrapappt w-250" ng-bind="patientitem.FullName" title="{{patientitem.FullName}}"></p>
+                                                        <p ng-hide="patientitem.AltHomeNumber == '' || patientitem.AltHomeNumber == null" class="mb-0">
+                                                            <span class="fs__sm--" ng-if="patientitem.MobileNoWithUsFormate != ''">
+                                                                {{patientitem.MobileNoWithUsFormate}}
+                                                            </span>
+                                                            <span>&nbsp;</span>
+                                                            <span class="fs__sm-- text-gray">
+                                                                - {{patientitem.patientdisplayid}}
+                                                            </span>
+                                                        </p>
+                                                        <p ng-hide="patientitem.PhoneNumber == 0 || patientitem.PhoneNumber == null" class="mb-0">
+                                                            <span class="fs__sm-- text-gray">
+                                                                {{ 'DOB' | translate}} : {{patientitem.DOB | date:'MM-dd-yyyy'}}
+                                                            </span>
+                                                            <span>&nbsp;</span>
+                                                            <span class="fs__sm-- text-gray">
+                                                                | {{patientitem.Gender}}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="searchbar-vipresearch">
+                                                        <span class="vip-patient" ng-if="patientitem.IsVIPInd"></span>
+                                                        <span class="research-patient" ng-if="patientitem.IsResearchInd"></span>
+                                                        <span class="highrisk-patient" ng-if="patientitem.IsHighRiskInd"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li ng-show="PatientsArray.length == 0" class="text-center">
+                                                <div class="billing-cominsoon">
+                                                    <img src="img/no-data/no-data-icon.png">
+                                                    <div class="msg">
+                                                        <p class="nodata-text">{{ 'OOPS' | translate}}</p>
+                                                        <p class="nodata-txt-line2">
+                                                            {{ 'LOOKSLIKETHEREISNOPATIENTS' | translate}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <button class="btn__lg-- btn__1d5558--o" ng-click="SearchPatientByMrNO();">{{ 'SEARCH' | translate}}</button>
+                        </div>
+                    </div>
+                    <div class="row" ng-hide="MergingPatient.PatientId==0">
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'NAME' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{MergingPatient.FullName}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'DOB' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{ MergingPatient.DOB | date:'dd/MM/yyyy' }}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'MOBILENO' | translate}} :<span class="fw__5-- tc__1D1D1D--"> {{MergingPatient.MobileNo}}</span></label>
+                        </div>
+                    </div>
+                    <div class="row" ng-hide="MergingPatient.PatientId==0">
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'MRNO' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{MergingPatient.PatientDisplayId}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'EMAIL' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{MergingPatient.EmailId}}</span></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__4-- tc__656565--">{{ 'CREATEDON' | translate}} :<span class="fw__5-- tc__1D1D1D--">{{MergingPatient.CreatedDt |date:'MM-dd-yyyy'}} by {{MergingPatient.CreatedBy}} </span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form__group m__auto-- width__94--">
+                <label>{{ 'REMARKS' | translate}}</label>
+                <textarea placeholder="{{ 'ENTERNOTES' | translate}}" ng-model="MergeAddReqObj.MergeRemarks" rows="4" maxlength="500"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Merge popup new design ended-->

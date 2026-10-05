@@ -1,0 +1,757 @@
+﻿ <!--New super bill design by mahendra(11/06/2025)-->
+<div class="modal__style--1 height__100--">
+    <div class="modal__header--">
+        <h1>Super Bill</h1>
+        <ul class="flex-flow-list">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                    <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span>{{cacheStorageItem.FullName}}</span>
+                        <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                    </div>
+                    <a><i class="icons__w16-- info__w16--f"></i></a>
+                </div>
+            </li>
+            <!--<li>
+                <button class="btn__lg-- btn__2D2D47--f" ng-if="superBillMainObj.MainTab==1" ng-click="SuperSurgeryBillPrint()">Print</button>
+                <button class="btn__lg-- btn__2D2D47--f" ng-if="superBillMainObj.MainTab==2" ng-click="SuperAnesthesiaBillPrint()">Print</button>
+            </li>-->
+            <li>
+                <button type="button" class="btn__lg-- btn__1d5558--o"  ng-click="Historypopupnew(20,2)">History</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="SaveAscSuperBill()" ng-disabled="SuperBillFinalObj.IsClickSaveSuperBillBtn == true">Save</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__C71D27--o" ng-click="closeuib()">Close</button>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body-- p__0-- height__100--">
+        <div class="two-sections p__0-- height__100--">
+            <div class="width__25-- height__100--">
+                <div class="d__f-- fd__c-- gap__5-- py__5-- height__100--">
+                    <div class="py__5-- px__10-- bb__DDD--">
+                        <label class="fs__xl-- fw__6-- tc__1D1D1D--">Suggested Codes</label>
+                    </div>
+                    <div class="form__group py__5-- px__10--" ng-if="superBillMainObj.MainTab==1 && ParentObject.IsScreenFrom=='ASC'">
+                        <select ng-change="changeSuperBillTemplateObj(SuperBillFinalObj.selectedSuperBillTemplateObj)" ng-model="SuperBillFinalObj.selectedSuperBillTemplateObj" ng-options="citem as citem.TemplateName for citem in suggestedSuperBillTemplatesArray.Surgery">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
+                    <div class="position__relative-- height__100--">
+                        <div class="adjustable-position slim-scroll">
+                            <ul class="d__f-- fd__c-- gap__10-- list__unstyled-- m__0-- px__10--" ng-if="superBillMainObj.MainTab==1">
+                                <li ng-repeat="item in superBillMainObj.SuggestedSurgeryCodesArray track by $index" ng-if="superBillMainObj.SuggestedSurgeryCodesArray.length > 0">
+                                    <ul class="list__unstyled-- m__0-- border__CFD3D4-- bradius__6-- boxs__0000001A--br10 p__5--">
+                                        <li class="py__5-- px__10--" ng-class="item.IsChecked ? 'bg__1D55581A-- bradius__10--' : ''">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-change="OnCheckSuggestedCode(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.CPTCode}}
+                                                    <span ng-show="item.OrganId== null">-</span>
+                                                    <span ng-show="item.OrganId== 1">(OD)</span>
+                                                    <span ng-show="item.OrganId== 2">(OS)</span>
+                                                    <span ng-show="item.OrganId== 3">(OU)</span>
+                                                    <span ng-show="item.OrganId== 4">(General)</span>
+                                                    {{item.ProcedureName}}
+                                                </span>
+                                            </label>
+                                        </li>
+                                        <li class="d__f-- fd__c-- gap__10-- px__10-- py__5--" ng-repeat="diag in item.DiagnosisArray" ng-class="!$last ? 'bb__grad--ddd' : ''">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__x--15">
+                                                <!--   <input type="checkbox" class="checkbox-1d5558--o m__0--" ng-model="diag.IsChecked" ng-change="OnCheckDiagforSuggestedCode(diag,item);">-->
+                                                <span class="tc__4A4A4A-- fw__4-- fs__normal-- fs__md-- lh__22-- width__94--">{{diag.ICD10CODE}} - {{diag.DiagnosisName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li ng-if="superBillMainObj.AdvisedSurgeryCodesArray.length > 0 && ParentObject.IsScreenFrom=='ASC'">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Advised</label>
+                                </li>
+                                <li ng-repeat="item in superBillMainObj.AdvisedSurgeryCodesArray track by $index" ng-if="superBillMainObj.AdvisedSurgeryCodesArray.length > 0 && ParentObject.IsScreenFrom=='ASC'">
+                                    <ul class="list__unstyled-- m__0-- border__CFD3D4-- bradius__6-- boxs__0000001A--br10 p__5--">
+                                        <li class="py__5-- px__10--" ng-class="item.IsChecked ? 'bg__1D55581A-- bradius__10--' : ''">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-change="OnCheckSuggestedCode(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.CPTCode}}
+                                                    <span ng-show="item.OrganId== null">-</span>
+                                                    <span ng-show="item.OrganId== 1">(OD)</span>
+                                                    <span ng-show="item.OrganId== 2">(OS)</span>
+                                                    <span ng-show="item.OrganId== 3">(OU)</span>
+                                                    <span ng-show="item.OrganId== 4">(General)</span>
+                                                    {{item.ProcedureName}}
+                                                </span>
+                                            </label>
+                                        </li>
+                                        <li class="d__f-- fd__c-- gap__10-- py__10--" ng-repeat="diag in item.DiagnosisArray" ng-class="!$last ? 'bb__grad--ddd' : ''" ng-show="item.IsChecked == true">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__x--15">
+                                                <input type="checkbox" class="checkbox-1d5558--o m__0--" ng-model="diag.IsChecked" ng-change="OnCheckDiagforSuggestedCode(diag,item);">
+                                                <span class="tc__4A4A4A-- fw__4-- fs__normal-- fs__md-- lh__22-- width__94--">{{diag.ICD10CODE}} - {{diag.DiagnosisName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li ng-if="superBillMainObj.AdvisedSurgeryCodesArray.length == 0 && ParentObject.IsScreenFrom=='ASC' ">
+                                    <p class="fs__lg-- fw__6-- tc__656565-- text-center m__0--">No Suggested procedures!</p>
+                                </li>
+                            </ul>
+                            <ul class="d__f-- fd__c-- gap__10-- list__unstyled-- m__0-- px__10--" ng-if="superBillMainObj.MainTab==2">
+                                <li ng-if="superBillMainObj.SuggestedAnesthesiaCodes.length > 0">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Anesthesia</label>
+                                </li>
+                                <li ng-repeat="item in superBillMainObj.SuggestedAnesthesiaCodes track by $index" ng-if="superBillMainObj.SuggestedAnesthesiaCodes.length > 0">
+                                    <ul class="list__unstyled-- m__0-- border__CFD3D4-- bradius__6-- boxs__0000001A--br10 p__5--">
+                                        <li class="py__5-- px__10--" ng-class="item.IsChecked ? 'bg__1D55581A-- bradius__10--' : ''">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-change="OnCheckSuggestedCode(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.ProcedureCode}}
+                                                    <span ng-show="item.OrganId== null">-</span>
+                                                    <span ng-show="item.OrganId== 1">(OD)</span>
+                                                    <span ng-show="item.OrganId== 2">(OS)</span>
+                                                    <span ng-show="item.OrganId== 3">(OU)</span>
+                                                    <span ng-show="item.OrganId== 4">(General)</span>
+                                                    {{item.ProcedureName}}
+                                                </span>
+                                            </label>
+                                        </li>
+                                        <li class="d__f-- fd__c-- gap__10-- py__10--" ng-repeat="diag in item.DiagnosisArray" ng-class="!$last ? 'bb__grad--ddd' : ''" ng-show="item.IsChecked">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__x--15">
+                                                <input type="checkbox" class="checkbox-1d5558--o m__0--" ng-model="diag.IsChecked" ng-change="OnCheckDiagforSuggestedCode(diag,item);">
+                                                <span class="tc__4A4A4A-- fw__4-- fs__normal-- fs__md-- lh__22-- width__94--">{{diag.ICD10CODE}} - {{diag.DiagnosisName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li ng-if="superBillMainObj.SuggestedConsultationCodes.length > 0">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Consultation</label>
+                                </li>
+                                <li ng-repeat="item in superBillMainObj.SuggestedConsultationCodes track by $index" ng-if="superBillMainObj.SuggestedConsultationCodes.length > 0">
+                                    <ul class="list__unstyled-- m__0-- border__CFD3D4-- bradius__6-- boxs__0000001A--br10 p__5--">
+                                        <li class="py__5-- px__10--" ng-class="item.IsChecked ? 'bg__1D55581A-- bradius__10--' : ''">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-change="OnCheckSuggestedCode(item);">
+                                                <span class="lbl"></span>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.CPTCode}}
+                                                    <span ng-show="item.OrganId== null">-</span>
+                                                    <span ng-show="item.OrganId== 1">(OD)</span>
+                                                    <span ng-show="item.OrganId== 2">(OS)</span>
+                                                    <span ng-show="item.OrganId== 3">(OU)</span>
+                                                    <span ng-show="item.OrganId== 4">(General)</span>
+                                                    {{item.ProcedureName}}
+                                                </span>
+                                            </label>
+                                        </li>
+                                        <li class="d__f-- fd__c-- gap__10-- py__10--" ng-repeat="diag in item.DiagnosisArray" ng-class="!$last ? 'bb__grad--ddd' : ''" ng-show="item.IsChecked == true">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__x--15">
+                                                <input type="checkbox" class="checkbox-1d5558--o m__0--" ng-model="diag.IsChecked" ng-change="OnCheckDiagforSuggestedCode(diag,item);">
+                                                <span class="tc__4A4A4A-- fw__4-- fs__normal-- fs__md-- lh__22-- width__94--">{{diag.ICD10CODE}} - {{diag.DiagnosisName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex bg__F5F5F5-- pr__5-- d__f-- fd__c-- height__100--">
+                <div class="d__f-- ai__c-- jc__sb-- width__100-- px__15-- py__15--">
+                    <div class="d__f-- ai__c-- gap__10--">
+                        <label class="fs__3l-- fw__6-- tc__1D1D1D-- d__f-- ai__c-- gap__10--">Edit Summary</label>
+                        <a><i class="icons__w16-- info__w16--l"></i></a>
+                    </div>
+                    <div class="d__f-- ai__c-- gap__10-- width__40--">
+                        <div class="form__group pl__15-- width__100--" typehead-dropdown-direction>
+                            <input type="text" class="input__style--2 icons-search" placeholder="Enter CPTCode or Order Name" autocomplete="off" maxlength="100" name="treatment" ng-model="SuperBillObj.SelectedCode" typeahead-min-length="0" typeahead-focus-on-select="false" typeahead-template-url="orgDfProceduress.html" uib-typeahead="treatitem as treatitem.CPTCode + ' - ' + treatitem.ProcedureName for treatitem  in GetOrganizationProcedure($viewValue)" typeahead-on-select="pushtoSuperBill(SuperBillObj.SelectedCode)" ng-focus="SuperBillObj.Isfocused == true;" ng-blur="SuperBillObj.Isfocused = false;" />
+                            <script type="text/ng-template" id="orgDfProceduress.html">
+                                <a tabindex="-1">
+                                    <span>{{match.model.ProcedureCode}} - {{match.model.ProcedureName}}</span>
+                                </a>
+                            </script>
+                        </div>
+                        <!--<button class="btn__lg-- btn__1d5558--f white-nowrap">Save Changes</button>-->
+                    </div>
+                </div>
+
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll">
+                        <div class="d__f-- fd__c-- gap__5-- ai__c-- jc__c--">
+                            <div class="section__style--4 width__98-- overflow-hidden m__0--" ng-if="(SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': 'N'}).length > 0">
+                                <div class="section__body-- p__0--">
+                                    <table class="table tableno-bordered m__0--">
+                                        <thead>
+                                            <tr>
+                                                <th class="py__4-- px__8-- bg__FFFFFF-- bradius__10--yl" width="5%"></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF--"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--">Suggested Procedure</label></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF--" width="10%"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--">Eye</label></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF--" width="10%"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--">Units</label></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF--" width="13%"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--">Modifier</label></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF-- bradius__10--yr" width="18%"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--">Claim Responsibility</label></th>
+                                                <th class="py__4-- px__8-- bg__FFFFFF--" width="3%"><label class="fs__md-- fw__7-- tc__4A4A4A-- lh__22--"></label></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="section__style--4 width__98--" ng-show="(SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': 'N'}).length == 0">
+                                <div class="section__body-- boxs__0000001A--br10 bradius__10--">
+                                    <div class="m__auto-- d__f-- fd__c-- jc__c-- width__100-- h__66--vh">
+                                        <div class="d__f-- fd__c-- gap__20-- p__10-- ai__c--">
+                                            <a><i class="nodata__1-- d2__nodata--1"></i></a>
+                                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Super Bill Generated</h1>
+                                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">Search for CPT codes above or select from the suggested codes in the left panel</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__5-- ai__c-- width__98-- sortable-area" id="sortableAscSuperbill" sortable item-list="SuperBillFinalObj.SuperBillSuggestedCodes" item-id-field="ProcedureId" ng-if="(SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': 'N'}).length > 0">
+                                <div class="section__style--4 width__100--" ng-repeat="item in (SuperBillFinalObj.SuperBillSuggestedCodes| filter: {'DeleteInd': 'N'}) track by  item.UniqueKey" data-key="{{$index}}_{{item.ProcedureId}}" data-id="{{item.ProcedureId}}">
+                                    <div class="section__body-- boxs__0000001A--br10 bradius__10-- py__0--">
+                                        <table class="table tableno-bordered m__0--">
+                                            <tbody class="bg__FFFFFF-- width-100">
+                                                <tr>
+                                                    <td class="py__10-- px__0--" width="5%" ng-click="isShowDiagnosis = !isShowDiagnosis">
+                                                        <div class="d__f-- ai__c-- gap__10--">
+                                                            <a><i class="icons__w16-- arrowdownfill__w16--l" ng-class="isShowDiagnosis ? '' : 'icon__flip--270'"></i></a>
+                                                            <a><i class="icons__w16-- drag__w16--l"></i></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__0--" ng-click="isShowDiagnosis = !isShowDiagnosis">
+                                                        <div class="d__f-- fd__c--">
+                                                            <label class="fs__md-- fw__6-- tc__1D1D1D--">
+                                                                <span>{{item.ProcedureCode}}</span>
+                                                                <span ng-show="item.OrganId== 1">- (OD)</span>
+                                                                <span ng-show="item.OrganId== 2">- (OS)</span>
+                                                                <span ng-show="item.OrganId== 3">- (OU)</span>
+                                                                <span ng-show="item.OrganId== 4">- (General)</span>
+                                                                {{item.ProcedureName}}
+                                                            </label>
+                                                            <div class="d__f-- ai__c-- gap__5--" ng-if="item.DiagnosisArray.length > 0 && !isShowDiagnosis">
+                                                                <label class="fs__md-- fw__4-- tc__656565--">Mapped Diag : </label>
+                                                                <ul class="list__unstyled-- m__0-- d__f-- ai__c-- gap__10-- fw__w--">
+                                                                    <li ng-repeat="ditem in getActiveDiagnoses(item) track by ditem.DiagnosisId">
+                                                                        <label class="fs__md-- fw__5-- tc__656565--">{{ditem.ICD10CODE}}</label>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__5--" width="10%">
+                                                        <div class="form__group">
+                                                            <select ng-model="item.OrganId" ng-options="gitem.OrganId as gitem.OrganName for gitem in GetOrganNameList">
+                                                                <option value="">Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__8--" width="10%">
+                                                        <div class="form__group">
+                                                            <input type="text" ng-model="item.Quantity" numbers-only />
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__8--" width="13%">
+                                                        <div class="form__group">
+                                                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction="">
+                                                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                                                    <span ng-if="(item.Modifiers | filter: {'IsChecked':true}).length > 0" ng-repeat="mod in item.Modifiers | filter: {'IsChecked':true}">{{mod.ModifierCode}}<span ng-if="!$last">,</span></span>
+                                                                    <span ng-if="(item.Modifiers | filter: {'IsChecked':true}).length == 0">Select</span>
+                                                                </button>
+                                                                <div class="dropdown-menu w-160" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)" tabindex="0">
+                                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                        <ul class="text-left">
+                                                                            <li ng-repeat="mod in item.Modifiers track by $index">
+                                                                                <div class="checkbox cn">
+                                                                                    <label>
+                                                                                        <input name="checkbox-11" type="checkbox" ng-model="mod.IsChecked" ng-change="OnModifierCheck(mod,$parent.$index);">
+                                                                                        <span class="checkbox-material">
+                                                                                            <span class="check"></span>
+                                                                                        </span>
+                                                                                        <small>{{mod.ModifierName}}</small>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__10--" width="18%">
+                                                        <div class="form__group">
+                                                            <select ng-model="item.ResponcibilityId" ng-options="ritem.ResponcibilityId as ritem.ResponcibilityName for ritem in ClaimResponcibilities" ng-change="OnSelectClaimResp(item)">
+                                                                <option value="">Select</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py__10-- px__8--" width="3%">
+                                                        <a tooltip-placement="top" uib-tooltip="Remove" ng-click="DeleteProcInSuperBill(item);"><i class="icons__w16-- close__w16--l"></i></a>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="isShowDiagnosis">
+                                                    <td colspan="7" class="pb__10-- px__8--">
+                                                        <div class="border__E4E4E4-- bg__FAFAFA-- bradius__5-- p__10-- d__f-- fd__c-- width__100--">
+                                                            <div class="d__f-- gap__10--">
+                                                                <div class="d__f-- ai__c-- jc__sb--">
+                                                                    <div class="d__f-- ai__c-- gap__10--">
+                                                                        <label class="fs__md-- fw__6-- tc__656565-- white-nowrap">Assigned Diagnoses:</label>
+                                                                        <a class="fs__lg-- fw__5-- tc__537ACF-- text-underline" ng-show="item.DiagnosisReordered" ng-click="resetDiagnosisOrder(item)">Reset</a>
+                                                                    </div>
+                                                                </div>
+                                                                <ul id="sortableAscDiagnosis{{$index}}" sortable item-list="item.DiagnosisArray" item-id-field="DiagnosisId" on-before-reorder="captureDiagnosisState(item)" ng-if="(item.DiagnosisArray | filter: {'DeleteInd':'N'}).length>0" class="list__unstyled-- m__0-- d__f-- ai__c-- gap__10-- fw__w-- bg__FFFFFF-- px__10-- py__5-- bradius__5-- width__100--">
+                                                                    <li ng-repeat="ditem in getActiveDiagnoses(item) track by ditem.DiagnosisId" data-id="{{ditem.DiagnosisId}}" data-key="{{$index}}_{{ditem.DiagnosisId}}">
+                                                                        <div class="d__f-- ai__c-- gap__10-- bg__EBEBEB-- border__C5C5C5-- px__5-- bradius__5--">
+                                                                            <a><i class="icons__w16-- drag__w16--s"></i></a>
+                                                                            <label class="fs__md-- fw__5-- tc__3C3C3C--" title="{{ditem.DiagnosisName}}">{{ditem.ICD10CODE}}</label>
+                                                                            <a ng-click="RemoveDiagnosisById(ditem,item)"><i class="icons__w16-- cancel__w16--l"></i></a>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                                <div>
+                                                                    <label class="fs__md-- fw__6-- tc__656565-- white-nowrap" ng-if="(item.DiagnosisArray | filter: {'DeleteInd':'N'}).length==0">No Diagnoses are Added.</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d__f-- gap__10--x m-t-10">
+                                                                <div uib-dropdown auto-close="outsideClick" on-toggle="toggled(open,item)" >
+                                                                    <button id="simple-dropdown" ng-disabled="superBillMainObj.SuggestedDiagnosisCodes.length==0" type="button" class="w-300 height-30 bradius-4 border__C5C5C5-- p-l-10 text-left" uib-dropdown-toggle>
+                                                                        Suggested Diagnosis <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                                                    </button>
+                                                                    <ul class="gap-y-10 w-300" uib-dropdown-menu >
+                                                                        <li ng-repeat="sitem in superBillMainObj.SuggestedDiagnosisCodes" class="m-l-10">
+                                                                            <div class="checkbox cn">
+                                                                                <label>
+                                                                                    <input name="checkbox-1" type="checkbox" ng-click="$event.stopPropagation()"
+                                                                                           ng-model="sitem.IsCheckedDiagnosis" ng-change="addupdateDiagnosistoprocedure(sitem,item)" />
+                                                                                    <span class="checkbox-material">
+                                                                                        <span class="check"></span>
+                                                                                    </span>
+                                                                                    <small class="fw__4--">{{sitem.ICD10CODE}}-{{sitem.DiagnosisName}}</small>
+                                                                                </label>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="width__50-- form__group">
+                                                                    <input type="text" class="input__style--1 border__E4E4E4-- icons-search"
+                                                                           name="Diagnosise"
+                                                                           ng-show="!item.IsRcopiaa"
+                                                                           placeholder="Search Diagnosis From Organization"
+                                                                           ng-model="item.DiagnosisObject"
+                                                                           maxlength="100"
+                                                                           typeahead-min-length="0"
+                                                                           typeahead-template-url="customDiagnosisTemplate.html"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(item.DiagnosisObject,'ehnote',item)" />
+                                                                    <input type="text" class="input__style--1 border__E4E4E4-- icons-search"
+                                                                           name="Diagnosise"
+                                                                           ng-show="item.IsRcopiaa && ParentObject.IsScreenFrom=='ASC'"
+                                                                           placeholder="Search Diagnosis From Rcopia"
+                                                                           ng-model="item.DiagnosisObject"
+                                                                           ng-model-options="{debounce: 1000}"
+                                                                           maxlength="100"
+                                                                           typeahead-min-length="3"
+                                                                           typeahead-focus-on-select="false"
+                                                                           uib-typeahead="item as item.ICD10Code + ' - ' + item.ICD10Description for item in GetProblemsFromRcopia($viewValue)"
+                                                                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(item.DiagnosisObject,'rcopia',item)" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form__group width__98--" ng-if="(SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': 'N'}).length > 0">
+                                <label>Remarks</label>
+                                <textarea class="msd-elastic: \n" maxlength="500" placeholder="Remarks" rows="1" ng-model="SuperBillFinalObj.SuperBillRemarks"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Super bill new design added in 07/08/2026-->
+<div class="d__f-- fd__c-- height__100--" ng-if="false">
+    <div class="d__f-- ai__c-- jc__sb-- px__12-- py__4-- bb__DDD--">
+        <span class="fs__lg-- fw__8-- tc__111827--">Super Bill</span>
+        <div class="d__f-- ai__c-- gap__8--">
+            <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                <div class="vs__list-- gap__0--">
+                    <span>{{cacheStorageItem.FullName}}</span>
+                    <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                </div>
+                <a><i class="icons__w16-- info__w16--f"></i></a>
+            </div>
+            <button type="button" class="btn__lg-- btn__1d5558--o" ng-click="Historypopupnew(20,2)">History</button>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="SaveAscSuperBill()" ng-disabled="SuperBillFinalObj.IsClickSaveSuperBillBtn == true">Save</button>
+            <button class="btn__lg-- btn__C71D27--o" ng-click="closeuib()">Close</button>
+        </div>
+    </div>    
+    <div class="d__f-- flex__1-- height__100--">
+        <div class="d__f-- fd__c-- w__250px-- flex__shrink--0 br__E5E7EB-- height__100--">
+            <div class="px__10-- py__8-- bg__F3F4F6-- bb__F3F4F6--">
+                <span class="fs__md-- fw__7-- tc__111827--">Suggested Codes</span>
+            </div>
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5-- p__5--">
+                        <div class="border__1D5558-- bg__1D55581A-- bradius__6-- px__8-- py__7-- c__p-- d__f-- fd__c-- gap__5--">
+                            <label class="cur-poiter d__f-- ai__s-- gap__5--">
+                                <input type="checkbox" class="checkbox">
+                                <span class="lbl"></span>
+                                <span class="fs__md-- tc__111827-- lh__18--"><b>92250</b> (OU) Fundus Photography, Bilateral</span>
+                            </label>
+                            <div class="d__f-- fd__c-- gap__3-- pl__21--">
+                                <span class="fs__xs-- tc__9CA3AF--" ng-repeat="i in [1,2,3]">H35.00 – Unspecified background retinopathy</span>
+                            </div>
+                        </div>
+                        <div class="border__d1d5dd-- bradius__6-- px__8-- py__7-- c__p-- d__f-- fd__c-- gap__5-- hover__1D5558--border hover__1D55581A--bg" ng-repeat="i in [1,2,3]">
+                            <label class="cur-poiter d__f-- ai__s-- gap__5--">
+                                <input type="checkbox" class="checkbox">
+                                <span class="lbl"></span>
+                                <span class="fs__md-- tc__111827-- lh__18--"><b>92250</b> (OU) Fundus Photography, Bilateral</span>
+                            </label>
+                            <div class="d__f-- fd__c-- gap__3-- pl__21--">
+                                <span class="fs__xs-- tc__9CA3AF--" ng-repeat="i in [1,2,3]">H35.00 – Unspecified background retinopathy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d__f-- fd__c-- gap__8-- px__12-- py__10-- flex__1--">
+            <div class="d__f-- ai__c-- jc__sb--">
+                <span class="fs__lg-- fw__8-- tc__111827--">Edit Summary</span>
+                <div class="d__f-- ai__c-- gap__x--7 flex__1-- jc__e--">
+                    <button class="btn__d1d5db--o btn__d1d5db--hover d__f-- ai__c-- gap__10--" ng-click="superBillNotesPopup()"><i class="icons__w16-- notes__w16--o"></i>Add Notes</button>
+                    <div class="position__relative-- maxw__340px-- w__100p--">
+                        <input type="text" placeholder="Search by Orders" class="input__style--8 pr__25-- width__100--" />
+                        <i svg-icon="icon__search--" size="16" class="position__absolute-- right__6-- top__8--"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="border__d1d5db-- bradius__8-- d__f-- fd__c--">
+                <div class="bb__E5E7EB-- bradius__8--xt overflow-hidden">
+                    <table class="table tableno-bordered m__0--">
+                        <tbody>
+                            <tr>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="5%"></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--"><span class="fs__sm-- fw__7-- tc__9CA3AF-- tt__u--">Suggested Procedure</span></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="10%"><span class="fs__sm-- fw__7-- tc__9CA3AF-- tt__u--">Eye</span></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="9%"><span class="fs__sm-- fw__7-- tc__9CA3AF-- tt__u--">Units</span></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="12%"><span class="fs__sm-- fw__7-- tc__9CA3AF-- tt__u--">Modifier</span></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="18%"><span class="fs__sm-- fw__7-- tc__9CA3AF-- tt__u--">Claim Responsibility</span></td>
+                                <td class="px__6-- py__8-- bg__F3F4F6--" width="3%"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="sortable-area bradius__10--xb" id="sortableAscSuperbill" sortable item-list="SuperBillFinalObj.SuperBillSuggestedCodes" item-id-field="ProcedureId" ng-if="(SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': 'N'}).length > 0"">
+                    <table class="table tableno-bordered m__0--" ng-repeat="item in (SuperBillFinalObj.SuperBillSuggestedCodes| filter: {'DeleteInd': 'N'}) track by  item.UniqueKey" data-key="{{$index}}_{{item.ProcedureId}}" data-id="{{item.ProcedureId}}">
+                        <tbody class="bg__FFFFFF-- width-100">
+                            <tr class="hover__F0F2F5--bg" ng-class="(!$last && !isShowDiagnosis) ? 'bb__DDD--' : ''">
+                                <td class="pl__12-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="5%">
+                                    <div class="d__f-- ai__c-- gap__15-- jc__e--">
+                                        <span class="tc__9CA3AF--  c__p--" ng-class="!isShowDiagnosis ? 'transform__rotate--90' : ''"  ng-click="isShowDiagnosis = !isShowDiagnosis"><i svg-icon="icon__arrowdown--" size="10"></i></span>
+                                        <a><i class="icons__w16-- drag__w16--l"></i></a>
+                                    </div>
+                                </td>
+                                <td class="px__4-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''">
+                                    <span class="fs__sm-- fw__8-- tc__111827--"><b>92250</b> - (OU) Fundus Photography, Bilateral</span>
+                                </td>
+                                <td class="px__6-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="10%">
+                                    <select class="w__100p-- h__30-- py__0-- pl__6-- pr__20-- border__d1d5db-- bradius__6-- fs__md-- fw__6-- tc__4B5563-- bg__FFF-- c__p-- outline__none-- flex__shrink--0 focus__border--1D5558" ng-model="item.OrganId" ng-options="gitem.OrganId as gitem.OrganName for gitem in GetOrganNameList">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td class="px__6-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="9%">
+                                    <input type="text" class="w__100p-- h__30-- py__0-- pl__6-- pr__20-- border__d1d5db-- bradius__6-- fs__md-- fw__6-- tc__4B5563-- bg__FFF-- c__p-- outline__none-- flex__shrink--0 focus__border--1D5558" ng-model="item.Quantity" numbers-only />
+                                </td>
+                                <td class="px__6-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="12%">
+                                    <div class="dropdown cstm-dropdown tab__style--13 w__100p--" button-dropdown-direction="">
+                                        <button class="tab w__100p--" id="dropdownMenu3" data-toggle="dropdown">
+                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                            <span ng-if="(item.Modifiers | filter: {'IsChecked':true}).length > 0" ng-repeat="mod in item.Modifiers | filter: {'IsChecked':true}">{{mod.ModifierCode}}<span ng-if="!$last">,</span></span>
+                                            <span ng-if="(item.Modifiers | filter: {'IsChecked':true}).length == 0">Select</span>
+                                        </button>
+                                        <div class="dropdown-menu right-0 left-auto slim-scroll bradius__10--" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)" tabindex="0">
+                                            <ul class="d__f-- fd__c-- list__unstyled-- m__0-- p__5--">
+                                                <li class="px__12-- py__6-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-repeat="mod in item.Modifiers track by $index">
+                                                    <label class="cur-poiter d__f-- ai__s-- gap__5--" ng-model="mod.IsChecked" ng-change="OnModifierCheck(mod,$parent.$index);">
+                                                        <input type="checkbox" class="checkbox">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__md-- tc__111827-- lh__18--">{{mod.ModifierName}}</span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px__6-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="18%">
+                                    <select class="w__100p-- h__30-- py__0-- pl__6-- pr__20-- border__d1d5db-- bradius__6-- fs__md-- fw__6-- tc__4B5563-- bg__FFF-- c__p-- outline__none-- flex__shrink--0 focus__border--1D5558" ng-model="item.ResponcibilityId" ng-options="ritem.ResponcibilityId as ritem.ResponcibilityName for ritem in ClaimResponcibilities" ng-change="OnSelectClaimResp(item)">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td class="px__6-- py__8--" ng-class="isShowDiagnosis ? 'bg__F9F9F9--' : ''" width="3%">
+                                    <a tooltip-placement="top" uib-tooltip="Remove" ng-click="DeleteProcInSuperBill(item);" class="tc__EF4444--"><i svg-icon="icon__cross--" size="12"></i></a>
+                                </td>
+                            </tr>
+                            <tr ng-if="isShowDiagnosis">
+                                <td colspan="7" class="py__10-- pr__10-- bg__F9F9F9--">
+                                    <div class="d__f-- fd__c-- gap__10-- flex__1-- pl__30-- ">
+                                        <div class="d__f-- ai__c-- gap__5--">
+                                            <span class="fs__md-- fw__7-- tc__4B5563--">Assigned Diagnoses:</span>
+                                            <a class="fs__lg-- fw__5-- tc__537ACF-- text-underline" ng-show="item.DiagnosisReordered" ng-click="resetDiagnosisOrder(item)">Reset</a>
+                                            <div class="d__f-- ai__c-- fw__w-- gap__6--">
+                                                <ul id="sortableAscDiagnosis{{$index}}" sortable item-list="item.DiagnosisArray" item-id-field="DiagnosisId" on-before-reorder="captureDiagnosisState(item)" ng-if="(item.DiagnosisArray | filter: {'DeleteInd':'N'}).length>0" class="list__unstyled-- m__0-- d__f-- ai__c-- gap__10-- fw__w--">
+                                                    <li ng-repeat="ditem in getActiveDiagnoses(item) track by ditem.DiagnosisId" data-id="{{ditem.DiagnosisId}}" data-key="{{$index}}_{{ditem.DiagnosisId}}">
+                                                        <div class="d__f-- ai__c-- gap__10-- bg__FFFFFF-- border__C5C5C5-- px__5-- bradius__5--">
+                                                            <a><i class="icons__w16-- drag__w16--s"></i></a>
+                                                            <label class="fs__md-- fw__5-- tc__3C3C3C--" title="{{ditem.DiagnosisName}}">{{ditem.ICD10CODE}}</label>
+                                                            <a ng-click="RemoveDiagnosisById(ditem,item)"><i class="icons__w16-- cancel__w16--l"></i></a>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <span class="fs__xs-- tc__9CA3AF--" ng-if="(item.DiagnosisArray | filter: {'DeleteInd':'N'}).length==0">None assigned</span>
+                                            </div>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__8--">
+                                            <div class="dropdown cstm-dropdown tab__style--13 w__240px--" button-dropdown-direction="">
+                                                <button class="tab w__100p--" id="dropdownMenu3" ng-disabled="superBillMainObj.SuggestedDiagnosisCodes.length==0" data-toggle="dropdown">
+                                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                                    Suggested Diagnosis
+                                                </button>
+                                                <div class="dropdown-menu right-0 left-auto slim-scroll bradius__10--" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)" tabindex="0">
+                                                    <ul class="d__f-- fd__c-- list__unstyled-- m__0-- p__5--">
+                                                        <li class="px__12-- py__6-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-repeat="sitem in superBillMainObj.SuggestedDiagnosisCodes">
+                                                            <label class="cur-poiter d__f-- ai__s-- gap__5--" ng-model="sitem.IsCheckedDiagnosis" ng-change="addupdateDiagnosistoprocedure(sitem,item)">
+                                                                <input type="checkbox" class="checkbox">
+                                                                <span class="lbl"></span>
+                                                                <span class="fs__md-- tc__111827-- lh__18--">{{sitem.ICD10CODE}}-{{sitem.DiagnosisName}}</span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="position__relative-- flex__1--">
+                                                <input type="text" class="input__style--8 pr__25-- width__100--"
+                                                       name="Diagnosise"
+                                                       ng-show="!item.IsRcopiaa"
+                                                       placeholder="Search Diagnosis From Organization"
+                                                       ng-model="item.DiagnosisObject"
+                                                       maxlength="100"
+                                                       typeahead-min-length="0"
+                                                       typehead-append-to-body="true"
+                                                       typeahead-template-url="customDiagnosisTemplate.html"
+                                                       typeahead-focus-on-select="false"
+                                                       uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                       typeahead-on-select="onSelectAssesmentPlannewDiagnosis(item.DiagnosisObject,'ehnote',item)" />
+                                                <input type="text" class="input__style--8 pr__25-- width__100--"
+                                                       name="Diagnosise"
+                                                       ng-show="item.IsRcopiaa && ParentObject.IsScreenFrom=='ASC'"
+                                                       placeholder="Search Diagnosis From Rcopia"
+                                                       ng-model="item.DiagnosisObject"
+                                                       ng-model-options="{debounce: 1000}"
+                                                       maxlength="100"
+                                                       typeahead-min-length="3"
+                                                       typehead-append-to-body="true"
+                                                       typeahead-focus-on-select="false"
+                                                       uib-typeahead="item as item.ICD10Code + ' - ' + item.ICD10Description for item in GetProblemsFromRcopia($viewValue)"
+                                                       typeahead-on-select="onSelectAssesmentPlannewDiagnosis(item.DiagnosisObject,'rcopia',item)" />
+                                                <i svg-icon="icon__search--" size="16" class="position__absolute-- right__6-- top__8--"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="investdiagnosispopoverscript.html">
+    <div style="height: calc(100vh - 197px)" class="p-5 overflow__auto--y">
+        <table class="table tableno-bordered tableno-padding m-0" ng-if="SuperBillFinalObj.isPopoverOpenInvestigation">
+            <tbody>
+                <tr>
+                    <td>
+                        <ul>
+                            <li class="flex pos-relative search-panel-input" typehead-dropdown-direction>
+                                <input type="text" class="form-outline icons-search"
+                                       name="Diagnosise"
+                                       ng-show="!ProblemrxObj.IsRcopiaa"
+                                       placeholder="Search Diagnosis From Organization"
+                                       ng-model="ProblemrxObj.DiagnosisObject"
+                                       maxlength="100"
+                                       typeahead-min-length="0"
+                                       typeahead-focus-on-select="false"
+                                       uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                       typeahead-on-select="onSelectAssesmentPlannewDiagnosis(ProblemrxObj.DiagnosisObject,'ehnote')" />
+
+                                <input type="text" class="form-outline icons-search"
+                                       name="Diagnosise"
+                                       ng-show="ProblemrxObj.IsRcopiaa"
+                                       placeholder="Search Diagnosis From Rcopia"
+                                       ng-model="ProblemrxObj.DiagnosisObject"
+                                       ng-model-options="{debounce: 1000}"
+                                       maxlength="100"
+                                       typeahead-min-length="3"
+                                       typeahead-focus-on-select="false"
+                                       uib-typeahead="item as item.ICD10Code + ' - ' + item.ICD10Description for item in GetProblemsFromRcopia($viewValue)"
+                                       typeahead-on-select="onSelectAssesmentPlannewDiagnosis(ProblemrxObj.DiagnosisObject,'rcopia')" />
+
+                            </li>
+                            <li>
+                                <div class="checkbox cn">
+                                    <label>
+                                        <input name="checkbox-1" type="checkbox"
+                                               ng-model="ProblemrxObj.IsRcopiaa" />
+                                        <span class="checkbox-material">
+                                            <span class="check"></span>
+                                        </span>
+                                        <small class="text-s12w700c000">Is Rcopia</small>
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="list-group m-b-5">
+                            <li class="list-group-item" ng-repeat="Sitem in AddDiagnosisAssesmentPlanArray | filter:{DeleteInd: 'N'} track by $index">
+                                <div class="checkbox cn">
+                                    <label>
+                                        <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                                        <span class="checkbox-material">
+                                            <span class="check"></span>
+                                        </span>
+                                        <small class="fs-14">{{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</small>
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <button class="btn btn-save-us w-100" ng-click="ADDdiagnosisInvestigationadded(item, 'Investigation')" popover-is-open="isPopoverOpenInvestigation">Add</button>
+                        <button class="btn btn-light-close" ng-click="Closeiagnosisadded(item)">Close</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+
+<script type="text/ng-template" id="addAdditionalDiagnosis.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1>Additional Diagnosis</h1>
+            <ul class="flex-flow-list">
+                <li>
+                    <button class="btn__lg-- btn__1d5558--f" ng-click="ADDdiagnosisInvestigationadded(modalItem, 'Investigation')">Save</button>
+                </li>
+                <li>
+                    <a ng-click="uibcloseFirst()"><i class="icons__w16-- close__w16--l"></i></a>
+                </li>
+            </ul>
+        </div>
+        <div class="modal__body-- d__f-- fd__c-- gap__10-- p__0--">
+            <label class="fs__md-- fw__5-- tc__1D1D1D-- p__10-- bg__EFF1F4-- border__E4E4E4-- width__100--">
+                Selected Procedure :
+                <span class="py__2-- px__7-- bg__1D55581A-- bradius__5-- fw__5--">{{modalItem.ProcedureCode}}</span>
+                <span ng-show="modalItem.OrganId== 1">(OD)</span>
+                <span ng-show="modalItem.OrganId== 2">(OS)</span>
+                <span ng-show="modalItem.OrganId== 3">(OU)</span>
+                <span ng-show="modalItem.OrganId== 4">(General)</span>
+                {{modalItem.ProcedureName}}
+            </label>
+            <div class="d__f-- fd__c-- gap__10--">
+                <div class="d__f-- form__group px__15--">
+                    <!--<input placeholder="Search by diagnosis code or description"  />-->
+                    <input type="text" class="input__style--1 border__E4E4E4-- icons-search"
+                           name="Diagnosise"
+                           ng-show="!ProblemrxObj.IsRcopiaa"
+                           placeholder="Search Diagnosis From Organization"
+                           ng-model="ProblemrxObj.DiagnosisObject"
+                           maxlength="100"
+                           typeahead-min-length="0"
+                           typeahead-focus-on-select="false"
+                           uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(ProblemrxObj.DiagnosisObject,'ehnote')" />
+
+                    <input type="text" class="input__style--1 border__E4E4E4-- icons-search"
+                           name="Diagnosise"
+                           ng-show="ProblemrxObj.IsRcopiaa"
+                           placeholder="Search Diagnosis From Rcopia"
+                           ng-model="ProblemrxObj.DiagnosisObject"
+                           ng-model-options="{debounce: 1000}"
+                           maxlength="100"
+                           typeahead-min-length="3"
+                           typeahead-focus-on-select="false"
+                           uib-typeahead="item as item.ICD10Code + ' - ' + item.ICD10Description for item in GetProblemsFromRcopia($viewValue)"
+                           typeahead-on-select="onSelectAssesmentPlannewDiagnosis(ProblemrxObj.DiagnosisObject,'rcopia')" />
+                    <label class="width-15">
+                        <input name="checkbox-1" type="checkbox"
+                               ng-model="ProblemrxObj.IsRcopiaa" />
+                        <span class="checkbox-material">
+                            <span class="check"></span>
+                        </span>
+                        <small class="text-s12w700c000">Is Rcopia</small>
+                    </label>
+                </div>
+                <label class="fs__md-- fw__5-- tc__1D1D1D-- px__15--">Suggested Codes</label>
+                <div class="h__250-- overflow__auto--y slim-scroll px__10--" ng-show="AddDiagnosisAssesmentPlanArray.length>0">
+                    <ul class="d__f-- fd__c-- gap__5-- m__0-- list__unstyled--">
+                        <li class="px__10-- py__5-- hover__f5f5f5--f" ng-repeat="Sitem in AddDiagnosisAssesmentPlanArray | filter:{DeleteInd: 'N'} track by $index">
+                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                <input type="checkbox" class="checkbox" ng-model="Sitem.IsCheckedDiagnosis">
+                                <span class="lbl"></span>
+                                <span class="fs__md-- fw__5-- tc__1D1D1D--">{{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="h__250-- overflow-y-auto slim-scroll px__10--" ng-show="AddDiagnosisAssesmentPlanArray.length == 0">
+                    <div class="billing-cominsoon m-20">
+                        <img src="img/no-data/no-data-icon.png" />
+                        <div class="msg m-t-20">
+                            <p class="nodata-text">Oops!!</p>
+                            <p class="nodata-txt-line2">
+                                No Suggested Codes Are Added In This Diagnosis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="customDiagnosisTemplate.html">
+    <div ng-if="match.model.showHeader">
+        <div class="fs__3l-- m-l-10 color-eHnote">
+            {{ match.model._group }}
+        </div>
+    </div>
+    <a>
+        {{ match.model.ICD10CODE }} - {{ match.model.DiagnosisName }}
+    </a>
+</script>
+
+

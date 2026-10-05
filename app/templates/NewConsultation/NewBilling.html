@@ -1,0 +1,555 @@
+﻿<div ng-controller="EhnoteNewBillingCtrl">
+    <div class="container-fluid p-0">
+        <div class="tabs-header new-tabs ul-border">
+            <ul>
+                <li class="active width-bill" ng-class="BillingActiveMenu(1)" ng-hide="showPatientWiseBillling">
+                    <a data-toggle="tab" ng-click="SwitchBillingPage(1)">Appointment Billing</a>
+                </li>
+                <!--<li class="active width-bill" ng-class="BillingActiveMenu(3)" ng-show="showPatientWiseBillling">
+                    <a data-toggle="tab" ng-click="SwitchBillingPage(3)">Patient Billing</a>
+                </li>-->
+                <li class="width-bill" ng-class="BillingActiveMenu(2)" ng-show="showHidePreviousTab">
+                    <a data-toggle="tab" ng-click="SwitchBillingPage(2)">Previous Billing </a>
+                </li>
+            </ul>
+            <div class="row" ng-show="showAppointmentBillingContent">
+                <div class="col-lg-3">
+                    <label class="ng-binding fn-b veralignbtm"><b>Patient Name :  </b>{{appointmentinfo.PatientDetails.Patient[0].FullName}}</label>
+                </div>
+                <div class="col-lg-3" ng-hide="appointmentinfo.PatientDetails.PatientPhone[0].PhNumber == undefined">
+                    <label class="ng-binding fn-b veralignbtm"><b>Patient Mobile :  </b>{{appointmentinfo.PatientDetails.PatientPhone[0].PhNumber}}</label>
+                </div>
+                <div class="col-lg-6">
+                    <label class="control-label pr-15">Select Treatments</label>
+                    <select id="dates-field2" multiselectdropdown multiple="multiple" ng-change="treatemntChangeEvent(treatments);" ng-model="treatments" blurevent="treatemntChangeEvent" ng-options="item.ProcedureName for item in consultationTreatments" class="mr-120 t-6"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div ng-show="Billingpageno==1">
+            <div id="BillingTab1" class="tab-pane fade active in">
+                <div class="report-details-wrap">
+                    <div class="billing_view_pane">
+                        <div class="panel-heading panelheadbg">
+                            <div class="row">
+                                <div class="col-lg-2 pull-right">
+                                    <a class="mt-clearbtn-billing pull-right" value="Clear All" ng-click="RestoreAllBillingsItems()">Clear All </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5-15">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="liBilling">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-left" width="17%"> <span>Date</span></th>
+                                                    <th class="text-left"><span>Particular </span></th>
+                                                    <th class="text-center"><span>Price (per unit)</span></th>
+                                                    <th class="text-center"><span>Unit</span></th>
+                                                    <th class="text-left"><span>Discount</span></th>
+                                                    <th class="text-center"><span>Total</span></th>
+                                                    <th class="text-center"><span>Action</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="appointment-row" ng-repeat="item in mainBillingObject.BillingDetail track by $index">
+                                                    <td class="valign-top">
+                                                        <div class="b-date">
+                                                            <input type="text" class="form-control icons-calendar" ng-disabled="item.PreviousBill=='Y'" ng-model="item.BillDate" datepickerforab placeholder="DD/MM/YYYY" />
+                                                            <i class="icon-calender"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <div class="container-fluid bill-drpdwn appbillhgt p-0">
+                                                            <input type="text" ng-model="item.selectedParticular" typeahead-min-length="1" uib-typeahead="Predlist as Predlist.ProcedureName for Predlist in getTreatments($viewValue)" class="form-control pull-left" typeahead-on-select="populateParticularCost(item.selectedParticular,$index)"  placeholder="Search treatment"  ng-disabled="item.PreviousBill=='Y'" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <input type="text" ng-model="item.ProcedureCost" ng-blur="CalculateTotalAmount(item,$index)" numbers-only="numbers-only" maxlength="8" class="form-control center-block w-100 text-center" ng-disabled="item.PreviousBill=='Y'" />
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <input type="text" numbers-only="numbers-only" ng-blur="CalculateTotalAmount(item,$index)" ng-model="item.Multiplyfactor" maxlength="5" class="form-control center-block w-50"  ng-disabled="item.PreviousBill=='Y'" />
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <div class="center-block">
+                                                            <input type="text" ng-disabled="item.PreviousBill=='Y'" ng-model="item.DiscountCost" maxlength="{{item.DiscountType==='PERCENT'?2:8}}" ng-blur="CalculateTotalAmount(item,$index)" class="form-control inp-pack center-block" numbers-only="numbers-only">
+                                                            <select class="pack-select center-block" ng-disabled="item.PreviousBill=='Y'" ng-model="item.DiscountType" ng-change="discountTypeChange(item,$index)">
+                                                                <option value="PERCENT">%</option>
+                                                                <option value="AMOUNT">INR</option>
+                                                            </select>
+                                                            <br>
+                                                        </div>
+                                                    </td>
+                                                    <td  class="text-right valign-top">
+                                                        <label class="mt-10 text-left">{{item.Total | number}}</label>
+                                                    </td>
+                                                    <td class="valign-top whtespc-nowrp">
+                                                        <a class="app-bill-add-btn ml-0" ng-show="$last" ng-click="addNewBillingItem(item)">
+                                                            <img src="img/plus-symbole-icon.svg" width="16" height="16" alt="" />
+                                                        </a>
+                                                        <a class="bill-delete-btn ml-0" ng-show="!$last" ng-click="deleteBillingItem($index)">
+                                                            <img src="img/ico-delete-red.svg" alt="delete" />
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-lg-4 pull-right p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>
+                                                            <span  class="pos-relative top-10">Mode of payment</span>
+                                                        </th>
+                                                        <td width="150">
+                                                            <select class="select-dropdown form-control" ng-model="mainBillingObject.PaymentInfoObject.PaymentTypeId" ng-disabled="true">
+                                                                <option value="1">Cash</option>
+                                                                <option value="2">Card</option>
+                                                                <option value="3">Cheque</option>
+                                                            
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Sub Total:</th>
+                                                        <td width="150">{{mainBillingObject.TotalSubAmount | number}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="valign-middle">
+                                                            <span>Discount :</span>
+                                                            <div class="w-150 dis-inline-block">
+                                                                <select class="pack-select" ng-model="mainBillingObject.DiscountType" ng-change="mainDiscountTypeChange();">
+                                                                    <option value="PERCENT" class="ng-binding">%</option>
+                                                                    <option value="AMOUNT">INR</option>
+                                                                </select>
+                                                            </div>
+                                                        </th>
+                                                        <td width="150">
+                                                            <input type="text" placeholder="0" ng-model="mainBillingObject.DiscountValue" ng-blur="discountChange(mainBillingObject,$index);" numbers-only="numbers-only" class="form-control" maxlength="{{mainBillingObject.DiscountType==='PERCENT'?2:8}}" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Total Net :</th>
+                                                        <!--<td width="150"><span>{{mainBillingObject.TotalNetAmount | number}}</span></td>-->
+                                                        <!--<td width="150">-->
+                                                        <td width="150">
+                                                            <span>
+                                                                {{mainBillingObject.TotalNetAmount=convertToInteger(mainBillingObject.TotalNetAmount)}}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-hide="mainBillingObject.PreviousPaidAmount=='0'">
+                                                        <th>Previously Paid Amount :</th>
+                                                        <td width="150"><span>{{mainBillingObject.PreviousPaidAmount | number}}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <span class="pos-relative top-10">Collected Amount :</span>
+                                                        </th>
+                                                        <td width="150">
+                                                            <input type="text" placeholder="0" numbers-only="numbers-only" ng-model="mainBillingObject.TotalBilledCost" ng-blur="checkCollectedAmount(mainBillingObject);" class="form-control" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr colspan="2">
+                                                        <th>
+                                                            <span class="top-10">Total Received:</span>
+                                                        </th>
+                                                        <td width="150"><span ng-bind="mainBillingObject.TotalReceivedAmount"></span></td>
+                                                    </tr>
+                                                    <tr colspan="4">
+                                                        <th>Total Balance:</th>
+                                                        <td width="150"><span ng-bind="mainBillingObject.TotalBalance=mainBillingObject.TotalNetAmount-mainBillingObject.TotalReceivedAmount"></span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="reg-pat-btn-bill clearfix pull-right" ng-show="showAppointmentBillingContent">
+                            <button class="btn primary-btn mw-100 pull-right" ng-click="Submit('Print')">
+                                Submit & Print
+                            </button>
+                            <button  class="btn blue-btn mw-100 pull-right mr-10 ml-10" ng-click="Submit('NoPrint')">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-show="Billingpageno==3 || Billingpageno==2">
+
+
+            <div class="row">
+                <div class="col-lg-12 text-right">
+                    <button class="btn blue-btn" ng-click="createNewBilling()">Create New Bill</button>
+                </div>
+            </div>
+            <div ng-if="patientWiseBillHistoryArray.length>0">
+                <uib-accordion class="case-history">
+                    <uib-accordion-group is-open="open" ng-repeat="mitem in  patientWiseBillHistoryArray">
+                        <uib-accordion-heading>
+                            <label for="{{'small-reg2' + $index}}" class="width-100 cur-poiter" ng-click="paymentHistoryTabClick(item)">
+                                <div class="row">
+                                    <div class="col-lg-10">
+                                        <span class="txt-color-grey mr-20 valign-middle" ><strong>Appointment ID: </strong> {{mitem.AppointmentID}} </span>
+                                        <span class="txt-color-grey mr-20 valign-middle"><strong>Appointment Date: </strong>{{mitem.AppointmentDate |date :'dd-MM-yyyy'}} </span>
+                                        <span class="txt-color-grey mr-20 valign-middle" ><strong>Bill ID: </strong>{{mitem.BillID}} </span>
+                                        <div ng-if="mitem.TotalBalance!=0" class="dis-web-inline">
+                                            <span class="txt-color-grey mr-20 valign-middle"><strong>Due: </strong>{{mitem.TotalBalance}} </span>
+                                        </div>
+                                        <span class="txt-color-grey mr-20 valign-middle" ><strong>Consult Doctor: </strong>{{mitem.DoctorFullName}} </span>
+                                    </div>
+                                </div>
+                            </label>
+                        </uib-accordion-heading>
+                        <div>
+                            <h6 class="pos-relative t-5 dis-web-inline">
+                                Treatments
+                            </h6>
+                            <a href="" class="pos-absolute right-39" ng-click="PrintParticularBillId(mitem)"><span><i class="fa fa-lg fa-print"></i> Print</span></a>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered multi-tabletreatment">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Treatment Name</th>
+                                                    <th>Treatment Cost</th>
+                                                    <th>Unit</th>
+                                                    <th>Discount</th>
+                                                    <th>Total Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in mitem.BillingDetail track by $index">
+                                                    <td><span ng-bind="item.BillDate"></span></td>
+                                                    <td><span ng-bind="item.ProcedureName"></span></td>
+                                                    <td><span ng-bind="item.ProcedureCost"></span></td>
+                                                    <td><span ng-bind="item.Multiplyfactor"></span></td>
+                                                    <td><span ng-bind="item.DiscountCost">Discount</span></td>
+                                                    <td><span ng-bind="item.Total"></span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <!--<table class="table table-bordered" id="liBilling">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"> <span>Date</span></th>
+                                                    <th class="text-center"><span>Particular </span></th>
+                                                    <th class="text-center"><span>Price (per unit)</span></th>
+                                                    <th class="text-center"><span>Unit</span></th>
+                                                    <th class="text-center"><span>Discount</span></th>
+                                                    <th class="text-center"><span>Total</span></th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="appointment-row" ng-repeat="item in mitem.BillingDetail track by $index">
+                                                    <td style="vertical-align:top">
+                                                        <div class="b-date">
+                                                            <input type="text" class="form-control icons-calendar" ng-disabled="item.PreviousBill=='Y'" ng-model="item.BillDate" datepickerforab placeholder="DD/MM/YYYY" />
+                                                            <i class="icon-calender"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td style="vertical-align:top">
+                                                        <div class="container-fluid bill-drpdwn appbillhgt" style="padding:0;">
+                                                            <input type="text" ng-model="item.selectedParticular" typeahead-min-length="1" uib-typeahead="Predlist as Predlist.ProcedureName for Predlist in getTreatments($viewValue)" class="form-control" typeahead-on-select="populateParticularCost(item.selectedParticular,$index)"
+                                                                   placeholder="Search treatment" style="float:left;" ng-disabled="item.PreviousBill=='Y'" />
+                                                        </div>
+                                                    </td>
+                                                    <td style="vertical-align:top">
+                                                        <input type="text" ng-model="item.ProcedureCost" style="width:100px; text-align: center" numbers-only="numbers-only" maxlength="8" class="form-control center-block" ng-disabled="item.PreviousBill=='Y'" />
+                                                    </td>
+                                                    <td style="vertical-align:top">
+                                                        <input type="text" numbers-only="numbers-only" ng-model="item.Multiplyfactor" maxlength="5" class="form-control center-block" style="width: 50px;" ng-disabled="item.PreviousBill=='Y'" />
+                                                    </td>
+                                                    <td style="vertical-align:top">
+                                                        <div class="center-block">
+                                                            <input type="text" ng-disabled="item.PreviousBill=='Y'" ng-model="item.DiscountCost" maxlength="3" class="form-control inp-pack center-block" numbers-only="numbers-only">
+                                                            <br>
+                                                        </div>
+                                                    </td>
+                                                    <td style="text-align: right;vertical-align:top">
+                                                        <label style="text-align:left" class="mt-10">{{item.Total | number}}</label>
+                                                    </td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>-->
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <button class="btn primary-btn" ng-click="ShowPaymentDetails = !ShowPaymentDetails"><i class="fa fa-eye fa-lg"></i> View Payment Details</button>
+                                        <!--<tr>
+                                            <td colspan="2"><a class="pull-right" href="" ng-click="ShowPaymentDetails = !ShowPaymentDetails"><i class="fa fa-eye fa-lg"></i> View Payment Details</a></td>
+                                        </tr>-->
+                                        <div class="table-responsive mt-10">
+                                            <table class="table table-bordered multi-tablehistory" ng-show="ShowPaymentDetails">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Receipt ID</th>
+                                                        <th>Receipt Date</th>
+                                                        <th>Total Amount</th>
+                                                        <th>Total Discount</th>
+                                                        <th>Total Billed Cost</th>
+                                                        <th>Total Received</th>
+                                                        <th>Total Balance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="accordion-toggle" data-toggle="collapse" data-target="#12345-cores" ng-repeat="hitem in mitem.billingHistryInfo">
+                                                        <td><span>{{hitem.ReceiptId}}</span></td>
+                                                        <td><span>{{hitem.BillDate | date: 'dd-MM-yyyy'}}</span></td>
+                                                        <td> <span>{{hitem.TotalNetAmount}}</span></td>
+                                                        <td><span>{{hitem.TotalDiscountAmount}}</span></td>
+                                                        <td><span>{{hitem.TotalBilledCost}}</span></td>
+                                                        <td><span>{{hitem.TotalReceivedAmount}}</span></td>
+                                                        <td><span>{{hitem.TotalBalance}}</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>
+                                                            <span class="pos-relative top-10">Mode of payment</span>
+                                                        </th>
+                                                        <td width="150">
+                                                            <select class="select-dropdown form-control" ng-model="mitem.PaymentInfoObject.PaymentTypeId" ng-disabled="true">
+                                                                <option value="1">Cash</option>
+                                                                <option value="2">Card</option>
+                                                                <option value="3">Cheque</option>
+                                                                <option value="4">EMI</option>
+                                                                <option value="5">Others</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Sub Total:</th>
+                                                        <td width="150">{{mitem.TotalSubAmount | number}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="valign-top">
+                                                            <span>Discount :</span>
+                                                            <div  class="w-150 dis-inline-block">
+                                                                <select class="pack-select" ng-model="mitem.DiscountType" ng-change="historyMainDiscountTypeChange(mitem,$index);">
+                                                                    <option value="PERCENT" class="ng-binding">%</option>
+                                                                    <option value="AMOUNT">INR</option>
+                                                                </select>
+                                                            </div>
+                                                        </th>
+                                                        <td width="150">
+                                                            <input type="text" placeholder="0" ng-disabled="mitem.isTotalPaid" ng-model="mitem.DiscountValue" ng-blur="patientWisediscountChange(mitem,$index);" maxlength="{{mitem.DiscountType==='PERCENT'?2:8}}" numbers-only="numbers-only" class="form-control" max="2" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Total Net :</th>
+                                                        <td width="150"><span>{{mitem.TotalNetAmount | number}}</span></td>
+                                                    </tr>
+                                                    <tr ng-hide="mitem.PreviousPaidAmount=='0'">
+                                                        <th>Previously Paid Amount :</th>
+                                                        <td width="150"><span>{{mitem.PreviousPaidAmount | number}}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><span class="pos-relative top-10">Collected Amount :</span></th>
+                                                        <td width="150">
+                                                            <input type="text" placeholder="0" numbers-only="numbers-only" ng-disabled="mitem.isTotalPaid" ng-model="mitem.TotalBilledCost" ng-blur="patientWisecheckCollectedAmount(mitem,$index);" class="form-control" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr colspan="2">
+                                                        <th><span class="top-10">Total Received:</span></th>
+                                                        <td width="150"><span ng-bind="mitem.TotalReceivedAmount"></span></td>
+                                                    </tr>
+                                                    <tr colspan="4">
+                                                        <th>Total Balance:</th>
+                                                        <td width="150"><span ng-bind="mitem.TotalBalance=mitem.TotalNetAmount-mitem.TotalReceivedAmount"></span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="reg-pat-btn-bill clearfix pull-right">
+                                <button class="btn primary-btn mw-100 pull-right" ng-click="SubmitPatientWise(mitem,'Print')" ng-disabled="mitem.TotalBilledCost==='0' || mitem.TotalBilledCost===0 || mitem.TotalBilledCost===''">
+                                    Submit & Print
+                                </button>
+                                <button  class="btn blue-btn mw-100 pull-right mr-10 ml-10" ng-click="SubmitPatientWise(mitem,'NoPrint')" ng-disabled="mitem.TotalBilledCost==='0' || mitem.TotalBilledCost===0 || mitem.TotalBilledCost===''">
+                                    SUBMIT
+                                </button>
+                            </div>
+                            <!--<a class="pull-right" href="" ng-click="ShowPaymentDetails = !ShowPaymentDetails"><i class="fa fa-eye fa-lg"></i> View Payment Details</a>-->
+                            <!--<table class="table table-bordered multi-tablehistory" ng-show="ShowPaymentDetails">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt ID</th>
+                                        <th>Receipt Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Total Discount</th>
+                                        <th>Total Billed Cost</th>
+                                        <th>Total Received</th>
+                                        <th>Total Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="accordion-toggle" data-toggle="collapse" data-target="#12345-cores" ng-repeat="hitem in mitem.billingHistryInfo">
+                                        <td><span>{{hitem.ReceiptId}}</span></td>
+                                        <td><span>{{hitem.BillDate | date: 'dd-MM-yyyy'}}</span></td>
+                                        <td> <span>{{hitem.TotalNetAmount}}</span></td>
+                                        <td><span>{{hitem.TotalDiscountAmount}}</span></td>
+                                        <td><span>{{hitem.TotalBilledCost}}</span></td>
+                                        <td><span>{{hitem.TotalReceivedAmount}}</span></td>
+                                        <td><span>{{hitem.TotalBalance}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>-->
+
+                        </div>
+
+
+                        <!-- <div class="billing-cominsoon norecords-found-patients text-center" ng-show="mitem.isTotalPaid">
+                            <img src="img/no-data/no_payment_history.png" />
+                            <div class="msg">
+                                <p class="goback-text-line1">NIL</p>
+                            </div>
+                        </div> -->
+
+
+                    </uib-accordion-group>
+                </uib-accordion>
+            </div>
+            <div class="billing-cominsoon norecords-found-patients text-center" ng-show="patientWiseBillHistoryArray.length == 0 || patientWiseBillHistoryArray.length == undefined">
+                <img src="img/no-data/no_payment_history.png" />
+                <div class="msg">
+                    <p class="goback-text-line1">No payment history for this patient </p>
+                </div>
+            </div>
+
+
+        </div>
+        <!--<div ng-show="Billingpageno==2">
+            <div ng-show="NewPatientBillHistoryArray.length > 0">
+                <uib-accordion class="case-history">
+                    <uib-accordion-group is-open="open" ng-repeat="item in  NewPatientBillHistoryArray">
+                        <uib-accordion-heading>
+
+                            <label for="{{'small-reg2' + $index}}" class="" ng-click="paymentHistoryTabClick(item)" style="width: 100%; cursor: pointer">
+                                <div class="row">
+                                    <div class="col-lg-8">
+
+                                        <span class="txt-color-grey mr-20" style="vertical-align: middle;"><strong>Appointment ID:</strong> {{item.AppointmentId}} </span>
+                                        <span class="txt-color-grey mr-20" style="vertical-align: middle;"><strong>Appointment Date:</strong>{{item.AppointmentDt |date :'dd-MM-yyyy'}} </span>
+                                        <span class="txt-color-grey mr-20" style="vertical-align: middle;"><strong>Bill ID:</strong>{{item.BillingId}} </span>
+                                    </div>
+                                </div>
+                            </label>
+                        </uib-accordion-heading>
+                        <div>
+                            <div class="accordion-form">
+                                <div class="table-container">
+                                    <h6 style="position: relative;top: -5px; display: -webkit-inline-box;">
+                                        Treatments
+                                    </h6>
+                                    <a href="" style="position: absolute; right: 39px;" ng-click="PrintParticularBillId(item)"><span><i class="fa fa-lg fa-print"></i> Print</span></a>
+                                    <table class="table table-bordered multi-tabletreatment">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Treatment Name</th>
+                                                <th>Treatment Cost</th>
+                                                <th>Unit</th>
+                                                <th>Discount</th>
+                                                <th>Total Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="titem in item.BillingItems">
+                                                <td><span ng-bind="titem.ProcedureName"></span></td>
+                                                <td><span ng-bind="titem.ProcedureCost"></span></td>
+                                                <td><span ng-bind="titem.Multiplyfactor"></span></td>
+                                                <td><span>{{titem.DiscountCost+(titem.DiscountType==='PERCENT'?'%':'INR')}}</span></td>
+                                                <td><span ng-bind="titem.Total"></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="col-lg-4 pull-right">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <th><strong>Total Net Amount: </strong></th>
+                                                        <td><span ng-bind="item.BillingHistoryDtls[0].TotalNetAmount"></span></td>
+                                                    </tr>
+                                                    <tr class="finbill-treat">
+                                                        <th><strong>Total Discount: </strong></th>
+                                                        <td><span>{{item.BillingHistoryDtls[0].TotalDiscountAmount}}</span></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th><strong>Total Received: </strong></th>
+                                                        <td><span ng-bind="item.BillingHistoryDtls[0].TotalReceivedAmount"></span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><strong>Total Balance: </strong></th>
+                                                        <td><span ng-bind="item.BillingHistoryDtls[0].TotalBalance"></span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2"><a class="pull-right" href="" ng-click="ShowPaymentDetails = !ShowPaymentDetails"><i class="fa fa-eye fa-lg"></i> View Payment Details</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered multi-tablehistory" ng-show="ShowPaymentDetails">
+                                        <thead>
+                                            <tr>
+                                                <th>Receipt ID</th>
+                                                <th>Receipt Date</th>
+                                                <th>Total Amount</th>
+                                                <th>Total Discount</th>
+                                                <th>Total Billed Cost</th>
+                                                <th>Total Received</th>
+                                                <th>Total Balance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="accordion-toggle" data-toggle="collapse" data-target="#12345-cores" ng-repeat="hitem in item.BillingHistoryDtls">
+                                                <td><span>{{hitem.ReceiptId}}</span></td>
+                                                <td><span>{{hitem.BillDate | date: 'dd-MM-yyyy'}}</span></td>
+                                                <td> <span>{{hitem.TotalNetAmount}}</span></td>
+                                                <td><span>{{hitem.TotalDiscountAmount}}</span></td>
+                                                <td><span>{{hitem.TotalBilledCost}}</span></td>
+                                                <td><span>{{hitem.TotalReceivedAmount}}</span></td>
+                                                <td><span>{{hitem.TotalBalance}}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </uib-accordion-group>
+                </uib-accordion>
+            </div>
+            <div class="billing-cominsoon norecords-found-patients text-center" ng-show="NewPatientBillHistoryArray.length == 0">
+                <img src="img/no-data/no_payment_history.png" />
+                <div class="msg">
+                    <p class="goback-text-line1">No payment history for this patient </p>
+                </div>
+            </div>
+        </div>-->
+    </div>
+    
+</div>

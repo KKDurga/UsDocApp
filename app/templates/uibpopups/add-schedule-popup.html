@@ -1,0 +1,126 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>{{ 'ADDSCHEDULE' | translate}}</h1>
+        <ul class="list__none-- m__0-- d__f-- ai__c-- gap__5--x">
+            <li>
+                <label class="fs__lg-- fw__6-- tc__1D1D1D--">{{ 'NAME' | translate}}:</label>
+                <span class="fs__lg-- fw__5-- tc__656565--"> {{MainUserObj.BasicInfo.Prefix}}.{{MainUserObj.BasicInfo.FullName}}</span>
+            </li>
+            <li>
+                <label class="fs__lg-- fw__6-- tc__1D1D1D--">{{ 'USERNAME' | translate}} :</label>
+                <span class="fs__lg-- fw__5-- tc__656565--">{{MainUserObj.BasicInfo.UserName}}</span>
+            </li>
+        </ul>
+        <a class="btn__close--2" ng-click="closeuib()">
+            <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+    <div class="modal__body--">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll">
+                <div class="row" ng-repeat="item in NewUserScheduleSlotsArray track by $index">
+                    <div class="col-lg-3">
+                        <table class="horizontal-table-eh">
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="form__group">
+                                            <label>{{ 'APPOINTMENTDURATION' | translate}}</label>
+                                            <select ng-model="newUserBasicInfoObj.AvgConsultationTime" ng-change="ChangeTimeslotsBasedonApptDuration(item,newUserBasicInfoObj.AvgConsultationTime);">
+                                                <option value="" ng-disabled="true">   {{ 'SELECT' | translate}}</option>
+                                                <option value="5">5</option>
+                                                <option value="10">10</option>
+                                                <option value="15">15</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="45">45</option>
+                                                <option value="60">60</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-12">
+                        <table class="horizontal-table-eh">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        <span class="ehr-input-label"> {{ 'STARTTIME' | translate}}</span>
+                                    </th>
+                                    <th>
+                                        <span class="ehr-input-label"> {{ 'ENDTIME' | translate}}</span>
+                                    </th>
+                                    <th>
+                                        <span class="ehr-input-label">{{ 'BRANCH' | translate}}</span>
+                                    </th>
+                                    <th>
+                                        <span class="ehr-input-label">Max Slots</span>
+                                    </th>
+                                    <th width="1%"></th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="kitem in item.UserScheduleDetails track by $index">
+                                    <td width="15%">
+                                        <span class="text-s12w500c313131 text-center fs-12 p-5 btn-block bg-4bb8a2 bradius-6 text-white">{{kitem.Day}}</span>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <select ng-model="kitem.StartTime" ng-change="ChangeStartTimeSchedule(kitem, item);">
+                                                <option value="">{{ 'SELECT' | translate}}</option>
+                                                <option ng-repeat="time in kitem.SlotStartValues" ng-selected="{{kitem.StartTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <select ng-model="kitem.EndTime">
+                                                <option value="">{{ 'SELECT' | translate}}</option>
+                                                <!--<option ng-repeat="time in item.SlotStartValues" ng-selected="{{kitem.EndTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>-->
+                                                <option ng-repeat="time in kitem.SlotEndValues" ng-selected="{{kitem.EndTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <select ng-model="kitem.BranchObj" ng-change="changeSlotBranch(kitem,item)" ng-options="item as item.BranchName for item in MainUserObj.BasicInfo.UserWorkingBranches">
+                                                <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <input type="text" placeholder="Max Slots" numbers-only ng-model="kitem.MaximumOverAllSlots" maxlength="3" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-link btn-sm" uib-tooltip="Remove" ng-click="clearDayData(kitem);">
+                                            <i class="eh-close eh-icon"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info btn-42b3f3" uib-tooltip="Copy" ng-click="Copyweekvalues(kitem,item)">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal__footer--">
+        <div class="form__group d__f-- ai__c-- gap__x--8">
+            <label>User Schedule Name : <em>*</em></label>
+            <input type="text" class="w__200--" ng-model="NewUserScheduleSlotsArray[0].UserScheduleName" />
+        </div>
+        <button class="btn__lg-- btn__C71D27--f" ng-click="closeuib()">{{ 'CLOSE' | translate}}</button>
+        <button class="btn__lg-- btn__1d5558--f" ng-click="SaveUserCurrentSLotNew(NewUserScheduleSlotsArray[0]);">{{ 'SAVE' | translate}}</button>
+    </div>
+</div>

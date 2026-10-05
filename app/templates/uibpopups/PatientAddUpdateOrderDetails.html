@@ -1,0 +1,283 @@
+﻿
+<div class="modal-header">
+    <label>Upload Images</label>
+    <button type="button" class="btn btn-link" ng-click="closeImagePopup()"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body p-10">
+    <section class="tile tile-shadow">
+
+        <div class="tile-body">
+
+            <div class="row" ng-if="showAddOrderDiv">
+                <div class="col-lg-12">
+                    <button class="btn btn-link" ng-click="navtoSelectExistingOrders()" style="float:right">Select Existing Order</button>
+                </div>
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable bg-white">
+                            <tbody>
+                                <tr>
+                                    <td width="40%">
+                                        <div class="form-group">
+                                            <label>Appointment <em>*</em></label>
+                                            <select class="form-control" ng-model="addUpdatePatientOrderImageDetailsReq.AppointmentId" ng-options="aitem.AppointmentId as aitem.NewAppointmentDate +' - '+aitem.DoctorName+' ( '+aitem.VisitReason+' ) ' for aitem in previousAppointmentsList">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="form-group">
+                                            <label>Modality <em>*</em></label>
+                                            <select class="form-control" ng-model="addUpdatePatientOrderImageDetailsReq.ModalityId" ng-options="option.ModalityId as option.ModalityName+' ('+option.ModalityShortName+')' for option in ModalityArray">
+                                                <option value="" disabled="disabled">select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td width="40%">
+                                        <div class="form-group">
+                                            <label>Investigation Name <em>*</em></label>
+                                            <input type="text" class="register-input" placeholder="Enter CPT code"
+                                                   autocomplete="off"
+                                                   maxlength="100"
+                                                   name="treatment"
+                                                   ng-model="addUpdatePatientOrderImageDetailsReq.ProcedureObj"
+                                                   typeahead-min-length="0"
+                                                   typeahead-focus-on-select="false"
+                                                   typeahead-template-url="orgDfProceduresdf.html"
+                                                   ng-change="onInvOrderProcedureChange(addUpdatePatientOrderImageDetailsReq.ProcedureObj)"
+                                                   uib-typeahead="treatitem as treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                   typeahead-on-select="onSelectOrderProcedureInv(addUpdatePatientOrderImageDetailsReq.ProcedureObj)" />
+                                            <script type="text/ng-template" id="orgDfProceduresdf.html">
+                                                <a tabindex="-1" class="m-w-350 fs-10">
+                                                    <span>{{match.model.ProcedureCode}} - {{match.model.ProcedureName}}</span>
+                                                </a>
+                                            </script>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="!showAddOrderDiv">
+                <div class="col-lg-12" ng-show="selectedPatientOrderId===0">
+                    <button class="btn btn-link" ng-click="navtoCreateNewOrder()" style="float:right">Create New Order</button>
+                </div>
+                <div class="col-lg-12">
+                    <table class="table table-bordered m-b-0">
+                        <thead>
+                            <tr>
+                                <th width="10%">Select</th>
+                                <th width="10%">Date</th>
+                                <th width="15%">Modality</th>
+                                <th>Order Description</th>
+                                <th>Provider</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in PatientOrdersArray">
+                                <td>
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input name="checkbox-po" type="checkbox" ng-disabled="item.isdisableOrderSelection" ng-model="item.IsSelected" ng-change="changeOrderSelected(item)">
+                                            <span class="checkbox-material">
+                                                <span class="check"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    {{item.OrderDate | date:"MM-dd-yyyy" }}
+                                </td>
+                                <td>{{item.ModalityName}}</td>
+
+                                <td>
+                                    <p class="m-b-0">
+                                        {{item.ProcedureName}} - {{item.OrganName}}
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="m-b-0">
+                                        Dr. {{item.AppointmentDoctor}}
+                                    </p>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable bg-white">
+                            <tbody>
+                                <tr>
+                                    <td width="50%">
+                                        <div class="form-group">
+                                            <label>Order Number <em>*</em></label>
+                                            <input type="text" class="form-control" ng-model="addUpdatePatientOrderImageDetailsReq.OrderNumber" />
+                                        </div>
+                                    </td>
+                                    <td width="50%">
+                                        <div class="form-group">
+                                            <label>Order Date <em>*</em></label>
+                                            <input type="text" class="form-control" placeholder="MM-DD-YYYY" ng-model="addUpdatePatientOrderImageDetailsReq.OrderDate" datepickeruniversal readonly />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!--<tr>
+                            <td colspan="2">
+                                <div class="form-group">
+                                    <label>Remarks <em>*</em></label>
+                                    <textarea rows="2" class="form-control msd-elastic: \n;" ng-model="addUpdatePatientOrderImageDetailsReq.OrderRemarks"></textarea>
+                                </div>
+                            </td>
+                        </tr>-->
+
+
+                                <tr ng-if="!showAddOrderDiv">
+                                    <td colspan="2">
+                                        <label>Advised Diagnosis <em>*</em></label>
+                                        <ul class="list-group m-b-5">
+                                            <li class="list-group-item" ng-repeat="Sitem in advisedDiagnosisArray">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-1" type="checkbox" ng-model="Sitem.IsCheckedDiagnosis" ng-change="changeadvicedDiagnosis(Sitem)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="fs-14">{{Sitem.ICD10CODE}}|{{Sitem.ICD10DIAGNAME}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <label>New Diagnosis</label>
+                                        <input type="text" class="form-control input-color"
+                                               placeholder="Search Diagnosis/ICD 10 Codes"
+                                               ng-model="newSelectedDiagObj"
+                                               maxlength="100"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                               typeahead-on-select="onselectOrderDiagnosisitem(newSelectedDiagObj)"
+                                               ng-change="changeselectOrderDiagnosisitem(newSelectedDiagObj)" />
+                                    </td>
+                                </tr>
+                                <tr ng-if="addUpdatePatientOrderImageDetailsReq.DiagnosisList.length > 0">
+                                    <td colspan="2">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <table class="table tableno-padding tableno-bordered tableno-padding">
+                                                    <tbody>
+                                                        <tr ng-repeat="sitem in addUpdatePatientOrderImageDetailsReq.DiagnosisList | filter:{DeleteInd: 'N'} track by $index">
+                                                            <td class="text-s12w500c000">
+                                                                {{sitem.ICDCode}} |   {{sitem.DiagnosisName}}
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-link" style="color:red" ng-click="removedSelectedDiagnosis(sitem)">X</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="row">
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                    <label>Right Eye</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <input type="file" id="ImageMgmtOD" value="Upload"
+                                                           ngf-select="selectedEyeFiles($files,'OD');"
+                                                           name="Rfile"
+                                                           ngf-pattern="'image/*'"
+                                                           ngf-accept="'image/*'"
+                                                           multiple="multiple" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-consultation" image-viewer style="border:0px !important;">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td ng-repeat="titem in tempODImagesArray" style="width:20%;">
+                                                                        <img ngf-thumbnail="titem.file" class="img-thumbnail" style="height:50px !important;width:50px !important" />  <button class="btn btn-link p-l-5 p-r-5 m-l-3" style="top: -15px; right: 4px;" ng-click="removeImage(titem, 'OD')"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="row">
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                    <label>Left Eye</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <input type="file" id="ImageMgmtOS" value="Upload"
+                                                           ngf-select="selectedEyeFiles($files,'OS');"
+                                                           name="Lfile"
+                                                           ngf-pattern="'image/*'"
+                                                           ngf-accept="'image/*'"
+                                                           multiple="multiple" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-consultation" image-viewer style="border:0px !important;">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td ng-repeat="titem in tempOSImagesArray" style="width:20%;">
+                                                                        <img ngf-thumbnail="titem.file" class="img-thumbnail" style="height:50px !important;width:50px !important" /> <button class="btn btn-link p-l-5 p-r-5 m-l-3 " style="top:-15px; right: 4px;" ng-click="removeImage(titem, 'OS')"><i class="fas fa-times-circle text-danger fa-lg"></i></button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="modal-footer">
+    <div class="row">
+        <div class="col-lg-12 text-right">
+            <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="clearImagePopup()">Clear</button>
+            <button type="button" class="etn btn-ehnote p-l-25 p-r-25" ng-click="SavePatientOrderDetails()">Save</button>
+        </div>
+    </div>
+</div>
+

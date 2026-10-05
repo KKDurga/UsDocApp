@@ -1,0 +1,1392 @@
+﻿<div class="row p-l-15 p-r-15 p-t-10 p-b-5">
+    <div class="col-lg-12">
+        <div class="dis-flex align-items-center justify-space-between">
+            <div>
+                <!--<h1 class="text-ocularhist">Advisor</h1>-->
+                <h1 class="font-weight-700 text-1d5558 fs-20 m-0">Orders</h1>
+            </div>
+            <div class="search-panel-input width-50" ng-show="ShowTab =='Order'">
+                <input type="text"
+                       maxlength="100"
+                       ng-model="adviseObj.SearchProcedureObj"
+                       placeholder="Select Orders"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                       typeahead-on-select="OnClickAdvisedProcedure(adviseObj.SearchProcedureObj)"
+                       ng-focus="ProcedureListFocus===true"
+                       ng-blur="ChangeAdvisedOrders()"
+                       ng-model-options="{ debounce: 500 }" />
+            </div>
+            <div class="search-panel-input width-50" ng-show="ShowTab =='Referral'">
+                <input type="text"
+                       maxlength="100"
+                       ng-model="adviseObj.SearchReferalObj"
+                       placeholder="Select Referal"
+                       typeahead-min-length="0"
+                       typeahead-focus-on-select="false"
+                       uib-typeahead="item as item.Referral for item in GetReferralMasterData($viewValue)"
+                       typeahead-on-select="OnClickAdvisedReferal(adviseObj.SearchReferalObj)"
+                       ng-focus="ProcedureListFocus===true"
+                       ng-blur="ChangeAdvisedOrders()" />
+            </div>
+            <div class="width-20">
+                <div class="form-group grid-gap-5 dis-flex">
+                    <button class="form-outline" ng-click="Costestimatedpopup()">Cost Estimated</button>
+                    <button class="form-outline" ng-click="Patienteducationpopup()">Patient Education</button>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-block btn-appt-color height-30" ng-click="ChangeAllOrdersTab('Referral');" ng-show="ShowTab =='Order'">Referral</button>
+                <button class="btn btn-block btn-ehnote-outline height-30" ng-click="ChangeAllOrdersTab('Order');" ng-show="ShowTab =='Referral'">Orders</button>
+            </div>
+            <div class="dis-flex align-items-center">
+                <ul class="us-controls">
+                    <li>
+                        <button class="btn btn-discard-us m-r-5" ng-click="closeuib()">Close</button>
+                    </li>
+                    <li>
+                        <button class="btn btn-save-us" ng-click="SaveAdvisorPopup()">Save</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="two-sections">
+            <div class="width-16 m-r-5">
+                <div class="dis-block width-100 overflow__auto--y border" style="height: calc(100vh - 47px)">
+                    <uib-accordion close-others="oneAtATime" class="assemntnav">
+                        <div uib-accordion-group class="panel-default" is-open="ContentButtonShowInvestigation">
+                            <uib-accordion-heading>
+                                Investigations
+                                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ContentButtonShowInvestigation, 'glyphicon-chevron-right': !ContentButtonShowInvestigation}"></i>
+                            </uib-accordion-heading>
+                            <ul class="templates-list-grid" ng-click="ChangeAdvisedOrder(Aitem)" ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.OrderTypeId==1">
+                                <li ng-class="Aitem.IsEditData ?'active':''">
+                                    <a href="javascript:;" class="width-100 over-hidden over-elipsis white-nowrap">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</a>
+
+                                    <i ng-click="DelectAdvicedOrder(Aitem, 'popup')">
+                                        <img src="img/close-red.svg" width="12" />
+                                    </i>
+                                </li>
+                            </ul>
+                        </div>
+                        <div uib-accordion-group class="panel-default" is-open="ContentButtonShowActiveSurgery">
+                            <uib-accordion-heading>
+                                Surgery
+                                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ContentButtonShowActiveSurgery, 'glyphicon-chevron-right': !ContentButtonShowActiveSurgery}"></i>
+                            </uib-accordion-heading>
+                            <ul class="templates-list-grid" ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.OrderTypeId==3" ng-click="ChangeAdvisedOrder(Aitem)">
+                                <li ng-class="Aitem.IsEditData ?'active':''">
+                                    <a href="javascript:;" class="width-100 over-hidden over-elipsis white-nowrap">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</a>
+                                    <i ng-click="DelectAdvicedOrder(Aitem, 'popup')">
+                                        <img src="img/close-red.svg" width="12" />
+                                    </i>
+                                </li>
+                            </ul>
+                        </div>
+                        <div uib-accordion-group class="panel-default" is-open="ContentButtonShowActiveProcedure">
+                            <uib-accordion-heading>
+                                Procedures
+                                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ContentButtonShowActiveProcedure, 'glyphicon-chevron-right': !ContentButtonShowActiveProcedure}"></i>
+                            </uib-accordion-heading>
+                            <ul class="templates-list-grid" ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show=" ContentButtonShowActiveProcedure && Aitem.OrderTypeId==2" ng-click="ChangeAdvisedOrder(Aitem)">
+                                <li ng-class="Aitem.IsEditData ?'active':''">
+                                    <a href="javascript:;" class="width-100 over-hidden over-elipsis white-nowrap">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</a>
+                                    <i ng-click="DelectAdvicedOrder(Aitem, 'popup')">
+                                        <img src="img/close-red.svg" width="12" />
+                                    </i>
+                                </li>
+                            </ul>
+                        </div>
+                        <div uib-accordion-group class="panel-default" is-open="ContentButtonShowActiveReferral">
+                            <uib-accordion-heading>
+                                Referral
+                                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': ContentButtonShowActiveReferral, 'glyphicon-chevron-right': !ContentButtonShowActiveReferral}"></i>
+                            </uib-accordion-heading>
+                            <ul class="templates-list-grid" ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show="ContentButtonShowActiveReferral && Aitem.OrderTypeId==4" ng-click="ChangeAdvisedOrder(Aitem)">
+                                <li ng-class="Aitem.IsEditData ?'active':''">
+                                    <a href="javascript:;" class="width-100 over-hidden over-elipsis white-nowrap">{{Aitem.Description}}</a>
+
+                                    <i ng-click="DelectAdvicedOrder(Aitem, 'popup')">
+                                        <img src="img/close-red.svg" width="12" />
+                                    </i>
+                                </li>
+                            </ul>
+                        </div>
+                    </uib-accordion>
+                </div>                
+            </div>
+            <div class="flex">
+                <!-- / -->
+                <div class="row" ng-hide="Referralobj.FinalObj =='Referral'">
+                    <div class="col-lg-12">
+                        <div class="overflow-x-hideen overflow__auto--y" style="height: calc(100vh - 70px)">
+                            <table class="table tableno-bordered m-0 table-layout-fix">
+                                <tbody class="b-0" ng-show="(AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' }).length>0">
+                                    <tr>
+                                        
+
+                                        <td class="valign-top">
+                                            
+                                            <!-- / -->
+                                            <div ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                                <!--<p class="text-s14w600c000 m-t-10">90912 DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</p>-->
+                                                <!-- / -->
+                                                <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6" ng-if="Aitem.OrderType =='Investigations' || Aitem.OrderType =='Procedure'">
+                                                    <span class="text-s12w600C1d5558 font-weight-700">{{Aitem.ProcedureCode}} | {{Aitem.Description}}</span>
+                                                    <div class="checkbox cn pull-right">
+                                                        <label>
+                                                            <input name="checkbox-1" type="checkbox" aria-invalid="false">
+                                                            <span class="checkbox-material">
+                                                                <span class="check"></span>
+                                                            </span>
+                                                            <small class="text-s12w700c000">Required Counseling</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="two-sections" ng-show="Referralobj.FinalObj =='Investigations'">
+                                                            <div class="ehr-input pop-ehr-input w-100">
+                                                                <label>Organ</label>
+                                                                <select class="form-outline" ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                                        ng-model="Aitem.OrganId">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input flex">
+                                                                <label>Select Modality</label>
+                                                                <select class="form-outline" ng-options="mitem.ModalityId as mitem.ModalityName for mitem in Modalities"
+                                                                        ng-model="Aitem.ModalityId" ng-change="ChangeModalities(Aitem,Aitem.ModalityId)">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-220" ng-show="!Aitem.ShowDateFormat">
+                                                                <label>Schedule</label>
+                                                                <div class="ehr-input-group">
+                                                                    <input type="text" class="form-outline" ng-model="Aitem.Duration" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4" ng-disabled="Aitem.DurationType === 'SD' || Aitem.DurationType === 'NV' || Aitem.DurationType === 'T'|| Aitem.DurationType === 'ASAP'">
+                                                                    <select class="form-outline" ng-model="Aitem.DurationType" ng-change="ChangeDurationType(Aitem)">
+                                                                        <option value="">Select</option>
+                                                                        <option value="D">Days</option>
+                                                                        <option value="W">Weeks</option>
+                                                                        <option value="M">Months</option>
+                                                                        <option value="Y">Years</option>
+                                                                        <option value="SD">Same Day</option>
+                                                                        <option value="NV">Next visit</option>
+                                                                        <option value="T">Tomorrow</option>
+                                                                        <option value="ASAP">ASAP</option>
+                                                                    </select>
+                                                                    <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                    <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-150" ng-show="Aitem.ShowDateFormat">
+                                                                <label>Onset</label>
+                                                                <div class="ehr-input-group">
+                                                                    <input type="text" placeholder="MM-DD-YYYY" class="form-outline" ng-model="Aitem.DurationDate" datepickeryearmonthchangeinforward readonly
+                                                                           ng-change="ChangeFormatDate(Aitem)" />
+                                                                    <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                    <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-120">
+                                                                <label>Status</label>
+                                                                <select class="form-outline" ng-options="pitem.StatusId as pitem.Status for pitem in GetProcedureStatusList"
+                                                                        ng-model="Aitem.StatusId"
+                                                                        ng-change="ChangeProcedureStatus(Aitem);">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
+                                                            <!--<div class="pop-ehr-input w-120 m-t-20" ng-if="Aitem.OrderType =='Investigations' || Aitem.OrderType =='Procedure'">
+                                                                <button ng-click="AddResult(Aitem)" class="form-outline">Add Result</button>
+                                                            </div>-->
+                                                        </div>
+                                                        <div class="" ng-show="Referralobj.FinalObj =='Surgery'">
+                                                            <div class="dis-flex flex grid-gap-5">
+                                                                <div class="ehr-input pop-ehr-input w-100">
+                                                                    <label>Organ</label>
+                                                                    <select class="form-outline" ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                                            ng-model="Aitem.OrganId">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input flex">
+                                                                    <label>Coordinator</label>
+                                                                    <select class="form-outline" ng-options="Citem.DoctorID as Citem.FullName for Citem in AllCoordinatorList"
+                                                                            ng-model="Aitem.CoordinatorId">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input flex">
+                                                                    <label>External Co-Manager</label>
+                                                                    <select class="form-outline" ng-options="Citem.DoctorID as Citem.FullName for Citem in AllExternalCoordinatorList"
+                                                                            ng-model="Aitem.ExternalCoManagerId">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dis-flex grid-gap-5">
+                                                                <div class="ehr-input pop-ehr-input flex">
+                                                                    <label>Internal Co-Manager</label>
+                                                                    <select class="form-outline" ng-options="Citem.DoctorID as Citem.FullName for Citem in AllInternalCoordinatorList"
+                                                                            ng-model="Aitem.InternalCoManagerId">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input w-250" ng-show="!Aitem.ShowDateFormat">
+                                                                    <label>Schedule</label>
+                                                                    <div class="ehr-input-group">
+                                                                        <input type="text" ng-model="Aitem.Duration" class="form-outline" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4" ng-disabled="Aitem.DurationType === 'SD' || Aitem.DurationType === 'NV' || Aitem.DurationType === 'T'|| Aitem.DurationType === 'ASAP'">
+                                                                        <select class="form-outline" ng-model="Aitem.DurationType" ng-change="ChangeDurationType(Aitem)">
+                                                                            <option value="">Select</option>
+                                                                            <option value="D">Days</option>
+                                                                            <option value="W">Weeks</option>
+                                                                            <option value="M">Months</option>
+                                                                            <option value="Y">Years</option>
+                                                                            <option value="SD">Same Day</option>
+                                                                            <option value="NV">Next visit</option>
+                                                                            <option value="T">Tomorrow</option>
+                                                                            <option value="ASAP">ASAP</option>
+                                                                        </select>
+                                                                        <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                        <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input w-250" ng-show="Aitem.ShowDateFormat">
+                                                                    <label>Onset</label>
+                                                                    <div class="ehr-input-group">
+                                                                        <input type="text" placeholder="MM-DD-YYYY" class="form-outline" ng-model="Aitem.DurationDate" datepickeryearmonthchangeinforward readonly
+                                                                               ng-change="ChangeFormatDate(Aitem)" />
+                                                                        <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                        <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input w-150">
+                                                                    <label>Status</label>
+                                                                    <select class="form-outline" ng-options="pitem.StatusId as pitem.Status for pitem in GetProcedureStatusList"
+                                                                            ng-model="Aitem.StatusId"
+                                                                            ng-change="ChangeProcedureStatus(Aitem);">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="two-sections" ng-show="Referralobj.FinalObj =='Procedure'">
+                                                            <div class="ehr-input pop-ehr-input w-100">
+                                                                <label>Organ</label>
+                                                                <select class="form-outline" ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                                        ng-model="Aitem.OrganId">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-300" ng-show="!Aitem.ShowDateFormat">
+                                                                <label>Schedule</label>
+                                                                <div class="ehr-input-group">
+                                                                    <input class="form-outline" type="text" ng-model="Aitem.Duration" placeholder="0" ng-change="ChangeDuration(Aitem)" valid-number maxlength="4" ng-disabled="Aitem.DurationType === 'SD' || Aitem.DurationType === 'NV' || Aitem.DurationType === 'T'|| Aitem.DurationType === 'ASAP'">
+                                                                    <select class="form-outline" ng-model="Aitem.DurationType" ng-change="ChangeDurationType(Aitem)">
+                                                                        <option value="">Select</option>
+                                                                        <option value="D">Days</option>
+                                                                        <option value="W">Weeks</option>
+                                                                        <option value="M">Months</option>
+                                                                        <option value="Y">Years</option>
+                                                                        <option value="SD">Same Day</option>
+                                                                        <option value="NV">Next visit</option>
+                                                                        <option value="T">Tomorrow</option>
+                                                                        <option value="ASAP">ASAP</option>
+                                                                    </select>
+                                                                    <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                    <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-300" ng-show="Aitem.ShowDateFormat">
+                                                                <label>Onset</label>
+                                                                <div class="ehr-input-group">
+                                                                    <input class="form-outline" type="text" placeholder="MM-DD-YYYY" ng-model="Aitem.DurationDate" datepickeryearmonthchangeinforward readonly
+                                                                           ng-change="ChangeFormatDate(Aitem)" />
+                                                                    <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                    <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeItem(Aitem)"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="ehr-input pop-ehr-input w-150">
+                                                                <label>Status</label>
+                                                                <select class="form-outline" ng-options="pitem.StatusId as pitem.Status for pitem in GetProcedureStatusList"
+                                                                        ng-model="Aitem.StatusId"
+                                                                        ng-change="ChangeProcedureStatus(Aitem);">
+                                                                    <option value="">Select</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row m-t-10">
+                                                    <div class="col-lg-12">
+                                                        <div class="panel-accordion">
+                                                            <div class="panel-body p-5">
+                                                                <textarea rows="4" placeholder="Enter Text Here" ng-model="Aitem.Remarks" maxlength="1000" class="border-none width-100" aria-invalid="false" style="" spellcheck="false"></textarea>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6">
+                                                            <span class="text-s12w600C1d5558 font-weight-700 fs-14">Coordinator</span>
+                                                            <div class="pull-right">
+                                                                <ul class="flex-flow-ulli-mb0">
+                                                                    <li>
+                                                                        <select class="form-outline b-0">
+                                                                            <option>Accepted</option>
+                                                                        </select>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="form-outline b-0">Book Appointment</button>
+                                                                    </li>
+                                                                </ul>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label>Co-ordinater Notes</label>
+                                                            <textarea rows="4" placeholder="Enter Text Here" maxlength="1000" class="form-outline width-100"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                               
+                                               <div class="row">
+                                                   <div class="col-lg-12">
+                                                       <table class="table tableno-bordered m-b-0 tableno-padding">
+                                                           <tbody>
+                                                               <tr>
+                                                                   <td colspan="3">
+                                                                       <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6">
+                                                                           <span class="text-s12w600C1d5558 font-weight-700 fs-14">Appointment Booking</span>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Pre-Admission</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar  text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Date Of Surgery</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Post 1 Day</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Post 1 Month</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Post 1 Year</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td></td>
+                                                               </tr>
+                                                           </tbody>
+                                                           <tbody class="b-0">
+                                                               <tr>
+                                                                   <td colspan="3">
+                                                                       <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6">
+                                                                           <span class="text-s12w600C1d5558 font-weight-700 fs-14">Surgery Staff</span>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Doctor</label>
+                                                                           <select class="form-outline">
+                                                                               <option>select</option>
+                                                                           </select>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Additional Doctor</label>
+                                                                           <select class="form-outline">
+                                                                               <option>select</option>
+                                                                           </select>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Nurse</label>
+                                                                           <select class="form-outline">
+                                                                               <option>select</option>
+                                                                           </select>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Anesthetist</label>
+                                                                           <select class="form-outline">
+                                                                               <option>select</option>
+                                                                           </select>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td></td>
+                                                                   <td></td>
+                                                               </tr>
+                                                           </tbody>
+                                                           <tbody class="b-0">
+                                                               <tr>
+                                                                   <td colspan="3">
+                                                                       <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6">
+                                                                           <span class="text-s12w600C1d5558 font-weight-700 fs-14">Follow up</span>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td>
+                                                                       <div class="ehr-input pop-ehr-input">
+                                                                           <label class="text-black">Follow-Up Date</label>
+                                                                           <div class="ehr-input-group">
+                                                                               <input type="text" class="form-outline" placeholder="MM-DD-YYYY">
+                                                                               <button class="bg-E3F1EE"><i class="far fa-calendar  text-1d5558"></i></button>
+                                                                           </div>
+                                                                       </div>
+                                                                   </td>
+                                                                   <td>
+                                                                      
+                                                                   </td>
+                                                                   <td>
+                                                                       
+                                                                   </td>
+                                                               </tr>
+                                                               <tr>
+                                                                   <td colspan="3">
+                                                                       <div class="form-group">
+                                                                           <textarea rows="4" placeholder="Enter Text Here" maxlength="1000" class="form-outline width-100" spellcheck="false"></textarea>
+                                                                       </div>
+                                                                   </td>
+                                                               </tr>
+                                                           </tbody>
+                                                       </table>
+                                                   </div>
+                                                   <div class="col-lg-12">
+                                                       <div class="col-lg-6 p-l-0">
+                                                           <div class="ehr-input pop-ehr-input">
+                                                               <label>Remarks</label>
+                                                               <select class="form-outline">
+                                                                   <option>select</option>
+                                                               </select>
+                                                           </div>
+                                                                 
+                                                       </div>
+                                                       <div class="col-lg-6 p-r-0">
+                                                           <div class="ehr-input pop-ehr-input">
+                                                            <label>Reviewd by</label>
+                                                            <select class="form-outline">
+                                                                <option>select</option>
+                                                            </select>
+                                                        </div>
+                                                       </div>
+                                                   </div>
+                                               </div>
+
+                                                <div class="two-sections" ng-if="(Aitem.InterpretationNotes != '' && Aitem.InterpretationNotes != null) || (Aitem.ResultDate !='' && Aitem.ResultDate !=null) || (Aitem.ResultAddedBy !='' && Aitem.ResultAddedBy !=null) || (Aitem.ResultLocation !='' && Aitem.ResultLocation !=null)">
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th><h4>Interpretation: </h4></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Date:</th>
+                                                                <th>Doctor:</th>
+                                                                <th>Location:</th>
+                                                                <th>Notes:</th>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding-right: 2ch;">{{Aitem.ResultDate | date:'MM-dd-yyyy'}}</td>
+                                                                <td style="padding-right: 2ch;">{{Aitem.ResultAddedBy}}</td>
+                                                                <td>
+                                                                    <label>Name:</label>
+                                                                    <span ng-if="Aitem.ResultLocation !=''||Aitem.ResultLocation !=null">{{Aitem.ResultLocation}}, </span>
+                                                                    <label>Address:</label>
+                                                                    <span>
+                                                                        <span ng-if="Aitem.PhysicalAddress1 !='' || Aitem.PhysicalAddress1 !=null">{{Aitem.PhysicalAddress1}},</span>
+                                                                        <span ng-if="Aitem.PhysicalAddress2 !='' || Aitem.PhysicalAddress2 !=null">{{Aitem.PhysicalAddress2}},</span>
+                                                                        <span ng-if="Aitem.PhysicalCityName !='' || Aitem.PhysicalCityName !=null">{{Aitem.PhysicalCityName}},</span>
+                                                                        <span ng-if="Aitem.PhysicalStateName !='' || Aitem.PhysicalStateName !=null">{{Aitem.PhysicalStateName}},</span>
+                                                                        <span ng-if="Aitem.PhysicalZipCode !='' || Aitem.PhysicalZipCode !=null">{{Aitem.PhysicalZipCode}},</span>
+                                                                    </span>
+                                                                    <span ng-if="Aitem.ContactMobileNumber !='' || Aitem.ContactMobileNumber !=null"><label>Phone:</label>{{Aitem.ContactMobileNumber}}</span>
+                                                                </td>
+                                                                <td style="padding-right: 2ch;">{{Aitem.InterpretationNotes}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="dilation-custom-popup bg-e9e9e9" ng-show="Referralobj.IsAddResult">
+                                                    <div class="eh-header b-0">
+                                                        <h1>Add Result</h1>
+                                                        <ul class="us-controls">
+                                                            <li>
+                                                                <a href="javascript:;">
+                                                                    <i ng-click="CloseResult()">
+                                                                        <img src="img/close-red.svg" width="10" />
+                                                                    </i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="two-sections">
+                                                                <div class="ehr-input pop-ehr-input w-150">
+                                                                    <label>Result Date</label>
+                                                                    <div class="ehr-input-group">
+                                                                        <input ng-focus="IsCalenderOpen" type="text" placeholder="MM-DD-YYYY" ng-model="ResultObj.DurationDate" datepickeruniversal readonly />
+                                                                        <button ng-click="Focustocalender()"><i class="far fa-calendar-alt fa-lg"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input w-180">
+                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                        <label class="text-appt">Result Added By</label>
+                                                                        <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{ResultObj.DoctorsName}}">
+                                                                            <span ng-if="ResultObj.DoctorsName !='' && ResultObj.DoctorsName !=null">{{ResultObj.DoctorsName}}</span>
+                                                                            <span ng-if="ResultObj.DoctorsName =='' || ResultObj.DoctorsName==null">Select Doctor</span>
+                                                                        </button>
+                                                                        <div class="dropdown-menu dr-drop-app right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                            <div class="p-5">
+                                                                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                                                            </div>
+                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                <ul>
+                                                                                    <li ng-repeat="item in MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtb.txt1}">
+                                                                                        <div class="checkbox cn">
+                                                                                            <label>
+                                                                                                <input name="checkbox-11" type="checkbox" ng-click="SelectUserName(item);">
+                                                                                                <small ng-bind="item.UserFullName + '-' + item.NPI"></small>
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ehr-input pop-ehr-input flex">
+                                                                    <label>Select Location</label>
+                                                                    <select ng-options="item.FacilityName as item.FacilityName for item in LocationList"
+                                                                            ng-model="ResultObj.LocationName" ng-change="ChangeLocation(ResultObj.LocationName)">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row m-t-10">
+                                                        <div class="ehr-input pop-ehr-input col-lg-12">
+                                                            <ul class="input-select-onset">
+                                                                <li colspan="3" class="bg-white">
+                                                                    <textarea class="msd-elastic: \n; ros-notes" placeholder="Enter Notes" ng-model="ResultObj.Notes" maxlength="500"></textarea>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group dis-flex">
+                                                        <ul class="us-controls">
+                                                            <li>
+                                                                <button class="btn btn-warning flex  m-l-5 ng-binding" ng-click="ClearResult()">Clear</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="btn btn-success flex  m-l-5 ng-binding" ng-click="AddUpdateResult(Aitem)">Save</button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <!-- / -->
+                                        </td>
+
+                                        <td class="valign-top" width="40%">
+                                            <section class="section-eh tile-default b-0" ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-show="Aitem.IsEditData==true">
+                                                <div class="col-lg-12 b-0 p-10 bg-fafafa">
+                                                   <div class="ehr-tabs">
+                                                       <ul>
+                                                           <li ng-class="Aitem.Subtab =='1'?'active':''">
+                                                               <a ng-click="Aitem.Subtab ='1'">Diagnosis</a>
+                                                           </li>
+                                                           <li ng-class="Aitem.Subtab =='2'?'active':''">
+                                                               <a ng-click="Aitem.Subtab ='2'">Consents</a>
+                                                           </li>
+                                                       </ul>
+                                                       <ul class="pos-absolute right-15 top-15 grid-gap-15">
+                                                           <buttton class="btn btn-primary" role="button" tabindex="0">
+                                                               Create a Template
+                                                           </buttton>
+                                                       </ul>
+                                                       <div  class="tab-content b-0">
+                                                           <div class="" ng-show="Aitem.Subtab =='1'">
+                                                               <div class="section-eh-body bg-f2f2f2 overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 125px)">
+                                                                   <div class="row">
+                                                                       <div class="col-lg-12 p-l-0 p-r-0">
+                                                                           <div class="search-panel-input adviced-dropdown">
+                                                                               <input type="text" class="form-outline icons-search p-10"
+                                                                                      name="Diagnosise"
+                                                                                      placeholder="Search Diagnosis"
+                                                                                      ng-model="adviseObj.DiagnosisObject"
+                                                                                      maxlength="100"
+                                                                                      typeahead-min-length="0"
+                                                                                      typeahead-focus-on-select="false"
+                                                                                      uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                                                      typeahead-on-select="onSelectAssesmentPlannewDiagnosis(adviseObj.DiagnosisObject, Aitem)"
+                                                                                      ng-blur="changefocusOption();" />
+                                                                           </div>
+                                                                       </div>
+                                                                   </div>
+                                                                   <div class="row">
+                                                                       <div class="col-lg-12 p-l-0 p-r-0">
+                                                                           <section class="tile tile-shadow">
+                                                                               <div class="tile-body">
+                                                                                   <ul class="list-unstyled m-t-4 m-b-4  overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 300px)">
+                                                                                       <li ng-repeat="item in Aitem.DiagnosisList track by $index">
+                                                                                           <label class="cur-poiter">
+                                                                                               <input type="checkbox" id="1" value="Diagnosis" class="checkbox" ng-model="item.Diagnosis">
+                                                                                               <span class="lbl"></span>
+                                                                                               <!--<span class="text-right text-s12w600C000">DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</span>-->
+                                                                                               <span class="text-right text-s12w600C000">{{item.ICDCode}} | {{item.DiagnosisName}}</span>
+                                                                                           </label>
+                                                                                       </li>
+                                                                                   </ul>
+                                                                               </div>
+                                                                           </section>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </div>
+                                                           <div ng-show="Aitem.Subtab =='2'">
+                                                               <section class="eh-panel m-b-10">
+                                                                   <div class="eh-body">
+                                                                       <table class="table tableno-bordered m-b-0 tableno-padding">
+                                                                           <tbody>
+                                                                               <tr>
+                                                                                   <td colspan="2" class="font-weight-700 fs-16">Guardian</td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <span class="text-3ebaab">Complete</span>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1" ng-repeat="i in [1,2,3,4,5,6]">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                           </tbody>
+                                                                       </table>
+                                                                   </div>
+                                                               </section>
+                                                               <section class="eh-panel m-b-10">
+                                                                   <div class="eh-body">
+                                                                       <table class="table tableno-bordered m-b-0 tableno-padding">
+                                                                           <tbody>
+                                                                               <tr>
+                                                                                   <td colspan="2" class="font-weight-700 fs-14">Patient</td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <span class="text-3ebaab">Complete</span>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1" ng-repeat="i in [1,2,3]">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                           </tbody>
+                                                                       </table>
+                                                                   </div>
+                                                               </section>
+                                                               <section class="eh-panel">
+                                                                   <div class="eh-body">
+                                                                       <table class="table tableno-bordered m-b-0 tableno-padding">
+                                                                           <tbody>
+                                                                               <tr>
+                                                                                   <td colspan="2" class="font-weight-700 fs-14">Care Provider</td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <span class="text-3ebaab">Complete</span>
+                                                                                   </td>
+                                                                               </tr>
+                                                                               <tr class="border-bottom-1" ng-repeat="i in [1,2]">
+                                                                                   <td>
+                                                                                       <div class="checkbox cn">
+                                                                                           <label>
+                                                                                               <input name="checkbox-1" type="checkbox">
+                                                                                               <span class="checkbox-material">
+                                                                                                   <span class="check"></span>
+                                                                                               </span>
+                                                                                               <small class="text-s12w500c000 m-l-5">
+                                                                                                   Co-Management consent & transfer of care form
+                                                                                               </small>
+                                                                                           </label>
+                                                                                       </div>
+                                                                                   </td>
+                                                                                   <td class="text-right">
+                                                                                       <button class="btn btn-orders-save">Action</button>
+                                                                                   </td>
+                                                                               </tr>
+                                                                           </tbody>
+                                                                       </table>
+                                                                   </div>
+                                                               </section>   
+                                                           </div>
+                                                       </div>
+                                                   </div>
+                                                </div>
+                                                
+                                            </section>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                                <tbody ng-show="(AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' }).length==0">
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-12 text-center bg-white">
+                                                    <div class="billing-cominsoon m-20">
+                                                        <img src="img/no-data/no-data-icon.png">
+                                                        <div class="msg m-t-20">
+                                                            <p class="nodata-text">Oops!!</p>
+                                                            <p class="nodata-txt-line2">
+                                                                No Adviced Orders added. <a href="javascript:;" ng-click="ProcedureListFocus = true">Click here</a> or on search box to add Adviced Orders.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- / -->
+                <!-- Referral -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="overflow-x-hideen overflow__auto--y m-r-8" style="height: calc(100vh - 70px)">
+                            <table class="table tableno-bordered m-0 table-layout-fix">
+                                <tbody class="b-0">
+                                    <tr>
+                                         
+                                        <td class="valign-top">
+                                            <table class="table tableno-bordered m-0 table-layout-fix" ng-show="Referralobj.FinalObj == 'Referral'">
+                                                <tbody ng-repeat="Aitem in AdvisedOrderDetailsArray| filter: { DeleteInd: 'N' } track by $index" ng-if="Aitem.IsEditData==true">
+                                                    <tr ng-if="Aitem.ReferralId!=14">
+                                                        <td colspan="2">
+                                                            <div class="bg-E3F1EE p-6 bradius-8 overflow-hidden m-b-6">
+                                                                <span class="text-s12w500c000 font-weight-700">Referral: </span>
+                                                                <span class="text-s12w600C1d5558 font-weight-700">{{Aitem.Referral}}<span ng-hide="Aitem.ReferralDoctorName ==''">,</span>{{Aitem.ReferralDoctorName}}</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-if="Aitem.ReferralId!=14">
+                                                        <td class="valign-top" colspan="2">
+                                                            <table class="table tableno-bordered m-b-0 tableno-padding">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <fieldset>
+                                                                                <div class="dis-inline-block">
+                                                                                    <span class="text-odosou text-s20w500c000">Referral</span>
+                                                                                </div>
+                                                                                <div class="dis-inline-block">
+                                                                                    <input type="radio" class="radio-custom width-0" id="Int" value="Internal" ng-model="Referralobj.Type" ng-change="ChangeReferaltype(Referralobj, Aitem);">
+                                                                                    <label for="Int" title="Internal Doctor" class="radio-custom-label cur-poiter mb-0 text-black">Internal</label>
+                                                                                </div>
+                                                                                <div class="dis-inline-block">
+                                                                                    <input type="radio" class="radio-custom width-0" id="Ext" value="External" ng-model="Referralobj.Type" ng-change="ChangeReferaltype(Referralobj, Aitem);">
+                                                                                    <label for="Ext" title="External Doctor" class="radio-custom-label cur-poiter mb-0 text-black">External</label>
+                                                                                </div>
+                                                                            </fieldset>
+                                                                        </td>
+                                                                        <td  ng-show="Referralobj.Type =='External'">
+                                                                            <div class="ehr-input pop-ehr-input">
+                                                                                <select class="form-outline" ng-model="Referralobj.SpecializationObj"
+                                                                                        ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                                                        ng-change="changereferalSpecialization(Referralobj.SpecializationObj);">
+                                                                                    <option value="">Select Specialization</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="ehr-input pop-ehr-input" ng-show="Referralobj.Type =='External' && SelectSpecializationObj == true">
+                                                                                <select class="form-outline" ng-model="Referralobj.SubSpecializationObj"
+                                                                                        ng-options="Oitem as Oitem.SubSpecializationName for Oitem in allSubSpecializationsArray"
+                                                                                        ng-change="changereferalSubSpecialization(Referralobj.SubSpecializationObj);">
+                                                                                    <option value="">Select SubSpeciality</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="form-group" ng-show="Referralobj.Type =='External'">
+                                                                                <input type="text" class="form-outline icons-search"
+                                                                                       autocomplete="off"
+                                                                                       ng-model="Referralobj.referralDoctorObj"
+                                                                                       placeholder="Select External Doctor Name"
+                                                                                       typeahead-min-length="0"
+                                                                                       typeahead-focus-on-select="false"
+                                                                                       typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,Aitem)"
+                                                                                       uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchPCPDOClist($viewValue)"
+                                                                                       ng-change="changeReferalDoctor(Referralobj.referralDoctorObj, )" />
+                                                                            </div>
+                                                                            <div class="form-group" ng-show="Referralobj.Type =='Internal'">
+                                                                                <input type="text" class="form-outline icons-search"
+                                                                                       autocomplete="off"
+                                                                                       ng-model="Referralobj.referralDoctorObj"
+                                                                                       placeholder="Select Internal Doctor Name"
+                                                                                       typeahead-min-length="0"
+                                                                                       typeahead-focus-on-select="false"
+                                                                                       typeahead-on-select="OnSelectReferalDoctor(Referralobj.referralDoctorObj,Aitem)"
+                                                                                       uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchInternalDOClist($viewValue)"
+                                                                                       ng-change="changeReferalDoctor(Referralobj.referralDoctorObj)" />
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div ng-show="Referralobj.Type =='External'" ng-model="Referralobj.IsnewProvider" ng-click="ChangeProvider(Referralobj.IsnewProvider)">
+                                                                                <button class="btn btn-link text-info fs-14">+ Add Provider</button>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>                                                            
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr ng-if="Aitem.ReferralId==14">
+                                                        <td colspan="2">
+                                                            <span class="text-s12w500c000">Hospital : </span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-if="Aitem.ReferralId==14">
+                                                        <td colspan="2" class="valign-top">
+                                                            <div class="p-5 dis-flex align-items-center justify-space-between">
+                                                                <div class="dis-flex align-items-center flex">
+                                                                    <div class="width-100">
+                                                                        <div class="form-group">
+                                                                            <input type="text" class="form-outline w-400 icons-search"
+                                                                                   autocomplete="off"
+                                                                                   ng-model="Referralobj.referralDoctorObj"
+                                                                                   placeholder="Search Hospital Name"
+                                                                                   typeahead-min-length="0"
+                                                                                   typeahead-focus-on-select="false"
+                                                                                   typeahead-on-select="OnSelectReferalHospital(Referralobj.referralDoctorObj,Aitem)"
+                                                                                   uib-typeahead="Ritem as Ritem.FullName for Ritem in SearchPCPDOClist($viewValue,4,Aitem)"
+                                                                                   ng-change="changeReferalDoctor(Referralobj.referralDoctorOb)" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-if="Aitem.ReferralId!=14">
+                                                        <td colspan="2">
+                                                            <div class="row" ng-show="Referralobj.IsnewProvider == true">
+                                                                <div class="col-lg-12">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table tableno-bordered m-b-0">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Select Suffix</label>
+                                                                                            <select class="form-admission" ng-model="PCPObj.SuffixId"
+                                                                                                    ng-options="pitem.Id as pitem.Name for pitem in SuffixList"
+                                                                                                    ng-change="changeSuffix(PCPObj.SuffixId);">
+                                                                                                <option value="">Select Suffix</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>First Name <em>*</em></label>
+                                                                                            <input type="text" class="form-admission " ng-model="PCPObj.FirstName" placeholder="First Name" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Last Name</label>
+                                                                                            <input type="text" class="form-admission" ng-model="PCPObj.LastName" placeholder="Last Name" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Gender <em>*</em></label>
+                                                                                            <select class="form-admission height-25 select-dropdown" ng-model="PCPObj.Gender">
+                                                                                                <option value="">Gender</option>
+                                                                                                <option value="Male">Male</option>
+                                                                                                <option value="Female">Female</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Mobile <em>*</em></label>
+                                                                                            <input type="text" class="form-admission" numeric-duration maxlength="14" ng-model="PCPObj.MobileNo" placeholder="Mobile No" ng-change="changePhNumber(PCPObj.MobileNo)" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Email <em>*</em></label>
+                                                                                            <input type="email" name="EmailID" class="form-admission" placeholder="Email Id" ng-model="PCPObj.EmailId" required ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/" />
+                                                                                            <div class="RequiredErrCls" ng-show="ReferalForm.EmailID.$error.required && ReferalForm.$submitted"><span>Enter Email </span></div>
+                                                                                            <div class="RequiredErrCls" ng-show="ReferalForm.EmailID.$error.email && ReferalForm.$submitted"><span>Enter valid Email </span></div>
+
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>NPI <em>*</em></label>
+                                                                                            <input type="text" class="form-admission" maxlength="15" ng-model="PCPObj.NPI" placeholder="NPI" numbers-only />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <!--<td>
+                                                    <div class="form-group">
+                                                        <label>SSN</label>
+                                                        <input type="text" class="form-admission" maxlength="10" ng-model="PCPObj.SSN" placeholder="SSN" />
+                                                    </div>
+                                                </td>-->
+
+
+                                                                                </tr>
+                                                                                <tr>
+
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Orginaction Name</label>
+                                                                                            <input type="text" class="form-admission" placeholder="Organization Name" ng-model="PCPObj.PcpOrganizationName" />
+
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Specialization</label>
+                                                                                            <select class="form-control" name="speciality" ng-model="PCPObj.SpecializationObj" ng-options="Oitem.SpecializationId as Oitem.SpecializationName for Oitem in OrgSpecialitiesArray"
+                                                                                                    ng-change="ChangeSpecialization(SpecializationObj);">
+                                                                                                <option value="">Select Specialization</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Sub Specialization</label>
+                                                                                            <select class="form-control" name="Subspeciality" ng-model="PCPObj.SubSpecializationObj" ng-click="ChangeSubspecialization(SubSpecializationObj)"
+                                                                                                    ng-options="value as value.SubSpecializationName for value in allSubSpecializationsArray" required>
+                                                                                                <option class="text-success" value="">select SubSpecializations</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                    </td>
+
+
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td colspan="2">
+                                                                                        <div class="form-group">
+                                                                                            <label>Address1</label>
+                                                                                            <input type="text" class="form-admission" ng-model="PCPObj.Address1" placeholder="Address Line 1" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td colspan="2">
+                                                                                        <div class="form-group">
+                                                                                            <label>Address2</label>
+                                                                                            <input type="text" class="form-admission" ng-model="PCPObj.Address2" placeholder="Address Line 2" />
+                                                                                        </div>
+                                                                                    </td>
+
+
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Location</label>
+                                                                                            <input type="text" class="form-admission" ng-model="PCPObj.LocationName" placeholder="LocationName" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td class="">
+                                                                                        <div class="form-group">
+                                                                                            <label>City</label>
+                                                                                            <input type="text" class="form-admission " ng-model="PCPObj.CityName" placeholder="City" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>State</label>
+                                                                                            <input type="text" class="form-admission" ng-model="PCPObj.StateName" placeholder="State" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="form-group">
+                                                                                            <label>Zipcode <em>*</em></label>
+                                                                                            <input type="text" name="" class="form-admission"
+                                                                                                   autocomplete="off"
+                                                                                                   ng-model="PCPObj.ZipCode"
+                                                                                                   placeholder="Enter ZipCode"
+                                                                                                   typeahead-min-length="0"
+                                                                                                   required
+                                                                                                   uib-typeahead="item as item.ZipCode for item in SearchLocationByZipcode($viewValue)"
+                                                                                                   typeahead-on-select="SearchZipcodebyCounty(PCPObj.ZipCode)"
+                                                                                                   ng-change="changeZipcodetoProcedure(item)" />
+                                                                                        </div>
+                                                                                    </td>
+
+
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td colspan="4">
+                                                                                        <div class="col-lg-12 text-right m-t-10">
+                                                                                            <div class="form-group">
+                                                                                                <button type="button" class="btn btn-save-us w-100" ng-click="AddReferalPCPDoctor()">Save</button>
+                                                                                                <button type="button" class="btn btn-danger w-100" ng-click="Referralobj.IsnewProvider = false">Close</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </td>
+
+
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="valign-top" colspan="2">
+                                                            <div class="valign-top" ng-show="Referralobj.FinalObj =='Referral' && Referralobj.IsnewProvider == false">
+                                                                <div class="dis-flex align-items-center justify-space-between">
+                                                                     
+                                                                    <div class="flex">
+                                                                        <ul class="input-select-onset">
+                                                                            <li class="w-200">
+                                                                                <div class="ehr-input pop-ehr-input">
+                                                                                    <label>Schedule</label>
+                                                                                    <div class="ehr-input-group" ng-show="!Aitem.ShowDateFormat">
+                                                                                        <input type="text" class="w-60 form-outline" ng-model="Aitem.Duration" placeholder="0" numbers-only ng-disabled="Aitem.DurationType === 'SD' || Aitem.DurationType === 'NV' || Aitem.DurationType === 'T'|| Aitem.DurationType === 'ASAP'">
+                                                                                        <select ng-model="Aitem.DurationType" ng-change="ChangeDurationType(Aitem)">
+                                                                                            <option value="">Select</option>
+                                                                                            <option value="D">Days</option>
+                                                                                            <option value="W">Weeks</option>
+                                                                                            <option value="M">Months</option>
+                                                                                            <option value="Y">Years</option>
+                                                                                            <option value="SD">Same Day</option>
+                                                                                            <option value="NV">Next visit</option>
+                                                                                            <option value="T">Tomorrow</option>
+                                                                                            <option value="ASAP">ASAP</option>
+                                                                                        </select>
+                                                                                        <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeReferalDateFormet(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                                        <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeReferalDateFormet(Aitem)"><i class="far fa-calendar-alt"></i></button>
+                                                                                    </div>
+                                                                                    <div class="ehr-input-group" ng-show="Aitem.ShowDateFormat">
+                                                                                        <input type="text" placeholder="MM-DD-YYYY" class="form-outline" ng-model="Aitem.DurationDate" datepickeryearmonthchangeinforward readonly
+                                                                                               ng-change="ChangeFormatDate(Aitem)" />
+                                                                                        <button ng-show="!Aitem.ShowDateFormat" ng-click="ChangeReferalDateFormet(Aitem)"><i class="far fa-keyboard"></i></button>
+                                                                                        <button ng-show="Aitem.ShowDateFormat" ng-click="ChangeReferalDateFormet(Aitem)"><i class="far fa-calendar-alt"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div>
+                                                                        <label class="cur-poiter">
+                                                                            <input type="checkbox" id="" class="checkbox" ng-model="Aitem.IsUrgency">
+                                                                            <span class="lbl"></span>
+                                                                            <span class="text-right text-s12w600C000">Urgent Referral</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="m-l-10">
+                                                                        <label class="cur-poiter">
+                                                                            <input type="checkbox" id="" class="checkbox" ng-model="Aitem.IsFollowUpAfterReferral">
+                                                                            <span class="lbl"></span>
+                                                                            <span class="text-right text-s12w600C000">Follow up after referral</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="flex m-l-15">
+                                                                        <!--<ul class="input-select-onset">
+                                        <li class="width-30">
+                                            <label>Alarm</label>
+                                        </li>
+                                        <li>
+                                            <input type="text" placeholder="" ng-model="Aitem.Alarm"
+                                                   class="form-control btr-radius bbr-radius height-25">
+                                        </li>
+                                    </ul>-->
+                                                                    </div>
+                                                                </div>
+                                                                <!-- / -->
+                                                                <!--<div class="bg-f1f1f1 bradius-5 p-5 m-b-10">
+                                <b class="text-odosou">
+                                    Midwestern Ophthomology
+                                </b>
+                                <span class="text-s12w600C000">
+                                    ,19389 N 59th Ave, Glendale, AZ 85308, ph. (623) 537-6000, Fax (626) 806-7210
+                                </span>
+                            </div>-->
+                                                                <!-- / -->
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="panel-accordion">
+                                                                            <div class="panel-body p-5">
+                                                                                <textarea rows="4" placeholder="Reason for referral" ng-model="Aitem.ReferralReason" maxlength="1000" class="border-none width-100 ng-pristine ng-valid ng-valid-maxlength ng-touched" aria-invalid="false" style="" spellcheck="false"></textarea>
+
+                                                                            </div>
+                                                                        </div>
+                                                                       
+                                                                    </div>
+                                                                </div>
+                                                                <!-- / -->
+                                                                <!--<div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="input-select-onset">
+                                        <li>
+                                            <textarea class="form-control bg-dbf6ff b-0" rows="5" ng-model="Aitem.Remarks" maxlength="500" placeholder="Notes"></textarea>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>-->
+                                                            </div>
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                        <td class="valign-top" width="30%" ng-show="Referralobj.FinalObj =='Referral' && Referralobj.IsnewProvider == false">
+                                            <section class="eh-panel overflow-visible">
+                                                <div class="eh-header p-10 bg-fafafa">
+                                                    <h1>Diagnosis</h1>
+                                                </div>
+                                                <div class="section-eh-body bg-f2f2f2 overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 130px)">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-outline icons-search"
+                                                                       name="Diagnosise"
+                                                                       placeholder="Search Diagnosis"
+                                                                       ng-model="Aitem.DiagnosisObject"
+                                                                       maxlength="100"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-focus-on-select="false"
+                                                                       uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                                                       typeahead-on-select="onSelectAssesmentPlannewDiagnosis1(Aitem.DiagnosisObject, Aitem)"
+                                                                       ng-blur="changefocusOption();" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <ul class="list-unstyled m-t-10">
+                                                                <li ng-repeat="item in Aitem.DiagnosisList track by $index" class="lh-2-5">
+                                                                    <label class="cur-poiter">
+                                                                        <input type="checkbox" id="1" value="Diagnosis" class="checkbox" ng-model="item.Diagnosis">
+                                                                        <span class="lbl"></span>
+                                                                        <!--<span class="text-right text-s12w600C000">DIFTRIFOCAL | Componente MD Sx Trifocal Lens DIF PanOptix</span>-->
+                                                                        <span class="text-right text-s12w600C000">{{item.ICDCode}} | {{item.DiagnosisName}}</span>
+                                                                    </label>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+
+
+
+
+
+
+
+ 

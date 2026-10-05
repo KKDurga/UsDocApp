@@ -1,0 +1,657 @@
+﻿<div ng-class="(ConsultationActiveId === '#ConsultationScroll5')?'eh-examinations-header':'fullcons-header'">
+    <h1>Assessment Plans</h1>
+    <ul class="us-controls">
+        <!--<li>
+        <input ng-focus="FocusObj.DiagnosisFocus === true" type="text"
+               class="form-control icons-search input-color"
+               name="Diagnosise"
+               placeholder="Enter Diagnosis"
+               ng-model="newAssessmentObj.DiagnosisObject"
+               maxlength="100"
+               typeahead-min-length="0"
+               typeahead-focus-on-select="false"
+               uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisEasyList($viewValue)"
+               typeahead-on-select="onSelectAssesmentPlanDiagnosis(newAssessmentObj)"
+               ng-blur="changefocusOption();" />
+    </li>-->
+        <li>
+             
+            <ul class="RFP-status">
+                <li ng-click="onClickChangeDiagnosisStatus(0);" ng-class="AssessmentplanObj.SelectedSubTabID == 0 ?'active' : ''">
+                    All({{cacheStorageItem.AssessmentPlan != undefined ? (cacheStorageItem.AssessmentPlan| filter: { DeleteInd: 'N'}).length : 0}})
+                </li>
+                <li ng-click="onClickChangeDiagnosisStatus(2);" ng-class="AssessmentplanObj.SelectedSubTabID == 2 ?'active' : ''">
+                    Resolved({{ResolvedCount}})
+                </li>
+                <li ng-click="onClickChangeDiagnosisStatus(3);" ng-class="AssessmentplanObj.SelectedSubTabID == 3 ?'active' : ''">
+                    Active({{ActiveCount}})
+                </li>
+                <li ng-click="onClickChangeDiagnosisStatus(1);" ng-class="AssessmentplanObj.SelectedSubTabID == 1 ?'active' : ''">
+                    Provisional({{ProvisionalCount}})
+                </li>
+            </ul>
+        </li>
+        <li class="m-l-20 m-r-10">
+            <ul class="flex-flow-ulli flex-flow-ulli-mb0 bg-dbf8ef p-2 bradius-4">
+                <li>
+                    <label class="text-s14wnrmlc0a6549 p-l-10 p-r-10">IOP</label>
+                </li>
+                <li>
+                    <div class="bg-white bradius-6 p-4 border">
+                        <span class="text-s12w500c000 p-r-5 border-right">Max</span>
+                        <span class="eh-od p-r-5">OD</span>
+                        <!--<span class="text-s12w500c000 p-r-5 text-red">4</span>-->
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.MaxTonometryODValue !=='' && cacheStorageItem.MaxTonometryODValue !=='0.00'">{{cacheStorageItem.MaxTonometryODValue }}</span>
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.MaxTonometryODValue =='' || cacheStorageItem.MaxTonometryODValue =='0.00'">-</span>
+                        <span class="eh-os p-r-5">OS</span>
+                        <!--<span >18</span>-->
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.MaxTonometryOSValue !=='' && cacheStorageItem.MaxTonometryOSValue !=='0.00'">{{cacheStorageItem.MaxTonometryOSValue}}</span>
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.MaxTonometryOSValue =='' || cacheStorageItem.MaxTonometryOSValue =='0.00'">-</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="bg-white bradius-6 p-4 border">
+                        <span class="text-s12w500c000 p-r-5 border-right">Baseline</span>
+                        <span class="eh-od p-r-5">OD</span>
+                        <!--<span class="text-s12w500c000 p-r-5 text-orange">4</span>-->
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.AvgTonometryODValue !==''">{{cacheStorageItem.AvgTonometryODValue}}</span>
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.AvgTonometryODValue ==''">-</span>
+                        <span class="eh-os p-r-5">OS</span>
+                        <!--<span class="text-s12w500c000 p-r-5 text-orange">18</span>-->
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.AvgTonometryOSValue !==''">{{cacheStorageItem.AvgTonometryOSValue}}</span>
+                        <span class="text-s12w500c000 p-r-5" ng-if="cacheStorageItem.AvgTonometryOSValue ==''">-</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="bg-white bradius-6 p-4 border">
+                        <span class="text-s12w500c000 p-r-5 border-right">Target</span>
+                        <span class="eh-od p-r-5">OD</span>
+                        <span class="text-s12w500c000 p-r-5">{{cacheStorageItem.TargetIOPODValue}}</span>
+                        <span class="eh-os p-r-5">OS</span>
+                        <span class="text-s12w500c000 p-r-5">{{cacheStorageItem.TargetIOPOSValue}}</span>
+                    </div>
+                </li>
+                <li class="hide">
+                    <span class="text-s14w500c000">Target </span>
+                </li>
+                <!--<li>
+                <input type="text" class="input-color input-sm ehr-input-control w-50" />
+            </li>-->
+                <li class="hide">
+                    <div class="bg-white bradius-6 p-4 border dis-flex">
+                        <span class="eh-od p-r-5 m-t-5">OD</span>
+                        <!--<span class="text-s12w500c000 p-r-5 ">4</span>-->
+                        <input type="text" class="form-control w-40 p-0" ng-model="cacheStorageItem.TargetIOPODValue" valid-number maxlength="5" />
+                        <span class="eh-os p-r-5 m-l-5 m-t-5">OS</span>
+                        <!--<span class="text-s12w500c000 p-r-5">18</span>-->
+                        <input type="text" class="form-control w-40 p-0" ng-model="cacheStorageItem.TargetIOPOSValue" valid-number maxlength="5" />
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <!--<li>
+        <div>
+            <span class="text-s12w600C000 dis-block w-90">Baseline IOP :</span>
+        </div>
+        <table class="table table-bordered m-0 tableno-padding">
+            <tbody>
+                <tr>
+                    <td class="bg-dcf8ff eh-od">OD</td>
+                    <td class="w-50 text-center">
+                        <span ng-if="cacheStorageItem.AvgTonometryODValue !=='' && cacheStorageItem.AvgTonometryODValue !=='0.00'">{{cacheStorageItem.AvgTonometryODValue}}</span>
+                        <span ng-if="cacheStorageItem.AvgTonometryODValue =='' || cacheStorageItem.AvgTonometryODValue =='0.00'">-</span>
+                    </td>
+                    <td class="bg-dcf8ff eh-os">OS</td>
+                    <td  class="w-50 text-center">
+                        <span ng-if="cacheStorageItem.AvgTonometryOSValue !=='' && cacheStorageItem.AvgTonometryOSValue !=='0.00'">{{cacheStorageItem.AvgTonometryOSValue}}</span>
+                        <span ng-if="cacheStorageItem.AvgTonometryOSValue =='' || cacheStorageItem.AvgTonometryOSValue =='0.00'">-</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </li>
+    <li>
+        <div>
+            <span class="text-s12w600C000 dis-block w-60">Max IOP :</span>
+        </div>
+        <table class="table table-bordered m-0 tableno-padding">
+            <tbody>
+                <tr>
+                    <td class="bg-dcf8ff eh-od">OD</td>
+                    <td class="w-50 text-center">
+                        <span ng-if="cacheStorageItem.MaxTonometryODValue !==''">{{cacheStorageItem.MaxTonometryODValue}}</span>
+                        <span ng-if="cacheStorageItem.MaxTonometryODValue ==''">-</span>
+                    </td>
+                    <td class="bg-dcf8ff eh-os">OS</td>
+                    <td  class="w-50 text-center">
+                        <span ng-if="cacheStorageItem.MaxTonometryOSValue !==''">{{cacheStorageItem.MaxTonometryOSValue}}</span>
+                        <span ng-if="cacheStorageItem.MaxTonometryOSValue ==''">-</span>
+                    </td>
+                    <td class="bg-dcf8ff">Type</td>
+                    <td  class="w-50 text-center">
+                        <span ng-if="cacheStorageItem.IOPInvName !==''">{{cacheStorageItem.IOPInvName}}</span>
+                        <span ng-if="cacheStorageItem.IOPInvName ==''">-</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </li>
+    <li>
+        <div class="w-120">
+            <span class="text-s12w600C000">Target</span>-->
+        <!--<span class="text-s12w400c767575 p-l-3 p-r-3 bradius-3 border">15%</span>-->
+        <!--<input type="text" class="w-30" ng-model="cacheStorageItem.TargetIOPPercentage" valid-number maxlength="2" ng-change="GetTargetIOPValues(cacheStorageItem.TargetIOPPercentage);"/>%
+        </div>
+        <table class="table table-bordered m-0 tableno-padding">
+            <tbody>
+                <tr>
+                    <td class="bg-dcf8ff eh-od">OD</td>
+                    <td>
+                        <input type="text" class="form-control w-60" ng-model="cacheStorageItem.TargetIOPODValue" valid-number maxlength="5" />
+                    </td>
+                    <td class="bg-dcf8ff eh-os">OS</td>
+                    <td>
+                        <input type="text" class="form-control w-60" ng-model="cacheStorageItem.TargetIOPOSValue" valid-number maxlength="5" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </li>-->
+        <li class="active">
+            <button class="btn btn-save-us" ng-click="GetLastAssessmentPlans('onClick')">Previous Assessment Plans</button>
+        </li>
+        <li>
+            <a href="javascript:;" ng-click="clickAddnewAssessmentpopup()">
+                <i class="plus-icon-us us-icon"></i>
+            </a>
+        </li>
+        <!--<li>
+        <a href="javascript:;">
+            <i class="plus-icon-us us-icon" ng-click="AssessmentPlansUIB(cacheStorageItem.AssessmentPlan)" role="button" tabindex="0"></i>
+        </a>
+    </li>-->
+    </ul>
+</div>
+<div class="consultation-body" ng-show="(cacheStorageItem.AssessmentPlan| filter: { DeleteInd: 'N' }).length > 0">
+    <div class="eh-body">
+        <div class="row" ng-show="AssessmentplanObj.SelectedSubTabID == 0">
+            <div class="col-lg-12">
+
+                <ul class="diagnosis-assessments-list">
+                    <li ng-repeat="Assess in cacheStorageItem.AssessmentPlan | filter: { DeleteInd: 'N'}" ng-class="Assess.IsSummaryViewInd === true? 'active':''">
+                       
+                        <span ng-click="onClickAssessmentselected(Assess,Assess.IsSummaryViewInd);">{{Assess.ICD10CODE}}  {{Assess.ICD10DIAGDESCRIPTION}}</span>
+                        <a href="javascript:;" ng-click="DelectAssessmentPlan(Assess)">
+                            <img src="img/consultation/close-icon.svg" width="16" />
+                        </a>
+                    </li>
+                </ul>
+              
+                <div class="bg-fff border p-5" ng-show="Assess.IsSummaryViewInd ? true : false" ng-repeat="Assess in cacheStorageItem.AssessmentPlan | filter: { DeleteInd: 'N'}">
+                    <p class="m-b-0">{{Assess.ICD10CODE}}  {{Assess.ICD10DIAGDESCRIPTION}}</p>
+                    <div class="two-sections">
+                        <div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="flex-flow-ulli-mb0 m-t-5">
+                                        <li ng-show="Assess.ODSeverityId != null && Assess.ODSeverityId != 0">
+                                            <span class="eh-od">OD</span>
+                                            <span class="text-s10w500C818181 fs-12">
+                                                (
+                                                <span ng-repeat="gitem in GetSeverityList" ng-show="gitem.ROSAllergiesID == Assess.ODSeverityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span> <span>, </span>
+                                                        <span>
+                                                            {{Assess.RDiagnosisStatus}}
+                                                        </span> <span>, </span>
+                                                <span ng-repeat="gitem in GetPriorityList" ng-show="gitem.ROSAllergiesID == Assess.PriorityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span>
+                                                )
+                                            </span>
+                                        </li>
+                                        <li ng-show="Assess.OSSeverityId != null && Assess.OSSeverityId != 0">
+                                            <span class="eh-os">OS</span>
+                                            <span class="text-s10w500C818181 fs-12">
+                                                (
+                                                <span ng-repeat="gitem in GetSeverityList" ng-show="gitem.ROSAllergiesID == Assess.OSSeverityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span> <span>, </span>
+                                                        <span>
+                                                            {{Assess.LDiagnosisStatus}}
+                                                        </span> <span>, </span>
+                                                <span ng-repeat="gitem in GetPriorityList" ng-show="gitem.ROSAllergiesID == Assess.PriorityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span>
+                                                )
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="list-unstyled">
+                                        <li ng-show="Assess.PlanofDiscussionsNotes != ''">
+                                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Plan Of Discussions</h1>
+                                            <p class="text-s12w500c313131">
+                                                {{Assess.PlanofDiscussionsNotes}}.
+                                            </p>
+                                        </li>
+                                        <li ng-show="Assess.PatientInstructions != ''">
+                                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Patient Instructions</h1>
+                                            <p class="text-s12w500c313131">
+                                                {{Assess.PatientInstructions}}.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                    <ul class="m-t-5 list-unstyled" ng-show="Assess.DoctorNotes != '' || Assess.ActionsTaken != ''">
+                                        <li ng-show="Assess.DoctorNotes != ''">
+                                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Doctor Notes</h1>
+                                            <p class="text-s12w500c313131">
+                                                {{Assess.DoctorNotes}}.
+                                            </p>
+                                        </li>
+                                        <li ng-show="Assess.ActionsTaken != ''">
+                                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Other Actions Taken</h1>
+                                            <p class="text-s12w500c313131">
+                                                {{Assess.ActionsTaken}}.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-left p-l-10 flex" ng-show="Assess.IsSummaryViewInd && ((Assess.InvestigationsArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.SurgeryArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.ProceduresArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.ReferralArray| filter: { DeleteInd: 'N' }).length != 0 || Assess.ReferralArray != '')">
+                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Orders</h1>
+                            <ul class="list-unstyled" ng-show="(Assess.InvestigationsArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li>
+                                    <h1 class="exam-sub-heading">
+                                        Investigations
+                                    </h1>
+                                </li>
+                                <li ng-repeat="Iitem in Assess.InvestigationsArray| filter: { DeleteInd: 'N' } track by $index">
+                                    
+                                    <label class="text-s12w500c313131">
+                                        (
+                                        <span class="us-od" ng-show="Iitem.OrganId == 1">OD</span>
+                                        <span class="us-os" ng-show="Iitem.OrganId == 2">OS</span>
+                                        <span class="us-ou" ng-show="Iitem.OrganId == 3">OU</span>
+                                        )
+
+                                        {{Iitem.ProcedureCode}} - {{Iitem.InvestigationName}}
+                                        <span class="text-s12w400c767575" ng-show="Iitem.Duration != ''">(Scheduled on {{Iitem.Duration}} {{Iitem.DurationType === 'Y' ? 'Year(s)' : (Iitem.DurationType === 'W' ? 'Week(s)' : (Iitem.DurationType === 'M' ? 'Month(s)' : (Iitem.DurationType === 'D' ? 'Day(s)' :  (Iitem.DurationType === 'S'? 'Sometime(s)' : ( Iitem.DurationType === 'B'? 'Few Day(s)' : ( Iitem.DurationType === 'T'? 'Today' : ( Iitem.DurationType === 'F'? 'Frequently': ( Iitem.DurationType === 'H'? 'Hours' : ""))))))))}}))</span>
+                                        <span class="text-s12w400c767575" ng-show="Iitem.DurationDate != null && Iitem.DurationDate != ''">(Scheduled on {{Iitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                    </label>
+
+                                    <p class="text-s12w500c3f5fb0" ng-show="Iitem.InvestigationNotes != ''">Remark :<span class="text-s12w500c313131">{{Iitem.InvestigationNotes}}.</span></p>
+
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled" ng-show="(Assess.SurgeryArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li>
+                                    <h1 class="exam-sub-heading">
+                                        Surgery
+                                    </h1>
+                                </li>
+                                <li ng-repeat="mitem in Assess.SurgeryArray| filter: { DeleteInd: 'N' } track by $index">
+
+                                    <label class="text-s12w500c313131">
+                                        {{mitem.ProcedureCode}}  {{mitem.SurgeryName}} (
+                                        <span class="us-od" ng-show="mitem.OrganId == 1">OD</span>
+                                        <span class="us-os" ng-show="mitem.OrganId == 2">OS</span>
+                                        <span class="us-ou" ng-show="mitem.OrganId == 3">OU</span>)
+                                        <span class="text-s12w400c767575" ng-show="mitem.DurationDate != null && mitem.DurationDate != ''">(Scheduled on {{mitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                        <span class="text-s12w400c767575" ng-show="mitem.Duration != ''">(Scheduled on {{mitem.Duration}} {{mitem.DurationType === 'Y' ? 'Year(s)' : (mitem.DurationType === 'W' ? 'Week(s)' : (mitem.DurationType === 'M' ? 'Month(s)' : (mitem.DurationType === 'D' ? 'Day(s)' :  (mitem.DurationType === 'S'? 'Sometime(s)' : ( mitem.DurationType === 'B'? 'Few Day(s)' : ( mitem.DurationType === 'T'? 'Today' : ( mitem.DurationType === 'F'? 'Frequently': ( mitem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>
+                                    </label>
+
+                                    <!--<p class="text-s12w500c3f5fb0" ng-show="mitem.CoordinatorName != ''">Coordinator :<span class="text-s12w500c313131">{{mitem.CoordinatorName}}</span></p>
+        <p class="text-s12w500c3f5fb0" ng-show="mitem.CoordinatorRemarks != ''">Remark :<span class="text-s12w500c313131">{{mitem.CoordinatorRemarks}}.</span></p>
+        <p class="text-s12w500c3f5fb0" ng-show="mitem.InternalCoManagerName != ''">Internal Co-Manager :<span class="text-s12w500c313131">{{mitem.InternalCoManagerName}}</span></p>
+        <p class="text-s12w500c3f5fb0" ng-show="mitem.InternalCoManagerRemarks !=''">Remark :<span class="text-s12w500c313131">{{mitem.InternalCoManagerRemarks}}.</span></p>
+        <p class="text-s12w500c3f5fb0" ng-show="mitem.ExternalCoManagerName != ''">External Co-Manager :<span class="text-s12w500c313131">{{mitem.ExternalCoManagerName}}</span></p>
+        <p class="text-s12w500c3f5fb0" ng-show="mitem.ExternalCoManagerRemarks !=''">Remark :<span class="text-s12w500c313131">{{mitem.ExternalCoManagerRemarks}}.</span></p>-->
+
+
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled" ng-show="(Assess.ProceduresArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li>
+                                    <h1 class="exam-sub-heading">
+                                        Procedures
+                                    </h1>
+                                </li>
+                                <li ng-repeat="pitem in Assess.ProceduresArray track by $index" ng-if="pitem.DeleteInd == 'N'">
+                                    
+                                    <label class="text-s12w500c313131">
+                                        {{pitem.ProcedureCode}} - {{pitem.ProcedureName}}
+                                        <span class="text-s12w400c767575" ng-show="pitem.DurationDate != null && pitem.DurationDate != ''">(Scheduled on {{pitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                        <span class="text-s12w400c767575" ng-show="pitem.Duration != ''">(Scheduled : {{pitem.Duration}} {{pitem.DurationType === 'Y' ? 'Year(s)' : (pitem.DurationType === 'W' ? 'Week(s)' : (pitem.DurationType === 'M' ? 'Month(s)' : (pitem.DurationType === 'D' ? 'Day(s)' :  (pitem.DurationType === 'S'? 'Sometime(s)' : ( pitem.DurationType === 'B'? 'Few Day(s)' : ( pitem.DurationType === 'T'? 'Today' : ( pitem.DurationType === 'F'? 'Frequently': ( pitem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>
+                                    </label>
+                                    <p class="text-s12w500c3f5fb0" ng-show="pitem.ProcedureNotes !=''">Remark :<span class="text-s12w500c313131">{{pitem.ProcedureNotes}}.</span></p>
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled" ng-show="(Assess.ReferralArray| filter: { DeleteInd: 'N' }).length !=0 || Assess.ReferralArray != ''">
+                                <li>
+                                    <h1 class="exam-sub-heading">
+                                        Referral
+                                    </h1>
+                                </li>
+                                <li ng-repeat="Ritem in Assess.ReferralArray| filter: { DeleteInd: 'N' } track by $index">
+                                    
+                                    <label class="text-s12w500c313131">
+                                        {{Ritem.Type == 'External'?'INT' :'EXT'}}  Dr. {{Ritem.ReferralDoctorName}} {{Ritem.SpecializationName}}
+
+
+                                        <span class="text-s12w400c767575 dis-block"><span>(Ordered Date {{Ritem.OrderDate}}</span>  <span ng-show="Ritem.Alarm != ''">Alarm: {{Ritem.Alarm}}</span>  <span ng-show="Ritem.Duration != ''">Scheduled on {{Ritem.Duration}} {{Ritem.DurationType === 'Y' ? 'Year(s)' : (Ritem.DurationType === 'W' ? 'Week(s)' : (Ritem.DurationType === 'M' ? 'Month(s)' : (Ritem.DurationType === 'D' ? 'Day(s)' :  (Ritem.DurationType === 'S'? 'Sometime(s)' : ( Ritem.DurationType === 'B'? 'Few Day(s)' : ( Ritem.DurationType === 'T'? 'Today' : ( Ritem.DurationType === 'F'? 'Frequently': ( Ritem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>  </span>
+                                    </label>
+                                    <p class="text-s12w500c3f5fb0 m-t-8" ng-show="Ritem.ReferralReason !=''">Reason for Referral :<span class="text-s12w500c313131">{{Ritem.ReferralReason}}</span></p>
+                                    <p class="text-s12w500c3f5fb0" ng-show="Ritem.Remarks !=''">Remark :<span class="text-s12w500c313131">{{Ritem.Remarks}}.</span></p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!--<a class="pos-absolute top-8 right-10" href="javascript:;" ng-click="DelectAssessmentPlan(Assess)">
+            <i class="eh-close eh-icon"></i>
+        </a>-->
+
+        <div class="row" ng-show="AssessmentplanObj.SelectedSubTabID !== 0">
+            <div class="col-lg-12">
+                <ul class="diagnosis-assessments-list">
+                    <li ng-repeat="Assess in cacheStorageItem.AssessmentPlan | filter: { DeleteInd: 'N', DiagnosisStatusId: AssessmentplanObj.SelectedSubTabID}" ng-class="Assess.IsSummaryViewInd === true? 'active':''">
+
+                        <span ng-click="onClickAssessmentselected(Assess,Assess.IsSummaryViewInd);">{{Assess.ICD10CODE}}  {{Assess.ICD10DIAGDESCRIPTION}}</span>
+                        <a href="javascript:;" ng-click="DelectAssessmentPlan(Assess)">
+                            <img src="img/consultation/close-icon.svg" width="16" />
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="bg-fff border p-5" ng-show="Assess.IsSummaryViewInd ? true : false" ng-repeat="Assess in cacheStorageItem.AssessmentPlan | filter: { DeleteInd: 'N'}">
+                    <p class="m-b-0 assesments-resolved"><b>{{Assess.ICD10CODE}}  {{Assess.ICD10DIAGDESCRIPTION}}</b></p>
+                    <div class="two-sections">
+                        <div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="flex-flow-ulli-mb0 m-t-5 list-none">
+                                        <li ng-show="Assess.ODSeverityId != null && Assess.ODSeverityId != 0">
+                                            <span class="eh-od">OD</span>
+                                            <span class="text-s10w500C818181 fs-12">
+                                                (
+                                                <span ng-repeat="gitem in GetSeverityList" ng-show="gitem.ROSAllergiesID == Assess.ODSeverityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span> <span>, </span>
+                                                        <span>
+                                                            {{Assess.RDiagnosisStatus}}
+                                                        </span> <span>, </span>
+                                                <span ng-repeat="gitem in GetPriorityList" ng-show="gitem.ROSAllergiesID == Assess.PriorityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span>
+                                                )
+                                            </span>
+                                        </li>
+                                        <li ng-show="Assess.OSSeverityId != null && Assess.OSSeverityId != 0">
+                                            <span class="eh-os">OS</span>
+                                            <span class="text-s10w500C818181 fs-12">
+                                                (
+                                                <span ng-repeat="gitem in GetSeverityList" ng-show="gitem.ROSAllergiesID == Assess.OSSeverityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span> <span>, </span>
+                                                        <span>
+                                                            {{Assess.LDiagnosisStatus}}
+                                                        </span> <span>, </span>
+                                                <span ng-repeat="gitem in GetPriorityList" ng-show="gitem.ROSAllergiesID == Assess.PriorityId">
+                                                    {{gitem.AllergyDescription}}
+                                                </span>
+                                                )
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>  
+                            <div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="two-sections">
+                                            <div class="flex p-r-10">
+                                                <ul class="list-none">
+                                                    <li ng-show="Assess.PlanofDiscussionsNotes != ''">
+                                                        <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Plan Of Discussions</h1>
+                                                        <p class="text-s12w500c313131">
+                                                            {{Assess.PlanofDiscussionsNotes}}.
+                                                        </p>
+                                                    </li>
+                                                    <li ng-show="Assess.PatientInstructions != ''">
+                                                        <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Patient Instructions</h1>
+                                                        <p class="text-s12w500c313131">
+                                                            {{Assess.PatientInstructions}}.
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                                <ul class="m-t-5 list-none" ng-show="Assess.DoctorNotes != '' || Assess.ActionsTaken != ''">
+                                                    <li ng-show="Assess.DoctorNotes != ''">
+                                                        <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Doctor Notes</h1>
+                                                        <p class="text-s12w500c313131">
+                                                            {{Assess.DoctorNotes}}.
+                                                        </p>
+                                                    </li>
+                                                    <li ng-show="Assess.ActionsTaken != ''">
+                                                        <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Other Actions Taken</h1>
+                                                        <p class="text-s12w500c313131">
+                                                            {{Assess.ActionsTaken}}.
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="p-l-10 border-left" ng-show="(Assess.InvestigationsArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.SurgeryArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.ProceduresArray| filter: { DeleteInd: 'N' }).length != 0 || (Assess.ReferralArray| filter: { DeleteInd: 'N' }).length != 0 || Assess.ReferralArray != ''">
+                            <h1 class="text-s14w600cc5771b p-y-2 border-bottom">Orders</h1>
+                            <ul class="list-unstyled list-none" ng-show="(Assess.InvestigationsArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li ng-repeat="Iitem in Assess.InvestigationsArray| filter: { DeleteInd: 'N' } track by $index">
+                                    <p class="text-s12w600C000 m-b-0">
+                                        Investigations
+                                    </p>
+                                    <label class="text-s12w500c313131">
+                                        (
+                                        <span class="us-od" ng-show="Iitem.OrganId == 1">OD</span>
+                                        <span class="us-os" ng-show="Iitem.OrganId == 2">OS</span>
+                                        <span class="us-ou" ng-show="Iitem.OrganId == 3">OU</span>
+                                        )
+
+                                        {{Iitem.ProcedureCode}} - {{Iitem.InvestigationName}}
+                                        <span class="text-s12w400c767575" ng-show="Iitem.Duration != ''">(Scheduled on {{Iitem.Duration}} {{Iitem.DurationType === 'Y' ? 'Year(s)' : (Iitem.DurationType === 'W' ? 'Week(s)' : (Iitem.DurationType === 'M' ? 'Month(s)' : (Iitem.DurationType === 'D' ? 'Day(s)' :  (Iitem.DurationType === 'S'? 'Sometime(s)' : ( Iitem.DurationType === 'B'? 'Few Day(s)' : ( Iitem.DurationType === 'T'? 'Today' : ( Iitem.DurationType === 'F'? 'Frequently': ( Iitem.DurationType === 'H'? 'Hours' : ""))))))))}}))</span>
+                                        <span class="text-s12w400c767575" ng-show="Iitem.DurationDate != null && Iitem.DurationDate != ''">(Scheduled on {{Iitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                    </label>
+
+                                    <p class="text-s12w500c3f5fb0" ng-show="Iitem.InvestigationNotes != ''">Remark :<span class="text-s12w500c313131">{{Iitem.InvestigationNotes}}.</span></p>
+
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled list-none" ng-show="(Assess.SurgeryArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li ng-repeat="mitem in Assess.SurgeryArray| filter: { DeleteInd: 'N' } track by $index">
+                                    <p class="text-s12w600C000 m-b-0">
+                                        Surgery
+                                    </p>
+                                    <label class="text-s12w500c313131">
+                                        {{mitem.ProcedureCode}}  {{mitem.SurgeryName}} (
+                                        <span class="us-od" ng-show="mitem.OrganId == 1">OD</span>
+                                        <span class="us-os" ng-show="mitem.OrganId == 2">OS</span>
+                                        <span class="us-ou" ng-show="mitem.OrganId == 3">OU</span>)
+                                        <span class="text-s12w400c767575" ng-show="mitem.DurationDate != null && mitem.DurationDate != ''">(Scheduled on {{mitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                        <span class="text-s12w400c767575" ng-show="mitem.Duration != ''">(Scheduled on {{mitem.Duration}} {{mitem.DurationType === 'Y' ? 'Year(s)' : (mitem.DurationType === 'W' ? 'Week(s)' : (mitem.DurationType === 'M' ? 'Month(s)' : (mitem.DurationType === 'D' ? 'Day(s)' :  (mitem.DurationType === 'S'? 'Sometime(s)' : ( mitem.DurationType === 'B'? 'Few Day(s)' : ( mitem.DurationType === 'T'? 'Today' : ( mitem.DurationType === 'F'? 'Frequently': ( mitem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>
+                                    </label>
+
+
+
+
+
+
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled list-none" ng-show="(Assess.ProceduresArray| filter: { DeleteInd: 'N' }).length !=0">
+                                <li ng-repeat="pitem in Assess.ProceduresArray track by $index" ng-if="pitem.DeleteInd == 'N'">
+                                    <p class="text-s12w600C000 m-b-0">
+                                        Procedures
+                                    </p>
+                                    <label class="text-s12w500c313131">
+                                        {{pitem.ProcedureCode}} - {{pitem.ProcedureName}}
+                                        <span class="text-s12w400c767575" ng-show="pitem.DurationDate != null && pitem.DurationDate != ''">(Scheduled on {{pitem.DurationDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                        <span class="text-s12w400c767575" ng-show="pitem.Duration != ''">(Scheduled : {{pitem.Duration}} {{pitem.DurationType === 'Y' ? 'Year(s)' : (pitem.DurationType === 'W' ? 'Week(s)' : (pitem.DurationType === 'M' ? 'Month(s)' : (pitem.DurationType === 'D' ? 'Day(s)' :  (pitem.DurationType === 'S'? 'Sometime(s)' : ( pitem.DurationType === 'B'? 'Few Day(s)' : ( pitem.DurationType === 'T'? 'Today' : ( pitem.DurationType === 'F'? 'Frequently': ( pitem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>
+                                    </label>
+
+                                    <p class="text-s12w500c3f5fb0" ng-show="pitem.ProcedureNotes !=''">Remark :<span class="text-s12w500c313131">{{pitem.ProcedureNotes}}.</span></p>
+                                </li>
+                            </ul>
+                            <ul class="list-unstyled list-none" ng-show="(Assess.ReferralArray| filter: { DeleteInd: 'N' }).length !=0 || Assess.ReferralArray != ''">
+                                <li ng-repeat="Ritem in Assess.ReferralArray| filter: { DeleteInd: 'N' } track by $index">
+                                    <p class="text-s12w600C000 m-b-0">
+                                        Referral
+                                    </p>
+                                    <label class="text-s12w500c313131">
+                                        {{Ritem.Type == 'External'?'INT' :'EXT'}}  Dr. {{Ritem.ReferralDoctorName}} {{Ritem.SpecializationName}}
+
+
+                                        <span class="text-s12w400c767575 dis-block"><span>(Ordered Date {{Ritem.OrderDate}}</span>  <span ng-show="Ritem.Alarm != ''">Alarm: {{Ritem.Alarm}}</span>  <span ng-show="Ritem.Duration != ''">Scheduled on {{Ritem.Duration}} {{Ritem.DurationType === 'Y' ? 'Year(s)' : (Ritem.DurationType === 'W' ? 'Week(s)' : (Ritem.DurationType === 'M' ? 'Month(s)' : (Ritem.DurationType === 'D' ? 'Day(s)' :  (Ritem.DurationType === 'S'? 'Sometime(s)' : ( Ritem.DurationType === 'B'? 'Few Day(s)' : ( Ritem.DurationType === 'T'? 'Today' : ( Ritem.DurationType === 'F'? 'Frequently': ( Ritem.DurationType === 'H'? 'Hours' : ""))))))))}})</span>  </span>
+                                    </label>
+                                    <p class="text-s12w500c3f5fb0" ng-show="Ritem.ReferralReason !=''">Reason for Referral :<span class="text-s12w500c313131">{{Ritem.ReferralReason}}</span></p>
+                                    <p class="text-s12w500c3f5fb0" ng-show="Ritem.Remarks !=''">Remark :<span class="text-s12w500c313131">{{Ritem.Remarks}}.</span></p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+ 
+    </div>
+    <!-- / -->   
+
+    <div class="consultation-vandp">
+        <section class="eh-panel" ng-show="cacheStorageItem.rcopiaEprescriptionsArray.length > 0">
+            <div class="eh-header">
+                <h1 class="text-068cb0">Prescriptions</h1>
+            </div>
+            <div class="eh-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-prescription">
+                            <thead>
+                                <tr>
+                                    <th>Drug & Directions</th>
+                                    <th>Qty</th>
+                                    <th>Rfl</th>
+                                    <th>Notes</th>
+                                    <th>Dr/Staff</th>
+                                    <th>Last Modified</th>
+                                    <th>Serial</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="pitem in cacheStorageItem.rcopiaEprescriptionsArray">
+                                    <td>
+                                        <p class="m-0">{{pitem.MedicineDescription}} <b class="text-danger">C-Schedule</b></p>
+                                        <p class="m-0">{{pitem.MedicineDose}} {{pitem.MedicineDoseUnit}} {{pitem.MedicineAction}} {{pitem.MedicineDoseTiming}}</p>
+                                    </td>
+                                    <td>{{pitem.MedicineQuantity}} {{pitem.MedicineQuantityUnit}}</td>
+                                    <td>{{pitem.MedicineRefills}}</td>
+                                    <td>Nill</td>
+                                    <td>{{pitem.PharmacyState}}</td>
+                                    <td>{{pitem.MedicineCreatedDate}}</td>
+                                    <td>{{pitem.RcopiaPrescriptionId}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="eh-panel" ng-show="cacheStorageItem.rcopiaMedicationsArray.length > 0">
+            <div class="eh-header">
+                <h1 class="text-068cb0">Medications</h1>
+            </div>
+            <div class="eh-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-prescription">
+                            <thead>
+                                <tr>
+                                    <th>Name & Directions</th>
+                                    <th>Qty</th>
+                                    <th>Rfl</th>
+                                    <th>Start</th>
+                                    <th>Stop</th>
+                                    <th>Last Written</th>
+                                    <th>Serial</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="mitem in cacheStorageItem.rcopiaMedicationsArray">
+                                    <td>
+                                        <p class="m-0">{{mitem.DrugBrandName}} <b class="text-danger">C-Schedule</b></p>
+                                        <p class="m-0">{{mitem.DrugForm}} {{mitem.DoseUnit}} {{mitem.DoseRoute}} {{mitem.DoseTiming}}</p>
+                                    </td>
+                                    <td>{{mitem.DrugDose}} {{mitem.QuantityUnit}}</td>
+                                    <td>None</td>
+                                    <td>{{mitem.MedicineStartDate}}</td>
+                                    <td>{{mitem.MedicineStopDate}}</td>
+                                    <td>{{mitem.OtherNotes}}</td>
+                                    <td>{{mitem.RcopiaMedicationId}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="consultation-body"  ng-hide="(cacheStorageItem.AssessmentPlan| filter: { DeleteInd: 'N' }).length > 0">
+    <div class="no-data-text p-b-0">
+        <span>No Assessment added.</span>
+        <a href="" ng-click="clickAddnewAssessmentpopup()">Click here</a>
+        <span>or on search box to add Assessment.</span>
+    </div>
+</div>
+ 
+
+
+
+
+
+
+
+
+<script type="text/ng-template" id="menu-popover-inner.html">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="fullcons-subhead">
+                <ul class="autofill-list m-b-0">
+                    <li>
+                        <a href="javascript:;" ng-click="getPrescriptionsFromRcopia();" title="get latest prescriptions">Prescription</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" ng-click="getMedicationsFromRcopia();" title="get latest Medication">Medications</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" title="Open E Prescribe" ng-click="openDirectEPrescribe();">E-Prescribe</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" ng-click="ShowLastPrescMedicinePopUp();">Load Previous Rx</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,474 @@
+<div class="d__f-- fd__c-- height__100-- gap__y--5 pb__5-- bg__FFFFFF--" ng-controller="UsPatientCommunicationMainCtrl">
+    <!-- ===================== Sub tabs ===================== -->
+    <div class="d__f-- ai__c-- px__10-- bb__DDD--">
+        <ul class="pch-subtabs">
+            <li ng-class="mainCommunicationObj.MainTab == 1 ? 'active' : ''">
+                <a ng-click="switchCommunicationTab(1)" id="tab_communication">Communication</a>
+            </li>
+            <!-- hidden when the user has no calling credential, or it was deactivated -->
+            <li ng-if="showCallHistoryTab()" ng-class="mainCommunicationObj.MainTab == 2 ? 'active' : ''">
+                <a ng-click="switchCommunicationTab(2)" id="tab_callhistory">Call History</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ===================== Tab 1 : Communication ===================== -->
+    <div class="d__f-- fd__c-- height__100-- gap__y--5" ng-if="mainCommunicationObj.MainTab == 1">
+        <div class="d__f-- jc__sb-- ai__c-- px__10-- py__5-- bb__DDD--">
+            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">Communication Logs</h1>
+            <ul class="list__none-- m__0-- d__f-- ai__c-- gap__x--10 jc__e--">
+                <li ng-if="false">
+                    <div class="dropdown cstm-dropdown width-100">
+                        <button class="btn__lg-- btn__DEDEDE--o jc__sb-- w__130--" id="dropdown_calender" data-toggle="dropdown">
+                            {{ Filterobj.CommunicationDate ? (Filterobj.CommunicationDate| date:"MM-dd-yyyy") : 'From Date'}}
+                            <i class="asc__icons-- calender-search-icon"></i>
+                        </button>
+                        <div class="dropdown-menu dr-drop-app left-auto right-0 bradius-5" role="menu" ng-click="$event.stopPropagation();">
+                            <div class="d__f-- fd__c--">
+                                <div class="d__f-- jc__sb-- p__6-- border-bottom">
+                                    <h3 class="text-s14w600c000 m-0">Calendar</h3>
+                                    <button class="btn__sm-- btn__1d5558--f" id="btn_dateapply">
+                                        Apply
+                                    </button>
+                                </div>
+                                <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                    <div uib-datepicker class="appt-calendar" ng-change="Changedate()" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="dropdown cstm-dropdown width-100">
+                        <button class="btn__lg-- btn__DEDEDE--o jc__sb-- w__130--" id="dropdown_calender" data-toggle="dropdown">
+                            {{Filterobj.CommunicationDate ? (Filterobj.CommunicationDate| date:"MM-dd-yyyy") : 'To Date'}}
+                            <i class="asc__icons-- calender-search-icon"></i>
+                        </button>
+                        <div class="dropdown-menu min__w275-- min__h300-- left-auto right-0 bradius-5" role="menu" ng-click="$event.stopPropagation();">
+                            <div class="d__f-- fd__c--">
+                                <div class="d__f-- jc__sb-- p__8-- border-bottom">
+                                    <h3 class="text-s14w600c000 m-0">Calendar</h3>
+                                    <button class="btn__sm-- btn__1d5558--f" ng-click="GetPatientCommunicationDetails('cal')" id="btn_dateapply">
+                                        Apply
+                                    </button>
+                                </div>
+                                <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                    <div uib-datepicker class="appt-calendar" ng-model="Filterobj.CommunicationDate" ng-change="Changedate()" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                        <button class="btn__sm-- btn__1d5558--o gap__10--" id="dropdown_filter" data-toggle="dropdown">
+                            Filter
+                            <i class="icons__w16--  filter__w16--o"></i>
+                        </button>
+                        <div class="dropdown-menu dr-drop-app left-auto right-0 bradius-5" role="menu" aria-labelledby="dropdown_filter" ng-click="$event.stopPropagation();">
+                            <div class="d__f-- fd__c--">
+                                <div class="p__6-- border-bottom">
+                                    <h3 class="text-s14w600c000 m-0">Filter</h3>
+                                </div>
+                                <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                    <div class="form__group">
+                                        <label>Mode of Interaction</label>
+                                        <select ng-model="Filterobj.ModeOfInteractionId" id="select_fmoi" ng-options="item.ModeOfInteractionId as item.ModeOfInteraction for item in FiltersModeOfInteractionsArray" ng-change="ChangeModeOfInteractions(Filterobj.ModeOfInteractionId)">
+                                            <option>Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group" ng-if="false">
+                                        <label>Status</label>
+                                        <select id="select_fstatus">
+                                            <option>Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label>Reason/Subject</label>
+                                        <select ng-model="Filterobj.ReasonId" id="select_freason" ng-options="item.ReasonId as item.ReasonName for item in FiltersCommunicationReasonsArray" ng-change="ChangeCommunicationReasons(Filterobj.ReasonId)">
+                                            <option>Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label>Follow-up</label>
+                                        <select ng-model="Filterobj.FollowUpIndicatorId" id="select_ffollowup" ng-options="item.FollowUpIndicatorId as item.FollowUpIndicator for item in FollowupArraylist" ng-change="ChangeFollowup(Filterobj.FollowUpIndicatorId)">
+                                            <option>Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label>Updated by</label>
+                                        <select ng-model="Filterobj.ModifiedByUserId" id="select_fupdated" ng-options="item.DoctorID as item.SecondUserFullName for item in MultiselectDoctorlist" ng-change="ChangeModifiedUsers(Filterobj.ModifiedByUserId)">
+                                            <option>Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="p__6-- d__f-- ai__c-- jc__e-- gap__10--">
+                                    <button class="btn__sm-- tc__1D5558-- bg__FFFFFF-- b-0 gap__10--" ng-click="Reset('filter')" id="btn_freset">
+                                        Reset
+                                        <i class="icons__w16-- refresh__w16--o"></i>
+                                    </button>
+                                    <button class="btn__sm-- btn__1d5558--f" ng-click="GetPatientCommunicationDetails()" id="btn_fapply">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li ng-if="false">
+                    <button class="btn__lg-- btn__1d5558--f" id="btn_apply">
+                        Apply
+                    </button>
+                </li>
+                <li>
+                    <a class="d__f-- ai__c-- gap__x--5 tc__1D5558--" ng-click="Reset('date')" id="btn_reset">
+                        <i class="icons__w16-- refresh__w16--o"></i> Reset
+                    </a>
+                </li>
+                <li ng-show="PatientCommunicationDetailsArray.length > 0">
+                    <button class="btn__sm-- btn__1d5558--o" ng-click="openAddNewLogPopup()" id="btn_addnewlog">
+                        <i class="icons__w16-- add__w16--o"></i>
+                        Add New Log
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="d__f-- fd__c-- border__DDD-- bradius__5-- height__100-- mx__6--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <table class="table__style--5" id="table_patientcomdetails" ng-class="PatientCommunicationDetailsArray.length == 0 ? 'height__100--':''">
+                        <thead>
+                            <tr>
+                                <th width="13%"><label class="fs__lg-- fw__6-- tc__1D1D1D-- lh__20--">Date & Time</label></th>
+                                <th width="7%"><label class="fs__lg-- fw__6-- tc__1D1D1D--">Mode</label></th>
+                                <th width="8%" ng-if="false"><label class="fs__lg-- fw__6-- tc__1D1D1D--">Status</label></th>
+                                <th width="10%"><label class="fs__lg-- fw__6-- tc__1D1D1D--">Reason/Subject</label></th>
+                                <th width="9%"><label class="fs__lg-- fw__6-- tc__1D1D1D--">Follow-up</label></th>
+                                <th width="12%"><label class="fs__lg-- fw__6-- tc__1D1D1D--">Created/Received</label></th>
+                                <th><label class="fs__lg-- fw__6-- tc__1D1D1D--">Notes</label></th>
+                                <th width="4%"></th>
+                            </tr>
+                        </thead>
+                        <tbody ng-if="PatientCommunicationDetailsArray.length>0">
+                            <tr ng-repeat="item in PatientCommunicationDetailsArray">
+                                <td>
+                                    <div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.CommunicationDate| date:'MM-dd-yyyy'}}; {{item.CommunicationTime| date:'hh:mm a'}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="fs__lg-- fw__6-- tc__1D1D1D--">{{item.ModeOfInteraction}}</span>
+                                    </div>
+                                </td>
+                                <td ng-if="false">
+                                    <div>
+                                        <span class="fs__lg-- fw__6-- tc__1D1D1D-- d__f-- gap__x--5"><i class="icons__w16-- outgoingcall__w16--"></i> Outgoing</span>
+                                        <!--   <span class="fs__lg-- fw__6-- tc__1D1D1D-- d__f-- gap__x--5"><i class="icons__w16-- incomingcall__w16--"></i>Incoming</span>
+                                           <span class="fs__lg-- fw__6-- tc__1D1D1D-- d__f-- gap__x--5"><i class="icons__w16-- missedcall__w16--"></i>Missed</span>
+                                           <span class="fs__lg-- fw__6-- tc__1D1D1D-- d__f-- gap__x--5"><i class="icons__w16-- incomingemail__w16--"></i>Incoming</span>
+                                           <span class="fs__lg-- fw__6-- tc__1D1D1D-- d__f-- gap__x--5"><i class="icons__w16-- outgoingemail__w16--"></i>Outgoing</span>-->
+
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.ReasonName}}">{{item.ReasonName}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="status__red-- fs-13 font-weight-400" ng-if="item.IsFollowUpRequired==false">Not Required</span>
+                                        <span class="status__green-- fs-13 font-weight-400" ng-if="item.IsFollowUpRequired==true">Required</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.ModifiedByUserName}}">{{item.ModifiedByUserName}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--  no-wrapappt" title="{{item.Notes}}">{{item.Notes}}</span>
+                                    </div>
+                                </td>
+                                <!--<td><div class="flex-row gap__10--"> <a class="hs__list--"><i class="icons__w16-- edit__w16--o" ng-click="openAddNewLogPopup(item)"></i></a> <a><i class="icons__w16--  delete__w16--o" ng-click="DeletePatientCommuncation(item)"></i></a></div></td>-->
+                                <td>
+                                    <div class="dropdown cstm-dropdown ai__c--">
+                                        <button class="border__none-- p__4-- bg__none-- hover__E3E3E3--f bradius__5-- w__32-- dropdown-button" id="dropdownMenu" data-toggle="dropdown" aria-expanded="true">
+                                            <i class="icons__w20-- more__w20--b" tooltip-placement="top" uib-tooltip="More"></i>
+                                        </button>
+                                        <div class="dropdown-menu right-0 left-auto w__130-- slim-scroll bradius__8--" role="menu">
+                                            <ul class="d__f-- fd__c-- list__unstyled-- m__0-- p__4--">
+                                                <li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="UserId == item.UserId &&openAddNewLogPopup(item)">
+                                                    <a class="outline-icon d__n--"><i class="icons__w16-- edit__w16--o"></i></a>
+                                                    <a class="light-icon d__b--"><i class="icons__w16-- edit__w16--l"></i></a>
+                                                    <label class="fs__md-- fw__5-- tc__656565-- c__p--">Edit</label>
+                                                </li>
+                                                <li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="UserId == item.UserId &&DeletePatientCommuncation(item)">
+                                                    <a class="outline-icon d__n--"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                    <a class="light-icon d__b--"><i class="icons__w16-- delete__w16--l"></i></a>
+                                                    <label class="fs__md-- fw__5-- tc__656565-- c__p--">Delete</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tbody ng-show="PatientCommunicationDetailsArray.length ===0">
+                            <tr>
+                                <td class="bg__none--" colspan="7">
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                        <a><i class="nodata__1-- f2__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No communication logs available</h1>
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">To get started, add a new log by clicking the button below</label>
+                                        <button class="btn__sm-- btn__1d5558--o" ng-click="openAddNewLogPopup()" id="btn_addnewlogpopup">
+                                            <i class="icons__w16-- add__w16--o"></i>
+                                            Add Log
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="bg__FFFFFF-- p__6-- bt__DDD--" ng-show="PatientCommunicationDetailsArray.length > 0">
+                <div class="EH-pagination text-center">
+                    <uib-pagination total-items="totalItems" id="uib_pagination"
+                                    ng-model="Filterobj.PageNumber"
+                                    ng-change="GetPatientCommunicationDetails(Filterobj.PageNumber)"
+                                    max-size="20"
+                                    items-per-page="Filterobj.PageSize"
+                                    class=""
+                                    boundary-link-numbers="true"
+                                    rotate="false"></uib-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== Tab 2 : Call History (Telnyx) ===================== -->
+    <div class="d__f-- fd__c-- height__100-- gap__y--5" ng-if="mainCommunicationObj.MainTab == 2">
+
+        <!-- stats -->
+        <div class="pch-stats">
+            <div class="pch-stat">
+                <div class="pch-stat-label">Total Calls</div>
+                <div class="pch-stat-value">{{callHistoryStats.Total || 0}}</div>
+            </div>
+            <div class="pch-stat">
+                <div class="pch-stat-label">Answered</div>
+                <div class="pch-stat-value pch-green">{{callHistoryStats.Answered || 0}}</div>
+            </div>
+            <div class="pch-stat">
+                <div class="pch-stat-label">Missed</div>
+                <div class="pch-stat-value pch-red">{{callHistoryStats.Missed || 0}}</div>
+            </div>
+            <!-- Total, not average: what was asked for. The proc still returns
+                 AvgTalkText, so putting the average back is one card. -->
+            <div class="pch-stat">
+                <div class="pch-stat-label">Total Talk Time</div>
+                <div class="pch-stat-value">{{callHistoryStats.TotalTalkText || '0s'}}</div>
+            </div>
+        </div>
+
+        <!-- date filter -->
+        <div class="pch-filters">
+            <!-- One range control rather than two independent pickers: it greys out the
+                 days that would invert the range, so a To Date earlier than the From Date
+                 cannot be picked at all. Same control the Logs list uses. -->
+            <div class="form__group--1">
+                <label>Date Range</label>
+                <div id="pch__dateRange" class="input__fromTo-- c__p--"
+                     popover-trigger="outsideClick"
+                     popover-class="date-range-popover drp__popover--"
+                     popover-is-open="callHistoryDrpOpen"
+                     popover-placement="bottom-left"
+                     popover-append-to-body="true"
+                     uib-popover-template="'templates/UIBPopovers/fromToCalender.html'"
+                     from-to-date-picker
+                     from-date="callHistoryFilterobj.FromDate"
+                     to-date="callHistoryFilterobj.ToDate"
+                     block-future>
+                    <input id="input__pchfromdate" type="text" placeholder="From Date"
+                           ng-value="callHistoryFilterobj.FromDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                    <span class="arrow">&rarr;</span>
+                    <input id="input__pchtodate" type="text" placeholder="To Date"
+                           ng-value="callHistoryFilterobj.ToDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                    <label class="icon-box">
+                        <i svg-icon="icon__calender--" size="13" class="tc__1D5558--"></i>
+                    </label>
+                </div>
+            </div>
+            <div class="d__f-- ai__c-- gap__x--10">
+                <button class="btn__sm-- btn__1d5558--f" id="btn_pchapply" ng-click="applyCallHistoryFilter()">
+                    Apply
+                </button>
+                <a class="d__f-- ai__c-- gap__x--5 tc__1D5558--" ng-click="ResetCallHistory()" id="btn_pchreset">
+                    <i class="icons__w16-- refresh__w16--o"></i> Reset
+                </a>
+            </div>
+        </div>
+
+        <!-- direction / status pills -->
+        <div class="pch-pills">
+            <button ng-class="{ active: callHistoryFilterobj.FilterKey === 'all' }"
+                    ng-click="setCallHistoryFilter('all')" id="btn_pchall">
+                All
+            </button>
+            <button ng-class="{ active: callHistoryFilterobj.FilterKey === 'incoming' }"
+                    ng-click="setCallHistoryFilter('incoming')" id="btn_pchincoming">
+                Incoming
+            </button>
+            <button ng-class="{ active: callHistoryFilterobj.FilterKey === 'outgoing' }"
+                    ng-click="setCallHistoryFilter('outgoing')" id="btn_pchoutgoing">
+                Outgoing
+            </button>
+            <button ng-class="{ active: callHistoryFilterobj.FilterKey === 'answered' }"
+                    ng-click="setCallHistoryFilter('answered')" id="btn_pchanswered">
+                Answered
+            </button>
+            <button ng-class="{ active: callHistoryFilterobj.FilterKey === 'missed' }"
+                    ng-click="setCallHistoryFilter('missed')" id="btn_pchmissed">
+                Missed
+            </button>
+        </div>
+
+        <!-- list -->
+        <div class="d__f-- fd__c-- border__DDD-- bradius__5-- height__100-- mx__6--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="pch-table" id="table_patientcallhistory">
+                        <div class="pch-thead">
+                            <span class="pch-col-icon"></span>
+                            <span class="pch-col-caller">Caller</span>
+                            <span class="pch-col-time">Date &amp; Time</span>
+                            <span class="pch-col-dur">Duration</span>
+                            <span class="pch-col-by">Answered By</span>
+                            <span class="pch-col-status">Status</span>
+                            <span class="pch-col-action">Action</span>
+                        </div>
+
+                        <div class="pch-row" ng-repeat-start="c in PatientCallHistoryArray">
+                            <span class="pch-col-icon">
+                                <span class="pch-dot" ng-class="chDotClass(c)">
+                                    <i class="fa" ng-class="chDotIcon(c)"></i>
+                                </span>
+                            </span>
+
+                            <span class="pch-col-caller">
+                                <div class="pch-name">
+                                    <i class="fa pch-dir"
+                                       ng-class="c.Direction === 'outgoing' ? 'fa-arrow-up pch-dir-out' : 'fa-arrow-down pch-dir-in'"
+                                       title="{{c.Direction === 'outgoing' ? 'Outgoing' : 'Incoming'}}"></i>
+                                    {{c.PatientName || 'Unknown caller'}}
+                                </div>
+                                <div class="pch-sub">
+                                    {{fmtCallPhone(c.ContactNumber)}}<span ng-if="c.PatientMRN"> &middot; MR No: {{c.PatientMRN}}</span>
+                                </div>
+                            </span>
+
+                            <span class="pch-col-time">{{c.StartTime | date:'MMM d, h:mm a'}}</span>
+                            <span class="pch-col-dur">{{c.CallStatusId === 2 ? c.DurationText : '&mdash;'}}</span>
+                            <span class="pch-col-by">{{c.AgentName || c.AnsweredByName || '&mdash;'}}</span>
+
+                            <span class="pch-col-status">
+                                <span class="pch-badge" ng-class="chBadgeClass(c)">{{c.CallStatusName}}</span>
+                            </span>
+
+                            <span class="pch-col-action">
+                                <div class="pch-actions">
+                                    <button class="pch-callbtn" ng-disabled="telnyxCallState"
+                                            ng-click="callBackFromHistory(c)" title="Call back" id="btn_pchcallback">
+                                        <i class="fa fa-phone"></i>
+                                    </button>
+                                    <!-- Only an answered call can have a recording -->
+                                    <button class="pch-recbtn" ng-if="c.CallStatusId === 2"
+                                            ng-class="{ 'is-open': c.showRec }"
+                                            ng-click="togglePatientRecording(c)"
+                                            title="Call recording" id="btn_pchrecording">
+                                        <i class="fa fa-microphone"></i>
+                                    </button>
+                                    <div class="dropdown cstm-dropdown" uib-dropdown dropdown-flip>
+                                        <button class="pch-morebtn" uib-dropdown-toggle id="btn_pchmore">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul uib-dropdown-menu class="pch-menu dropdown-menu dropdown-menu-right" role="menu">
+                                            <li role="menuitem">
+                                                <a ng-click="callBackFromHistory(c)"><i class="fa fa-phone"></i> Call back</a>
+                                            </li>
+                                            <li role="menuitem" ng-if="c.CallStatusId === 2">
+                                                <a ng-click="togglePatientRecording(c)"><i class="fa fa-microphone"></i> Play recording</a>
+                                            </li>
+                                            <li role="menuitem">
+                                                <a ng-click="AddLogFromCall(c)"><i class="fa fa-plus"></i> Add Log</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+
+                        <!-- Recording player, opened under its own row. Telnyx stores the
+                             audio, so the link is fetched when the row is opened rather
+                             than for every row in the list. -->
+                        <div class="pch-rec" ng-repeat-end ng-if="c.showRec">
+                            <span class="pch-rec-msg" ng-if="c.recState === 'loading'">
+                                <i class="fa fa-spinner fa-spin"></i> Loading recording&hellip;
+                            </span>
+                            <span class="pch-rec-msg" ng-if="c.recState === 'none'">
+                                <i class="fa fa-microphone-slash"></i> No recording saved for this call.
+                            </span>
+                            <span class="pch-rec-msg text-danger" ng-if="c.recState === 'error'">
+                                <i class="fa fa-exclamation-circle"></i> Couldn't load the recording. Try again.
+                            </span>
+                            <div class="pch-rec-item" ng-if="c.recState === 'ready'" ng-repeat="r in c.recordings">
+                                <i class="fa fa-microphone"></i>
+                                <audio controls preload="none" ng-src="{{ r.PlayUrl | trustAsResourceUrl }}"></audio>
+                                <span class="pch-rec-saved">Saved {{ r.SavedAtUtc | date:'MMM d, h:mm a' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="pch-empty" ng-if="!PatientCallHistoryArray.length">
+                            <a><i class="nodata__1-- f2__nodata--1"></i></a>
+                            <!-- "nothing here yet" and "nothing matched what you asked
+                                 for" are different answers; a filtered empty list that
+                                 says the patient has no calls reads like a data loss. -->
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--"
+                                ng-if="callHistoryFilterobj.FilterKey === 'all' && !callHistoryFilterobj.FromDate">
+                                No call history available
+                            </h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--"
+                                   ng-if="callHistoryFilterobj.FilterKey === 'all' && !callHistoryFilterobj.FromDate">
+                                Calls made to or received from this patient will appear here
+                            </label>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--"
+                                ng-if="callHistoryFilterobj.FilterKey !== 'all' || callHistoryFilterobj.FromDate">
+                                No records found
+                            </h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--"
+                                   ng-if="callHistoryFilterobj.FilterKey !== 'all' || callHistoryFilterobj.FromDate">
+                                No calls match this filter or date range. Reset to see every call.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg__FFFFFF-- p__6-- bt__DDD--" ng-show="PatientCallHistoryArray.length > 0">
+                <div class="EH-pagination text-center">
+                    <uib-pagination total-items="callHistoryTotalItems" id="uib_pagination_callhistory"
+                                    ng-model="callHistoryFilterobj.PageNumber"
+                                    ng-change="callHistoryPageChanged(callHistoryFilterobj.PageNumber)"
+                                    max-size="20"
+                                    items-per-page="callHistoryFilterobj.PageSize"
+                                    class=""
+                                    boundary-link-numbers="true"
+                                    rotate="false"></uib-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

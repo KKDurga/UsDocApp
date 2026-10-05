@@ -1,0 +1,745 @@
+﻿ <div class="row" ng-controller="EhnoteImageManagementParentCtrl">
+      
+<div class="col-lg-2 p-l-0">
+    <table class="table-c6-list">
+        <thead>
+            <tr>
+                <th colspan="2" class="text-center">
+
+                    <div class="p-3">
+                        <ul class="tabs-fill-outline">
+                            <li class="{{ imageMainTab ==1 ? 'active' :''}}">
+                                <a href="javascript:;" ng-click="navtoMainImageTab(1)">Order View</a>
+                            </li>
+                            <li class="{{ imageMainTab ==2 ? 'active' :''}}">
+                                <a href="javascript:;" ng-click="navtoMainImageTab(2)">Images</a>
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+            </tr>
+
+
+            <tr ng-show="imageMainTab ==2">
+                <th colspan="2" class="text-center">
+                    <div class="dis-flex">
+                        <div class="flex">
+                            <button class="btn btn-save-us btn-block m-l-5" ng-click="openImageUploadForStudyPopup()">Upload</button>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr ng-show="imageMainTab ==2">
+                <th>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label>Sort</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="dropdown btn-block">
+                                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" style="float:right">
+                                    <i class="fas fa-filter pull-right text-info pos-relative top-5"></i>
+                                </button>
+                                <ul class="dropdown-menu left-auto right-0 w-180">
+                                    <li>
+                                        <a style="font-size:10px" ng-click="navtoAppointmentReport()" title="Ascending">
+                                            Ascending
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a style="font-size:10px" ng-click="navtoAppointmentReport()" title="Decending">
+                                            Decending
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody style="max-height: 500px; overflow-y: scroll;background:#ebe8e8">
+            <tr ng-show="imageMainTab==2">
+                <td>
+                    <div class="form-group">
+                        <label>Modality</label>
+                        <select class="form-control" ng-model="getOrderImagesObj.ModalityId" ng-options="mitem.Id as mitem.Name for mitem in MasterModalityArray" ng-change="changeModalityForStudies()">
+                        </select>
+                    </div>
+                </td>
+            </tr>
+            <tr ng-show="imageMainTab==2">
+                <td colspan="2" class="p-r-0 bg-white">
+                    <div>
+                        <ul class="list-imagex-ul nav navbar-nav side-nav lazy-navigation m-t-5 fixed-side-nav m-b-5" style="width:100%">
+                            <li ng-repeat="aitem in allPatientImagesArray" class="ng-scope">
+                                <div class="checkbox cn">
+                                    <label>
+                                        <input name="checkbox-1" type="checkbox" ng-model="aitem.IsCheckAll" ng-click="checkAllImagesOfAppointment(aitem)">
+                                        <span class="checkbox-material">
+                                            <span class="check"></span>
+                                        </span>
+                                        <small class="text-s12w500c767575">
+                                            {{aitem.AppointmentDate | date:'MM-dd-yyyy'}}
+                                        </small>
+                                    </label>
+                                    <i class="fas fa-chevron-down text-info m-l-5 m-r-5" ng-click="ActiveCollapsebar(aitem)"></i>
+                                </div>
+                                <ul class="collapse list-imagex-ul-inside" uib-collapse="aitem.IsActive">
+                                    <li ng-repeat="sitem in aitem.PatientFiles" class="ng-scope">
+                                        <div class="dis-flex align-items-center">
+                                            <div class="flex">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-2" type="checkbox" ng-model="sitem.IsActive">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-info">
+                                                            <i class="far fa-image text-info m-l-5 m-r-5"></i>
+                                                            {{sitem.ProcedureName}}
+                                                        </small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="w-20 eh-ou">
+                                                {{sitem.OrganName}}
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+
+            <tr ng-show="imageMainTab==1">
+                <td colspan="2" class="p-r-0 bg-white">
+                    <div class="form-group">
+                        <label>Modality</label>
+                        <select class="form-control" ng-model="studyViewGetObj.ModalityId" ng-options="mitem.Id as mitem.Name for mitem in MasterModalityArray" ng-change="changeModalityForStudies()">
+                        </select>
+                    </div>
+                    <div>
+                        <ul class="list-imagex-ul">
+                            <li class="cur-poiter" ng-click="showImageStudyDetails(imgstdyitem)" ng-repeat="imgstdyitem in studyViewGetObj.imageStudyListArray | filter: modalityfilterData" ng-class="imgstdyitem.IsActive ?'active':''">
+                                <a href="javascript:;">
+                                    <label class="text-s12w500c000">{{imgstdyitem.DOSDate | date:'MM-dd-yyyy'}} {{imgstdyitem.ModalityName}} </label> <span style="font-size: 8px; float: right; color: #248014">{{imgstdyitem.ImageStudyName}}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="col-lg-10 p-l-0">
+    <div class="row" ng-show="imageMainTab==1">
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row" ng-show="selectedImageStudyFiles.AllFiles.length > 0">
+                        <table class="table-c6-list tableno-bordered tableno-padding table-layout-fix">
+                            <tbody>
+                                <tr>
+                                    <td width="6%" class="valign-top">
+                                        <ul class="image-management-list">
+                                            <li ng-repeat="imgitem in selectedImageStudyFiles.RightEyeFiles">
+                                                <img ng-src="{{imgitem.small}}" style="cursor:pointer" class="media-photo" ng-click="clickonParticularImage(imgitem,$index)" />
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td class="valign-top">
+                                        <div class="image-management-img">
+                                            <div id="image-gallery">
+                                                 
+
+                                                <div class="image-container"></div>
+                                                <!--<img src="img/next.png" style="cursor:pointer" class="next" ng-click="nextODimgClick()" />
+                                                <img src="img/pre.png" style="cursor:pointer" class="prev" ng-click="previousODClick()" />-->
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="6%" class="valign-top">
+                                        <ul class="image-management-list">
+                                            <li ng-repeat="imgitem in selectedImageStudyFiles.LeftEyeFiles">
+                                                <img ng-src="{{imgitem.small}}" style="cursor:pointer" class="media-photo" ng-click="clickonRParticularImage(imgitem,$index)" />
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td class="valign-top">
+                                         
+                                        <div class="image-management-img">
+                                            <div id="rimage-gallery">
+                                                <div class="image-container"></div>
+                                                <!--<img src="img/next.png" style="cursor:pointer" class="next" ng-click="nextOSimgClick()" />
+                                                <img src="img/pre.png" style="cursor:pointer" class="prev" ng-click="previousOSClick()" />-->
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row" ng-show="selectedImageStudyFiles.AllFiles.length > 0">
+                        <div class="eh-panel bg-dbdbdb">
+                            <div class="eh-header border-bottom-color-000">
+                                <h1>Image Type : {{selectedImageStudyObj.InvestigationName}}</h1>
+                                <!--<fieldset>
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="1" value="1">
+                                        <label for="1" class="radio-custom-label cur-poiter mb-0 text-black">OD</label>
+                                    </div>
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="2" value="2">
+                                        <label for="2" class="radio-custom-label cur-poiter mb-0 text-black">OS</label>
+                                    </div>
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="3" value="3">
+                                        <label for="3" class="radio-custom-label cur-poiter mb-0 text-black">OU</label>
+                                    </div>
+                                </fieldset>-->
+                                <ul class="us-controls">
+                                    <li>
+                                        <button class="btn btn-save-us" ng-click="saveImageManagementStudyDetails()">Save</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="eh-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <table class="table tableno-bordered tableno-padding table-layout-fix">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="valign-top">
+                                                        <ul class="input-select-onset">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Image Quality</span>
+                                                            </li>
+                                                            <li>
+                                                                <div class="dis-flex">
+                                                                    <div class="flex">
+                                                                        <button class="btn  btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.ImageQuality !='Good' , 'btn-save-us': selectedImageStudyObj.ImageQuality =='Good'}" ng-click="selectedImageStudyObj.ImageQuality='Good'">Good</button>
+                                                                    </div>
+                                                                    <div class="flex m-l-5">
+                                                                        <button class="btn btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.ImageQuality !='Fair' , 'btn-save-us': selectedImageStudyObj.ImageQuality =='Fair'}" ng-click="selectedImageStudyObj.ImageQuality='Fair'">Fair</button>
+                                                                    </div>
+                                                                    <div class="flex m-l-5">
+                                                                        <button class="btn btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.ImageQuality !='Poor' , 'btn-save-us': selectedImageStudyObj.ImageQuality =='Poor'}" ng-click="selectedImageStudyObj.ImageQuality='Poor'">Poor</button>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--OCT Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===1">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">OCT MAC Findings</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Findings" ng-model="selectedImageStudyObj.OCTMACFindings" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===1">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">OCT ON  Findings</span>
+                                                            </li>
+                                                            <li>
+                                                                <div class="dis-flex">
+                                                                    <div class="flex">
+                                                                        <button class="btn btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.OCTONFindings !='LargeCDR' , 'btn-save-us': selectedImageStudyObj.OCTONFindings =='LargeCDR'}" ng-click="selectedImageStudyObj.OCTONFindings='LargeCDR'">Large CDR</button>
+                                                                    </div>
+                                                                    <div class="flex m-l-5">
+                                                                        <button class="btn btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.OCTONFindings !='LowRNFLAvg' , 'btn-save-us': selectedImageStudyObj.OCTONFindings =='LowRNFLAvg'}" ng-click="selectedImageStudyObj.OCTONFindings='LowRNFLAvg'">Low RNFL avg</button>
+                                                                    </div>
+                                                                    <div class="flex m-l-5">
+                                                                        <button class="btn btn-block" ng-class="{'btn-save-us-outline': selectedImageStudyObj.OCTONFindings !='Thick360' , 'btn-save-us': selectedImageStudyObj.OCTONFindings =='Thick360'}" ng-click="selectedImageStudyObj.OCTONFindings='Thick360'">Thick 360</button>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--AScan Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===2">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">IOL Lens</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter IOL Lens" ng-model="selectedImageStudyObj.IOLLensValue" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===2">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">IOL Power</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter IOL Power" ng-model="selectedImageStudyObj.IOLPowerValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--BScan Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===3">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Frequencies</span>
+                                                            </li>
+                                                            <li>
+                                                                <select class="form-control input-md" ng-model="selectedImageStudyObj.FrequencyValue">
+                                                                    <option value="">Select Frequency</option>
+                                                                    <option value="10 MHz">10 MHz</option>
+                                                                    <option value="20 MHz">20 MHz</option>
+                                                                    <option value="35 MHz">35 MHz</option>
+                                                                    <option value="50 MHz">50 MHz</option>
+                                                                    <option value="100 MHz">100 MHz</option>
+                                                                </select>
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===3">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Findings</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Findings" ng-model="selectedImageStudyObj.FindingValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--Corneal Topography Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===4">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">K1 Value</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter K1 Value" ng-model="selectedImageStudyObj.K1Value" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===4">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">K2 Value</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter K2 Value" ng-model="selectedImageStudyObj.K2Value" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===4">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">CYL Value</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter CYL Value" ng-model="selectedImageStudyObj.CYLValue" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===4">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">
+                                                                    Corneal Thickness
+                                                                </span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Corneal Thickness" ng-model="selectedImageStudyObj.CornealThicknessValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--Slit Lamp Photography-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===5">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Lids</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Lids" ng-model="selectedImageStudyObj.LidsValue" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===5">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Conjunctiva</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Conjunctiva" ng-model="selectedImageStudyObj.ConjunctivaValue" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===5">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Sclera</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Sclera" ng-model="selectedImageStudyObj.ScleraValue" />
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===5">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">
+                                                                    Cornea
+                                                                </span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Cornea" ng-model="selectedImageStudyObj.CorneaValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--AS OCT Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===6">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Findings</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Findings" ng-model="selectedImageStudyObj.FindingValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--Fundus Photos Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===7">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Findings</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Findings" ng-model="selectedImageStudyObj.FindingValue" />
+                                                            </li>
+                                                        </ul>
+
+                                                        <!--Endothelial cell count Content-->
+
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===8">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">No Of Cells</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter No Of Cells" ng-model="selectedImageStudyObj.EndothelialCellCountValue" />
+                                                            </li>
+                                                            <li class="m-l-10 w-50 bg-d9d9d9 text-center">
+                                                                μm
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===8">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Cell Density</span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Cell Density" ng-model="selectedImageStudyObj.EndothelialCellDensity" />
+                                                            </li>
+                                                            <li class="m-l-10 w-50 bg-d9d9d9 text-center">
+                                                                μm
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset" ng-if="selectedImageStudyObj.InvestigationId===8">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">
+                                                                    Corneal Thickness
+                                                                </span>
+                                                            </li>
+                                                            <li>
+                                                                <input type="text" class="form-control input-md" placeholder="Enter Corneal Thickness" ng-model="selectedImageStudyObj.CornealThicknessValue" />
+                                                            </li>
+                                                            <li class="m-l-10 w-50 bg-d9d9d9 text-center">
+                                                                μm
+                                                            </li>
+                                                        </ul>
+
+
+                                                        <ul class="input-select-onset">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Provider</span>
+                                                            </li>
+                                                            <li>
+
+                                                                <div class="row" style="width:100%">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+
+                                                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                                                                {{selectedImageStudyObj.DoctorObj.FullName}}
+                                                                            </button>
+
+                                                                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="mainsearch-App">
+                                                                                            <i class="fas fa-search"></i>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                    <input type="text" class="form-control" placeholder="Search Provider" ng-model="searchdoctor.txt1" />
+                                                                                </div>
+                                                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                    <ul>
+                                                                                        <li role="presentation" ng-repeat="item in clinicDoctorList | filter:{'FullName':searchdoctor.txt1}" ng-click="chooseDoctorforImageStudy(item)">
+                                                                                            <a href="javascript:;">{{item.FullName}}</a>
+                                                                                        </li>
+
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="input-select-onset">
+                                                            <li class="w-200">
+                                                                <span class="text-s12w500C068cb0 m-r-10">Technician</span>
+                                                            </li>
+                                                            <li>
+                                                                <div class="row" style="width:100%">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+
+                                                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                                                                {{selectedImageStudyObj.TechnicianObj.FullName}}
+                                                                            </button>
+
+                                                                            <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="mainsearch-App">
+                                                                                            <i class="fas fa-search"></i>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                    <input type="text" class="form-control" placeholder="Search Provider" ng-model="searchdoctor.txt1" />
+                                                                                </div>
+                                                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                    <ul>
+                                                                                        <li role="presentation" ng-repeat="item in AllTecniciansList | filter:{'FullName':searchdoctor.txt1}" ng-click="chooseTechnicianforImageStudy(item)">
+                                                                                            <a href="javascript:;">{{item.FullName}}</a>
+                                                                                        </li>
+
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label>Provider Notes :</label>
+                                                                    <textarea class="form-control" rows="4" placeholder="Add Notes" ng-model="selectedImageStudyObj.ProviderRemarks"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label>Technician Notes :</label>
+                                                                    <textarea class="form-control" rows="4" placeholder="Add Notes" ng-model="selectedImageStudyObj.TechnicianRemarks"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                    <td class="valign-top">
+                                                        <div class="eh-panel" style="height: 200px;">
+                                                            <div class="eh-header border-bottom-color-000">
+
+                                                                <input type="text" class="form-control input-color"
+                                                                       placeholder="Search Diagnosis/ICD 10 Codes"
+                                                                       ng-model="selectedImageStudyObj.SelectedDiagObj"
+                                                                       maxlength="100"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-focus-on-select="false"
+                                                                       uib-typeahead="item as item.ICDCodewithDIAGDESCRIPTION for item in GetDiagnosisSearch($viewValue)"
+                                                                       typeahead-on-select="onselectDiagnosisitem(selectedImageStudyObj.SelectedDiagObj,item)"
+                                                                       ng-change="changeselectDiagnosisitem(selectedImageStudyObj.SelectedDiagObj,item)" />
+
+                                                            </div>
+                                                            <div class="eh-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <table class="table tableno-padding tableno-bordered tableno-padding">
+                                                                            <tbody>
+                                                                                <tr ng-repeat="ditem in selectedImageStudyObj.DiagnosisListArray">
+                                                                                    <td class="text-s12w500c000">
+                                                                                        {{ditem.ICD10CODE}} |   {{ditem.ICD10DIAGNAME}}
+                                                                                    </td>
+                                                                                    <td width="5%">
+                                                                                        <a href="javascript:;">
+                                                                                            <img src="img/close-red.svg" width="15" height="15" ng-click="deleteDiagitem(ditem,$index)" />
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row" ng-hide="selectedImageStudyFiles.AllFiles.length > 0">
+                        <div class="col-lg-12 text-center">
+                            <div class="billing-cominsoon">
+                                <img src="img/no-data/no-settings.png">
+                                <div class="msg">
+                                    <p class="">No data to show</p>
+                                    <p class="no-records-txt-line2">
+                                        Try using a different criteria to view better results.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row" ng-show="imageMainTab==2">
+
+        <div class="col-lg-12">
+            <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary" ng-click="addImageStudy()">Add Study</button>
+                            <button class="btn btn-info" ng-click="addImagetoCompare()">Add to  Compare</button>
+
+                            <button class="btn btn-danger" ng-click="clearComapredArray()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="row">
+                <div class="col-lg-6 m-b-10" ng-repeat="imgitem in compareImagesArray">
+                    <div class="width-100 height-300 pos-relative overflow-hidden bg-407959">
+                        <div class="image-management-img">
+                            <div id="CompImgId{{$index+1}}" ng-mouseover=scrollparticularImg($index+1)>
+                                <div id="zoom{{$index+1}}" class="zoomclass ">
+                                    <img ng-src="{{imgitem.S3URL}}" class="img-responsive" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+<style>
+
+    #image-gallery {
+        width: 100%;
+        position: relative;
+        height: 300px;
+        background: #000;
+    }
+
+        #image-gallery .image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0px;
+        }
+
+        #image-gallery .prev,
+        #image-gallery .next {
+            position: absolute;
+            height: 32px;
+            margin-top: -66px;
+            top: 50%;
+        }
+
+        #image-gallery .prev {
+            left: 20px;
+        }
+
+        #image-gallery .next {
+            right: 20px;
+            cursor: pointer;
+        }
+
+        #image-gallery .footer-info {
+            position: absolute;
+            height: 50px;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            line-height: 50px;
+            font-size: 24px;
+            text-align: center;
+            color: white;
+            border-top: 1px solid #fff;
+        }
+
+
+
+    #rimage-gallery {
+        width: 100%;
+        position: relative;
+        height: 300px;
+        background: #000;
+    }
+
+        #rimage-gallery .image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0px;
+        }
+
+        #rimage-gallery .prev,
+        #rimage-gallery .next {
+            position: absolute;
+            height: 32px;
+            margin-top: -66px;
+            top: 50%;
+        }
+
+        #rimage-gallery .prev {
+            left: 20px;
+        }
+
+        #rimage-gallery .next {
+            right: 20px;
+            cursor: pointer;
+        }
+
+        #rimage-gallery .footer-info {
+            position: absolute;
+            height: 50px;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            line-height: 50px;
+            font-size: 24px;
+            text-align: center;
+            color: white;
+            border-top: 1px solid #fff;
+        }
+
+    .zoomclass {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        margin: 10px;
+        transform-origin: 0px 0px;
+        transform: scale(1) translate(0px, 0px);
+        cursor: grab;
+    }
+
+    div .zoomclass > img {
+        width: 100%;
+        height: auto;
+    }
+</style>

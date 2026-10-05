@@ -1,0 +1,483 @@
+﻿<div class="section__style--4 height__100--">
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- mb__10--">
+        <table class="table m-0 tableno-bordered tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="18%">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input type="text" class="icons-calendar" id="input_fdate" ng-model="ARReportData.FromDate" placeholder="MM-DD-YYYY" datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="18%">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input type="text" class="icons-calendar" id="input_tdate" ng-model="ARReportData.ToDate" placeholder="MM-DD-YYYY" datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="18%">
+                        <div class="form__group">
+                            <label>Aging By</label>
+                            <select ng-model="ARReportData.Type" id="select_brangetype" ng-options="item.value as item.label for item in agingByOptions">
+                                <option value="" disabled> Select </option>
+                            </select>
+                        </div>
+                    </td>
+                    <!--<td>
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                Select Offices <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="office in mainBillerDataObj.AllBranchesList">
+                                    <label>
+                                        <input type="checkbox" ng-model="office.selected"> {{ office.BranchName }}
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>-->
+                    <td>
+                        <div class="form__group mt__20-- d__f-- ai__c-- gap__10--">
+                            <button class="btn__lg-- btn__1d5558--f" ng-click="GetAllARReport()" id="btn_search">Search</button>
+                            <button ng-if="reportTab=='AgingDetailByInsurance' ||reportTab=='AgingDetailByPatient' ||reportTab=='AgingDetailByBillingProvider' "
+                                    ng-click="onBtExport()" class="btn__lg-- btn__1d5558--f">
+                                Export to Excel
+                            </button>
+                            <button ng-if="reportTab=='AgingDetailByInsurance'"
+                                    ng-click="onBtExportInsuranceWisePDF()" class="btn__lg-- btn__1d5558--f">
+                                Export to PDF
+                            </button>
+                            <button ng-if="reportTab=='AgingDetailByPatient' "
+                                    ng-click="onBtExportPatientWisePDF()" class="btn__lg-- btn__1d5558--f">
+                                Export to PDF
+                            </button>
+                            <button ng-if="reportTab=='AgingDetailByBillingProvider' "
+                                    ng-click="onBtExportProviderWisePDF()" class="btn__lg-- btn__1d5558--f">
+                                Export to PDF
+                            </button>
+                            <!--<button ng-if="reportTab=='AgingDetailByInsurance' ||reportTab=='AgingDetailByPatient' ||reportTab=='AgingDetailByBillingProvider' "
+                                    ng-click="exportSelectedOffices()" class="btn__lg-- btn__1d5558--f">
+                                Download CSV
+                            </button>-->
+
+                            <button class="b-0" ng-click="refreshARDetails(1)" id="btn_refresh">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="section__header--">
+        <h1>{{ getReportHeading() }}</h1>
+    </div>
+    <div class="section__body-- height__100--">
+        <div class="d__f-- fd__c-- height__100--">
+            <div class="height__100--" ng-if="reportTab=='SummaryByAllOptions'">
+                <div class="ag-theme-quartz height__100--" id="summaryGrid"></div>
+            </div>
+            <div class="height__100--" ng-if="reportTab=='DetailByAllOptions'">
+                <div class="ag-theme-quartz height__100--" id="summaryGrid"></div>
+            </div>
+            <div class="height__100--" ng-if="reportTab=='AgingDetailByInsurance'">
+                <div class="ag-theme-quartz height__100--" id="insuranceARGrid"></div>
+            </div>
+            <div class="height__100--" ng-if="reportTab=='AgingDetailByPatient'">
+                <div class="ag-theme-alpine height__100--" id="patientARGrid"></div>
+            </div>
+            <div class="height__100--" ng-if="reportTab=='AgingDetailByBillingProvider'">
+                <div class="ag-theme-alpine height__100--" id="providerARGrid"></div>
+            </div>
+            <div class="height__100--" ng-if="reportTab=='EmptyAgingReport'">
+                <div class="ag-theme-alpine height__100--" id="emptyARGrid"></div>
+            </div>
+        </div>
+    </div>
+    <div id="ARInsuranceReport_Print" class="m-5" style="display:none;">
+        <div style="width: 100%; padding: 6px; margin: auto; padding-bottom: 12px; background-color: #fff; clear: both">
+            <table style="width: 100%; border-bottom: 0.5px solid #ADADAD; background: #FAFAFA; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="vertical-align:top;">
+                            <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{HospitalAddressArray.ClinicName}}</div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address1}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address2}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CityName}}, {{HospitalAddressArray.StateName}}
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CountryName}}, {{HospitalAddressArray.PinCode}}
+                            </div>
+                        </td>
+                        <!--<td style="vertical-align:top; width:50%">
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                Any concerns about your invoice?
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                <b style="font-weight:700;">   Phone:</b> (353) 454-6456 <b style="font-weight:700;">   Fax:</b>  (463) 565-6547
+                            </div>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="color: #000; font-size: 14px; font-style: normal; font-weight: 700; line-height: normal; text-align: center;">
+                            AGING REPORT (By Insurance)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="width: 100%;" ng-repeat="officeItem in GroupedOfficeArray">
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  Office: </b>{{officeItem.office}}
+                </div>
+                <div style="width: 100%;" ng-repeat="ins in officeItem.insurances">
+                    <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                        <b>  Insurance: </b>{{ins.insurance}}
+                    </div>
+
+                    <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                        <thead>
+                            <tr>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0; background: #FFFF; font-style: normal;  font-weight: 700; line-height: normal; text-align: left;  padding: 5px 8px; width: 14%; ">DOS</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:14%">Claim Date</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:25%">Patient</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:10%">CPT</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">0-30</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">31-60</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">61-90</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">91-120</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">120+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in ins.claims">
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ServiceFrom | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ClaimDate | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                    {{row.Patient}}
+                                </td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.CPT}} </td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging0_30}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging31_60}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging61_90}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging91_120}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging120plus}}</td>
+                            </tr>
+                            <tr ng-init="insTotals = getInsuranceTotals(ins)">
+                                <td colspan="4" style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">TOTAL - {{ins.insurance}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.zeroToThirty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.thirtyToSixty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.sixtyToNinety | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.ninetyToOneTwenty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.moreThanOneTwenty | number:2}}</td>
+                            </tr>
+                            <!--<tr>
+                                <td colspan="9" style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px 8px; text-align:right;">Continue on the next page</td>
+                            </tr>-->
+                        </tbody>
+                    </table>
+
+                </div>
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  OFFICE TOTAL:  </b> {{officeItem.office}}
+                </div>
+                <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                    <tbody>
+                        <tr ng-init="totals = getOfficeTotalsForOffice(officeItem)">
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right:0.8px solid #808080;">
+                                0-30 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.zeroToThirty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                31-60 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.thirtyToSixty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                61-90 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.sixtyToNinety | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                91-120 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.ninetyToOneTwenty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                120+ Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.moreThanOneTwenty | number:2}}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+
+
+        </div>
+    </div>
+    <div id="ARPatientReport_Print" class="m-5" style="display:none;">
+        <div style="width: 100%; padding: 6px; margin: auto; padding-bottom: 12px; background-color: #fff; clear: both">
+            <table style="width: 100%; border-bottom: 0.5px solid #ADADAD; background: #FAFAFA; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="vertical-align:top;">
+                            <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{HospitalAddressArray.ClinicName}}</div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address1}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address2}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CityName}}, {{HospitalAddressArray.StateName}}
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CountryName}}, {{HospitalAddressArray.PinCode}}
+                            </div>
+                        </td>
+                        <!--<td style="vertical-align:top; width:50%">
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                Any concerns about your invoice?
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                <b style="font-weight:700;">   Phone:</b> (353) 454-6456 <b style="font-weight:700;">   Fax:</b>  (463) 565-6547
+                            </div>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="color: #000; font-size: 14px; font-style: normal; font-weight: 700; line-height: normal; text-align: center;">
+                            AGING REPORT (By Patient)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="width: 100%;" ng-repeat="patientItem in GroupedPatientArray">
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  Patient: </b>{{patientItem.patient}}
+                </div>
+                <div style="width: 100%;" ng-repeat="ofc in patientItem.offices">
+                    <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                        <b>  Office: </b>{{ofc.office}}
+                    </div>
+
+                    <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                        <thead>
+                            <tr>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0; background: #FFFF; font-style: normal;  font-weight: 700; line-height: normal; text-align: left;  padding: 5px 8px; width: 14%; ">DOS</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:14%">Claim Date</th>
+                                <!--<th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:25%">Patient</th>-->
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:10%">CPT</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">0-30</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">31-60</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">61-90</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">91-120</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">120+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in ofc.claims">
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ServiceFrom | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ClaimDate | date:'MM-dd-yyyy'}}</td>
+                                <!--<td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                    {{row.PatientFullName}}
+                                </td>-->
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.CPT}} </td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging0_30}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging31_60}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging61_90}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging91_120}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging120plus}}</td>
+                            </tr>
+                            <tr ng-init="insTotals = getInsuranceTotals(ofc)">
+                                <td colspan="3" style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">TOTAL - {{ofc.office}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.zeroToThirty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.thirtyToSixty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.sixtyToNinety | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.ninetyToOneTwenty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.moreThanOneTwenty | number:2}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  PATIENT TOTAL:  </b> {{patientItem.patient}}
+                </div>
+                <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                    <tbody>
+                        <tr ng-init="totals = getPatientOfficeTotalsForOffice(patientItem)">
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right:0.8px solid #808080;">
+                                0-30 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.zeroToThirty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                31-60 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.thirtyToSixty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                61-90 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.sixtyToNinety | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                91-120 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.ninetyToOneTwenty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                120+ Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.moreThanOneTwenty | number:2}}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div id="ARProviderReport_Print" class="m-5" style="display:none;">
+        <div style="width: 100%; padding: 6px; margin: auto; padding-bottom: 12px; background-color: #fff; clear: both">
+            <table style="width: 100%; border-bottom: 0.5px solid #ADADAD; background: #FAFAFA; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="vertical-align:top;">
+                            <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{HospitalAddressArray.ClinicName}}</div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address1}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.Address2}}
+
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CityName}}, {{HospitalAddressArray.StateName}}
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                {{HospitalAddressArray.CountryName}}, {{HospitalAddressArray.PinCode}}
+                            </div>
+                        </td>
+                        <!--<td style="vertical-align:top; width:50%">
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                Any concerns about your invoice?
+                            </div>
+                            <div style="font-size: 12px; font-style: normal; font-weight: 400; line-height: 20px; color: #000; ">
+                                <b style="font-weight:700;">   Phone:</b> (353) 454-6456 <b style="font-weight:700;">   Fax:</b>  (463) 565-6547
+                            </div>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="color: #000; font-size: 14px; font-style: normal; font-weight: 700; line-height: normal; text-align: center;">
+                            AGING REPORT (By Provider)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="width: 100%;" ng-repeat="providerItem in GroupedProviderArray">
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  Provider: </b>{{providerItem.provider}}
+                </div>
+                <div style="width: 100%;" ng-repeat="ofc in providerItem.offices">
+                    <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                        <b>  Office: </b>{{ofc.office}}
+                    </div>
+
+                    <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                        <thead>
+                            <tr>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0; background: #FFFF; font-style: normal;  font-weight: 700; line-height: normal; text-align: left;  padding: 5px 8px; width: 14%; ">DOS</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:14%">Claim Date</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:25%">Patient</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:10%">CPT</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">0-30</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">31-60</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding: 5px 8px; width:9%">61-90</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">91-120</th>
+                                <th style="font-size: 10px; border-bottom: 1px solid #808080; border-radius: 2px 2px 0 0;   background: #FFFF; font-style: normal; font-weight: 700; line-height: normal; text-align:left;  padding:  5px 8px; width: 9% ">120+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in ofc.claims">
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ServiceFrom | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.ClaimDate | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                    {{row.Patient}}
+                                </td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">{{row.CPT}} </td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging0_30}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging31_60}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging61_90}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging91_120}}</td>
+                                <td style="font-size: 10px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">${{row.Aging120plus}}</td>
+                            </tr>
+                            <tr ng-init="insTotals = getInsuranceTotals(ofc)">
+                                <td colspan="4" style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">TOTAL - {{ofc.office}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.zeroToThirty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.thirtyToSixty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.sixtyToNinety | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.ninetyToOneTwenty | number:2}}</td>
+                                <td style="font-size: 10px; background:#2D2D47; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #fff; padding: 5px 8px;">${{insTotals.moreThanOneTwenty | number:2}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:5px;">
+                    <b>  PROVIDER TOTAL:  </b> {{providerItem.provider}}
+                </div>
+                <table style="width: 100%; border: 0.6px solid #808080; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom: 10px;">
+                    <tbody>
+                        <tr ng-init="totals = getPatientOfficeTotalsForOffice(providerItem)">
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right:0.8px solid #808080;">
+                                0-30 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.zeroToThirty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                31-60 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.thirtyToSixty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                61-90 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.sixtyToNinety | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px; border-right: 0.8px solid #808080;">
+                                91-120 Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.ninetyToOneTwenty | number:2}}</p>
+                            </td>
+                            <td style="font-size: 11px;  font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #1D1D1D; padding: 5px 8px;">
+                                120+ Days
+                                <p style="font-size: 12px;  font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #1D1D1D; margin-top:5px;">${{totals.moreThanOneTwenty | number:2}}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+
+
+        </div>
+    </div>
+</div>

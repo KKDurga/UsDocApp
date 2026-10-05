@@ -1,0 +1,115 @@
+﻿<div class="mini-popup p-0">
+    <div class="dis-flex">
+        <div class="left-nav-opot m-t-5">
+            
+            <div class="p-10 bg-gradient m-t-55">
+                <div>
+                    <fieldset class="pos-relative m-b-5">
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom width-0" id="NameId" name="patSearchType" ng-value="1" aria-invalid="false" ng-model="AppointmentObj.SelectedSearchType" ng-click="ChangeAllpatientsearchradioButton(AppointmentObj.SelectedSearchType);">
+                            <label for="NameId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'NAME' | translate}}</label>
+                        </div>
+                        <div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0 " id="mrMobileId" name="patSearchType" ng-value="2" aria-invalid="false" ng-model="AppointmentObj.SelectedSearchType" ng-click="ChangeAllpatientsearchradioButton(AppointmentObj.SelectedSearchType);">
+                            <label for="mrMobileId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'MRNO' | translate}}</label>
+                        </div>
+                        <div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0 " id="oldMRId" name="patSearchType" ng-value="3" aria-invalid="false" ng-model="AppointmentObj.SelectedSearchType" ng-click="ChangeAllpatientsearchradioButton(AppointmentObj.SelectedSearchType);">
+                            <label for="oldMRId" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'OLDMRNO' | translate}}</label>
+                        </div>
+                        <!--<div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0" id="DOBinc" name="patSearchType" ng-model="AppointmentObj.SelectedSearchType" ng-value="4" ng-click="ChangeAllpatientsearchradioButton(AppointmentObj.SelectedSearchType);" value="4">
+                            <label for="DOBinc" class="radio-custom-label cur-poiter mb-0 text-label">{{ 'DOB' | translate}}</label>
+                        </div>-->
+                    </fieldset>
+                </div>
+                <input type="text" class="form-control icons-search consultation-input text-capitalize dropdown-toggle bradius-10" ng-show="AppointmentObj.SelectedSearchType == 1"
+                       placeholder="Search Name" ng-model="AppointmentObj.SearchText" ng-change="">
+                <input type="text" class="form-control icons-search consultation-input text-capitalize dropdown-toggle bradius-10" ng-show="AppointmentObj.SelectedSearchType == 2"
+                       placeholder="Search MRNo" ng-model="AppointmentObj.MRNoText" ng-change="">
+                <input type="text" class="form-control icons-search consultation-input text-capitalize dropdown-toggle bradius-10" ng-show="AppointmentObj.SelectedSearchType == 3"
+                       placeholder="Search Old MRNo" ng-model="AppointmentObj.OldMRNoText" ng-change="">
+                <input type="text" class="form-control icons-search consultation-input text-capitalize dropdown-toggle bradius-10" placeholder="MM-DD-YYYY" typeahead-min-length="10" ng-show="AppointmentObj.SelectedSearchType == 4" ng-model="AppointmentObj.DOB" ng-change="" dob-format minlength="10" maxlength="10">
+
+                <i class="fa fa-times new-color" ng-click="ClickSearchIconOnPatient()" style="position: absolute; top: 99px; left: 252px; font-size: 17px;"></i>
+            </div>
+            <!--<div ng-show="AppointmentObj.CurrentDateAppointmentList.length == 0">
+                <div class="col-lg-12 text-center">
+                    <div class="billing-cominsoon">
+                        <img src="img/no-data/no-results.png" />
+                        <div class="msg">
+                            <p class="goback-text">No Appointments available.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <ul class="over-scrol-y" resize ng-style="heightHB()" ng-hide="AppointmentObj.CurrentDateAppointmentList.length == 0">
+                <!--<li ng-repeat="row in AppointmentObj.CurrentDateAppointmentList">-->
+                <li ng-repeat="row in AppointmentObj.CurrentDateAppointmentList | filter:{'PatientFullName' : AppointmentObj.SearchText,'MRNumber': AppointmentObj.MRNoText,'OldMRNumber' : AppointmentObj.OldMRNoText}">
+                    
+                    <div class="dis-flex">
+                        <div class="w-30 applist-popoevr pos-relative text-center">
+                            <div class="checkedin-summary checktype">
+                                <p>{{row.CheckinStatusId===2 || row.CheckinStatusId===1  ? 'IN':'Out'}}</p>
+                            </div>
+                        </div>
+                        <div class="summary-dropdown m-l-10 flex">
+                            <div ng-click="getSelectedPatientDetails(row)">
+                                <div class="dis-flex justify-space-between">
+                                    <span class="m-b-0 flex">
+                                        <b>
+                                            {{row.Patient.FullName}}
+                                        </b>
+                                        <!-- {{(row.Patient.Title ==''||row.Patient.Title ==null)?"Mr .":(row.Patient.Title + '. ')}}-->
+                                    </span>
+                                    <span>
+                                        <!--<i class="vip eh-icon"></i>-->
+                                        <!--<i class="chekin eh-icon"></i>
+                        <i class="Walkin eh-icon"></i>
+                        <i class="wheelchair eh-icon"></i>-->
+                                    </span>
+                                </div>
+                                <p class="m-b-0 pos-relative bottom-5">
+                                    <span class="summary-edit">{{row.Patient.PatientDisplayId}} </span>
+                                    <span class="summary-edit"> |</span>
+                                    <!--<span class="summary-edit" ng-show="row.Patient.AgeInYears!=0">  {{row.Patient.AgeInYears}} Y </span>
+                    <span class="summary-edit" ng-show="row.Patient.AgeInYears ===0"> {{row.Patient.AgeInMonths}}M {{ row.Patient.AgeInDays}}D </span>-->
+                                    <span class="summary-edit">{{row.Patient.DOB | date:'MM-dd-yyyy'}}</span>
+                                    <span class="summary-edit"> | </span>
+                                    <span class="summary-edit"> {{row.Patient.Gender}} </span>
+                                </p>
+                                <div ng-show="row.TrackerDetails.length >0">
+                                    <span class="summary-edit">{{row.TrackerDetails[0].RoomType}},</span>
+                                    <span class="summary-edit">{{row.TrackerDetails[0].Status}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li ng-show="AppointmentListFilter.TotalCount > 400">
+                    <uib-pagination total-items="AppointmentListFilter.TotalCount"
+                                    ng-model="AppointmentListFilter.PageNumber"
+                                    ng-change="GetAllAppointmentsList(AppointmentListFilter.PageNumber)"
+                                    max-size="5"
+                                    items-per-page="AppointmentListFilter.PageSize"
+                                    class=""
+                                    boundary-link-numbers="true"
+                                    rotate="false"></uib-pagination>
+                </li>
+            </ul>
+            <ul class="over-scrol-y" resize ng-style="heightHB()" ng-show="AppointmentObj.CurrentDateAppointmentList.length == 0">
+                <li>
+                    <div class="col-lg-12 text-center">
+                        <div class="billing-cominsoon">
+                            <img src="img/no-data/no-results.png" />
+                            <div class="msg">
+                                <p class="goback-text">No Appointments available.</p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="flex" ng-click="patientsummary();"></div>
+    </div>    
+</div>

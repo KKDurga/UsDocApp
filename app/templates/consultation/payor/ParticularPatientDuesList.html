@@ -1,0 +1,441 @@
+﻿<div class="modal-header">
+    <h2 class="modal-title">
+       Ledger
+    </h2>
+    <button type="button" class="close m-r-10 m-b-3 m-t-0" ng-click="ClosePopup()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+ 
+<div class="modal-body bg-fafbfc">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="table-responsive">
+                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                    <tbody>
+                        <tr>
+                            <td class="w-150">
+                                <div class="form-group">
+                                    <label>From Date</label>
+                                    <!--<input type="text" class="form-control icons-calendar" />-->
+                                    <input type="text" class="form-control icons-calendar"  placeholder="MM-DD-YYYY"  ng-model="PatientInvoiceSerachObj.FromDate" datepickerregpatientus readonly />
+                                </div>
+                            </td>
+                            <td class="w-150">
+                                <div class="form-group">
+                                    <label>To Date</label>
+                                    <!--<input type="text" class="form-control icons-calendar" />-->
+                                    <input type="text" class="form-control icons-calendar"  placeholder="MM-DD-YYYY" ng-model="PatientInvoiceSerachObj.ToDate" datepickerregpatientus readonly />
+                                </div>
+                            </td>
+                            <td class="w-200">
+                                <div class="form-group">
+                                    <label>Invoice No</label>
+                                    <input type="text" class="form-control" placeholder="Search with invoice number" ng-model="PatientInvoiceSerachObj.InvoiceId" maxlength="10" noSpecialChar/>
+                                </div>
+                            </td>
+                            <td colspan="2">
+                                <div class="form-group m-t-25">
+                                    <button class="btn btn-success p-l-30 p-r-30" ng-click="GetPatientInvoiceslist(1);">Search</button>
+                                    <button class="btn btn-discard-us p-l-30 p-r-30" ng-click="ClearSearch();">Clear</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="border-d2d2d2">
+        <div>
+            <div class="col-lg-12 bg-edfaff">
+                <div class="col-lg-3 p-l-0">
+                    <div class="tile-header b-0 text-center">
+                        <h1 class="p-15">Invoice List</h1>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="tile-header b-0 text-center">
+                        <ul class="us-controls dis-inline-flex pull-right">
+                            <li class="tile-header b-0">
+                                <h1>Invoice Summary</h1>
+                            </li>
+                            <li class="tile-header b-0">
+                                <label class="cur-poiter">
+                                    <input type="checkbox" id="3" value="" class="checkbox" ng-model="PatientInvoiceSerachObj.IsShowAllDueBills" ng-change="ChangeToDueList(PatientInvoiceSerachObj.IsShowAllDueBills);">
+                                    <span class="lbl"></span>
+                                    <span class="usc-remarks fs-14"><b>show invoice with the due balance</b></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 p-r-0">
+                <div class="eh-panel b-0 p-0 b-radius">
+                    <div class="eh-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 m-l-5 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th width="50%">Invoice</th>
+                                                <th>Balance</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!--<tr class="invoice-body">
+                                        <td>
+                                            <p class="m-b-0">PR9976688</p>
+                                            <p class="m-b-0">20/02/2022</p>
+                                        </td>
+                                        <td>
+                                            <p class="m-b-0 text-d02626">$1000</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <i class="fa fa-chevron-right"></i>
+                                        </td>
+                                    </tr>-->
+                                            <tr ng-repeat="item in PatientInvoicesList" ng-class="item.IsShowItems == true ? 'invoice-body':''" ng-click="onClickParticulerInvoice(item);">
+                                                <td>
+                                                    <p class="m-b-0">{{item.InvoiceId}}</p>
+                                                    <p class="m-b-0">{{item.AppointmentDate | date:'MM/dd/yyyy'}}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-b-0 text-d02626" ng-show="item.TotalBalance != 0">${{item.TotalBalance}}</p>
+                                                </td>
+                                                <td class="text-center" ng-show="item.IsShowItems == false">
+                                                    <i class="fa fa-chevron-down"></i>
+                                                </td>
+                                                <td class="text-center" ng-show="item.IsShowItems == true">
+                                                    <i class="fa fa-chevron-right"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                 <div class="EH-pagination text-center">
+                                     <uib-pagination total-items="PatientInvoiceSerachObj.Count"
+                                                     ng-model="PatientInvoiceSerachObj.PageNumber"
+                                                     ng-change="GetPatientInvoiceslist(PatientInvoiceSerachObj.PageNumber)"
+                                                     ng-show="PatientInvoiceSerachObj.Count > 10"
+                                                     max-size="PatientInvoiceSerachObj.PageSize"
+                                                     class=""
+                                                     boundary-link-numbers="true"
+                                                     rotate="false">
+
+                                     </uib-pagination>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-lg-9" ng-show="ShowDuePaymentAmountView === false && SelectedInvoiceObj.BillingDetails.length > 0">
+                <section class="eh-panel b-0 p-0 b-radius">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th class="w-100">Date</th>
+                                                <th>Service</th>
+                                                <th>Plan of service</th>
+                                                <th class="w-80">Unit cost</th>
+                                                <th>Units</th>
+                                                <th>Total</th>
+                                                <th>In1</th>
+                                                <th>In2</th>
+                                                <th>Copay</th>
+                                                <th class="w-50">Due</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bb-d2d2d2" ng-repeat="sitem in  SelectedInvoiceObj.BillingDetails">
+                                                <td>
+                                                    {{SelectedInvoiceObj.AppointmentDate | date:'MM-dd-yyyy'}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.ProcedureName}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.PlaceofServiceName}}
+                                                </td>
+                                                <td>
+                                                    {{sitem.ProcedureCost}}
+                                                </td>
+                                                <td>*{{sitem.Multiplyfactor}}</td>
+                                                <td>{{sitem.TotalAmountReceived}}</td>
+                                                <td>{{sitem.InsuranceAmount1}}</td>
+                                                <td>{{sitem.InsuranceAmount2}}</td>
+                                                <td>{{sitem.PatientCoPay}}</td>
+                                                <td class="text-danger">{{sitem.ItemDueAmount}}</td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody>
+
+                                            <tr class="text-center  bg-edfaff">
+                                                <td colspan="2">
+                                                    Total Received: <b>$ {{SelectedInvoiceObj.TotalReceivedAmount == 0?0:SelectedInvoiceObj.TotalReceivedAmount}}</b>
+                                                </td>
+                                                <td colspan="2">
+                                                    Insurance Balance: <b>$ {{SelectedInvoiceObj.TotalInsurancePaid}}</b>
+                                                </td>
+                                                <td colspan="3">
+                                                    Patient Balance: <b>$ {{SelectedInvoiceObj.TotalPatientBalance}}</b>
+                                                </td>
+                                                <td colspan="3">
+                                                    Total Balance: <b>$ {{SelectedInvoiceObj.TotalBalance}}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="modal-footer text-left p-10" style=" background-image: linear-gradient(to bottom, #f6f6f6, #e5e5e5) !important;">
+                                    <a>
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b>HFCA PRINT</b>
+                                    </a>
+                                    <a class="m-l-10">
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b> PRINT FINAL BILL</b>
+                                    </a>
+                                    <a class="m-l-10">
+                                        <img src="img/consultation/ledger-print.svg" />
+                                        <b> PRINT appointment wise BILL</b>
+                                    </a>
+                                    <button type="button" class="btn btn-save-us pull-right m-l-10" ng-click="AddpaymentShow();" ng-disabled="SelectedInvoiceObj.TotalBalance == 0">
+                                        <img src="img/consultation/add-payment.png" /> Add Payment
+                                    </button>
+                                    <button type="button" class="btn btn-view-payment pull-right" ng-click="onClickViewPaymentList()">{{ShowBillViewList == true ? 'Hide Payment Details' :'View Payment Details'}}</button>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12" ng-show="ShowBillViewList == true">
+                                <div class="table-responsive" ng-show="mainBillingObject.BillingHistoryDetails.length > 0">
+                                    <table class="table tableno-bordered m-b-0 m-t-5">
+                                        <thead>
+                                            <tr class="invoice-head">
+                                                <th class="w-100">Date</th>
+                                                <th>ReceiptId</th>
+                                                <th>Paid</th>
+                                                <th>Mode of Payment</th>
+                                                <th>Transaction Number</th>
+                                                <th>Created By</th>
+                                                <th>Branch</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bb-d2d2d2" ng-repeat="sitem in  mainBillingObject.BillingHistoryDetails">
+                                                <td>{{sitem.CreatedDt | date:'MM-dd-yyyy'}}</td>
+                                                <td>{{sitem.ReceiptNo}}</td>
+                                                <td>{{sitem.BilledCost}} </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>{{sitem.CreatedBy}}</td>
+                                                <td>{{sitem.BranchName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div ng-show="mainBillingObject.BillingHistoryDetails.length == 0">
+                                    <div class="billing-cominsoon text-center">
+                                        <div class="msg" style=" height: 40px;">
+                                            <p class="goback-text m-t-20">No Results Found</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-lg-9" ng-show="ShowDuePaymentAmountView === true">
+                <section class="eh-panel b-0 p-0 b-radius" style="height: 260px;">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12 m-t-5">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0">
+                                        <tbody>
+                                            <tr class="text-center  bg-edfaff">
+                                                <td colspan="2">
+                                                    Total Received: <b>$ {{SelectedInvoiceObj.TotalReceivedAmount == 0 ? 0 :SelectedInvoiceObj.TotalReceivedAmount}}</b>
+                                                </td>
+                                                <td colspan="2">
+                                                    Insurance Balance: <b>$ {{SelectedInvoiceObj.TotalInsurancePaid}}</b>
+                                                </td>
+                                                <td colspan="2">
+                                                    Patient Balance: <b>$ {{SelectedInvoiceObj.TotalPatientBalance}}</b>
+                                                </td>
+                                                <td colspan="2">
+                                                    Total Balance: <b>$ {{SelectedInvoiceObj.TotalBalance}}</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="w-150">
+                                                    <div class="form-group">
+                                                        <label>Type</label>
+                                                        <select class="form-control" ng-model="DuePaymentObj.PatientBillTypeId"  ng-change="changePaymentType(DuePaymentObj);">
+                                                            <option value="">Select</option>
+                                                            <option value="1">By Patient</option>
+                                                            <option value="2">By Primary</option>
+                                                            <option value="3">By Secondary</option>
+
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td class="w-150">
+                                                    <div class="form-group">
+                                                        <label>Date</label>
+                                                        <input type="text" class="form-control icons-calendar" ng-model="DuePaymentObj.Date" datepickerforusformat placeholder="MM-DD-YYYY" />
+                                                    </div>
+                                                </td>
+                                                <td style="width: 100px;">
+                                                    <div class="form-group">
+                                                        <label>Mode</label>
+                                                        <select class="form-control" ng-model="DuePaymentObj.PaymentModeobj"
+                                                                ng-options="item as item.PaymentModeName for item in masterPaymentModes"
+                                                                ng-change="ChangeDuePaymentMode(DuePaymentObj)">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td width="10%">
+                                                    <div class="form-group">
+                                                        <label>Trance ID</label>
+                                                        <input type="text" class="form-control" ng-model="DuePaymentObj.TraceId" ng-disabled="DuePaymentObj.PatientBillTypeId =='1'" placeholder="TraceId" />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label>Amount</label>
+                                                        <input type="text" class="form-control" ng-model="DuePaymentObj.Amount" placeholder="Amount" numbers-only="numbers-only" />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <label>Adjustment</label>
+                                                        <input type="text" class="form-control" ng-model="DuePaymentObj.Adjustment" placeholder="Adjusted" />
+                                                    </div>
+                                                </td>
+                                                <td class="w-200">
+                                                    <div class="form-group">
+                                                        <label>Reason</label>
+                                                        <select class="form-control" ng-model="DuePaymentObj.PaymentReasonobj"
+                                                                ng-options="item as item.ReasonCode +'-'+item.Description for item in PaymentReasonList"
+                                                                ng-change="ChangeDueReasonStatus(DuePaymentObj)">
+                                                            <option value="" selected>Reason</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group m-t-25">
+                                                        <button type="button" class="btn btn-save-us" ng-click="addPaymentObj(DuePaymentObj);">{{DuePaymentObj.Edit == true?'EDIT':'ADD'}}</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-12" ng-show="mainBillingObject.Payments.length > 0">
+                                <section class="eh-panel p-0 border-d2d2d2">
+                                    <div class="eh-body">
+                                        <div class="table-responsive">
+                                            <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                                <thead>
+                                                    <tr class="invoice-head">
+                                                        <th><span class="m-l-5">Type</span></th>
+                                                        <th>Date</th>
+                                                        <th>Mode</th>
+                                                        <th width="10%">Trance ID</th>
+                                                        <th>Amount</th>
+                                                        <th>Adjustment</th>
+                                                        <th width="25%">Reason</th>
+                                                        <th width="5%"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="pitem in mainBillingObject.Payments track by $index">
+                                                        <td>
+                                                            <span class="m-l-5">
+                                                                {{pitem.PatientBillTypeId == '1'?'By Patient':(pitem.PatientBillTypeId == '2'?'By Primary':(pitem.PatientBillTypeId == '3'?'By Secondary':''))}}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{pitem.Date | date:'MM-dd-yyyy'}}</td>
+                                                        <td>{{pitem.PaymentModeobj.PaymentModeName}}</td>
+                                                        <td>{{pitem.TraceId}}</td>
+                                                        <td>${{pitem.Amount}}</td>
+                                                        <td>${{(pitem.Adjustment == '' || pitem.Adjustment == undefined)?0:pitem.Adjustment}}</td>
+                                                        <td>{{pitem.PaymentReasonobj.Description}}</td>
+                                                        <td>
+                                                            <img src="img/consultation/addpayment-edit.png" ng-click="EditDuePayment(pitem, $index);" />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                 
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="eh-body">
+                                        <div class="form-group m-t-25">
+                                            <button type="button" class="btn btn-save-us pull-right m-t-10" ng-click="DynamicStatusSelection('NoPrint',sendDocEmail,sendPatientEmail,sendPatientSms,'','Biller')">Submit</button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                            </div>
+
+                            <div class="col-lg-12 m-t-5">
+                                <div class="eh-body">
+                                    <div class="form-group m-t-25">
+                                        <button type="button" class="btn btn-clear pull-right m-t-10" ng-click="onClickPaymentClear();">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-lg-9" ng-show="ShowDuePaymentAmountView === false && SelectedInvoiceObj == ''">
+                <section class="eh-panel b-0 p-0 b-radius" style="height: 260px;">
+                    <div class="eh-body">
+                        <div class="row m-r-3">
+                            <div class="col-lg-12" style="height:260px !important">
+                                <div class="billing-cominsoon text-center">
+                                    <img src="img/no-data/no-results.png" style="margin-top:45px;">
+                                    <div class="msg">
+                                        <p class="goback-text">No Results Found</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+

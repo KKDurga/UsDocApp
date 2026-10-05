@@ -1,0 +1,1139 @@
+﻿<div class="height__100--" ng-controller="USConsentNewEditor">
+    <!--New Design started-->
+    <div class="d__f-- fd__c-- gap__5-- height__100--" ng-show="!mainConsentObj.IsNewEmptyDoc">
+        <div class="bb__DDD-- px__5--">
+            <ul class="tab__style--5">
+                <li ng-class="(subChildConsentTab == 1)?'active':''">
+                    <a href="javascript:;" id="tab_cformlist" data-ng-click="switchChildConsentSubTab(1)">Consent Forms List</a>
+                </li>
+                <li ng-class="(subChildConsentTab == 2)?'active':''">
+                    <a href="javascript:;" id="tab_ctemplatelist" data-ng-click="switchChildConsentSubTab(2)">Consent Templates List</a>
+                </li>
+                <li ng-class="(subChildConsentTab == 3)?'active':''">
+                    <a href="javascript:;" id="tab_letters" data-ng-click="switchChildConsentSubTab(3)">Letters</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d__f-- ai__c-- jc__sb-- px__10--" ng-if="subChildConsentTab==1">
+            <div class="d__f-- ai__c-- gap__10-- width__35--">
+                <div class="form__group width__100--">
+                    <input type="text" class="input__style--2 icons-search" id="input_mcsearch" placeholder="Enter Search Text" ng-model="GetConsenForm.masterConsentsSearchText">
+                </div>
+                <button class="btn__lg-- btn__1d5558--f" id="btn_search" ng-click="GetConsentsByOrganizationAndType(1);">{{ 'SEARCH' | translate}}</button>
+                <a class="fs__lg-- fw__5-- tc__C71D27--" id="a_clear" ng-click="ClearConsentTabSearch()">{{ 'CLEAR' | translate}}</a>
+            </div>
+            <div class="d__f-- ai__c-- gap__5--">
+                <button class="btn__lg-- btn__1d5558--o" id="btn_navfilld" ng-show="showMultiSelectedDocuments" ng-click="navtoFillDocuments()">Use Selected</button>
+                <!--<button class="btn__lg-- btn__1d5558--f" id="btn_cnewd" ng-click="showNewEditorFields()">Create New Document</button>-->
+            </div>
+
+
+            <button class="btn btn-success" ng-click="openEditor()">
+                Create Document
+            </button>
+
+            <div ng-if="showEditor" class="editor-wrapper">
+                <div class="editor-card">
+                    <textarea id="consentEditor"
+                              ng-model="consent.content">
+        </textarea>
+                </div>
+            </div>
+
+        </div>
+        <div class="row nocolpad d__f-- ai__e-- fw__w--" ng-if="subChildConsentTab==2">
+            <div class="col-lg-3">
+                <div class="form__group">
+                    <label>Location</label>
+                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                            {{selectedLocationString}}
+                        </button>
+                        <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3">
+                            <div class="p-5">
+                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                            </div>
+                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                <ul>
+                                    <li ng-repeat="item in AllHospitalsList | filter:{'BranchName':LocationTypeObj.Name} | filter: { 'ClinicId': '!0' } track by $index" ng-click="changeAppointmentBranch(item)">
+                                        <!--  <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                            <input type="checkbox" class="checkbox" ng-model="item.IsChecked">
+                                            <span class="lbl"></span>
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"  ng-click="item.IsChecked = !item.IsChecked ; changeAppointmentBranch(item)"></span>
+                                        </label>-->
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form__group">
+                    <label>Visit Reason</label>
+                    <ui-select ng-model="consentFormObj" theme="bootstrap" on-select="onSelectApptVisitReason(consentFormObj)" class="form__uiselect fd__c--">
+                        <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{selectdServiceType != "" ? consentFormObj.Reason : 'Select Visit Reason'}}</ui-select-match>
+                        <ui-select-choices repeat="item in AllApptVisitReasons | filter: $select.search" null-option="EmptySelect" loose-null>
+                            <span ng-bind-html="item.Reason | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="d__f-- ai__e-- gap__10--">
+                    <div class="flex">
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <div class="form__group width__100--">
+                                <input type="text" class="input__style--2 icons-search" id="input_searchtext" placeholder="Enter Search Text" ng-model="getConsentTemplateObj.SearchText">
+                            </div>
+                            <button class="btn__lg-- btn__1d5558--f" ng-click="GetConsentsTemplateByOrganization();" id="btn_search">{{ 'SEARCH' | translate}}</button>
+                            <a class="fs__lg-- fw__5-- tc__C71D27--" ng-click="ClearConsentTemplateSearch()" id="btn_clear">{{ 'CLEAR' | translate}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <button class="btn__lg-- btn__1d5558--f" ng-click="navtoCreateConsentTemplatePopup()" id="btn_cntemplate">Create New Template</button>
+            </div>
+        </div>
+        <div class="d__f-- ai__c-- jc__sb-- px__10--" ng-if="subChildConsentTab==3">
+            <div class="d__f-- ai__c-- gap__10-- width__35--">
+                <div class="form__group width__100--">
+                    <input type="text" class="input__style--2 icons-search" placeholder="Enter Search Text" id="input_consentstxt" ng-model="GetConsenForm.masterConsentsSearchText">
+                </div>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="GetConsentsByOrganizationAndType(1,7);" id="btn_search">{{ 'SEARCH' | translate}}</button>
+                <a class="fs__lg-- fw__5-- tc__C71D27--" ng-click="ClearConsentTabSearch()" id="btn_clear">{{ 'CLEAR' | translate}}</a>
+            </div>
+            <div class="d__f-- ai__c-- gap__5--">
+                <!--<button class="btn__lg-- btn__1d5558--o" ng-show="showMultiSelectedDocuments" ng-click="navtoFillDocuments()">Use Selected</button>-->
+                <button class="btn__lg-- btn__1d5558--f" ng-click="showNewEditorFields()" id="btn_creatend">Create New Document</button>
+            </div>
+        </div>
+        <div class="d__f-- fd__c-- gap__5-- height__100--" ng-if="subChildConsentTab==1">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5-- p__5-- height__100--">
+                        <table class="table__style--5" ng-if="subChildConsentTab==1 && Consentformlist.length > 0" id="table_cformlist">
+                            <thead>
+                                <tr>
+                                    <th width="4%"><label class="text-center fs__lg-- fw__5-- tc__1D1D1D--">{{ 'SNO' | translate}}</label></th>
+                                    <th width="25%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'DOCUMENTNAME' | translate}}</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'DOCUMENTTYPE' | translate}}</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'DOCUMENTSUBTYPE' | translate}}</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">Expiry Days</label></th>
+                                    <th width="20%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">Required Signs</label></th>
+                                    <th ng-show="mainConsentObj.IsFromPatient"><label></label></th>
+                                    <th width="5%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ACTION' | translate}}</label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in Consentformlist">
+                                    <td class="text-center"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ (GetConsenForm.masterConsentsPageNumber - 1) * masterMedicinePageSize + $index + 1 }}</label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--" for="consents{{$index+1}}">{{item.DocumentName}}</label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ConsentTypeName}}   <span ng-if="item.IsSignRequiredForEachVisit">(Each Visit)</span></label></td>
+                                    <td>
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D--" ng-hide="item.ConsentTypeId==3">{{item.ConsentSubTypeName}}</label>
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D--" ng-show="item.ConsentTypeId==3">{{item.CPTCode}} -  {{item.ProcedureName}}</label>
+                                    </td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--" for="consents{{$index+1}}">{{item.ExpiredDay}}</label></td>
+                                    <td>
+                                        <ul class="flex-flow-ulli-mb0 fd__r-- gap__5--">
+                                            <li>
+                                                <button class="custom-button" title="Patient Sign" ng-class="{'disabled': !item.IsPatientSignRequired , 'incomplete': item.IsPatientSignRequired}">P</button>
+                                            </li>
+                                            <li>
+                                                <button class="custom-button" title="Doctor Sign" ng-class="{'disabled': !item.IsDoctorSignRequired , 'incomplete': item.IsDoctorSignRequired}">D</button>
+                                            </li>
+                                            <li>
+                                                <button class="custom-button" title="Guardian Sign" ng-class="{'disabled': !item.IsGuardianSignRequired , 'incomplete': item.IsGuardianSignRequired}">G</button>
+                                            </li>
+                                            <li>
+                                                <button class="custom-button" title="Staff Sign" ng-class="{'disabled': !item.IsStaffSignRequired , 'incomplete': item.IsStaffSignRequired}">S</button>
+                                            </li>
+                                            <li>
+                                                <button class="custom-button" title="Anesthesist Sign" ng-class="{'disabled': !item.IsAnesthesistSignRequired , 'incomplete': item.IsAnesthesistSignRequired}">A</button>
+                                            </li>
+                                            <li>
+                                                <button class="custom-button" title="Counselor Sign" ng-class="{'disabled': !item.IsCounselorSignRequired , 'incomplete': item.IsCounselorSignRequired}">C</button>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td ng-show="mainConsentObj.IsFromPatient">
+                                        <a class="fs__lg-- fw__5-- tc__1D5558-- bb__1D5558--" ng-click="UseCurrentDocument(item)">Use this document</a>
+                                    </td>
+                                    <td>
+                                        <div class="d__f-- fd__r-- ai__c-- gap__5--">
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" ng-click="EditCurrentDocument(item)"><i class="icons__w16-- edit__w16--o"></i></a>
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" ng-click="deleteCurrentDocument(item);"><i class="icons__w16-- delete__w16--o"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="subChildConsentTab== 1 && Consentformlist.length == 0">
+                            <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Consent Forms Available</h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">Consent forms will appear here once added or assigned.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="EH-pagination text-center py__5--" ng-show="Consentformlist.length > 0">
+                <uib-pagination total-items="GetConsenForm.masterConsentsItems"
+                                ng-model="GetConsenForm.masterConsentsPageNumber"
+                                ng-change="masterConsentsPagechanged(GetConsenForm.masterConsentsPageNumber)"
+                                force-ellipses="true"
+                                boundary-links="true"
+                                max-size="masterMedicinePageSize">
+                </uib-pagination>
+            </div>-->
+        </div>
+        <div class="d__f-- fd__c-- gap__5-- height__100--" ng-if="subChildConsentTab==2">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5-- p__5-- height__100--">
+                        <table class="table__style--5" ng-show="subChildConsentTab==2 && (consentTemplatesArray | filter:{'DeleteInd':'N'}).length > 0" id="table_ctempaltelist">
+                            <thead>
+                                <tr>
+                                    <th width="4%"><label class="text-center fs__lg-- fw__5-- tc__1D1D1D--">{{ 'SNO' | translate}}</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">Template Name</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">Visit Reason</label></th>
+                                    <th width="50%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">Consent Forms</label></th>
+                                    <th width="5%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ACTION' | translate}}</label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in consentTemplatesArray | filter:{'DeleteInd':'N'}">
+                                    <td class="text-center"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ (getConsentTemplateObj.PageNumber - 1) * masterMedicinePageSize + $index + 1 }}</label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ConsentTemplateName}}<span class="fs__lg-- fw__5-- tc__50C878--" ng-if="item.IsPrimary=='Y'"> (Primary)</span></label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ServiceTypeName}}</label></td>
+                                    <td>
+                                        <ul class="flex-flow-list fd__r-- fw__w--">
+                                            <li ng-repeat="citem in item.TemplateDetails">
+                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{citem.DocumentName}}</label><label>-</label><label class="fs__lg-- fw__4-- tc__656565--">({{citem.ConsentTypeName}}) <span ng-hide="$last">,</span></label>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <div class="d__f-- fd__r-- ai__c-- gap__5--">
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" ng-click="EditConsentTemplateItem(item)"><i class="icons__w16-- edit__w16--o"></i></a>
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" ng-click="deleteConsentTemplateItem(item);"><i class="icons__w16-- delete__w16--o"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="height__100-- d__f-- fd__c-- jc__c-- ai__c--  gap__10--y" ng-show="subChildConsentTab==2 && (consentTemplatesArray | filter:{'DeleteInd':'N'}).length == 0">
+                            <a><i class="nodata__1-- e2__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Consent Templates Found</h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">Templates will appear here once they are created or added.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="EH-pagination text-center py__5--" ng-show="consentTemplatesArray.length > 0">
+                <uib-pagination total-items="getConsentTemplateObj.TotalCount"
+                                ng-model="getConsentTemplateObj.PageNumber"
+                                ng-change="masterConsentTemplatePagechanged(getConsentTemplateObj.PageNumber)"
+                                force-ellipses="true"
+                                boundary-links="true"
+                                max-size="masterMedicinePageSize">
+                </uib-pagination>
+            </div>-->
+        </div>
+        <div class="d__f-- fd__c-- gap__5-- height__100--" ng-if="subChildConsentTab==3">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5-- p__5--">
+                        <table class="table__style--5" ng-if="subChildConsentTab==3 && Letterslist.length > 0" id="table_letterslist">
+                            <thead>
+                                <tr>
+                                    <th width="4%"><label class="text-center fs__lg-- fw__5-- tc__1D1D1D--">{{ 'SNO' | translate}}</label></th>
+                                    <th width="25%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'DOCUMENTNAME' | translate}}</label></th>
+                                    <th><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'DOCUMENTTYPE' | translate}}</label></th>
+                                    <!--<th ng-show="mainConsentObj.IsFromPatient"><label></label></th>-->
+                                    <th width="5%"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ACTION' | translate}}</label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in Letterslist">
+                                    <td class="text-center"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{ (GetConsenForm.masterConsentsPageNumber - 1) * masterMedicinePageSize + $index + 1 }}</label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--" for="consents{{$index+1}}">{{item.DocumentName}}</label></td>
+                                    <td><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ConsentTypeName}}   <span ng-if="item.IsSignRequiredForEachVisit">(Each Visit)</span></label></td>
+                                    <!--<td ng-show="mainConsentObj.IsFromPatient">
+                                        <a class="fs__lg-- fw__5-- tc__1D5558-- bb__1D5558--" ng-click="UseCurrentDocument(item)">Use this document</a>
+                                    </td>-->
+                                    <td>
+                                        <div class="d__f-- fd__r-- ai__c-- gap__5--">
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" ng-click="EditCurrentDocument(item)"><i class="icons__w16-- edit__w16--o"></i></a>
+                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" ng-click="deleteCurrentDocument(item);"><i class="icons__w16-- delete__w16--o"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="height__100-- d__f-- fd__c-- jc__c-- ai__c--  gap__10--y" ng-show="subChildConsentTab== 3 && Letterslist.length == 0">
+                            <a><i class="nodata__1-- e2__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Letters Available</h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">Add or create a letter template to get started.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="EH-pagination text-center py__5--" ng-show="Letterslist.length > 0">
+                <uib-pagination total-items="GetConsenForm.masterLetterItems"
+                                ng-model="GetConsenForm.masterConsentsPageNumber"
+                                ng-change="masterConsentsPagechanged(GetConsenForm.masterConsentsPageNumber)"
+                                force-ellipses="true"
+                                boundary-links="true"
+                                max-size="masterMedicinePageSize">
+                </uib-pagination>
+            </div>-->
+        </div>
+
+    </div>
+    <!--New design ended-->
+
+    <div ng-if="false">
+        <section class="h-100" ng-show="!mainConsentObj.IsNewEmptyDoc">
+            <div class="panel-tabs dis-flex flex-direction-column h-100">
+                <ul>
+                    <li ng-class="(subChildConsentTab == 1)?'active':''">
+                        <a href="javascript:;" data-ng-click="switchChildConsentSubTab(1)">
+                            Consent Forms List
+                        </a>
+                    </li>
+                    <li ng-class="(subChildConsentTab == 2)?'active':''">
+                        <a href="javascript:;" data-ng-click="switchChildConsentSubTab(2)">
+                            Consent Templates List
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content h-100">
+                    <div class="tab-pane active in show h-100" ng-if="subChildConsentTab==1">
+                        <div class="dis-flex flex-direction-column grid-gap-5 h-100">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="asc-surgery-list">
+                                        <li>
+                                            <label>{{ 'SEARCHTEXT' | translate}}</label>
+                                        </li>
+                                        <li class="flex form__group">
+                                            <input type="text" rows="1" placeholder="Enter Search Text" ng-model="GetConsenForm.masterConsentsSearchText" />
+                                        </li>
+                                        <li>
+                                            <button class="btn__xl-- btn__1d5558--f" ng-click="GetConsentsByOrganizationAndType();"><i class="action__icons--1 action__search--"></i>{{ 'SEARCH' | translate}}</button>
+                                            <button class="btn__xl-- btn__C71D27--o" ng-click="ClearConsentTabSearch()"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                                        </li>
+                                        <li class="flex justify-content-end">
+                                            <button class="btn__xl-- btn__C71D27--f" ng-show="showMultiSelectedDocuments" ng-click="navtoFillDocuments()">Use Selected</button>
+                                            <button class="btn__xl-- btn__1d5558--f" ng-click="showNewEditorFields()"><i class="action__icons--1 action__add--"></i>Create New Document</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="dis-flex flex-direction-column grid-gap-10 h-100">
+                                <div class="pos-relative h-100" ng-if="subChildConsentTab==1 && Consentformlist.length > 0">
+                                    <div class="adjustable-position">
+                                        <table class="table__style--7">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">{{ 'SNO' | translate}}</th>
+                                                    <th class="white-nowrap">{{ 'DOCUMENTNAME' | translate}}</th>
+                                                    <th class="white-nowrap">{{ 'DOCUMENTTYPE' | translate}}</th>
+                                                    <th class="white-nowrap">{{ 'DOCUMENTSUBTYPE' | translate}}</th>
+                                                    <th>Required Signs</th>
+                                                    <th ng-show="mainConsentObj.IsFromPatient"></th>
+                                                    <th class="text-center">{{ 'ACTION' | translate}}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in Consentformlist" class="cur-poiter">
+                                                    <td class="column__sm text-center">
+                                                        {{ (GetConsenForm.masterConsentsPageNumber - 1) * masterMedicinePageSize + $index + 1 }}
+                                                        <!--{{$index+1}}-->
+                                                    </td>
+                                                    <td>
+                                                        <div class="dis-flex align-items-center grid-gap-10">
+                                                            <!--<input type="checkbox" id="consents{{$index+1}}" value="" class="checkbox" ng-model="item.IsSelected" title="Select" ng-click="changeMultiSelectDocuments(item)">
+                                                            <span class="lbl"></span>-->
+                                                            <label class="text-s12w500C068cb0 m-t-4" for="consents{{$index+1}}">{{item.DocumentName}}</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-s12wnormlc000">
+                                                            {{item.ConsentTypeName}}   <span ng-if="item.IsSignRequiredForEachVisit">(Each Visit)</span>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-s12wnormlc000" ng-hide="item.ConsentTypeId==3"> {{item.ConsentSubTypeName}}</span>
+                                                        <span class="text-s12wnormlc000" ng-show="item.ConsentTypeId==3"> {{item.CPTCode}} -  {{item.ProcedureName}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <ul class="flex-flow-ulli-mb0">
+                                                            <li>
+                                                                <button class="custom-button" title="Patient Sign" ng-class="{'disabled': !item.IsPatientSignRequired , 'incomplete': item.IsPatientSignRequired}">P</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="custom-button" title="Doctor Sign" ng-class="{'disabled': !item.IsDoctorSignRequired , 'incomplete': item.IsDoctorSignRequired}">D</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="custom-button" title="Guardian Sign" ng-class="{'disabled': !item.IsGuardianSignRequired , 'incomplete': item.IsGuardianSignRequired}">G</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="custom-button" title="Staff Sign" ng-class="{'disabled': !item.IsStaffSignRequired , 'incomplete': item.IsStaffSignRequired}">S</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="custom-button" title="Anesthesist Sign" ng-class="{'disabled': !item.IsAnesthesistSignRequired , 'incomplete': item.IsAnesthesistSignRequired}">A</button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="custom-button" title="Counselor Sign" ng-class="{'disabled': !item.IsCounselorSignRequired , 'incomplete': item.IsCounselorSignRequired}">C</button>
+                                                                <!--<button class="custom-button" ng-class="{'disabled': buttons.P.color === 'disabled', 'incomplete': buttons.P.color === 'incomplete', 'complete': buttons.P.color === 'complete'}" ng-click="changeColor('P')">P</button>
+                                                                <button class="custom-button" ng-class="{'disabled': buttons.D.color === 'disabled', 'incomplete': buttons.D.color === 'incomplete', 'complete': buttons.D.color === 'complete'}" ng-click="changeColor('D')">D</button>
+                                                                <button class="custom-button" ng-class="{'disabled': buttons.G.color === 'disabled', 'incomplete': buttons.G.color === 'incomplete', 'complete': buttons.G.color === 'complete'}" ng-click="changeColor('G')">G</button>
+                                                                <button class="custom-button" ng-class="{'disabled': buttons.S.color === 'disabled', 'incomplete': buttons.S.color === 'incomplete', 'complete': buttons.S.color === 'complete'}" ng-click="changeColor('S')">S</button>
+                                                                <button class="custom-button" ng-class="{'disabled': buttons.A.color === 'disabled', 'incomplete': buttons.A.color === 'incomplete', 'complete': buttons.A.color === 'complete'}" ng-click="changeColor('A')">A</button>
+                                                                <button class="custom-button" ng-class="{'disabled': buttons.C.color === 'disabled', 'incomplete': buttons.C.color === 'incomplete', 'complete': buttons.C.color === 'complete'}" ng-click="changeColor('C')">C</button>-->
+                                                            </li>
+                                                        </ul>
+
+                                                    </td>
+                                                    <td ng-show="mainConsentObj.IsFromPatient">
+                                                        <button class="btn btn-link" ng-click="UseCurrentDocument(item)">Use this document</button>
+                                                    </td>
+                                                    <td class="column__sm">
+                                                        <div class="dis-flex align-items-center grid-gap-5 justify-content-center">
+                                                            <a class="cur-poiter"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="EditCurrentDocument(item)"></i></a>
+                                                            <a class="cur-poiter"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="deleteCurrentDocument(item);"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="EH-pagination text-center" ng-show="Consentformlist.length > 0">
+                                        <uib-pagination total-items="GetConsenForm.masterConsentsItems"
+                                                        ng-model="GetConsenForm.masterConsentsPageNumber"
+                                                        ng-change="masterConsentsPagechanged(GetConsenForm.masterConsentsPageNumber)"
+                                                        force-ellipses="true"
+                                                        boundary-links="true"
+                                                        max-size="masterMedicinePageSize">
+                                        </uib-pagination>
+                                    </div>
+                                    <div class="row" ng-show="subChildConsentTab== 1 && Consentformlist.length == 0">
+                                        <div class="col-lg-12 text-center">
+                                            <div class="billing-cominsoon m-20">
+                                                <img src="img/no-data/no-data-icon.png" />
+                                                <div class="msg m-t-20">
+                                                    <p class="nodata-text">Oops!!</p>
+                                                    <p class="nodata-txt-line2">
+                                                        There is No Data is added To Show.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="tab-pane active in show h-100" ng-if="subChildConsentTab==2">
+                        <div class="dis-flex flex-direction-column h-100">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ul class="asc-surgery-list">
+                                        <li>
+                                            <label>{{ 'SEARCHTEXT' | translate}}</label>
+                                        </li>
+                                        <li class="flex form__group">
+                                            <input type="text" rows="1" placeholder="Enter Search Text" ng-model="getConsentTemplateObj.SearchText" />
+                                        </li>
+                                        <li>
+                                            <button class="btn__xl-- btn__1d5558--f" ng-click="GetConsentsTemplateByOrganization();"><i class="action__icons--1 action__search--"></i>{{ 'SEARCH' | translate}}</button>
+                                            <button class="btn__xl-- btn__C71D27--o" ng-click="ClearConsentTemplateSearch()"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                                        </li>
+                                        <li class="flex justify-content-end">
+                                            <button class="btn__xl-- btn__1d5558--f" ng-click="navtoCreateConsentTemplatePopup()"><i class="action__icons--1 action__add--"></i>Create New Template</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="section-eh h-100">
+                                <div class="section-eh-body dis-flex flex-direction-column grid-gap-10 h-100 pb-0">
+                                    <div class="row h-100" ng-show="subChildConsentTab==2 && (consentTemplatesArray | filter:{'DeleteInd':'N'}).length > 0">
+                                        <div class="col-lg-12 h-100 p-0">
+                                            <div class="pos-relative h-100">
+                                                <div class="adjustable-position">
+                                                    <table class="table__style--7">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">{{ 'SNO' | translate}}</th>
+                                                                <th>Template Name</th>
+                                                                <th>Visit Reason </th>
+                                                                <th>Consent Forms</th>
+                                                                <th class="text-center">{{ 'ACTION' | translate}}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in consentTemplatesArray | filter:{'DeleteInd':'N'}" class="cur-poiter">
+                                                                <td class="column__sm text-center">
+                                                                    {{ (getConsentTemplateObj.PageNumber - 1) * masterMedicinePageSize + $index + 1 }}
+                                                                    <!--{{$index+1}}-->
+                                                                </td>
+                                                                <td>
+                                                                    <span class="text-s12w500C068cb0">{{item.ConsentTemplateName}}</span> <span style="color:green" ng-if="item.IsPrimary=='Y'"> (Primary)</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="text-s12wnormlc000">
+                                                                        {{item.ServiceTypeName}}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <ul class="referral-summary-list">
+                                                                        <li ng-repeat="citem in item.TemplateDetails">
+                                                                            <span style="font-weight:700">{{citem.DocumentName}}</span> -<span>({{citem.ConsentTypeName}}) <span ng-hide="$last">,</span></span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
+
+                                                                <td class="column__sm text-center">
+                                                                    <div class="dis-flex align-items-center grid-gap-5">
+                                                                        <a class="cur-poiter"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="EditConsentTemplateItem(item)"></i></a>
+                                                                        <a class="cur-poiter"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="deleteConsentTemplateItem(item);"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="EH-pagination text-center">
+                                            <uib-pagination total-items="getConsentTemplateObj.TotalCount"
+                                                            ng-model="getConsentTemplateObj.PageNumber"
+                                                            ng-change="masterConsentTemplatePagechanged(getConsentTemplateObj.PageNumber)"
+                                                            force-ellipses="true"
+                                                            boundary-links="true"
+                                                            max-size="masterMedicinePageSize"
+                                                            ng-show="consentTemplatesArray.length > 0">
+                                            </uib-pagination>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-show="subChildConsentTab==2 && (consentTemplatesArray | filter:{'DeleteInd':'N'}).length == 0">
+                                        <div class="col-lg-12 text-center">
+                                            <div class="billing-cominsoon m-20">
+                                                <img src="img/no-data/no-data-icon.png" />
+                                                <div class="msg m-t-20">
+                                                    <p class="nodata-text">Oops!!</p>
+                                                    <p class="nodata-txt-line2">
+                                                        There is No Data is added To Show.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!--Create Document new design-->
+    <div class="section__style--4 d__f-- fd__c-- height__100--"  ng-if="mainConsentObj.IsNewEmptyDoc">
+        <div class="section__header--">
+            <div class="d__f-- ai__c-- gap__5--">
+                <button class="btn__lg-- btn__909090--" ng-click="clearEmptyData()"><i class="icons__w16-- arrowleftfill__w16--l"></i>Back</button>
+                <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- lh__28--">Create Document</h1>
+            </div>
+        </div>
+        <div class="section__body-- height__100--">
+            <div class="two-sections height__100--">
+                <div class="flex height__100--">
+                    <div class="position__relative-- height__100--">
+                        <div class="adjustable-position">
+                            <div class="document-editor">
+                                <div class="document-editor__toolbar" id="toolbar-container"></div>
+                                <div class="document-editor__editable-container">
+                                    <div class="document-editor__editable a4wh focussed">
+                                        <textarea id="consentEditor"
+                                                  ng-model="mainConsentObj.HtmlContent">
+                                         </textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="width-25 height__100-- p__10--">
+                    <div class="position__relative-- height__100--">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="d__f-- fd__c--">
+                                <section class="eh-panel" ng-show="mainConsentObj.IsSideBarAddFieldsShow">
+                                    <div class="eh-header">
+                                        <h1 class="fs__lg-- fw__5-- tc__1D1D1D-- m__0--">Text Fields</h1>
+                                        <ul class="us-controls">
+                                            <li>
+                                                <button class="btn btn-ehnote" ng-click="hideAddNewFields()">Done</button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="eh-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <uib-accordion close-others="false">
+                                                    <div uib-accordion-group class="panel-default" is-open="status.open" ng-click="showDIvCategory(catitem)" ng-repeat="catitem in MainFieldsArray">
+                                                        <uib-accordion-heading>
+                                                            <span class="fs-14"> {{catitem.FieldCategoryName}}</span> <i class="pull-right glyphicon fs-14" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                        </uib-accordion-heading>
+                                                        <div class="row">
+                                                            <ul class="list-eh-vertical">
+                                                                <li ng-repeat="subitem in catitem.SubFields" ng-click="addtexttoEditor(subitem)">
+                                                                    <a href="javascript:;" class="fs-12">{{subitem.FieldName}}</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </uib-accordion>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <div ng-hide="mainConsentObj.IsSideBarAddFieldsShow">
+                                    <div class="d__f-- fd__c-- gap__5--" ng-if="mainConsentObj.IsDirectSave">
+                                        <div class="d__f-- fd__c-- gap__5--">
+                                            <div class="form__group">
+                                                <label>Consent Name</label>
+                                                <input type="text"
+                                                       ng-disabled="ConsentFormsDatareq.OrganisationConsentFormId !=0"
+                                                       name="ConsertFromName" placeholder="Enter Consent Name"
+                                                       ng-model="ConsentFormsDatareq.ConsentName" maxlength="200">
+                                            </div>
+                                            <div class="form__group">
+                                                <label>Document Name</label>
+                                                <select ng-model="ConsentFormsDatareq.ConsentTypeId"
+                                                        ng-change=PDFChangeValueConsent(ConsentFormsDatareq.ConsentTypeId)
+                                                        ng-options="item.ConsentTypeId as item.ConsentTypeName for item in masterConsentTypes">
+                                                    <option value=""> Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="form__group" ng-show="ConsentFormsDatareq.ConsentTypeId==1 || ConsentFormsDatareq.ConsentTypeId==2">
+                                                <label>Document Sub Type</label>
+                                                <select ng-model="ConsentFormsDatareq.ConsentSubTypeId"
+                                                        ng-options="sitem.ConsentSubTypeId as sitem.ConsentSubTypeName for sitem in masterConsentSubTypes | filter:{ConsentTypeId:ConsentFormsDatareq.ConsentTypeId}">
+                                                    <option value="" disabled="disabled">Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="form__group position__relative--" ng-show="ConsentFormsDatareq.ConsentTypeId==3">
+                                                <input type="text"
+                                                       maxlength="100"
+                                                       ng-model="ConsentFormsDatareq.ProcedureObj"
+                                                       placeholder="Search Procedure"
+                                                       typeahead-min-length="0"
+                                                       uib-typeahead="item as item.ProcedureCode +'-'+item.ProcedureName for item in GetOrganizationProcedure($viewValue)"
+                                                       typeahead-on-select="onClickProcedure(ConsentFormsDatareq.ProcedureObj, ConsentFormsDatareq)"
+                                                       ng-change="ChangeProcedure(PayorProcedureFeeObj);"
+                                                       quotes-restrict enter-directive />
+                                            </div>
+                                            <div>
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsSignRequiredForEachVisit">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Required for Each Visit</span>
+                                                </label>
+                                            </div>
+                                            <div class="form__group">
+                                                <label>Expiry Days</label>
+                                                <input type="text" name="ConsentExpiryDays" placeholder="Enter Expiry Day" ng-model="ConsentFormsDatareq.ExpiredDay" maxlength="4" numbers-only>
+                                            </div>
+                                            <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- mt__5--">Required Signatures</h1>
+                                            <ul class="d__f-- fd__c-- gap__6--y p__0-- m__0-- list__unstyled-- mt__10--">
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsPatientSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsPatientSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsPatientSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Patient Sign</span>
+                                                    </label>
+                                                </li>
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsDoctorSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsDoctorSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsDoctorSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Provider Sign</span>
+                                                    </label>
+                                                </li>
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsAnesthesistSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsAnesthesistSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsAnesthesistSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Anesthesiologist Sign</span>
+                                                    </label>
+                                                </li>
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsCounselorSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsCounselorSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsCounselorSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Counselor Sign</span>
+                                                    </label>
+                                                </li>
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsStaffSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsStaffSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsStaffSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Staff Sign</span>
+                                                    </label>
+                                                </li>
+                                                <li class="br__5-- p__5--" ng-class="ConsentFormsDatareq.IsGuardianSignRequired ? 'border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'">
+                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                        <input type="checkbox" class="checkbox" ng-model="ConsentFormsDatareq.IsGuardianSignRequired">
+                                                        <span class="lbl"></span>
+                                                        <span class="fs__lg-- fw__5--" ng-class="ConsentFormsDatareq.IsGuardianSignRequired ? 'tc__1D5558--' : 'tc__1D1D1D--'">Guardian Sign</span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__10--">
+                                            <button class="btn__lg-- btn__C71D27--o width__50--" ng-click="clearConsentDocument()">clear</button>
+                                            <button class="btn__lg-- btn__1d5558--f width__50--" ng-click="saveConsentDocument()">Save</button>
+                                        </div>
+                                        <button class="btn__lg-- btn__1d5558--f width__100--" ng-hide="ConsentFormsDatareq.OrganisationConsentFormId==0" ng-click="saveasNewDocument()">Save as New Doc</button>
+                                    </div>
+
+                                    <div class="d__f-- fd__c-- gap__5--" ng-if="!mainConsentObj.IsDirectSave">
+                                        <div class="form__group">
+                                            <label>New Document Name</label>
+                                            <input type="text"
+                                                   name="ConsertFromName" placeholder="Enter Document Name"
+                                                   ng-model="ConsentFormsDatareq.ConsentName" maxlength="200">
+                                        </div>
+                                        <div class="form__group">
+                                            <label>Document Type</label>
+                                            <select ng-model="ConsentFormsDatareq.ConsentTypeId"
+                                                    ng-change=PDFChangeValueConsent(ConsentFormsDatareq.ConsentTypeId)
+                                                    ng-options="item.Id as item.ConsentTypeName for item in ConsentTypes">
+                                                <option value="" disabled="disabled"> Select</option>
+                                            </select>
+                                        </div>
+                                        <div class="form__group">
+                                            <label>Document Sub Type</label>
+                                            <select ng-disabled="ConsentFormsDatareq.ConsentTypeId==''||ConsentFormsDatareq.ConsentTypeId==1" ng-model="ConsentFormsDatareq.ConsentSubTypeId"
+                                                    ng-options="sitem.SurgerySpecializationId as sitem.Name for sitem in masterSurgerySpecializationArray">
+                                                <option value="" disabled="disabled">Select</option>
+                                            </select>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__10--">
+                                            <button class="btn__lg-- btn__C71D27--o width__50--" ng-click="clearConsentDocument()">clear</button>
+                                            <button class="btn__lg-- btn__1d5558--f width__50--" ng-click="saveConsentDocument()">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--New design ended-->
+
+
+    <div class=" m-t-10 width-100 text-right" ng-show="mainConsentObj.IsTemplateEmptyDoc">
+        <button class="btn btn-save-us-outline">Save Doc</button>
+        <button class="btn btn-save-us-outline">Save as New Doc</button>
+    </div>
+    <script type="text/ng-template" id="vuploadpopoverconsentsTemplate.html">
+        <div class="row">
+            <!--<div class="col-lg-12">
+                <button class="btn btn-save-us btn-block">Upload</button>
+            </div>-->
+            <div class="col-lg-12 m-t-10">
+
+                <button class="btn btn-save-us-outline" ng-click="showNewEditorFields()">Create New Document</button>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="addsignatuurepopovertemplate.html">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="nav nav-pills signature-tabs nav-justified">
+                    <li class="active"><a data-toggle="pill" data-target="Consents-Patient">Patient</a></li>
+                    <li><a data-toggle="pill" data-target="">Staff</a> <i class="fas fa-bookmark pos-absolute top-2 right-5 text-15898f"></i></li>
+                    <li><a data-toggle="pill" data-target="">Provider</a></li>
+                    <li><a data-toggle="pill" data-target="">Counsellor</a></li>
+                    <li><a data-toggle="pill" data-target="">Anesthetist</a></li>
+                    <li><a data-toggle="pill" data-target="">Guardian</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active p-10">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="ehr-input">
+                                    <select>
+                                        <option>Select Staff</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <button class="btn btn-ehnote-outline active btn-block p-t-8 p-b-8 p-l-40 p-r-40 h-auto">Capture</button>
+                            </div>
+                        </div>
+                        <!-- / -->
+                        <div class="row m-y-10">
+                            <div class="col-lg-12">
+                                <div class="signature-pad">
+                                    <div class="pos-absolute top-10 right-10">
+                                        <button class="btn btn-save-us btn-block">Save Sign</button>
+                                        <button class="btn btn-discard-us m-t-5 btn-block">Clear</button>
+                                    </div>
+                                    <img src="">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / -->
+                        <div class="row ">
+                            <div class="col-lg-6">
+                                <div class="ehr-input">
+                                    <div class="ehr-input-group">
+                                        <input type="text" placeholder="DD - MM - YYYY" />
+                                        <button><i class="far fa-calendar-alt"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-offset-2">
+                                <button class="btn btn-ehnote-outline active btn-block p-t-8 p-b-8 p-l-40 p-r-40 h-auto">Complete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="menu1" class="tab-pane fade">
+                        <h3>Menu 1</h3>
+                        <p>Some content in menu 1.</p>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <h3>Menu 2</h3>
+                        <p>Some content in menu 2.</p>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <h3>Menu 2</h3>
+                        <p>Some content in menu 2.</p>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <h3>Menu 2</h3>
+                        <p>Some content in menu 2.</p>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <h3>Menu 2</h3>
+                        <p>Some content in menu 2.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </script>
+</div>
+
+<style>
+    .ta-editor.form-control.myform1-height, .ta-scroll-window.form-control.myform1-height {
+        max-height: 600px;
+        overflow: hidden;
+        height: 600px;
+        font-family: inherit;
+        font-size: 100%;
+    }
+
+    .form-control.myform1-height > .ta-bind {
+        height: 600px;
+        max-height: 600px;
+        overflow: hidden;
+        padding: 6px 12px;
+    }
+    /* .ta-toolbar.focussed {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        z-index: 999;
+        background: rgba(0,0,0,.44);
+        padding: 2%;
+        display: block;
+    }*/
+
+
+    .ta-editor {
+        height: 600px !important;
+        width: 100%;
+        height: auto;
+        overflow: auto;
+        font-family: inherit;
+        font-size: 100%;
+    }
+
+    .ta-hidden-input {
+        display: none;
+    }
+
+    .test-span {
+        display: inline-block;
+        padding: .6em;
+        background-color: lightblue;
+        border: blue;
+        border-radius: 4px;
+    }
+
+
+    .btn-blue {
+        background-color: #6acaff;
+        color: #fff;
+        border-color: #4c7889;
+    }
+
+        .btn-blue:hover,
+        .btn-blue:focus,
+        .btn-blue.focus,
+        .btn-blue:active,
+        .btn-blue.active,
+        .open > .dropdown-toggle.btn-blue {
+            border-color: #33505b;
+        }
+
+        .btn-blue:active,
+        .btn-blue.active,
+        .open > .dropdown-toggle.btn-blue {
+            background-image: none;
+        }
+
+        .btn-blue.disabled,
+        .btn-blue[disabled],
+        fieldset[disabled] .btn-blue,
+        .btn-blue.disabled:hover,
+        .btn-blue[disabled]:hover,
+        fieldset[disabled] .btn-blue:hover,
+        .btn-blue.disabled:focus,
+        .btn-blue[disabled]:focus,
+        fieldset[disabled] .btn-blue:focus,
+        .btn-blue.disabled.focus,
+        .btn-blue[disabled].focus,
+        fieldset[disabled] .btn-blue.focus,
+        .btn-blue.disabled:active,
+        .btn-blue[disabled]:active,
+        fieldset[disabled] .btn-blue:active,
+        .btn-blue.disabled.active,
+        .btn-blue[disabled].active,
+        fieldset[disabled] .btn-blue.active {
+            border-color: #4c7889;
+        }
+
+
+    [ta-button] {
+        height: 44px;
+        margin-bottom: 5px;
+    }
+
+    .red {
+        color: red;
+    }
+</style>
+
+
+<style>
+    .document-editor {
+        border: 1px solid var(--ck-color-base-border);
+        border-radius: var(--ck-border-radius);
+        /* Set vertical boundaries for the document editor. */
+        max-height: 700px;
+        /* This element is a flex container for easier rendering. */
+        display: flex;
+        flex-flow: column nowrap;
+    }
+
+    .document-editor__toolbar {
+        /* Make sure the toolbar container is always above the editable. */
+        z-index: 1;
+        /* Create the illusion of the toolbar floating over the editable. */
+        box-shadow: 0 0 5px hsla( 0,0%,0%,.2 );
+        /* Use the CKEditor CSS variables to keep the UI consistent. */
+        border-bottom: 1px solid var(--ck-color-toolbar-border);
+    }
+
+        /* Adjust the look of the toolbar inside the container. */
+        .document-editor__toolbar .ck-toolbar {
+            border: 0;
+            border-radius: 0;
+        }
+    /* Make the editable container look like the inside of a native word processor application. */
+    .document-editor__editable-container {
+        padding: calc( 2 * var(--ck-spacing-large) );
+        background: #e2dede;
+        /* Make it possible to scroll the "page" of the edited content. */
+        /* overflow-y: scroll;*/
+    }
+
+        .document-editor__editable-container .ck-editor__editable {
+            /* Set the dimensions of the "page". */
+            width: 35cm;
+            min-height: 21cm;
+            /* Keep the "page" off the boundaries of the container. */
+            padding: 1cm 2cm 2cm;
+            border: 1px hsl( 0,0%,82.7% ) solid;
+            border-radius: var(--ck-border-radius);
+            background: white;
+            /* The "page" should cast a slight shadow (3D illusion). */
+            box-shadow: 0 0 5px hsla( 0,0%,0%,.2 );
+            /* Center the "page". */
+            margin: 0 auto;
+        }
+    /* Set the default font for the "page" of the content. */
+    .document-editor .ck-content,
+    .document-editor .ck-heading-dropdown .ck-list .ck-button__label {
+        font: 16px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    /* Adjust the headings dropdown to host some larger heading styles. */
+    .document-editor .ck-heading-dropdown .ck-list .ck-button__label {
+        line-height: calc( 1.7 * var(--ck-line-height-base) * var(--ck-font-size-base) );
+        min-width: 6em;
+    }
+
+    /* Scale down all heading previews because they are way too big to be presented in the UI.
+    Preserve the relative scale, though. */
+    .document-editor .ck-heading-dropdown .ck-list .ck-button:not(.ck-heading_paragraph) .ck-button__label {
+        transform: scale(0.8);
+        transform-origin: left;
+    }
+
+    /* Set the styles for "Heading 1". */
+    .document-editor .ck-content h2,
+    .document-editor .ck-heading-dropdown .ck-heading_heading1 .ck-button__label {
+        font-size: 2.18em;
+        font-weight: normal;
+    }
+
+    .document-editor .ck-content h2 {
+        line-height: 1.37em;
+        padding-top: .342em;
+        margin-bottom: .142em;
+    }
+
+    /* Set the styles for "Heading 2". */
+    .document-editor .ck-content h3,
+    .document-editor .ck-heading-dropdown .ck-heading_heading2 .ck-button__label {
+        font-size: 1.75em;
+        font-weight: normal;
+        color: hsl( 203, 100%, 50% );
+    }
+
+    .document-editor .ck-heading-dropdown .ck-heading_heading2.ck-on .ck-button__label {
+        color: var(--ck-color-list-button-on-text);
+    }
+
+    /* Set the styles for "Heading 2". */
+    .document-editor .ck-content h3 {
+        line-height: 1.86em;
+        padding-top: .171em;
+        margin-bottom: .357em;
+    }
+
+    /* Set the styles for "Heading 3". */
+    .document-editor .ck-content h4,
+    .document-editor .ck-heading-dropdown .ck-heading_heading3 .ck-button__label {
+        font-size: 1.31em;
+        font-weight: bold;
+    }
+
+    .document-editor .ck-content h4 {
+        line-height: 1.24em;
+        padding-top: .286em;
+        margin-bottom: .952em;
+    }
+
+    /* Set the styles for "Paragraph". */
+    .document-editor .ck-content p {
+        font-size: 1em;
+        line-height: 1.63em;
+        padding-top: .5em;
+        margin-bottom: 1.13em;
+    }
+    /* Make the block quoted text serif with some additional spacing. */
+    .document-editor .ck-content blockquote {
+        font-family: Georgia, serif;
+        margin-left: calc( 2 * var(--ck-spacing-large) );
+        margin-right: calc( 2 * var(--ck-spacing-large) );
+    }
+
+    .disabled {
+        background-color: grey;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    .incomplete {
+        background-color: red;
+        color: white;
+    }
+
+    .custom-button {
+        display: inline-block;
+        margin-right: 10px; /* Adjust spacing between buttons */
+        padding: 5px 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 12px;
+    }
+
+    .ta-editor.ta-html, .ta-scroll-window.form-control {
+        max-height: 29.7cm !important;
+        overflow-y: scroll;
+        width: 21cm;
+        line-height: normal !important;
+        height: 29.7cm !important;
+    }
+
+    .panel-default > .panel-heading + .panel-collapse .panel-body {
+        padding: 5px !important;
+    }
+
+    .ta-editor.ta-html, .ta-scroll-window.form-control p {
+        margin: 0px !important;
+    }
+    /*.OutlineElement > p {
+        margin-bottom: 0;
+    }*/
+
+    .editor-wrapper {
+        margin-top: 15px;
+    }
+
+    .editor-card {
+        background: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 4px;
+        padding: 10px;
+        min-height: 500px;
+    }
+
+    /* CKEditor height fix */
+    .cke_contents {
+        min-height: 400px !important;
+    }
+    .cke_notification {
+        display: none !important;
+    }
+
+</style>

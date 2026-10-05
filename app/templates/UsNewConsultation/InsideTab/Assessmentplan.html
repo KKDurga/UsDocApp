@@ -1,0 +1,1067 @@
+﻿<div class="consultation-center row-fluid">
+    <div class="col-lg-4 p-l-0 p-r-0">
+        <div class="consultation-sides">
+            <section class="tile">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Assessment Plans</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon" ng-click="AssessmentPlansUIB(cacheStorageItem.AssessmentPlan)"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body p-t-5 p-b-5">
+                    <div class="no-data-text p-b-0" ng-hide="(cacheStorageItem.AssessmentPlan| filter: { ActiveInd: 'Y' }).length > 0">
+                        <span>No Assessment added.</span>
+                        <a href="" ng-click="AssessmentPlansUIB(cacheStorageItem.AssessmentPlan)">Click here</a>
+                        <span>or on search box to add Assessment.</span>
+                    </div>
+                    <table class="eh-table ros-table m-b-8">
+                        <tbody ng-repeat="Assess in cacheStorageItem.AssessmentPlan| filter: { ActiveInd: 'Y' }  track by $index">
+                            <tr>
+                                <td>
+                                    <b class="text-068cb0">
+                                        {{Assess.ICD10CODE}} | {{Assess.ICD10DIAGDESCRIPTION}}
+                                        <span class="text-Mild" ng-if="Assess.DiagnosisStatus ==1"> Active </span>
+                                        <span class="text-Mild" ng-if="Assess.DiagnosisStatus ==2"> Stabled </span>
+                                        <span class="text-Mild" ng-if="Assess.DiagnosisStatus ==3"> Improved </span>
+                                        <span class="text-Mild" ng-if="Assess.DiagnosisStatus ==4"> Resolved </span>
+                                        <span class="text-Mild" ng-if="Assess.DiagnosisStatus ==5"> Worse </span>
+                                    </b>
+                                </td>
+                                <td width="40%" class="text-right">
+
+                                    <span class="usc-mvalues" ng-bind="Assess.OrganId == 1||Assess.OrganId == '1'?'OD':Assess.OrganId == 2||Assess.OrganId == '2'?'OS':Assess.OrganId == 3||Assess.OrganId == '3'?'OU': 'General'"></span>
+                                    <span class="text-Sever">({{Assess.DiagnosisRiskLevel}})</span>
+                                    <span class="text-Sever">
+                                        <a href="javascript:;" ng-click="DelectAssessmentPlan(Assess,$index)">
+                                            <i class="eh-close eh-icon" ></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-show="Assess.PlanOfcareNotesArray !=0">
+                                <th colspan="2">
+                                    Plan Of Care
+                                </th>
+                            </tr>
+                            <tr ng-show="(Assess.PlanOfcareNotesArray| filter: { DeleteInd: 'N' }).length !=0" ng-repeat="Plan in Assess.PlanOfcareNotesArray | filter: { DeleteInd: 'N' }  track by $index">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="eh-value">{{Plan.PlanOfCareNotes}}</span>
+                                                    <span class="usc-mvalues">(Scheduled on {{Plan.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <li>
+                                                            <a href="javascript:;" ng-click="DelectAssPlanOfcare(Plan,Assess,$index)">
+                                                                <i class="eh-close eh-icon"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+
+                            <tr ng-hide="Assess.ProceduresArray.length ==0">
+                                <th colspan="2">
+                                    Procedures
+                                </th>
+                            </tr>
+                            <tr ng-hide="Assess.ProceduresArray.length ==0">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody ng-repeat="pitem in Assess.ProceduresArray  track by $index">
+                                            <tr>
+                                                <td>
+                                                    <span class="eh-value">{{pitem.TreatmentData.ProcCode}}   | {{pitem.TreatmentData.TreatmentName}}</span>
+                                                    <span class="usc-mvalues dis-block">(Scheduled on {{pitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <!--<li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon"></i>
+                                                            </a>
+                                                        </li>-->
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr ng-show="Assess.SurgeryArray.length !=0">
+                                <th colspan="2">
+                                    Surgery
+                                </th>
+                            </tr>
+                            <tr ng-show="Assess.SurgeryArray.length !=0">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr ng-repeat="mitem in Assess.SurgeryArray  track by $index">
+                                                <td>
+                                                    <span class="eh-value"> {{mitem.SurgeryName}}</span>
+                                                    <span class="usc-mvalues dis-block">(Scheduled on {{mitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <!--<li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon"></i>
+                                                            </a>
+                                                        </li>-->
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr ng-show="Assess.InvestigationsArray.length !=0">
+                                <th colspan="2">
+                                    Investigations
+                                </th>
+                            </tr>
+                            <tr ng-show="Assess.InvestigationsArray.length !=0">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr ng-repeat="mitem in Assess.InvestigationsArray  track by $index">
+                                                <td>
+                                                    <span class="eh-value"> {{mitem.CPTCode}} - {{mitem.InvestigationName}}</span>
+                                                    <span class="usc-mvalues">(Scheduled on {{mitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <!--<li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon"></i>
+                                                            </a>
+                                                        </li>-->
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- / -->
+                        <!--<tbody>
+            <tr>
+                <th colspan="2">
+                    Surgery
+                </th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">PPV+PPL+IOAB+Corneal tear repair</span>
+                                    <span class="usc-mvalues dis-block">(Scheduled on Mar-22-2022 11:27 AM)</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>-->
+                        <!-- / -->
+                        <!--<tbody>
+            <tr>
+                <th colspan="2">
+                    Investigations
+                </th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">B-Scan</span>
+                                    <span class="usc-mvalues">(Scheduled on Mar-22-2022 11:27 AM)</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>-->
+                    </table>
+                    <!-- / -->
+                    <!--<table class="eh-table ros-table m-b-8 border-top">
+        <tbody>
+            <tr>
+                <td>
+                    <b class="text-068cb0">H45.1 | Endophthalmitis <span class="text-Mild">Stable</span></b>
+                </td>
+                <td width="40%" class="text-right">
+                    <span class="usc-mvalues">OD <span class="text-Sever">(Sever)</span></span>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Plan Of Care
+                </th>
+                <td width="40%" class="text-right">
+                    <span class="usc-mvalues">(Scheduled on Mar-22-2022 11:27 AM)</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">Do not rub eyes</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <span class="usc-remarks">
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">Clean the eye with clean cloth after eye drops</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">Follow up within 3 days</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>-->
+                    <!-- / -->
+                    <!--<tbody>
+        <tr>
+            <th colspan="2">
+                Surgery
+            </th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="eh-value">PPV+PPL+IOAB+Corneal tear repair</span>
+                                <span class="usc-mvalues dis-block">(Scheduled on Mar-22-2022 11:27 AM)</span>
+                            </td>
+                            <td>
+                                <ul class="heading-conticn">
+                                    <li>
+                                        <a>
+                                            <i class="eh-image eh-icon"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="eh-edit eh-icon"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="eh-close eh-icon"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>-->
+                    <!-- / -->
+                    <!--<tbody>
+            <tr>
+                <th colspan="2">
+                    Investigations
+                </th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="eh-value">B-Scan</span>
+                                    <span class="usc-mvalues">(Scheduled on Mar-22-2022 11:27 AM)</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>-->
+                </div>
+            </section>
+        </div>
+        <!--<div class="consultation-sides" ng-show="AssessmentSection.isAssessmentData==false">
+            <section class="tile m-0">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Assessment Plans</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon" ng-click="AssessmentPlansUIB(cacheStorageItem.AssessmentPlan)"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body">
+                    <div class="no-data-text">
+                        <span>No Assessment Plans added.</span>
+                        <a href="">Click here</a>
+                        <span>or on search box to add Assessment Plans</span>
+                    </div>
+                </div>
+            </section>
+        </div>-->
+    </div>
+
+    <!-- / Assessment Plans End-->
+    <div class="col-lg-4 p-l-0 p-r-0">
+        <div class="consultation-sides">
+            <section class="tile">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Orders</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon" ng-click="OrdersUIB(cacheStorageItem.OrderDetails)"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body p-t-5 p-b-5">
+                    
+                    <div class="no-data-text" ng-hide="cacheStorageItem.OrderDetails.length > 0">
+                        <span>No Orders added.</span>
+                        <a href="javascript:;" ng-click="OrdersUIB(cacheStorageItem.OrderDetails)">Click here</a>
+                        <span>or on search box to add Orders</span>
+                    </div>
+                    <table class="eh-table ros-table m-b-8" ng-hide="cacheStorageItem.OrderDetails.length == 0">
+                        <tbody ng-if="(cacheStorageItem.OrderDetails  | filter:{ 'OrderTypeId': 2}).length != 0">
+                            <tr>
+                                <th>
+                                    OPD Procuders
+                                </th>
+                                <td width="8%" class="text-right">
+                                </td>
+                            </tr>
+                            <tr ng-repeat="OPitem in cacheStorageItem.OrderDetails | filter:{ 'OrderTypeId': 2} track by $index">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="eh-value">{{OPitem.Description}}</span>OrderDate
+                                                    <span class="usc-mvalues dis-block">(Scheduled on {{OPitem.OrderDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon" ng-click="RemoveOrderitem(OPitem,$index)"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- / -->
+                        <tbody class="b-0" ng-if="(cacheStorageItem.OrderDetails  | filter:{ 'OrderTypeId': 3}).length != 0">
+                            <tr>
+                                <th>
+                                    Surgery
+                                </th>
+                                <td width="8%" class="text-right">
+                                    <!--<button class="btn btn-link text-actionb" popover-append-to-body="true" popover-placement="bottom-right"
+                    popover-trigger="outsideClick" popover-class="extexaminpopotemplcss"
+                    uib-popover-template="externalexaminationPopover.templateUrl" type="button">+Add</button>-->
+                                </td>
+                            </tr>
+                            <tr ng-repeat="pitem in cacheStorageItem.OrderDetails | filter:{ 'OrderTypeId': 3} track by $index">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="eh-value">{{pitem.Description}}</span>OrderDate
+                                                    <span class="usc-mvalues dis-block">(Scheduled on {{pitem.OrderDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon" ng-click="RemoveOrderitem(pitem,$index)"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- / -->
+                        <tbody class="b-0" ng-if="(cacheStorageItem.OrderDetails  | filter:{ 'OrderTypeId': 1}).length != 0">
+                            <tr>
+                                <th>
+                                    Investigations
+                                </th>
+                                <td width="8%" class="text-right">
+                                    <!--<button class="btn btn-link text-actionb" popover-append-to-body="true"
+                    popover-placement="bottom-right" popover-trigger="outsideClick"
+                    popover-class="extexaminpopotemplcss" uib-popover-template="externalexaminationPopover.templateUrl"
+                    type="button">+Add</button>-->
+                                </td>
+                            </tr>
+                            <tr ng-repeat="Invitem in cacheStorageItem.OrderDetails | filter:{ 'OrderTypeId': 1} track by $index">
+                                <td colspan="2">
+                                    <table class="table tableno-bordered m-b-0 ros-table m-l-15">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="eh-value">{{Invitem.Description}}</span>OrderDate
+                                                    <span class="usc-mvalues dis-block">(Scheduled on {{Invitem.OrderDate |date:'MMM-dd-yyyy h:mm a'}})</span>
+                                                </td>
+                                                <td>
+                                                    <ul class="heading-conticn">
+                                                        <!--<li>
+                                            <a>
+                                                <i class="eh-image eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a>
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>-->
+                                                        <li>
+                                                            <a>
+                                                                <i class="eh-close eh-icon" ng-click="RemoveOrderitem(Invitem,$index)"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- / -->
+        <div class="consultation-sides">
+            <section class="tile">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Systematic Medicine</h1>
+                    <!--<ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon"></i>
+                            </a>
+                        </li>
+                    </ul>-->
+                </div>
+                <div class="eh-body p-t-5 p-b-5">
+                    <div class="no-data-text">
+                        <span>No Systematic Medicine added.</span>
+                        <a href="">Click here</a>
+                        <span>or on search box to add Systematic Medicine</span>
+                    </div>
+                    <table class="eh-table ros-table" ng-show="cacheStorageItem.SystematicMedicine.length !==0">
+                        <tbody ng-repeat="treat in cacheStorageItem.SystematicMedicine | filter:{'ActiveIND':'Y'} track by $index">
+                            <tr ng-show="treat.IsEdit ==true">
+                                <th>{{treat.MedicalConditionName}}</th>
+                                <td width="35%">
+                                    <fieldset>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="1">
+                                            <label for="selectedCurTHistoryEye1_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Right Eye" tooltip-append-to-body="true"> OD</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="2">
+                                            <label for="selectedCurTHistoryEye2_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Left Eye" tooltip-append-to-body="true">OS</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="3">
+                                            <label for="selectedCurTHistoryEye3_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="Both Eyes" tooltip-append-to-body="true">OU</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom1" id="selectedCurTHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" ng-model="treat.OrganId" value="4">
+                                            <label for="selectedCurTHistoryEye4_{{cat.CategoryId}}_{{$index+1}}" class="radio-custom-label1 cur-poiter mb-0" uib-tooltip="General" tooltip-append-to-body="true">Gen.</label>
+                                        </div>
+                                    </fieldset>
+                                </td>
+                                <td width="25%">
+                                    <div class="dis-flex">
+                                        <input type="text" class="us-form m-r-5 w-40 ros-input" ng-model="treat.Duration" ng-change="AddToCache()" />
+                                        <select class="register-select flex ros-select" ng-model="treat.DurationType" ng-change="AddToCache()">
+                                            <option value="">Select</option>
+                                            <option value="D">Days</option>
+                                            <option value="W">Weeks</option>
+                                            <option value="M">Months</option>
+                                            <option value="Y">Years</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-show="treat.IsEdit ==true">
+                                <td colspan="3">
+                                    <input type="text" placeholder="Add Remarks Here" class="us-form ros-input" ng-model="treat.Remarks" ng-change="AddToCache()" maxlength="500">
+                                </td>
+                            </tr>
+                            <tr ng-show="treat.IsEdit !==true">
+                                <td colspan="2">
+                                    <span class="eh-value">{{treat.MedicalConditionName}}</span>
+                                </td>
+                                <td>
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a href="javascript:;" ng-click="EditSystematicMedicine(treat)">
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;" ng-click="RemoveSystematicMedicine(treat)">
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                     
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="col-lg-4 p-l-0 p-r-0">
+        <div class="consultation-sides">
+            <section class="tile m-0">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Medical Rx</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;" ng-click="medicalrxsUIB()">
+                                <i class="plus-icon-us us-icon"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body p-t-5 p-b-5">
+                    <div class="no-data-text" ng-hide="cacheStorageItem.Prescriptions.length > 0">
+                        <span>No Medical Rx added.</span>
+                        <a href="javascript:;" ng-click="medicalrxsUIB()">Click here</a>
+                        <span>or on search box to add Medical Rx</span>
+                    </div>
+                    <table class="eh-table ros-table" ng-if="cacheStorageItem.Prescriptions.length > 0">
+                        <tbody ng-repeat="presc in cacheStorageItem.Prescriptions | filter:{ 'PrescriptionType': 'GenericMedicine'} track by $index" ng-hide="presc.PrescriptionData.ActiveInd == 'N'">
+                            <tr>
+                                <td>
+                                    <span class="eh-value">{{presc.PrescriptionData.ModifiedDt | date:'dd-MMM-yyyy'}}</span>
+                                    <b class="text-068cb0">{{presc.PrescriptionData.Name}}</b>
+                                    <span class="eh-value">
+                                        <span>{{presc.PrescriptionData.Dosage}} mg</span>
+                                        <span>
+                                            day
+                                            <b ng-show="presc.PrescriptionData.FrequencyObj != ''">{{presc.PrescriptionData.FrequencyObj.languages[0].translateName}}</b>
+                                            <b ng-show="presc.PrescriptionData.FrequencyObj === ''"></b>
+                                            tablets
+                                        </span>
+
+                                        <b ng-show="presc.PrescriptionData.Intake==0">After meal</b>
+                                        <b ng-show="presc.PrescriptionData.Intake==1">Before  meal</b>
+                                        <b ng-show="presc.PrescriptionData.Intake==2">N/A</b>
+                                        <b>{{presc.PrescriptionData.Duration}}</b>
+                                        <b class="border-right m-r-5 p-r-5" ng-bind="presc.PrescriptionData.DurationType == 'D'?'Day(s)':presc.PrescriptionData.DurationType == 'M'?'Month(s)':presc.PrescriptionData.DurationType == 'Y'?'Year(s)':presc.PrescriptionData.DurationType == 'C'?'To Be continued':presc.PrescriptionData.DurationType == 'W'?'Week(s)':presc.PrescriptionData.DurationType == 'L'?'Life Time':''"></b>
+                                    </span>
+                                </td>
+                                <td width="25%">
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a ng-click="EditParticularPrescription(presc);" uib-tooltip="Edit">
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="RemovePrescription($index,presc);" uib-tooltip="Close">
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-repeat="presc in cacheStorageItem.Prescriptions | filter:{ 'PrescriptionType': 'TaperDrop'} track by $index" ng-hide="presc.PrescriptionData.ActiveInd == 'N'">
+                            <tr>
+                                <td>
+                                    <div class="dis-flex">
+                                        <div class="text-medicine">
+                                            {{presc.PrescriptionData.ModifiedDt | date:'dd-MMM-yyyy'}} Take <span class="Text-blue">{{presc.PrescriptionData.Name}}</span>
+
+                                        </div>
+                                        <div class="m-l-10">
+                                            <ul class="meical-ul">
+                                                <li ng-repeat="mitem in presc.PrescriptionData.TempTaperingArray |filter:{'ActiveInd':'Y'}">
+                                                    <b>One drop</b>
+                                                    <b>-{{mitem.Dosage}}-{{mitem.Frequency2}}-</b>
+                                                    <b>{{mitem.Duration}}</b>
+                                                    <b ng-bind="mitem.DurationType == 'D'?'Day(s)':mitem.DurationType == 'M'?'Month(s)':mitem.DurationType == 'Y'?'Year(s)':mitem.DurationType == 'C'?'To Be continued':mitem.DurationType == 'W'?'Week(s)':mitem.DurationType == 'L'?'Life Time':''"></b>
+                                                    <b class="border-right m-r-5 p-r-5">
+                                                        <b class="text-gray fs-14">Refill </b>
+                                                        <b>{{mitem.Refill}}</b>
+                                                    </b>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="25%">
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a ng-click="EditParticularPrescription(presc);" uib-tooltip="Edit">
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="RemoveTaperDrop(presc);" uib-tooltip="Close">
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tbody ng-repeat="presc in cacheStorageItem.Prescriptions | filter:{ 'PrescriptionType': 'TaperTablet'} track by $index" ng-hide="presc.PrescriptionData.ActiveInd == 'N'">
+                            <tr>
+                                <td>
+                                    <div class="dis-flex">
+                                        <div class="text-medicine">
+                                            {{presc.PrescriptionData.ModifiedDt | date:'dd-MMM-yyyy'}} Take <span class="Text-blue">{{presc.PrescriptionData.Name}}</span>
+                                        </div>
+                                        <div class="m-l-10">
+                                            <ul class="meical-ul">
+                                                <li ng-repeat="mitem in presc.PrescriptionData.TempTaperingArray |filter:{'ActiveInd':'Y'}">
+
+                                                    <b>{{mitem.Dosage}}</b>
+                                                    <b>{{mitem.Frequency1}} - {{mitem.EyeType.FrequencyCode}}</b>
+                                                    <b> - {{mitem.Frequency2}}</b>
+                                                    <b> - {{mitem.Duration}}</b>
+                                                    <b> {{mitem.DurationType === 'Y' ? 'Year(s)' : (mitem.DurationType === 'W' ? 'Week(s)' : (mitem.DurationType === 'M' ? 'Month(s)' : (mitem.DurationType === 'D' ? 'Day(s)' : "")))}}</b>
+                                                    <b class="border-right m-r-5 p-r-5">
+                                                        <b class="text-gray fs-14">Refill </b>
+                                                        <b>{{mitem.Refill}}</b>
+                                                    </b>
+
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td width="25%">
+                                    <ul class="heading-conticn">
+                                        <li>
+                                            <a ng-click="EditParticularPrescription(presc);" uib-tooltip="Edit">
+                                                <i class="eh-edit eh-icon"></i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="RemoveTaperTablet(presc);" uib-tooltip="Close">
+                                                <i class="eh-close eh-icon"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- / Glass Rx-->
+        <div class="consultation-sides" ng-show="AssessmentSection.isGlassRxData==true">
+            <section class="tile m-0">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Glass Rx</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon" ng-click="EditAssessmentData('GlassRx')"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body p-t-5 p-b-5">                    
+                    <table class="eh-table ros-table">
+                        <tbody>
+                            <tr ng-if="inv.InvestigationId === 43" ng-repeat="inv in cacheStorageItem.GlassDetails track by $index">
+                                <td class="eh-od valign-top" width="5%">OD</td>
+                                <td>
+                                    <!--<span class="eh-value">+2.50  +1.50 / 45o</span>-->
+                                    <label><span class="usc-mvalues">Sph :</span> {{inv.RightEyeValues.Spherical}}</label>
+                                    <label><span class="usc-mvalues">Cyl :</span> {{inv.RightEyeValues.Cylindrical}}</label>
+                                    <label><span class="usc-mvalues">Axis :</span> {{inv.RightEyeValues.Axis}}</label>
+                                    <br />
+                                    <label><span class="usc-mvalues">BCVA :</span>  {{inv.RightEyeValues.BCVA}}</label>
+                                    <label><span class="usc-mvalues">Add :</span>{{inv.RightEyeValues.Adition}}</label>
+                                    <label><span class="usc-mvalues">BCNVA :</span> {{inv.RightEyeValues.BCNVA}}</label>
+                                    <label><span class="usc-mvalues">Prism :</span> {{inv.RightEyeValues.Prism}}</label>
+                                    <label><span class="usc-mvalues">Base :</span> {{inv.RightEyeValues.Base}}</label>
+                                </td>
+                            </tr>
+                            <tr ng-if="inv.InvestigationId === 43" ng-repeat="inv in cacheStorageItem.GlassDetails track by $index">
+                                <td class="eh-os valign-top">OS</td>
+                                <td>
+                                    <label><span class="usc-mvalues">Sph :</span> {{inv.LeftEyeValues.Spherical}}</label>
+                                    <label><span class="usc-mvalues">Cyl :</span> {{inv.LeftEyeValues.Cylindrical}}</label>
+                                    <label><span class="usc-mvalues">Axis :</span> {{inv.LeftEyeValues.Axis}}</label>
+                                    <br />
+                                    <label><span class="usc-mvalues">BCVA :</span>  {{inv.LeftEyeValues.BCVA}}</label>
+                                    <label><span class="usc-mvalues">Add :</span>{{inv.LeftEyeValues.Adition}}</label>
+                                    <label><span class="usc-mvalues">BCNVA :</span> {{inv.LeftEyeValues.BCNVA}}</label>
+                                    <label><span class="usc-mvalues">Prism :</span> {{inv.LeftEyeValues.Prism}}</label>
+                                    <label><span class="usc-mvalues">Base :</span> {{inv.LeftEyeValues.Base}}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr ng-if="inv.InvestigationId === 43" ng-repeat="inv in cacheStorageItem.GlassDetails track by $index">
+
+                                <td colspan="2" class="border-top">
+                                    <span class="eh-value">
+
+                                        <!--<span>{{inv.TypeOfLens}} </span>
+                                        <span>{{inv.LensMaterial}}  </span>
+                                        <span>for {{inv.Modeofwear}}  </span>
+                                        <span>with {{inv.LensCoating}}  </span>
+                                        <span>for {{inv.FrameMaterial}} </span>-->
+
+                                        <span ng-repeat="litem in inv.LensTypeArray" ng-if="litem.IsActive == true">{{litem.Name}} </span>
+                                         <span ng-repeat="litem in LensMaterialarray" ng-if="litem.IsActive == true"> {{litem.DropDownValue}}  </span>
+                                         <span ng-repeat="litem in ModeOfWeararray" ng-if="litem.IsActive == true">for {{litem.DropDownTypeName}}  </span>
+                                         <span ng-repeat="litem in inv.LensCoatingArray" ng-if="litem.IsActive == true"> with {{litem.Name}}  </span>
+                                        <span ng-repeat="litem in FrameMaterialarray" ng-if="litem.IsActive == true">for {{litem.DropDownValue}} </span>
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-if="inv.Remarks != '' && inv.InvestigationId === 43" ng-repeat="inv in cacheStorageItem.GlassDetails track by $index">
+                                <td colspan="2">
+                                    <span class="eh-value">
+                                        <b>Remarks  : </b><span>{{inv.Remarks}}</span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- / Glass Rx-->
+        <div class="consultation-sides" ng-show="AssessmentSection.isGlassRxData==false">
+            <section class="tile m-0">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Glass Rx</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="plus-icon-us us-icon" ng-click="GlassRxsUIB()"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body">
+                    <div class="no-data-text" >
+                        <span>No Glass Rx added.</span>
+                        <a href="javascript:;" ng-click="GlassRxsUIB()">Click here</a>
+                        <span>or on search box to add Glass Rx</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- / Glass Rx End-->
+        <div class="consultation-sides">
+            <section class="tile m-0">
+                <div class="eh-header">
+                    <h1 class="text-068cb0">Patient Notes</h1>
+                    <ul class="us-controls">
+                        <li>
+                            <a href="javascript:;" ng-click="onClickAddPatientNotes()">
+                                <i class="plus-icon-us us-icon"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="eh-body p-t-5 p-b-5" ng-show="PatientNotes.IsEdit == true">
+                    <!--<div class="no-data-text">
+                        <span>No Patient Notes added.</span>
+                        <a href="javascript:;" ng-click="onClickAddPatientNotes()">Click here</a>
+                        <span>or on search box to add Patient Notes</span>
+                    </div>-->
+                    <table class="eh-table">
+                        <tbody class="border-bottom">
+                            <tr>
+                                <td>
+                                    <input type="text" placeholder="Enter Patient Notes" class="us-form" maxlength="500" ng-model="PatientNoteObj.Notes">
+                                </td>
+                                <td class="text-right w-80">
+                                    <ul class="us-controls">
+                                        <li>
+                                            <button class="btn btn-info radius-100 btn-block" ng-click="SavePatientList(PatientNoteObj);">Add</button>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="eh-body p-t-5 p-b-5">
+                    <div class="no-data-text" ng-hide="cacheStorageItem.PatientNotesArray.length > 0" ng-show="PatientNotes.IsEdit == false">
+                        <span>No Patient Notes added.</span>
+                        <a href="javascript:;" ng-click="onClickAddPatientNotes()">Click here</a>
+                        <span>or on search box to add Patient Notes</span>
+                    </div>
+                    <table class="eh-table ros-table">
+                        <tbody>
+                            <tr ng-repeat="item in cacheStorageItem.PatientNotesArray" ng-if="item.ActiveInd == 'Y'">
+                                <td colspan="2">
+                                    <span class="eh-value">
+                                        {{item.Notes}}
+                                    </span>
+                                </td>
+                                <td class="w-40">
+                                    <a href="javascript:;" uib-tooltip="Clear" tooltip-append-to-body="true" ng-click="removePatientNotes(item,$index)">
+                                        <i class="eh-close eh-icon"></i>
+
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <!-- / -->
+        <div class="consultation-sides bg-roo">
+            <table class="eh-table ros-table">
+                <tbody>
+                    <tr>
+                        <th class="15%">
+                            <b>Return to Office</b>
+                        </th>
+                        <!--<td>
+                            <span class="eh-value">{{cacheStorageItem.FollowUpDate}}</span>
+                        </td>-->
+                        <td class="text-right">
+                            <input type="text" class="form-admission icons-calendar w-150"
+                                   ng-model="cacheStorageItem.FollowUpDate"
+                                   ng-change="chgAppDt(cacheStorageItem.FollowUpDate)"
+                                   datepickerapnl readonly ng-disabled="appointmentInfo.AppointmentStatus == 'O'" focus-followup="followup.focusInput" />
+                            <!--<button class="btn btn-link text-actionb text-actionb">Reschedule</button>-->
+                        </td>
+                        <td class="w-40" ng-show="cacheStorageItem.FollowUpDate != '' && cacheStorageItem.FollowUpDate != undefined">
+                            <a href="javascript:;" uib-tooltip="Clear" tooltip-append-to-body="true" ng-click="cacheStorageItem.FollowUpDate = '';">
+                                <i class="eh-close eh-icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- / -->
+</div>

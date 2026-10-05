@@ -1,0 +1,266 @@
+﻿<div class="history-panel" ng-repeat="hitem in cat.CategoryDetails" ng-if="hitem.SubCategoryId===48">
+    <div class="history-repeat">
+        <div class="history-header">
+            <h1><i class="headicon-icn assessment-ehcons"></i> Assessment</h1>
+            <div>
+                <ul class="autofill-list m-b-0">
+                    <li>
+                        <button class="btn btn btn-light-blue">Add From Template</button>
+                    </li>
+                    <li>
+                        <div class="w-150">
+                            <div class="dropdown dropdown-scroll width-100">
+                                <button class="form-control select-dropdown boxshadowbill text-left" data-toggle="dropdown">
+                                    {{Show.selectDiagnosis}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app">
+                                    <div class="drop-menu-Scroll template-edit-icon">
+                                        <ul class="m-0 list-group">
+                                            <li class="list-group-item p-6">
+                                                <input type="text"
+                                                       name="prescTemp"
+                                                       ng-model="Show.txt1"
+                                                       class="form-control"
+                                                       ng-change="" />
+                                            </li>
+                                            <li class="list-group-item p-6" ng-repeat="item in Show.DiagnosisList  | filter:{'TemplateName':Show.txt1}" ng-click="ChangesForDiagnosistemplateInConsultation(item);">
+                                                <div class="dis-flex align-items-center justify-space-between">
+                                                    <div class="flex cur-poiter">
+                                                        <a class="font-weight-600 text-black" href="javascript:;" ng-bind="item.TemplateName"></a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ulDropdowntextclear">
+                            <input ng-focus="FocusObj.DiagnosisFocus === true" type="text" class="form-control input-color icons-search w-400"
+                                   name="Diagnosise"
+                                   placeholder="Enter Diagnosis"
+                                   ng-model="newAssessmentObj.DiagnosisObject"
+                                   maxlength="100"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.DiagnosisName + ' - ' + item.DiagnosisCode for item in GetDiagnosisEasyList($viewValue)"
+                                   typeahead-on-select="onSelectAssesmentDiagnosis(newAssessmentObj)" 
+                                   ng-blur="changefocusOption();"/>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="history-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="no-data-text p-b-0" ng-hide="cacheStorageItem.AssessmentPlan.length > 0">
+                        <span>No Assessment added.</span>
+                        <a href="" ng-click="FocusObj.DiagnosisFocus = true;">Click here</a>
+                        <span>or on search box to add Assessment.</span>
+                    </div>
+                  
+                    <div class="single-panel" ng-show="cacheStorageItem.AssessmentPlan.length > 0">
+                        <div class="single-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <section class="section-ehnote m-t-5" ng-repeat="Assess in cacheStorageItem.AssessmentPlan | filter: { ActiveInd: 'Y' }  track by $index">
+                                        <div class="ehnote-body">
+                                            <div class="table-responsive">
+                                                <table class="table assessment-table">
+                                                    <tbody>
+                                                        <tr ng-hide="cacheStorageItem.AssessmentPlan.length == 0">
+                                                            <td width="15%">
+                                                                <div class="osodou-head bg-Hsuccess m-b-5">{{Assess.OrganName}}</div>
+                                                                <div class="osodou-content bg-Csuccess m-b-5">{{Assess.DiagnosisRiskLevel}}</div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-light-ehnote">
+                                                                    <span style="color:red;font-weight:600" ng-show="Assess.FindingId > 0">{{$index+1}}.{{Assess.InvestigationDesc}} - {{Assess.InvestigationFindingValues}}</span>
+                                                                    <span>{{Assess.ICD10CODE}}</span> |
+                                                                    <span>{{Assess.ICD10DIAGDESCRIPTION}}</span>
+                                                                    {{Assess.DiagnosisStatus}}
+                                                                </span>
+                                                                <span class="bg-improved bg-Csuccess" ng-if="Assess.DiagnosisStatus ==1"> Active </span>
+                                                                <span class="bg-improved bg-Csuccess" ng-if="Assess.DiagnosisStatus ==2"> Stabled </span>
+                                                                <span class="bg-improved bg-Csuccess" ng-if="Assess.DiagnosisStatus ==3"> Improved </span>
+                                                                <span class="bg-improved bg-Csuccess" ng-if="Assess.DiagnosisStatus ==4"> Resolved </span>
+                                                                <span class="bg-improved bg-Csuccess" ng-if="Assess.DiagnosisStatus ==5"> Worse </span>
+                                                            </td>
+                                                            <td width="20%" class="valign-top">
+                                                                <ul class="heading-conticn">
+                                                                    <!--<li>
+                                                        <a href="javascript:;" uib-tooltip="" tooltip-append-to-body="true" class="text-primary-diagnosis m-r-10">
+                                                            Primary Diagnosis
+                                                        </a>
+                                                    </li>-->
+                                                                    <li>
+                                                                        <a href="javascript:;" ng-click="showPlanOfCarePopup(Assess,$index)">
+                                                                            <i class="eh-edit eh-icon"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a ng-click="removeAssessment(Assess,cacheStorageItem.AssessmentPlan,$index)" uib-tooltip="" tooltip-append-to-body="true">
+                                                                            <i class="eh-close eh-icon"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                        <tr ng-show="Assess.PlanOfcareNotesArray !=0">
+                                                            <td class="valign-top text-right">
+                                                                <span class="text-general-plans">
+                                                                    Plan Of Care
+                                                                </span>
+                                                            </td>
+                                                            <td colspan="2">
+                                                                <div class="bg-ulcounsoled">
+                                                                    <ul>
+                                                                        <li ng-repeat="Plan in Assess.PlanOfcareNotesArray  track by $index">
+                                                                            <div class="flex">
+                                                                                <span>{{Plan.PlanOfCareNotes}}</span>
+                                                                                <span class="casehistory-date fs-12">(Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor)</span>
+                                                                            </div>
+                                                                            <div class="dis-flex">
+                                                                                <div class="flex text-adviceafter m-r-8">
+                                                                                    Scheduled on {{Plan.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}}
+                                                                                </div>
+                                                                                <div class="w-30 border-left">
+                                                                                    <a>
+                                                                                        <i class="eh-close eh-icon"></i>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+
+
+                                                        <tr ng-hide="Assess.ProceduresArray ==0">
+                                                            <td class="valign-top text-right">
+                                                                <span class="text-general-plans">
+                                                                    Procedures
+                                                                </span>
+                                                            </td>
+                                                            <td colspan="2">
+                                                                <div class="bg-ulcounsoled">
+                                                                    <ul>
+                                                                        <li ng-repeat="pitem in Assess.ProceduresArray  track by $index">
+                                                                            <div>
+                                                                                {{pitem.TreatmentData.ProcCode}}   | {{pitem.TreatmentData.TreatmentName}}
+                                                                            </div>
+                                                                            <div class="dis-flex">
+                                                                                <div class="flex text-adviceafter m-r-8">
+                                                                                    Scheduled on {{pitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}}
+                                                                                </div>
+                                                                                <div class="w-30 border-left">
+                                                                                    <a>
+                                                                                        <i class="eh-close eh-icon"></i>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+
+
+                                                        <tr ng-show="Assess.PrescriptionArray !=0">
+                                                            <td class="valign-top text-right">
+                                                                <span class="text-general-plans">
+                                                                    Prescription
+                                                                </span>
+                                                            </td>
+                                                            <td colspan="2">
+                                                                <div class="bg-ulcounsoled">
+                                                                    <ul>
+                                                                        <li ng-repeat="mitem in Assess.PrescriptionArray  track by $index">
+                                                                            {{mitem.PrescriptionData.Name}}
+                                                                            <span class="text-adviceafter">
+                                                                                Scheduled on {{mitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}}
+                                                                            </span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+
+
+                                                        <tr ng-show="Assess.SurgeryArray !=0">
+                                                            <td class="valign-top text-right">
+                                                                <span class="text-general-plans">
+                                                                    Surgery
+                                                                </span>
+                                                            </td>
+                                                            <td colspan="2">
+                                                                <div class="bg-ulcounsoled">
+                                                                    <ul>
+                                                                        <li ng-repeat="mitem in Assess.SurgeryArray  track by $index">
+                                                                            <div>
+                                                                                {{mitem.SurgeryName}}
+                                                                            </div>
+                                                                            <div class="dis-flex">
+                                                                                <div class="flex text-adviceafter m-r-8">
+                                                                                    Scheduled on {{mitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}}
+                                                                                </div>
+                                                                                <div class="w-30 border-left">
+                                                                                    <a>
+                                                                                        <i class="eh-close eh-icon"></i>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr ng-show="Assess.InvestigationsArray !=0">
+                                                            <td class="valign-top text-right">
+                                                                <span class="text-general-plans">
+                                                                    Investigations
+                                                                </span>
+                                                            </td>
+                                                            <td colspan="2">
+                                                                <div class="bg-ulcounsoled">
+                                                                    <ul>
+                                                                        <li ng-repeat="mitem in Assess.InvestigationsArray  track by $index">
+                                                                            <div>
+                                                                                {{mitem.CPTCode}} - {{mitem.InvestigationName}}
+                                                                            </div>                                                                            
+                                                                            <div class="dis-flex">
+                                                                                <div class="flex text-adviceafter m-r-8">
+                                                                                    Scheduled on {{mitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}}
+                                                                                </div>
+                                                                                <div class="w-30 border-left">
+                                                                                    <a>
+                                                                                        <i class="eh-close eh-icon"></i>
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

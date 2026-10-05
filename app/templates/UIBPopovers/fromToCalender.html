@@ -1,0 +1,181 @@
+﻿<div class="d__f-- fd__c--"
+     style="padding:14px 16px 12px; gap:10px; min-width:580px;"
+     ng-click="$event.stopPropagation()">
+
+    <div class="d__f-- jc__c-- position__relative--" ng-if="drp.tabs && drp.tabs.length">
+        <div class="d__f-- bg__F3F4F6-- bradius__99-- p__2--">
+            <button ng-repeat="tab in drp.tabs"
+                    ng-click="drpSetTab(tab.key)"
+                    class="bradius__99-- px__15-- py__4-- fw__7--"
+                    style="border:none; cursor:pointer; font-size:12px;"
+                    ng-style="drp.activeTab === tab.key
+                        ? {'background':'#fff','color':'#1d5558','box-shadow':'0 1px 3px rgba(0,0,0,0.1)'}
+                        : {'background':'transparent','color':'#6B7280'}">
+                {{tab.label}}
+            </button>
+        </div>
+        <div class="d__f-- ai__c-- gap__5-- position__absolute-- right__0-- top__0--">
+            <button class="button__DC2626--o"
+                    ng-click="drpClear()">
+                Clear
+            </button>
+            <a class="btn__close--2" ng-click="drpClose()">
+                <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+            </a>
+        </div>
+    </div>
+    <div class="d__f-- ai__c-- gap__5-- jc__e--" ng-hide="drp.tabs && drp.tabs.length">
+        <button class="button__DC2626--o"
+                ng-click="drpClear()">
+            Clear
+        </button>
+        <a class="btn__close--2" ng-click="drpClose()">
+            <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+
+    <div class="d__f-- gap__20--">
+
+        <div style="flex:1; min-width:0;">
+            <div class="d__f-- ai__c-- jc__sb-- mb__5--">
+                <button class="btn__arrow--" style="width:24px;height:24px;flex-shrink:0;"
+                        ng-if="drpShowLeftPrev()"
+                        ng-click="drpPrevMonth()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                         stroke="#4B5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <div ng-if="!drpShowLeftPrev()" style="width:24px;height:24px;flex-shrink:0;"></div>
+
+                <div class="d__f-- ai__c-- gap__4--">
+                    <select class="select__style--1"
+                            style="height:24px;font-size:11px;font-weight:600;color:#1d1d1d;min-width:88px;padding:0 20px 0 6px;"
+                            ng-model="drp.leftMonth"
+                            ng-change="drpOnLeftMonthChange()"
+                            ng-options="m.val as m.label for m in drp.leftMonths">
+                    </select>
+                    <select class="select__style--1"
+                            style="height:24px;font-size:11px;font-weight:600;color:#1d1d1d;min-width:60px;padding:0 18px 0 6px;"
+                            ng-model="drp.leftYear"
+                            ng-change="drpOnLeftYearChange()"
+                            ng-options="y for y in drp.allowedYears">
+                    </select>
+                </div>
+
+                <button class="btn__arrow--" style="width:24px;height:24px;flex-shrink:0;"
+                        ng-if="drpShowLeftNext()"
+                        ng-click="drpLeftNextMonth()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                         stroke="#4B5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
+                <div ng-if="!drpShowLeftNext()" style="width:24px;height:24px;flex-shrink:0;"></div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;">
+                <tr>
+                    <th ng-repeat="d in drp.dayNames"
+                        class="ta__c-- tc__9CA3AF--"
+                        style="font-size:10px;font-weight:600;padding:3px 2px;width:32px;">{{d}}</th>
+                </tr>
+                <tr ng-repeat="week in drp.leftWeeks">
+                    <td ng-repeat="day in week"
+                        class="ta__c--"
+                        style="width:32px;height:28px;vertical-align:middle;padding:1px;"
+                        ng-class="drpGetCellClass(day, 'from')"
+                        ng-click="drpSelectDay(day, 'from')"
+                        ng-mouseenter="drp.hover = day.date; drpRefresh()">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:11px;"
+                              ng-class="drpGetSpanClass(day, 'from')">{{day.num}}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="width:1px;background:#e4e4e4;align-self:stretch;flex-shrink:0;"></div>
+
+        <div style="flex:1; min-width:0;">
+            <div class="d__f-- ai__c-- jc__sb-- mb__5--">
+                <button class="btn__arrow--" style="width:24px;height:24px;flex-shrink:0;"
+                        ng-if="drpShowRightPrev()"
+                        ng-click="drpRightPrevMonth()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                         stroke="#4B5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <div ng-if="!drpShowRightPrev()" style="width:24px;height:24px;flex-shrink:0;"></div>
+
+                <div class="d__f-- ai__c-- gap__4--">
+                    <select class="select__style--1"
+                            style="height:24px;font-size:11px;font-weight:600;color:#1d1d1d;min-width:88px;padding:0 20px 0 6px;"
+                            ng-model="drp.rightMonth"
+                            ng-change="drpOnRightMonthChange()"
+                            ng-options="m.val as m.label for m in drp.rightMonths">
+                    </select>
+                    <select class="select__style--1"
+                            style="height:24px;font-size:11px;font-weight:600;color:#1d1d1d;min-width:60px;padding:0 18px 0 6px;"
+                            ng-model="drp.rightYear"
+                            ng-change="drpOnRightYearChange()"
+                            ng-options="y for y in drp.allowedYears">
+                    </select>
+                </div>
+
+                <button class="btn__arrow--" style="width:24px;height:24px;flex-shrink:0;"
+                        ng-if="drpShowRightNext()"
+                        ng-click="drpNextMonth()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                         stroke="#4B5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
+                <div ng-if="!drpShowRightNext()" style="width:24px;height:24px;flex-shrink:0;"></div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;">
+                <tr>
+                    <th ng-repeat="d in drp.dayNames"
+                        class="ta__c-- tc__9CA3AF--"
+                        style="font-size:10px;font-weight:600;padding:3px 2px;width:32px;">{{d}}</th>
+                </tr>
+                <tr ng-repeat="week in drp.rightWeeks">
+                    <td ng-repeat="day in week"
+                        class="ta__c--"
+                        style="width:32px;height:28px;vertical-align:middle;padding:1px;"
+                        ng-class="drpGetCellClass(day, 'to')"
+                        ng-click="drpSelectDay(day, 'to')"
+                        ng-mouseenter="drp.hover = day.date; drpRefresh()">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:11px;"
+                              ng-class="drpGetSpanClass(day, 'to')">{{day.num}}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <!--<div class="d__f-- jc__e-- ai__c-- gap__8-- bt__DDD--"
+         style="padding-top:10px; margin-top:2px;">
+        <span ng-if="drp.from" class="tc__6B7280--" style="font-size:11px; flex:1;">
+            {{drp.from | date:'MM-dd-yyyy'}}
+            <span ng-if="drp.to"> → {{drp.to | date:'MM-dd-yyyy'}}</span>
+        </span>
+        <button class="button__DC2626--o" style="height:26px;font-size:11px;"
+                ng-click="drpClose()">
+            Close
+        </button>
+        <button class="button__1D5558--o" style="height:26px;font-size:11px;"
+                ng-click="drpClear()">
+            Clear
+        </button>
+        <button class="button__1D5558--o bg__1D5558-- tc__FFFFFF--"
+                style="height:26px;font-size:11px;border-color:#1d5558;"
+                ng-click="drpApply()">
+            Apply
+        </button>
+    </div>-->
+
+</div>

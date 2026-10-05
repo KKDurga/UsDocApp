@@ -1,0 +1,332 @@
+﻿<div class="dis-flex p-8 justify-space-between">
+    <div class="pos-relative w-600">
+        <input ng-focus="FocusObj.DiagnosisFocus === true" type="text" class="form-control input-color icons-search w-800"
+               name="Diagnosise"
+               placeholder="Enter Diagnosis"
+               ng-model="newAssessmentObj.DiagnosisObject"
+               maxlength="100"
+               typeahead-min-length="0"
+               typeahead-focus-on-select="false"
+               uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisEasyList($viewValue)"
+               typeahead-on-select="onSelectAssesmentPlanDiagnosis1(newAssessmentObj)"
+               ng-blur="changefocusOption();" />
+    </div>
+    <div>
+        <button class="btn btn-discard-us" ng-click="AssessmentPlansUIBclose()">Close</button>
+        <button class="btn btn-save-us" ng-click="SaveAssessmentPlans()">Save</button>
+    </div>
+</div>
+<div class="h-scroll" ng-style="heightBDO()" resize>
+    <table class="eh-table ros-table h-100">
+        <tbody>
+            <tr>
+                <th width="20%" class="bg-assplans valign-top">
+                    <h2 class="text-assesplan">Assessment Plans</h2>
+                    <ul class="assessments-uslist">
+                        <li ng-class="item.IsEditData ?'active':''" ng-repeat="item in AssessmentplanpopupObj.AssessmentArray| filter: { ActiveInd: 'Y' }"
+                            ng-click="ChangeDiagnosis1(item)"
+                            ng-model="selecteditem" class="dis-flex">
+                            <span class="flex">
+                                {{item.ICD10CODE}} |  {{item.ICD10DIAGNAME}}
+                            </span>
+                            <span class="pull-right">
+                                <i class="eh-close eh-icon" ng-click="DelectAssessmentPlan1(item, 'popup')"></i>
+                            </span>
+                        </li>
+
+                        <!--<li>
+                            H45.1 | Endophthalmitis
+                        </li>
+                        <li>
+                            H42 | Glaucoma in diseases
+                            classified elsewhere
+                        </li>
+                        <li>
+                            H52.513 | Internal ophthalmoplegia
+                            (complete) (total), bilateral
+                        </li>-->
+                    </ul>
+                </th>
+                <td class="valign-top">
+                    <div class="SNOMED-CT" ng-repeat="item in AssessmentplanpopupObj.AssessmentArray| filter: { ActiveInd: 'Y' } track by $index" ng-show="item.IsEditData==true">
+                        <label> {{item.ICD10CODE}} |  {{item.ICD10DIAGNAME}}</label>
+                        <div class="dis-flex align-items-center m-t-7">
+                            <div class="m-r-10 text-scnomed">SNOMED-CT</div>
+                            <div class="flex">
+                                <!--<input type="text" class="form-control" placeholder="Enter SNOMED-CT Code or Name Here" />-->
+
+                                <input type="text" class="form-control"
+                                       ng-model="item.SnomedCodeObject"
+                                       placeholder="Enter SNOMED-CT Code or Name Here"
+                                       typeahead-on-select="onselectSnomedCode(item)"
+                                       ng-blur="BlurSnomedCode(item)"
+                                       uib-typeahead="sitem as sitem.Description + ' - ' + sitem.ConceptId for sitem in getSnomedCodes($viewValue,item)"
+                                       ng-focus="true"
+                                       typeahead-focus-first=" false"
+                                       typeahead-min-length="0"
+                                       ng-change="changeSnomedCode(item)" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / -->
+                    <!--<div class="no-data-text text-center">
+                        <span>No Assessment Plans added.</span>
+                        <a href="">Click here</a>
+                        <span>or on search box to add Assessment Plans</span>
+                    </div>-->
+                    <div class="bg-white valign-top dis-flex align-items-center p-5" ng-repeat="item in AssessmentplanpopupObj.AssessmentArray| filter: { ActiveInd: 'Y' } track by $index" ng-show="item.IsEditData==true">
+                        <div class="dis-flex align-items-center border-right p-r-10 p-l-10">
+                            <label class="m-r-10 lh-1-0 fs-14 font-weight-600">Eye Location</label>
+                            <fieldset>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="dEye_1{{$index+1}}" ng-value="1" ng-model="item.OrganId">
+                                    <label for="dEye_1{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> OD</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="dEye_2{{$index+1}}" ng-value="2" ng-model="item.OrganId">
+                                    <label for="dEye_2{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> OS</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="dEye_3{{$index+1}}" ng-value="3" ng-model="item.OrganId">
+                                    <label for="dEye_3{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> OU</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="dis-flex align-items-center border-right p-r-10 p-l-10">
+                            <label class="m-r-10 lh-1-0 fs-14 font-weight-600">Severity</label>
+                            <fieldset>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="diagSever_1{{$index+1}}" value="Mild" ng-model="item.DiagnosisRiskLevel">
+                                    <label for="diagSever_1{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Mild</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="diagSever_2{{$index+1}}" value="Moderate" ng-model="item.DiagnosisRiskLevel">
+                                    <label for="diagSever_2{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Moderate</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="diagSever_3{{$index+1}}" value="Severe" ng-model="item.DiagnosisRiskLevel">
+                                    <label for="diagSever_3{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Severe</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="dis-flex align-items-center p-r-10 p-l-10">
+                            <label class="m-r-10 lh-1-0 fs-14 font-weight-600">Eye Status</label>
+                            <fieldset>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="eyeStatus_1{{$index+1}}" ng-value="1" ng-model="item.DiagnosisStatus">
+                                    <label for="eyeStatus_1{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Active</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="eyeStatus_2{{$index+1}}" ng-value="2" ng-model="item.DiagnosisStatus">
+                                    <label for="eyeStatus_2{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Stable</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="eyeStatus_3{{$index+1}}" ng-value="3" ng-model="item.DiagnosisStatus">
+                                    <label for="eyeStatus_3{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Improved</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="eyeStatus_4{{$index+1}}" ng-value="4" ng-model="item.DiagnosisStatus">
+                                    <label for="eyeStatus_4{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Resolved</label>
+                                </div>
+                                <div class="m-b-3 dis-inline-block">
+                                    <input type="radio" class="radio-custom width-0" id="eyeStatus_5{{$index+1}}" ng-value="5" ng-model="item.DiagnosisStatus">
+                                    <label for="eyeStatus_5{{$index+1}}" class="radio-custom-label text-label cur-poiter mb-0"> Worse</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="bg-eye-location p-0">
+                        <table class="eh-table" ng-repeat="item in AssessmentplanpopupObj.AssessmentArray| filter: { ActiveInd: 'Y' } track by $index" ng-show="item.IsEditData==true">
+                            <tbody>
+                                <tr>
+                                    <td class="valign-top p-0">
+                                        <div class="consultation-vandp p-8">
+                                            <section class="eh-panel">
+                                                <div class="eh-header">
+                                                    <h1 class="text-068cb0">Plan of Discussion</h1>
+                                                    <ul class="us-controls">
+                                                        <li>
+                                                            <button class="btn btn-info radius-100 btn-block" ng-click="addPlanOfCareNotes(assonj,item)">Add</button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="eh-body">
+                                                    <div class="pos-relative">
+                                                        <!--<input type="text" class="icons-search consultation-input m-t-6 m-b-6 form-control"
+                                                               placeholder="Enter Plan of Discussion" maxlength="500"
+                                                               ng-model="assonj.planOfCareText">-->
+                                                        <textarea type="text" class="m-t-6 m-b-6 form-control"
+                                                                  placeholder="Enter Plan of Discussion" maxlength="500" rows="5"
+                                                                  ng-model="assonj.planOfCareText"></textarea>
+
+
+                                                    </div>
+                                                    <ul class="list-group PIOS-list">
+                                                        <li class="list-group-item" ng-repeat="pitem in item.PlanOfcareNotesArray | filter: { DeleteInd: 'N' } track by $index">
+                                                            <span>
+                                                                {{pitem.PlanOfCareNotes}}
+                                                            </span>
+                                                            <span class="pull-right">
+                                                                <i class="eh-close eh-icon" ng-click="DelectAssPlanOfcare(pitem,item,$index)"></i>
+                                                            </span>
+
+                                                            <!--<a ng-click="removePlanOfCareitem($index, item.PlanOfcareNotesArray)" uib-tooltip="Close">
+                                                                <i class="eh-close eh-icon"></i>
+                                                            </a>-->
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </section>
+                                            <!-- / -->
+                                            <section class="eh-panel">
+                                                <div class="eh-header">
+                                                    <h1 class="text-068cb0">Investigation</h1>
+                                                    <ul class="us-controls">
+                                                         
+                                                        <li>
+                                                            <div class="pos-relative">
+                                                                <input type="text" class="form-control input-color icons-search w-300"
+                                                                       autocomplete="off"
+                                                                       placeholder="Enter Investigation"
+                                                                       ng-attr-placeholder="{{item.InvsearchBy == 2 ?'Search Investigation By CPT Code':'Search Investigation'}}"
+                                                                       ng-model="assonj.SelectedInvestigationObj"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-focus-on-select="false"
+                                                                       typeahead-on-select="onAsseselectInvestigation(assonj.SelectedInvestigationObj,item)"
+                                                                       uib-typeahead="InvItem as InvItem.ProcedureCode + ' - ' + InvItem.ProcedureName for InvItem in GetOrganizationTypeOfService($viewValue,item.InvsearchBy,'Investigation')" />
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="eh-body">                                                    
+                                                    <ul class="list-group PIOS-list">
+                                                        <li class="list-group-item" ng-repeat="Iitem in item.InvestigationsArray| filter: { DeleteInd: 'N' } track by $index">
+                                                            <!--<span class="btn btn-link text-actionb text-actionb badge">Schedule</span>-->
+                                                            <span class="pull-right">
+                                                                <i class="eh-close eh-icon" ng-click="DelectAssInvestigation(Iitem, item);"></i>
+                                                            </span>
+                                                            {{Iitem.ProcedureCode}} | {{Iitem.InvestigationName}}
+                                                            <label>(on {{Iitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</label>
+                                                        </li>
+                                                         
+                                                    </ul>
+                                                </div>
+                                                 
+                                                 
+                                                 
+                                                 
+
+                                                <!--//-->
+                                                <div class="eh-header">
+                                                    <h1 class="text-068cb0"> Surgery</h1>
+                                                    <ul class="us-controls">
+                                                         
+                                                        <li>
+
+                                                            <div class="pos-relative">
+                                                                <input type="text" class="form-control input-color icons-search w-300"
+                                                                       autocomplete="off"
+                                                                       ng-model="assonj.SelectedSurgeryObj"
+                                                                       ng-attr-placeholder="{{item.ProcedureSurgerysearchBy == 2 ?'Search Procedure / Surgery By CPT Code':'Search Procedure / Surgery'}}"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-focus-on-select="false"
+                                                                       typeahead-on-select="onAsseselectSurgeryItem(assonj, item,6)"
+                                                                       uib-typeahead="psitem as psitem.ProcedureCode + ' - ' + psitem.ProcedureName for psitem in GetOrganizationTypeOfService($viewValue,item.ProcedureSurgerysearchBy,'Surgery')" />
+                                                            </div>
+
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="eh-body">
+                                                    <ul class="list-group PIOS-list">
+                                                         
+                                                        <li class="list-group-item" ng-repeat="Sitem in item.SurgeryArray| filter: { DeleteInd: 'N' } track by $index">
+                                                            <span> {{Sitem.ProcedureCode}} | {{Sitem.SurgeryName}}</span>
+                                                            <span class="pull-right">
+                                                                <i class="eh-close eh-icon" ng-click="DelectAssSurgery(Sitem, item);"></i>
+                                                            </span>
+                                                            <label>(on {{Sitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</label>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                                <!--//-->
+                                                
+                                                     <!--//-->
+                                                <div class="eh-header">
+                                                    <h1 class="text-068cb0">Procedures</h1>
+                                                    <ul class="us-controls">
+                                                         
+                                                        <li>
+
+                                                            <div class="pos-relative">
+                                                                <input type="text" class="form-control input-color icons-search w-300"
+                                                                       autocomplete="off"
+                                                                       ng-model="assonj.SelectedProcedureObj"
+                                                                       ng-attr-placeholder="{{item.ProcedureSurgerysearchBy == 2 ?'Search Procedure By CPT Code':'Search Procedure / Surgery'}}"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-focus-on-select="false"
+                                                                       typeahead-on-select="onAsseselectProcedureItem(assonj, item)"
+                                                                       uib-typeahead="psitem as psitem.ProcedureCode + ' - ' + psitem.ProcedureName for psitem in GetOrganizationTypeOfService($viewValue,item.ProcedureSurgerysearchBy,'Procedure')"/>
+                                                            </div>
+
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="eh-body">
+                                                    <ul class="list-group PIOS-list">
+                                                        <li class="list-group-item" ng-repeat="pitem in item.ProceduresArray track by $index" ng-if="pitem.DeleteInd == 'N'">
+                                                            <span> {{pitem.ProcedureCode}}   | {{pitem.ProcedureName}}</span>
+                                                            <span class="pull-right">
+                                                                <i class="eh-close eh-icon" ng-click="DelectAssProcedure(pitem,item)"></i>
+                                                            </span>
+                                                            <label>(on {{pitem.CreatedDateTime |date:'MMM-dd-yyyy h:mm a'}})</label>
+
+                                                        </li>
+                                                        
+                                                    </ul>
+
+                                                </div>
+                                                <!--//-->
+                                            </section>
+                                            <!-- / -->
+
+                                        </div>
+                                         
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="eh-table h-100" ng-show="(AssessmentplanpopupObj.AssessmentArray| filter: { ActiveInd: 'Y' }).length ==0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="billing-cominsoon">
+                                            <img src="img/no-data/no-reports.png">
+                                            <div class="msg">
+                                                <span>No Assessment added.</span>
+                                                <a href="" ng-click="FocusObj.DiagnosisFocus = true;">Click here</a>
+                                                <span>or on search box to add Assessment.</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right" width="8%">
+                                        <button class="btn btn-discard-us m-r-10" ng-click="AssessmentPlansUIBclose()">Close</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+

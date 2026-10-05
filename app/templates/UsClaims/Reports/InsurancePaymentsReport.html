@@ -1,0 +1,961 @@
+﻿<div class="d__f-- fd__c-- height__100-- p__8-- gap__y--8 bg__FFFFFF--">
+
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- mb__10--">
+        <table class="table m-0 tableno-bordered tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td ng-if="false">
+                        <div class="form__group select-ui-match custom-select-width ">
+                            <label>Location</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                    {{InsuranceReportsObj.SelectLocationString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2" ng-click="stopClosingDropDown($event)">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Branch" ng-model="InsuranceReportsObj.LocationName" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in InsuranceReportsObj.AllBranchesList | filter:{'ClinicName':InsuranceReportsObj.LocationName}">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="ChangeReportsLocation(item)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label>Check Range</label>
+                            <select ng-model="InsuranceReportsObj.PaymentDateRangeId" id="select_daterange"
+                                    ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                    ng-change="setInsuranceCheckDateRange(InsuranceReportsObj.PaymentDateRangeId)">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="InsuranceReportsObj.PaymentDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="InsuranceReportsObj.PaymentFromDate"
+                                   date-range-one-year="InsuranceReportsObj.PaymentToDate"
+                                   readonly>
+
+                        </div>
+                    </td>
+
+                    <td ng-if="InsuranceReportsObj.PaymentDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="InsuranceReportsObj.PaymentToDate"
+                                   date-range-one-year
+                                   readonly>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label>DOS Date Range</label>
+                            <select ng-model="InsuranceReportsObj.ServiceDateRangeId" id="select_servicedaterange"
+                                    ng-options="item.Id as item.Name for item in ServiceDateRangeArray"
+                                    ng-change="setDOSDateRange(InsuranceReportsObj.ServiceDateRangeId)">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="InsuranceReportsObj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar" ng-model="InsuranceReportsObj.DOSFromDate"
+                                    date-range-one-year="InsuranceReportsObj.DOSToDate" readonly>
+                        </div>
+                    </td>
+                    <td ng-if="InsuranceReportsObj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar" ng-model="InsuranceReportsObj.DOSToDate" date-range-one-year readonly>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label>Billing Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+
+                                    {{InsuranceReportsObj.SelectBillingProviderString}}
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                    <div class="drop-menu-Scroll apptsearchdroplist" ng-click="stopClosingDropDown($event)">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-all" type="checkbox" class="checkbox" ng-model="InsuranceReportsObj.AllBillingProviderStatusCheck" ng-change="checkInsuranceAllBillingProviders(InsuranceReportsObj.AllBillingProviderStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in InsuranceReportsObj.BillingProviderList track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-{{item.OrganizationBillingProviderId}}" class="checkbox" type="checkbox" ng-model="item.IsChecked" ng-change="InsuranceProviderToggle(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">{{item.BillingProviderName}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group ">
+                            <label>Rendering Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown">
+                                    {{InsuranceReportsObj.SelectRenderingStatusString}}
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchtxtb.txt1" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="InsuranceReportsObj.AllRenderingStatusCheck" ng-click="checkAllRendering(InsuranceReportsObj.AllRenderingStatusCheck)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in InsuranceReportsObj.RenderingProviderList | filter:{'FullName':searchtxtb.txt1} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="InsuranceRenderingToggle(item);">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label for="apptList__bookType">User</label>
+                            <div class="dropdown cstm-dropdown width-100 " button-dropdown-direction>
+                                <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{InsuranceReportsObj.SelectUserStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="InsuranceReportsObj.UserFullName" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="InsuranceReportsObj.AllUserStatusCheck" ng-click="checkAllInsuranceUser(InsuranceReportsObj.AllUserStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in InsuranceReportsObj.AllUsersList | filter:{'FullName':InsuranceReportsObj.UserFullName} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="InsuranceUserToggle(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.FullName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <button popover-trigger="click"
+                                popover-append-to-body="true"
+                                popover-class="opfilter-popover m-0 min__w500--"
+                                popover-placement="bottom-right"
+                                popover-is-open="isPopoverOpen"
+                                ng-click="togglePopover()"
+                                uib-popover-template="payerFilterPopover.templateUrl"
+                                type="button" class="btn__sm-- btn__1d5558--o gap__10-- mt__20-- ws__nowrap--">
+                            More Filter <i class="icons__w16--  filter__w16--o"></i>
+                        </button>
+                        <script type="text/ng-template" id="payerFilterPopover.html" ng-if="isPopoverOpen">
+                            <div class="d__f-- fd__c--  ">
+                                <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                                    <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                    <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                </div>
+
+                                <div class="h__250--  over-scrol-y p__5--">
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Payer Name</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li>
+                                                    <a href="javascript:;" class="fs__lg-- fw__5-- fs__normal-- tc__006080--" ng-click="ClearAllPayor()">
+                                                        Clear All
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text"
+                                                       id="input_payernamedata"
+                                                       autocomplete="off"
+                                                       class="input__style--2"
+                                                       name="InsurancePayor"
+                                                       placeholder="Search Payer"
+                                                       ng-model="InsuranceReportsObj.PayorObj"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       typeahead-on-select="ChangeInsurancePayor(InsuranceReportsObj.PayorObj)"
+                                                       uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="item in InsuranceReportsObj.AllPayorList">
+                                                            <td>
+                                                                {{item.PayorName}}
+                                                            </td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeletePayor($index,item)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Referal</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li>
+                                                    <a href="javascript:;" class="fs__lg-- fw__5-- fs__normal-- tc__006080--" ng-click="ClearAllReferal()">
+                                                        Clear All
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+
+                                                <input type="text"
+                                                       class="input__style--2"
+                                                       id="input__refprovider"
+                                                       autocomplete="off"
+                                                       placeholder="Referring"
+                                                       maxlength="100"
+                                                       ng-model="InsuranceReportsObj.ReferringObj"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       uib-typeahead="item as item.NPI+'-'+item.FullName for item in GetReferalPCPDoctors($viewValue,2)"
+                                                       typeahead-on-select="onSelectReferral(InsuranceReportsObj.ReferringObj);" />
+                                            </div>
+                                            <div class=" overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="Pitem in InsuranceReportsObj.AllReferalList">
+                                                            <td>
+                                                                {{Pitem.FullName}}
+                                                            </td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteReferal($index,Pitem)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Procedure</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li>
+                                                    <a href="javascript:;" class="fs__lg-- fw__5-- fs__normal-- tc__006080--" ng-click="ClearAllProcedure()">
+                                                        Clear All
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text" placeholder="Enter CPT code"
+                                                       class="input__style--2"
+                                                       id="input__serviceobj1"
+                                                       autocomplete="off"
+                                                       maxlength="100"
+                                                       name="treatment"
+                                                       ng-model="InsuranceReportsObj.ServiceObj"
+                                                       typeahead-min-length="0"
+                                                       typeahead-focus-on-select="false"
+                                                       uib-typeahead="treatitem as treatitem.ProcedureCode +'-'+treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                       typeahead-on-select="onselectServiceItem(InsuranceReportsObj.ServiceObj,InsuranceReportsObj)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="sitem in InsuranceReportsObj.AllProcedureList track by $index">
+                                                            <td>
+                                                                {{sitem.ProcedureName}}
+                                                            </td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteProcedure($index,sitem)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--"><h1>ChkPosted Date</h1></div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <select class="input__style--2"
+                                                        ng-model="InsuranceReportsObj.ChkPostedDateRangeId"
+                                                        ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                                        ng-change="setInsChkPostedDateRange(InsuranceReportsObj.ChkPostedDateRangeId)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="d__f-- gap__5-- mt__5--" ng-if="InsuranceReportsObj.ChkPostedDateRangeId == 11">
+                                                <div class="form__group flex">
+                                                    <label>From</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="InsuranceReportsObj.ChkPostedFromDate"
+                                                           datepickerforapplist readonly>
+                                                </div>
+                                                <div class="form__group flex">
+                                                    <label>To</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="InsuranceReportsObj.ChkPostedToDate" datepickerforapplist readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                    <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" id="a_restore_pop" ng-click="ClearInsuranceFilters()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                                    <button class="btn__lg-- btn__1d5558--f" id="button_applypopp" ng-click="ClickForInsuranceFilteredData()">{{ 'APPLY' | translate}}</button>
+                                </div>
+                            </div>
+                        </script>
+                    </td>
+                    <td>
+                        <div class="d__f-- ai__c-- gap__5-- mt__20--">
+                            <button class="btn__lg-- btn__2D2D47--f" ng-click="ClickForInsuranceFilteredData()">Apply</button>
+                            <button class=" b-0" id="btn_clear" ng-click="ClearInsuranceFilters()">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <div class="position__relative-- height__100--" ng-if="InsSubTab =='BillingProvider'">
+        <div class="adjustable-position slim-scroll">
+            <div class="d__f-- ai__fs-- gap__5--x" ng-if="InsuranceBillingProviderlist.length > 0 && !ShowBillingProviderMonthsDataSummary">
+                <div class="section__style--5 width__45--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Billing Provider
+                        </h1>
+                    </div>
+                    <div class="section__body-- p__0--">
+                        <div class="d__f-- fd__c-- height__100--">
+                            <table class="table__style--21 b__0--" id="table_pospaylist">
+                                <thead>
+                                    <tr>
+                                        <th width="40%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Billing Provider Name</label></th>
+                                        <th width="15%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">NPI</label></th>
+                                        <th width="15%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Charges</label></th>
+                                        <th width="15%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payment</label></th>
+                                        <th width="18%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Adjustment</label></th>
+                                        <th width="5%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in InsuranceBillingProviderlist track by $index">
+                                    <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.BillingProviderId,'BillingProvider')">
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                            <div class="d__f-- ai__c-- gap__5--">                                                
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{item.BillingProviderName}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.BillingProviderNPI}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalChargeAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalPaymentAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5-- jc__c--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalAdjustmentAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <a>
+                                                <i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="item.IsOpenAccordian">
+                                        <td colspan="4">
+                                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                                <div id="mypatientPaymentGrid{{$index}}"
+                                                     class="ag-theme-alpine"
+                                                     style="height:600px;width:100%">
+                                                </div>
+
+                                            </div>
+                                            <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section__style--5 flex">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Charges by Billing Provider
+                        </h1>
+                    </div>
+                    <div class="section__body--">
+                        <div id="InsBillingProviderBarChart" style="height:400px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- ai__fs-- gap__5--x" ng-if="InsuranceBillingProviderlist.length > 0 && ShowBillingProviderMonthsDataSummary ">
+               <div class="section__style--5 width__45--">
+                   <div class="section__header--">
+                       <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                           Billing Provider
+                       </h1>
+                   </div>
+                   <div class="section__body-- p__0--">
+                       <div class="d__f-- fd__c-- height__100--">
+                           <table  class="table__style--21 b__0--" id="table_pospaylist">
+                               <thead>
+                                   <tr>
+                                       <th width="40%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Users</label></th>
+                                       <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">NPI</label></th>
+                                       <th width="40%" colspan="2" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 2"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                       <th width="50%" colspan="3" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 3"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                       <th width="5%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                   </tr>
+                                   <tr class="bg__D1D1D1--">
+                                       <td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>
+                                       <td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>
+                                       <td ng-repeat="month in MonthsArray track by $index" class="text-center py__4-- px__6--">
+                                           <span class="fs__lg-- fw__5-- tc__656565--">
+                                               {{ month }}
+                                           </span>
+                                       </td>
+                                       <td colspan="2"></td>
+                                   </tr>
+                               </thead>
+                               <tbody class="border__none--" ng-repeat="item in InsBillingProviderSummaryChartList track by $index">
+
+                                   <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.BillingProviderId,'BillingProvider')">
+                                       <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                           <div class="d__f-- ai__c-- gap__5--">                                             
+                                               <span class="fs__lg-- fw__5-- tc__656565--">{{item.BillingProviderName}}</span>
+                                           </div>
+                                       </td>
+                                       <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                           <div class="d__f-- fd__c-- gap__5--">
+                                               <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.BillingProviderNPI}}</label>
+                                           </div>
+                                       </td>
+                                       <td ng-class="{'bg__FCFAF5--': item.Isshow}" ng-repeat="month in MonthsArray track by $index" class="text-right">
+                                           <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                               ${{ item.MonthPayments[month] | number:2 }}
+                                           </label>
+                                       </td>
+                                       <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                           <div class="d__f-- fd__c-- gap__5-- jc__c--">
+                                               <a><i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i></a>
+
+                                           </div>
+                                       </td>
+                                   </tr>
+                                   <tr ng-if="item.IsOpenAccordian">
+                                       <td colspan="4">
+                                           <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                               <div id="mypatientPaymentGrid{{$index}}"
+                                                    class="ag-theme-alpine"
+                                                    style="height:600px;width:100%">
+                                               </div>
+
+                                           </div>
+                                           <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                       </td>
+                                   </tr>
+                               </tbody>
+                           </table>
+                       </div>
+                   </div>
+               </div>
+               <div class="section__style--5 flex">
+                   <div class="section__header--">
+                       <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                           Charges by Billing Provider
+                       </h1>
+                   </div>
+                   <div class="section__body--">
+                       <div id="InsBillingProviderBarChart" style="height:400px"></div>
+                   </div>
+               </div>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-if="InsuranceBillingProviderlist.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Payments Recorded</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Patient payment records will be listed here once payments are received.</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="position__relative-- height__100--" ng-if="InsSubTab =='RenderingProvider'">
+        <div class="adjustable-position slim-scroll">           
+            <div  class="d__f-- ai__fs-- gap__5--x" ng-if="InsuranceSummaryRenderingProviderlist.length > 0 && !ShowRenderingProviderMonthsDataSummary">
+                <div class="section__style--5 width__45--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Rendering Provider
+                        </h1>
+                    </div>
+                    <div class="section__body-- p__0--">
+                        <div class="d__f-- fd__c-- height__100-- ">
+                            <table class="table tableno-bordered m__0-- table-layout-fix col-lg-4" id="table_pospaylist">
+                                <thead>
+                                    <tr>
+                                        <th width="60%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Users</label></th>
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">NPI</label></th>
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payment</label></th>
+                                        <th width="5%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                        <!--<th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="!showRenderingBarGraph"><label class="fs__md-- fw__7-- tc__4A4A4A--">Adjustment</label></th>-->
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in InsuranceSummaryRenderingProviderlist track by $index">
+                                    <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.RenderingProviderId,'RenderingProvider')">
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{item.RenderingProviderName}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.RenderingProviderNPI}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalPaymentAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <a><i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i></a>
+                                        </td>
+                                        <!--<td ng-class="{'bg__FCFAF5--': item.Isshow}" ng-if="!showRenderingBarGraph">
+                        <div class="d__f-- fd__c-- gap__5--">
+                            <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalAdjustment |number:2}}</label>
+                        </div>
+                    </td>-->
+                                    </tr>
+                                    <tr ng-if="item.IsOpenAccordian">
+                                        <td colspan="4">
+                                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                                <div id="mypatientPaymentGrid{{$index}}"
+                                                     class="ag-theme-alpine"
+                                                     style="height:600px;width:100%">
+                                                </div>
+
+                                            </div>
+                                            <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <!--<div class="col-lg-8" ng-if="!showRenderingBarGraph">
+                    <div class="section__style--5">
+                        <div class="section__header-- ">
+                            <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                                Charges by Rendering Provider
+                            </h1>
+                        </div>
+
+                        <div class="section__body--">
+                            <div id="InsRenderingProviderBarChart" style="height:400px"></div>
+                        </div>
+                    </div>
+                </div>-->
+                <!--ng-if="showRenderingBarGraph"-->
+                
+                    <div class="section__style--5 flex">
+                        <div class="section__header-- ">
+                            <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                                Charges by Rendering Provider
+                            </h1>
+                        </div>
+
+                        <div class="section__body--">
+                            <div id="InsRenderingProviderPaymentBarChart" style="height:400px"></div>
+                        </div>
+                    </div>
+               
+            </div>
+            <div class="d__f-- ai__fs-- gap__5--x"  ng-if="InsuranceSummaryRenderingProviderlist.length > 0 && ShowRenderingProviderMonthsDataSummary ">
+                <div class="section__style--5 width__45--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Rendering Provider
+                        </h1>
+                    </div>
+                    <div class="section__body-- p__0--">
+                        <div class="d__f-- fd__c-- height__100--">
+                            <table class="table tableno-bordered m__0-- table-layout-fix" id="table_pospaylist">
+                                <thead>
+                                    <tr>
+                                        <th width="40%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Users</label></th>
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">NPI</label></th>
+                                        <th width="40%" colspan="2" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 2"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                        <th width="50%" colspan="3" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 3"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                        <th width="5%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                    </tr>
+                                    <tr class="bg__D1D1D1--">
+                                        <td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>
+                                        <td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>
+                                        <td ng-repeat="month in MonthsArray track by $index" class="text-center py__4-- px__6--">
+                                            <span class="fs__lg-- fw__5-- tc__656565--">
+                                                {{ month }}
+                                            </span>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in InsRenderingProviderSummaryChartList track by $index">
+
+                                    <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.RenderingProviderId,'RenderingProvider')">
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{item.RenderingProviderName}}</span>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.RenderingProviderNPI}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" ng-repeat="month in MonthsArray track by $index" class="text-right">
+                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                                ${{ item.MonthPayments[month] | number:2 }}
+                                            </label>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <a><i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="item.IsOpenAccordian">
+                                        <td colspan="4">
+                                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                                <div id="mypatientPaymentGrid{{$index}}"
+                                                     class="ag-theme-alpine"
+                                                     style="height:600px;width:100%">
+                                                </div>
+
+                                            </div>
+                                            <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+               
+                    <div class="section__style--5 flex">
+                        <div class="section__header-- ">
+                            <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                                Charges by Rendering Provider
+                            </h1>
+                        </div>
+
+                        <div class="section__body--">
+                            <div id="InsRenderingProviderPaymentBarChart" style="height:400px"></div>
+                        </div>
+                    </div>
+                
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-if="InsuranceSummaryRenderingProviderlist.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Payments Recorded</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Insurance payment records will be listed here once payments are received.</label>
+            </div>
+        </div>
+    </div>
+    <div class="position__relative-- height__100--" ng-if="InsSubTab =='Payor'">
+        <div class="adjustable-position slim-scroll">           
+            <div class="d__f-- ai__fs-- gap__5--x"  ng-if="InsuranceSummaryPayorlist.length > 0 && !ShowPayorsMonthsDataSummary">
+                <div class="section__style--5 width__45--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Payor
+                        </h1>
+                    </div>
+                    <div class="section__body-- p__0--">
+                        <div class="d__f-- fd__c-- height__100--" ng-if="InsuranceSummaryPayorlist.length > 0">
+                            <table class="table tableno-bordered m__0-- table-layout-fix" id="table_pospaylist">
+                                <thead>
+                                    <tr>
+                                        <th class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payor Name</label></th>
+                                        <!-- <th class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10  bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">OrganizationName</label></th>-->
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10  bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Charges</label></th>
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10  bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payment</label></th>
+                                        <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10  bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">Adjustment</label></th>
+                                        <th width="5%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10  bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in InsuranceSummaryPayorlist track by $index">
+                                    <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.OrganizationPayorId,'Payor',item)">
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{item.OrganizationPayorName}}</span>
+                                            </div>
+                                        </td>
+                                        <!--<td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                        <div class="d__f-- fd__c-- gap__5--">
+                            <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.OrganizationName}}</label>
+                        </div>
+                    </td>-->
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalChargeAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalPaymentAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <div class="d__f-- fd__c-- gap__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">${{item.TotalAdjustmentAmount |number:2}}</label>
+                                            </div>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <a><i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="item.IsOpenAccordian">
+                                        <td colspan="4">
+                                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                                <div id="mypatientPaymentGrid{{$index}}"
+                                                     class="ag-theme-alpine"
+                                                     style="height:600px;width:100%">
+                                                </div>
+
+                                            </div>
+                                            <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section__style--5 flex">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Charges by Payor
+                        </h1>
+                    </div>
+
+                    <div class="section__body--">
+                        <div id="PayorPaymentBarChart" style="height:400px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div  class="d__f-- ai__fs-- gap__5--x" ng-if="InsuranceSummaryPayorlist.length > 0 && ShowPayorsMonthsDataSummary">
+                <div class="section__style--5 width__45--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                            Payor
+                        </h1>
+                    </div>
+                    <div class="section__body-- p__0--">
+                        <div class="d__f-- fd__c-- height__100--">
+                            <table class="table tableno-bordered m__0-- table-layout-fix" id="table_pospaylist">
+                                <thead>
+                                    <tr>
+                                        <th width="40%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payor</label></th>
+                                        <!-- <th width="20%" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">Location</label></th>-->
+                                        <th width="60%" colspan="2" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 2"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                        <th width="60%" colspan="3" class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr" ng-if="MonthsArray.length == 3"><label class="fs__md-- fw__7-- tc__4A4A4A--">Payments</label></th>
+                                        <th width="5%"  class="bg__F5F5F5-- py__4-- px__6-- position__sticky-- top__0-- zindex-10 text-center bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                    </tr>
+                                    <tr class="bg__D1D1D1--">
+                                        <td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>
+                                        <!--<td><span class="fs__lg-- fw__5-- tc__656565--"></span></td>-->
+                                        <td ng-repeat="month in MonthsArray track by $index" class="text-center py__4-- px__6--">
+                                            <span class="fs__lg-- fw__5-- tc__656565--">
+                                                {{ month }}
+                                            </span>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in InsPayorsSummaryChartList track by $index">
+
+                                    <tr class="hover__1D55581A--bg" ng-class="(!$last && !item.Isshow) ? 'bb__DDD--' : ''" ng-click="openInsurancePaymentPopup(item.OrganizationPayorId,'Payor',item)">
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" class="py__8-- px__6-- bradius__3--bl">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{item.OrganizationPayorName}}</span>
+                                            </div>
+                                        </td>
+                                        <!--<td ng-class="{'bg__FCFAF5--': item.Isshow}">
+        <div class="d__f-- fd__c-- gap__5--">
+            <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal-- no-wrapappt" title="">{{item.OrganizationName}}</label>
+        </div>
+    </td>-->
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}" ng-repeat="month in MonthsArray track by $index" class="text-right">
+                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                                ${{ item.MonthPayments[month] | number:2 }}
+                                            </label>
+                                        </td>
+                                        <td ng-class="{'bg__FCFAF5--': item.Isshow}">
+                                            <a><i class="icons__w16--" ng-class="item.Isshow ? 'drawarrow__w16--l' : 'drawarrow__w16--l'"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="item.IsOpenAccordian">
+                                        <td colspan="4">
+                                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" id="myGridContainer">
+
+                                                <div id="mypatientPaymentGrid{{$index}}"
+                                                     class="ag-theme-alpine"
+                                                     style="height:600px;width:100%">
+                                                </div>
+
+                                            </div>
+                                            <!--<div class="dis-block h-100" ng-include="'templates/UsClaims/Reports/PatientGridContainer.html'"></div>-->
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>               
+              
+                    <div class="section__style--5 flex">
+                        <div class="section__header--">
+                            <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">
+                                Charges by Payor
+                            </h1>
+                        </div>
+
+                        <div class="section__body--">
+                            <div id="PayorPaymentBarChart" style="height:400px"></div>
+                        </div>
+                    </div>
+               
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-if="InsuranceSummaryPayorlist.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Payments Recorded</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Insurance payment records will be listed here once payments are received.</label>
+            </div>
+        </div>
+    </div>
+</div>

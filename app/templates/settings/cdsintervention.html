@@ -1,0 +1,678 @@
+<div class="setting-content h-100" ng-controller="EhnoteSettingCdsCtrl">
+    <div class="pos-relative h-100">
+        <div class="adjustable-position slim-scroll">
+            <div class="section__style--2">
+                <div class="section__header--">
+                    <h1>Add CDS Intervention</h1>
+                </div>
+                <div class="section__body--">
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form__group">
+                                <label>CDS Intervention<em>*</em></label>
+                                <label class="cur-poiter float-right">
+                                    <input type="checkbox" id="checkbox_cdsinte" class="checkbox" ng-model="GetSavingCdsMainObj.ActiveInd">
+                                    <span class="lbl"></span>
+                                    <span class="list-opt-text-new ng-binding">Enable CDS Intervention</span>
+                                </label>
+                                <input type="text" id="input_cdsinte" placeholder="Enter Here" ng-model="GetSavingCdsMainObj.CDAIntreventionName" ng-focus="cdsFocus" ng-focus-lost="LostSettingsFocus()"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="form__group">
+                                <label>Rules<em>*</em></label>
+                                <!--<label class="cur-poiter">
+                        <input type="checkbox" class="checkbox">
+                        <span class="lbl"></span>
+                        <span class="list-opt-text-new ng-binding">Enable Rules</span>
+                    </label>-->
+                                <a href="javascript:;" class="font-weight-600 float-right" ng-click="IsShowCdsAddingData()" ng-hide="SettingCdsshowingObj.IsShowDemograpicValue" id="a_addrules">+Add Rules</a>
+                                <select ng-model="GetSavingCdsMainObj.CDAIntreventionRule" id="select_gscdsmobj" ng-options="item as item.CdsRuleName for item in CdsPrimaryRuleObjArray" ng-change="changeRuleType(GetSavingCdsMainObj.CDAIntreventionRule)">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / -->
+                    <div class="row" ng-show="SettingCdsshowingObj.IsShowDemograpicValue">
+                        <div class="col-lg-12">
+                            <div class="two-sections">
+                                <div class="ehr-tabs flex">
+                                    <ul>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Demographics' ?'active':''">
+                                            <a ng-click="switchCdsTab('Demographics')" class="border" id="tab_demographics"> Demographics </a>
+                                        </li>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Diagnosis' ?'active':''">
+                                            <a ng-click="switchCdsTab('Diagnosis')" class="border" id="tab_diagnosis"> Diagnosis </a>
+                                        </li>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Medications' ?'active':''">
+                                            <a ng-click="switchCdsTab('Medications')" class="border" id="tab_medications"> Medications </a>
+                                        </li>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Allergies' ?'active':''">
+                                            <a ng-click="switchCdsTab('Allergies')" class="border" id="tab_allergies">Allergies </a>
+                                        </li>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Vitals' ?'active':''">
+                                            <a ng-click="switchCdsTab('Vitals')" class="border" id="tab_vitals"> Vitals </a>
+                                        </li>
+                                        <li ng-class="SettingCdsTabs.SettingsCdsTab =='Lab' ?'active':''">
+                                            <a ng-click="switchCdsTab('Lab')" class="border" id="tab_lab"> Lab </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div id="Demographics" ng-if="SettingCdsTabs.SettingsCdsTab =='Demographics'">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table tableno-bordered tableno-padding">
+                                                        <tbody ng-repeat="item in DemograpicViewAddingArray|  filter:{'DeleteInd':'N'} track by $index  ">
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="form__group">
+                                                                        <label>Rule</label>
+                                                                        <select ng-model="item.CategoryId" id="select_rule" ng-options="sitem as sitem.ParameterName for sitem in settingDemograpicArray" ng-change="ChangeValueBasedOnSelection(item.CategoryId,item)">
+                                                                            <option value="">Select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==1">
+                                                                        <label>Condition</label>
+                                                                        <select ng-model="item.AgeFactor" id="select_condition" ng-options="pitem as pitem.value for pitem in ageOptions" ng-disabled="item.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==2">
+                                                                        <label>Value</label>
+                                                                        <select ng-model="item.GenderFactor" id="select_ovalue" ng-options="gitem as gitem.value for gitem in genderOptions">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==3">
+                                                                        <label>Value</label>
+                                                                        <select ng-model="item.LanguageFactor" id="select_tvalue" ng-options="litem as litem.value for litem in languageOptions">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==4">
+                                                                        <label>Value</label>
+                                                                        <input type="text" class="form-control icons-calendar" id="input_value" placeholder="MM-DD-YYYY"
+                                                                               ng-model="item.DobFactor" datepickerforapplist readonly />
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==5">
+                                                                        <label>Value</label>
+                                                                        <select ng-model="item.RaceFactor" id="select_thvalue" ng-options="litem as litem.Value for litem in PatientRaceList">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==6">
+                                                                        <label>Value</label>
+                                                                        <select ng-model="item.EthnicityFactor" id="select_value" ng-options="litem as litem.Value for litem in PatientEthnicityList">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td>
+                                                                    <div class="form__group" ng-show="item.SelectedParameterId==1">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_tvalue" ng-disabled="(item.CategoryId=='')||(item.AgeFactor=='')" ng-model="item.ValueName" />
+                                                                    </div>
+                                                                </td>
+                                                                <td width="3%" class="valign-bottom" ng-show="(DemograpicViewAddingArray| filter:{'DeleteInd':'N'}).length>1">
+                                                                    <a href="javascript:;">
+                                                                        <img src="img/ros-chart/ros-close.svg" width="20" ng-model="item.RemoveFactor" ng-click="RemoveDemograpicValue(item,$index)">
+                                                                    </a>
+                                                                </td>
+                                                                <td class="valign-bottom" width="3%">
+                                                                    <div class="ehr-input pop-ehr-input" ng-show="$last">
+                                                                        <a href="javascript:;" ng-click="AddingNewDemograpicValue(item)" id="a_advalue">
+                                                                            <i class="fa fa-plus-circle fa-lg m-t-23 fs-18"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-if="SettingCdsTabs.SettingsCdsTab =='Diagnosis'">
+                                            <div class="row" id="Diagnosis">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group" typehead-dropdown-direction>
+                                                        <div class="pos-relative flex">
+                                                            <input type="text" class="form-control icons-search input-color"
+                                                                   placeholder="Enter Diagnosis" id="input_drulename"
+                                                                   autocomplete="off"
+                                                                   maxlength="200"
+                                                                   ng-model="DiagnosisObjValue.DiagnosisRuleName"
+                                                                   typeahead-min-length="0"
+                                                                   typeahead-focus-on-select="false"
+                                                                   typeahead-on-select="onSelectDiagnosisVlaue(DiagnosisObjValue.DiagnosisRuleName)"
+                                                                   uib-typeahead="item as item.ICD10Code + ' - ' + item.ICD10Description for item in GetProblemsFromRcopia($viewValue)" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table__style--7" id="table_drnstore">
+                                                            <tbody ng-hide="(DiagnosisObjValue.DiagnosisRuleNameStoreArray| filter:{'DeleteInd':'N'}).length==0">
+                                                                <tr>
+                                                                    <td><span class="text-s12w500c000">S.No</span></td>
+                                                                    <td><span class="text-s12w500c000">Diagnosis Name</span> </td>
+                                                                    <td><span class="text-s12w500c000">Action</span></td>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tbody>
+                                                                <tr ng-repeat="item in DiagnosisObjValue.DiagnosisRuleNameStoreArray| filter:{'DeleteInd':'N'} track by $index">
+                                                                    <td>
+                                                                        <span class="text-s12w500c000">{{$index+1}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="text-s12w500c000" ng-if="item.ValueName!=''">{{item.ValueCode}}-{{item.ValueName}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="javascript:;" ng-click="RemoveDiagnosisItem(item,$index)">
+                                                                            <img src="img/ros-chart/ros-close.svg" width="24">
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="Medications" ng-if="SettingCdsTabs.SettingsCdsTab =='Medications'">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group" typehead-dropdown-direction>
+                                                        <input type="text" class="form-control input-color icons-search" placeholder="Enter Medicine Name"
+                                                               ng-model="MedicineGetObj.MedicationsRuleName" id="input_mname"
+                                                               typeahead-on-select="MedicationDetailsSelecting(MedicineGetObj.MedicationsRuleName,'Ehnote')"
+                                                               typeahead-focus-on-select="false"
+                                                               typeahead-min-length="0"
+                                                               uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength  +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)" />
+
+                                                    </div>
+                                                </div>
+                                                <!--<div class="col-lg-2 p-r-0 p-l-0">
+                                        <label class="cur-poiter">
+                                            <input type="checkbox" class="checkbox">
+                                            <span class="lbl"></span>
+                                            <span class="list-opt-text-new ng-binding">Is Rcopia</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <select>
+                                                <option>In</option>
+                                            </select>
+                                        </div>
+                                    </div>-->
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table__style--7" id="table_mrnamestore">
+                                                        <tbody ng-hide="(MedicineGetObj.MedicationsRuleNameStoreArray | filter:{'DeleteInd':'N'}).length==0">
+                                                            <tr>
+                                                                <td><span class="text-s12w500c000">S.No</span></td>
+                                                                <td><span class="text-s12w500c000">Medication Name</span> </td>
+                                                                <td><span class="text-s12w500c000">Action</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in MedicineGetObj.MedicationsRuleNameStoreArray| filter:{'DeleteInd':'N'} track by $index">
+                                                                <td>
+                                                                    <span class="text-s12w500c000">{{$index+1}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="text-s12w500c000" ng-if="item.ValueName!=''">{{item.ValueName}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="javascript:;" ng-click="RemoveMedicineItem(item,$index)">
+                                                                        <img src="img/ros-chart/ros-close.svg" width="24">
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="Allergies" ng-if="SettingCdsTabs.SettingsCdsTab =='Allergies'">
+                                            <div class="row" id="Diagnosis">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <div class="pos-relative flex" typehead-dropdown-direction>
+                                                            <input type="text" class="form-control icons-search input-color"
+                                                                   placeholder="Enter Allergies" id="input_addallergy"
+                                                                   autocomplete="off"
+                                                                   maxlength="200"
+                                                                   ng-enter="addAllergy(AllergiesObjValue.AllergiesRuleEnterName)"
+                                                                   ng-model="AllergiesObjValue.AllergiesRuleName"
+                                                                   typeahead-min-length="0"
+                                                                   typeahead-focus-on-select="false"
+                                                                   typeahead-on-select="onAllergySelect(AllergiesObjValue.AllergiesRuleName)"
+                                                                   uib-typeahead="item as item.BrandName for item in GetAllergyListFromRcopia($viewValue)" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table__style--7" id="table_arnstore">
+                                                            <tbody ng-hide="(AllergiesObjValue.AllergiesRuleNameStoreArray| filter:{'DeleteInd':'N'}).length==0">
+                                                                <tr>
+                                                                    <td><span class="text-s12w500c000">S.No</span></td>
+                                                                    <td><span class="text-s12w500c000">Allergy Name</span> </td>
+                                                                    <td><span class="text-s12w500c000">Action</span></td>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tbody>
+                                                                <tr ng-repeat="item in AllergiesObjValue.AllergiesRuleNameStoreArray| filter:{'DeleteInd':'N'} track by $index">
+                                                                    <td>
+                                                                        <span class="text-s12w500c000">{{$index+1}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="text-s12w500c000" ng-if="item.ValueName!=''">{{item.ValueName}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="javascript:;" ng-click="RemoveAllergyItem(item,$index)">
+                                                                            <img src="img/ros-chart/ros-close.svg" width="24">
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="Vitals" ng-if="SettingCdsTabs.SettingsCdsTab =='Vitals'">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <table class="table tableno-bordered tableno-padding">
+                                                        <tbody ng-repeat="vitem in VitalsViewAddingArray | filter:{'DeleteInd':'N'} track by $index">
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="form__group">
+                                                                        <label>Rule</label>
+                                                                        <select ng-model="vitem.CategoryId" id="select_rule" ng-options="sitem as sitem.VitalName for sitem in VitalsShowArray" ng-change="changeVitelIdCondition(vitem.CategoryId,vitem)">
+                                                                            <option value="">Select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form__group" ng-show="vitem.VitalId==11||vitem.VitalId==12||vitem.VitalId==14||vitem.VitalId==15||vitem.VitalId==40||vitem.VitalId==13||vitem.VitalId==1||vitem.VitalId==2||vitem.VitalId==17||vitem.VitalId==37||vitem.VitalId==5">
+                                                                        <label>Condition</label>
+                                                                        <select ng-model="vitem.ConditionFactor" id="select_condition" ng-options="citem as citem.value for citem in Conditions" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-show="vitem.VitalId==4">
+                                                                        <label>Condition</label>
+                                                                        <select ng-model="vitem.ConditionFactor" id="select_conditionf" ng-options="citem as citem.value for citem in Conditions" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==11">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_value" ng-model="vitem.ValueName" ng-disabled="vitem.CategoryId==''" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==4">
+                                                                        <label>Systolic Value</label>
+                                                                        <input type="text" id="input_svalue" ng-model="vitem.SecondValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==5">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_valuename" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==1">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_valuef" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==2">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_values" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                </td>
+                                                                <td ng-hide="vitem.VitalId!=4">
+                                                                    <div class="form__group" ng-show="vitem.VitalId==4">
+                                                                        <label>Condition</label>
+                                                                        <select ng-model="vitem.secondConditionFactor" id="select_condition" ng-options="citem as citem.value for citem in Conditions" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==11">
+                                                                        <label>Units</label>
+                                                                        <select ng-model="vitem.TemparetureFactor" id="select_units" ng-options="titem as titem.value for titem in TempratureUnits" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==12||vitem.VitalId==14||vitem.VitalId==15||vitem.VitalId==40||vitem.VitalId==13">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_valuet" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==4">
+                                                                        <label>Diastolic Value</label>
+                                                                        <input type="text" id="input_dvalue" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==5">
+                                                                        <label>units</label>
+                                                                        <select ng-model="vitem.BGLFactor" id="select_unit" ng-options="bitem as bitem.value for bitem in BGLUnits" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==1">
+                                                                        <label>units</label>
+                                                                        <select ng-model="vitem.WeightFactor"id="select_unitf" ng-options="witem as witem.value for witem in WeightUnits" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==2">
+                                                                        <label>units</label>
+                                                                        <select ng-model="vitem.HeightFactor" id="select_unitt"  ng-options="hitem as hitem.value for hitem in HeightUnits" ng-disabled="vitem.CategoryId==''">
+                                                                            <option value="">select</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==17">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_valuefo" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                    <div class="form__group" ng-if="vitem.VitalId==37">
+                                                                        <label>Value</label>
+                                                                        <input type="text" id="input_valuefi" ng-model="vitem.ValueName" />
+                                                                    </div>
+                                                                </td>
+                                                                <!--<td width="8%" class="valign-bottom">
+                                                        <button class="btn btn-default btn-block">°F</button>
+                                                    </td>
+                                                    <td width="8%" class="valign-bottom">
+                                                        <button class="btn btn-save-us btn-block">°C</button>
+                                                    </td>-->
+                                                                <td width="3%" class="valign-bottom" ng-if="(VitalsViewAddingArray| filter:{'DeleteInd':'N'}).length>1">
+                                                                    <a href="javascript:;">
+                                                                        <img src="img/ros-chart/ros-close.svg" width="24" ng-click="RemoveVitalItemById(vitem,$index)">
+                                                                    </a>
+                                                                </td>
+                                                                <td width="3%" class="valign-bottom">
+                                                                    <a href="javascript:;" ng-show="$last" ng-click="AddVitalCondition(vitem)" id="a_avcondition">
+                                                                        <i class="fa fa-plus-circle fa-lg m-t-23 fs-18"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="Lab" ng-if="SettingCdsTabs.SettingsCdsTab =='Lab'">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <div class="form-group pos-relative" typehead-dropdown-direction>
+                                                            <input type="text" class="form-control icons-search input-color"
+                                                                   autocomplete="off" id="input_labrulename"
+                                                                   placeholder="Enter Investigation"
+                                                                   ng-attr-placeholder="Search Investigation"
+                                                                   ng-model="LabObjValue.LabRuleName"
+                                                                   typeahead-min-length="0"
+                                                                   typeahead-focus-on-select="false"
+                                                                   typeahead-on-select="onAsseselectInvestigation(LabObjValue.LabRuleName)"
+                                                                   uib-typeahead="InvItem as InvItem.ProcedureCode + ' - ' + InvItem.ProcedureName for InvItem in GetOrganizationTypeOfService($viewValue)" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table__style--7" id="table_lrnamestore">
+                                                            <tbody>
+                                                                <tr ng-repeat="item in LabObjValue.LabRuleNameStoreArray | filter:{'DeleteInd':'N'} track by $index">
+                                                                    <td>
+                                                                        <span class="text-s12w500c000">{{$index+1}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="text-s12w500c000" ng-if="item.ValueName!=''">{{item.ValueCode}}-{{item.ValueName}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="javascript:;">
+                                                                            <img src="img/ros-chart/ros-close.svg" width="24" ng-click="RemoveLabRuleItem(item,$index)">
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="width-25 bg-f2f2f2">
+                                    <table class="table table-bordered m-b-0" id="table_dvadding">
+                                        <tbody ng-repeat=" item in DemograpicViewAddingArray | filter:{'DeleteInd':'N'} track by $index" ng-if="DemograpicViewAddingArray.length>0">
+                                            <tr ng-if="item.CategoryId!=''">
+                                                <td>{{item.CategoryId.ParameterName}}</td>
+                                                <td ng-if="item.SelectedParameterId==1">{{item.AgeFactor.value}}</td>
+                                                <td ng-if="item.SelectedParameterId==1">{{item.ValueName}}</td>
+                                                <td ng-if="item.SelectedParameterId==2"></td>
+                                                <td ng-if="item.SelectedParameterId==2">{{item.GenderFactor.value}}</td>
+                                                <td ng-if="item.SelectedParameterId==3"></td>
+                                                <td ng-if="item.SelectedParameterId==3">{{item.LanguageFactor.value}}</td>
+                                                <td ng-if="item.SelectedParameterId==5"></td>
+                                                <!--  <td ng-if="item.SelectedParameterId==5">{{item.RaceFactor.Name}}</td>-->
+                                                <td ng-if="item.SelectedParameterId==5">{{item.RaceFactor.Value}}</td>
+                                                <td ng-if="item.SelectedParameterId==6"></td>
+                                                <!--  <td ng-if="item.SelectedParameterId==6">{{item.EthnicityFactor.Name}}</td>-->
+                                                <td ng-if="item.SelectedParameterId==6">{{item.EthnicityFactor.Value}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table ng-if="DiagnosisObjValue.DiagnosisRuleNameStoreArray.length>0" class="table table-bordered m-b-0" id="table_dobjvalue">
+                                        <tbody ng-repeat=" item in DiagnosisObjValue.DiagnosisRuleNameStoreArray">
+                                            <tr>
+                                                <td> Diagnosis Name:{{item.ValueCode}}-{{item.ValueName}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-bordered m-b-0" ng-if="MedicineGetObj.MedicationsRuleNameStoreArray.length>0" id="table_mrnstore">
+                                        <tbody ng-repeat="item in MedicineGetObj.MedicationsRuleNameStoreArray">
+                                            <tr>
+                                                <td>
+                                                    <label>Medication Name:</label>
+                                                    <span>{{item.ValueName}}</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-bordered m-b-0" ng-if="AllergiesObjValue.AllergiesRuleNameStoreArray.length>0" id="table_arnstore">
+                                        <tbody ng-repeat=" item in AllergiesObjValue.AllergiesRuleNameStoreArray">
+                                            <tr>
+                                                <td>
+                                                    <label>  Allergy Name:</label>
+                                                    <span> {{item.ValueName}} </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <ul class="flex-flow-ulli-mb0 p-5" ng-if="VitalsViewAddingArray.length>0" ng-repeat=" item in VitalsViewAddingArray | filter:{'DeleteInd':'N'} track by $index">
+                                        <li>
+                                            <label>{{item.CategoryId.VitalName}}</label>
+                                        </li>
+                                        <li ng-if="item.VitalId==11">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==11">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==11">{{item.TemparetureFactor.value}}</li>
+                                        <li ng-if="item.VitalId==12">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==12"></li>
+                                        <li ng-if="item.VitalId==12">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==4">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==4">{{item.SecondValueName}}</li>
+                                        <li ng-if="item.VitalId==4">{{item.secondConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==4">{{item.ValueName}}</li>
+                                        <!--<li ng-if="item.VitalId==4"></li>-->
+                                        <li ng-if="item.VitalId==14"> {{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==14"></li>
+                                        <li ng-if="item.VitalId==14">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==15">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==15"></li>
+                                        <li ng-if="item.VitalId==15">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==40">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==40"></li>
+                                        <li ng-if="item.VitalId==40">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==5">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==5"></li>
+                                        <li ng-if="item.VitalId==5">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==5">{{item.BGLFactor.value}}</li>
+                                        <li ng-if="item.VitalId==13">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==13"></li>
+                                        <li ng-if="item.VitalId==13">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==1">{{item.ConditionFactor.value}} </li>
+                                        <li ng-if="item.VitalId==1"></li>
+                                        <li ng-if="item.VitalId==1">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==1">{{item.WeightFactor.value}}</li>
+                                        <li ng-if="item.VitalId==1"> </li>
+                                        <li ng-if="item.VitalId==2">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==2">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==2">{{item.HeightFactor.value}}</li>
+                                        <li ng-if="item.VitalId==17"> </li>
+                                        <li ng-if="item.VitalId==17">{{item.ConditionFactor.value}}</li>
+                                        <li ng-if="item.VitalId==17">{{item.ValueName}}</li>
+                                        <li ng-if="item.VitalId==37">{{item.ConditionFactor.value}} </li>
+                                        <li ng-if="item.VitalId==37"></li>
+                                        <li ng-if="item.VitalId==37">{{item.ValueName}}</li>
+                                    </ul>
+                                    <!--<table class="table table-bordered m-b-0" >
+                            <tbody >
+                                <tr ng-if="item.CategoryId!=''">
+                                    <td></td>
+
+                                </tr>
+                            </tbody>
+                        </table>-->
+                                    <table class="table table-bordered m-b-0" ng-if="LabObjValue.LabRuleNameStoreArray.length>0" id="table_lrnamestore">
+                                        <tbody ng-repeat=" item in LabObjValue.LabRuleNameStoreArray| filter:{'DeleteInd':'N'} track by $index">
+                                            <tr>
+                                                <td>
+                                                    <label>  Lab Name:</label>
+                                                    <span>{{item.ValueCode}}-{{item.ValueName}} </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row m-b-10" ng-show="SettingCdsshowingObj.IsShowDemograpicValue">
+                                <div class="col-lg-12">
+                                    <div class="dis-flex align-items-center justify-content-end grid-gap-10 bg-f5f5f5 p-15">
+                                        <button class="btn__xl-- btn__C71D27--f" ng-click="ClearCdsEnterData(GetSavingCdsMainObj)" ng-hide="!GetSavingCdsMainObj.IsCdsDataEditCaseInd" id="btn_cancel"><i class="action__icons--1 action__cancel--"></i>Cancel</button>
+                                        <button class="btn__xl-- btn__C71D27--o" ng-click="ClearCdsEnterData(GetSavingCdsMainObj)" ng-hide="GetSavingCdsMainObj.IsCdsDataEditCaseInd" id="btn_clear"><i class="action__icons--1 action__clear--"></i>Clear</button>
+                                        <button class="btn__xl-- btn__1d5558--f" ng-click="SavingCdsSettingLevel()" id="btn_scdsslevel"><i ng-class="{'action__icons--1 action__add--': SaveTitle === 'ADD','action__icons--1 action__update--': SaveTitle === 'Update'}"></i>{{SaveTitle}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / -->
+                    <!-- / -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div>
+                                <table class="table__style--7" id="table_gcdsidata">
+                                    <thead>
+                                        <tr>
+                                            <th>CDS Intervention</th>
+                                            <th>Rules</th>
+                                            <th class="text-center">Enable Intervention</th>
+                                            <!--<th>Enable Rules</th>-->
+                                            <th class="text-center">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="item in GetCDAinventionsDataArray">
+                                        <tr>
+                                            <td class="cur-poiter">
+                                                <span class="font-weight-600">
+                                                    <i class="glyphicon" ng-click="IsHideShowCdsDataViewClick(item)" ng-class="{'glyphicon-chevron-down': status.isCustomHeaderOpen, 'glyphicon-chevron-right': !status.isCustomHeaderOpen}"></i> {{item.CDAIntreventionName}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div ng-repeat="ritem in item.RuleData" ng-if="item.RuleData.length>0">
+                                                    <spann ng-show="ritem.RuleName !=''">{{ritem.RuleName}}</spann>
+                                                    <spann ng-show="ritem.RuleName ==''">-</spann>
+                                                </div>
+                                                <div ng-if="item.RuleData.length==0">
+                                                    <spann>-</spann>
+                                                </div>
+                                            </td>
+                                            <td class="text-center column__sm">
+                                                <label class="cur-poiter">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.ActiveInd" ng-change="ChangingEnableCdsIntervention('Enable Access',item)">
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </td>
+                                            <!--<td>
+                                    <label class="cur-poiter">
+                                        <input type="checkbox" class="checkbox">
+                                        <span class="lbl"></span>
+                                    </label>
+                                </td>-->
+                                            <td class="column__sm">
+                                                <div class="dis-flex align-items-center grid-gap-5 justify-content-center">
+                                                    <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="EditCdsItemBySettinglevel(item)"></i></a>
+                                                    <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-hide="item.IsCdsDataEditCaseInd" ng-click="RemoveCdsItemSettTing(item)"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="item.IsShowGetCdaDataOInd">
+                                            <td colspan="4" class="bg-fff9e2">
+                                                <table class="table tableno-bordered m-b-0" ng-if="sitem.RuleDetails.length>0" ng-repeat="sitem in item.RuleData">
+                                                    <thead class="coloured">
+                                                        <tr class="text-underline">
+                                                            <td> Intervention Name</td>
+                                                            <td> Condition  </td>
+                                                            <td> Value  </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody ng-repeat="nitem in item.RuleData">
+                                                        <tr ng-repeat="sitem in nitem.RuleDetails">
+                                                            <td>
+                                                                {{sitem.IntreventionTypeName}}
+                                                                <span ng-if="sitem.CategoryName!=''">
+                                                                    ({{sitem.CategoryName}})
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                {{sitem.ConditionName}}
+                                                                <span ng-hide="sitem.VitalBpValueCodition==''||sitem.VitalBpValueCodition==null"> , {{sitem.VitalBpValueCodition}} </span>
+                                                            </td>
+                                                            <td>
+                                                                {{sitem.ValueName}}
+                                                                <span ng-hide="sitem.VitalBpValue==''||sitem.VitalBpValue==null"> / {{sitem.VitalBpValue}}</span>
+                                                                <span ng-hide="sitem.VitalValueUnit==''||sitem.VitalValueUnit==null">({{sitem.VitalValueUnit}})</span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row m-t-10">
+                                <div class="col-lg-12 text-center EH-pagination">
+                                    <uib-pagination total-items="GetSavingCdsMainObjTotalItem"
+                                                    ng-model="GetSavingCdsMainObj.PageNationsValue"
+                                                    ng-change="CdspageChanged(GetSavingCdsMainObj.PageNationsValue)"
+                                                    force-ellipses="true"
+                                                    boundary-links="true"
+                                                    max-size="GetSavingCdsMainObj.PageSize"
+                                                    ng-show="GetCDAinventionsDataArray.length > 0">
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </div>    
+</div>

@@ -1,0 +1,36 @@
+<!-- Task 13 - Order Given By details for a custom (General) order marked Done, protected by the
+     Given By user's passcode. Same behaviour as the medication partial DropTimingGivenBy.html.
+
+     Included as a sibling straight after the section's existing "Done" block (the one holding the
+     Time field and the Given By dropdown), inside ng-repeat="Aitem in Mitem.GeneralOrders".
+     That existing block carries ng-show="Aitem.Status == 'Done' && !IsGeneralOrderValidated(Aitem) && !Aitem.$$IsLocked",
+     so it shows while the order is being recorded, hides once validated, and hides again while a
+     validated row is waiting for the previous Given By user's passcode.
+
+     Row handlers (ValidateGeneralOrderGivenBy, EditGeneralOrderGivenBy, ...) come from
+     DropTimingGivenByService.attach($scope) - the same call the medication rows already use.
+     The $$ fields are UI-only and are dropped from the save payload by angular.toJson. -->
+<ul class="facesheet-list-label m-0" ng-show="Aitem.Status == 'Done'" style="flex-wrap:nowrap;">
+    <li ng-show="!IsGeneralOrderValidated(Aitem)" style="flex:0 0 120px;">
+        <div class="form__group" tooltip-placement="top" uib-tooltip="{{Aitem.$$IsLocked ? 'Enter ' + Aitem.$$PrevGivenByName + ' password to edit' : 'Enter Given By password'}}">
+            <input type="password" masked-code class="form-outline" id="input_customgivenbypasscode" autocomplete="new-password" ng-model="Aitem.$$GivenByPassword" placeholder="Enter Password" style="width:120px;" />
+        </div>
+    </li>
+    <li ng-show="!IsGeneralOrderValidated(Aitem)" style="flex:0 0 auto;">
+        <button class="btn btn-ehnote" id="btn_customgivenbyvalidate" ng-click="Aitem.$$IsLocked ? ValidatePrevGeneralOrderGivenBy(Aitem) : ValidateGeneralOrderGivenBy(Aitem)">Validate</button>
+    </li>
+    <li ng-show="IsGeneralOrderValidated(Aitem)" style="min-width:0;">
+        <label ng-if="Aitem.MedicationTime != ''">{{Aitem.MedicationTime}}</label>
+        <span ng-if="Aitem.GivenByname != ''">@</span>
+        <label ng-if="Aitem.GivenByname != ''"> {{Aitem.GivenByname}}</label>
+        <label ng-show="Aitem.LicenseNumber !== '' && Aitem.LicenseNumber !== null">,Lic: {{Aitem.LicenseNumber}}</label>
+    </li>
+    <li class="d__f-- ai__c-- gap__5--x">
+        <a tooltip-placement="top" uib-tooltip="Edit" id="a_customgivenbyedit" ng-show="IsGeneralOrderValidated(Aitem)" ng-click="EditGeneralOrderGivenBy(Aitem)">
+            <i class="fas fa-pen text-muted"></i>
+        </a>
+        <a tooltip-placement="top" uib-tooltip="Cancel Edit" id="a_customgivenbycanceledit" ng-show="!IsGeneralOrderValidated(Aitem) && Aitem.$$IsEditMode" ng-click="CancelEditGeneralOrderGivenBy(Aitem)">
+            <i class="fas fa-undo text-muted"></i>
+        </a>
+    </li>
+</ul>

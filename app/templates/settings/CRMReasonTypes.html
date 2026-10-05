@@ -1,0 +1,184 @@
+﻿<div class="h-100" ng-controller="UsCRMReasonTypeCtrl">
+    <div class="pos-relative h-100">
+        <div class="adjustable-position slim-scroll">
+            <div class="dis-flex flex-direction-column grid-gap-10 height__100--">
+                <div class="section__style--2" ng-show="addedVisitReasonType">
+                    <div class="section__header--">
+                        <h1>Add Reason Types</h1>
+                        <!--<ul class="controls">
+                            <li class="dis-flex align-items-center">
+                                <label class="cur-poiter">
+                                    <input type="checkbox" class="checkbox">
+                                    <span class="lbl"></span>
+                                    <span class="list-opt-text-new">Transfer to IOJ</span>
+                                </label>
+                            </li>
+                        </ul>-->
+                    </div>
+                    <div class="section__body--">
+                        <div class="row nocolpad">
+                            <div class="col-lg-3 col-sm-3 form__group">
+                                <label for=s_cba_reason>Reason Type<em>*</em></label>
+                                <!--<input type="text" class="form-control" placeholder="text here" maxlength="50" ng-model="ReasonObj.ReasonTypeName" />-->
+                                <input type="text" id="s_cba_reason"
+                                       placeholder="Select Reason Type"
+                                       ng-model="ReasonObj.ReasonTypeName"
+                                       maxlength="50"
+                                       typeahead-min-length="0"
+                                       typeahead-focus-on-select="false"
+                                       uib-typeahead="item as item.ReasonTypeName for item in AllReasonTypes | filter:$viewValue"
+                                       typeahead-on-select="onselectResontype($item)"
+                                       ng-blur="changefocusOption(ReasonObj.ReasonTypeName)" 
+                                       ng-focus="CRMReasonTypeFocus" ng-focus-lost="LostSettingsFocus()"/>
+                            </div>
+                            <div class="col-lg-5 col-sm-5 input__group">
+                                <label>Duration</label>
+                                <div>
+                                    <span>From</span>
+                                    <!--numbers-only="numbers-only"-->
+                                    <input id="s_cba_dfrom" type="text" placeholder="0" maxlength="4" ng-model="ReasonObj.DurationFrom" ng-disabled="ReasonObj.TransferToCall">
+                                    <select id="s_cba_dfyear" ng-model="ReasonObj.DurationTypeFrom" ng-change="ChangeDuration(ReasonObj,'From')">
+                                        <option value="">Select</option>
+                                        <!--<option value="W">Weeks</option>-->
+                                        <option value="M">Months</option>
+                                        <option value="Y">Years</option>
+                                    </select>
+                                    <span>To</span>
+                                    <input id="s_cba_dto" type="text" placeholder="0" maxlength="4" ng-model="ReasonObj.DurationTo" ng-disabled="ReasonObj.TransferToCall">
+                                    <select id="s_cba_dtoyear" ng-model="ReasonObj.DurationTypeTo" ng-change="ChangeDuration(ReasonObj,'To')">
+                                        <option value="">Select</option>
+                                        <!--<option value="W">Weeks</option>-->
+                                        <option value="M">Months</option>
+                                        <option value="Y">Years</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-4 input__group">
+                                <label>Age<em>*</em></label>
+                                <div>
+                                    <span>From</span>
+                                    <input id="s_cba_agefrom" type="text" placeholder="0" maxlength="4" ng-model="ReasonObj.AgeFrom" ng-disabled="ReasonObj.TransferToCall">
+                                    <span>To</span>
+                                    <input id="s_cba_ageto" type="text" placeholder="0" maxlength="4" ng-model="ReasonObj.AgeTo" ng-disabled="ReasonObj.TransferToCall">
+                                    <select id="s_cba_ageyear" ng-model="ReasonObj.AgeDurationType" ng-change="ChangeAllergy(Allergy)" ng-disabled="true">
+                                        <option value="">Select</option>
+                                        <!--<option value="W">Weeks</option>-->
+                                        <option value="M">Months</option>
+                                        <option value="Y">Years</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row nocolpad">
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="input__group">
+                                    <label>Visit Reason<em>*</em></label>
+                                    <div id="s_cba_visitreason">
+                                        <button class="form__control" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="ReasonObj.TransferToCall">
+                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-32"></i>
+                                            {{ReasonObj.SelectStatusString}}
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                            <div class="p-5">
+                                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="Searchobj.txt1" />
+                                            </div>
+                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                <ul>
+                                                    <li ng-repeat="item in AllVisitreasons | filter:{'Reason':Searchobj.txt1} track by $index">
+                                                        <div class="checkbox cn">
+                                                            <label>
+                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="ReasonStatusToggle(item)">
+                                                                <span class="checkbox-material">
+                                                                    <span class="check"></span>
+                                                                </span>
+                                                                <small ng-bind="item.Reason"></small>
+                                                            </label>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-sm-2">
+                                <span class="cur-poiter dis-flex align-items-center grid-gap-5 m-t-23">
+                                    <input id="s_cba_ttioj" type="checkbox" class="checkbox" ng-change="ChangeTransfertocall()" ng-model="ReasonObj.TransferToCall">
+                                    <span class="lbl"></span>
+                                    <label class="list-opt-text-new" for="s_cba_ttioj">Transfer to IOJ</label>
+                                </span>
+                            </div>
+                            <div class="col-lg-7 col-sm-7">
+                                <div class="dis-flex align-items-center jc__e-- grid-gap-10 m-t-23">
+                                    <button class="btn__xl-- btn__1d5558--f" ng-click="SaveReasonType()" id="btn_save_crm"><i class="action__icons--1 action__save--"></i>{{ 'SAVE' | translate}}</button>
+                                    <button class="btn__xl-- btn__C71D27--o" ng-click="ClearReasonType()" id="btn_clear_crm"><i class="action__icons--1 action__clear--"></i>{{ 'CLEAR' | translate}}</button>
+                                    <button class="btn__xl-- btn__C71D27--f" ng-click="closeVisitReasonType()" id="btn_cancel_crm"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section__style--2 d__f-- fd__c-- height__100-- mb__5--">
+                    <div class="section__header--">
+                        <h1>Reason Types List</h1>
+                        <button class="btn__lg-- btn__1d5558--f" id="btn_addnew" ng-click="addVisitReasonType()" ng-disabled="addedVisitReasonType"><i class="action__icons--1 action__add--"></i>Add New</button>
+                    </div>
+                    <div class="section__body-- height__100--">
+                        <div class="row" ng-show="AllCrmReasonTypes.length>0">
+                            <div class="col-lg-12">
+                                <div class="overflow__auto--x slim-scroll">
+                                    <table class="table__style--7" id="s_cba_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Reason Type</th>
+                                                <th>Duration</th>
+                                                <th>Age</th>
+                                                <th>Visit Reason</th>
+                                                <th>Transfer To IOJ</th>
+                                                <th class="text-center table-sticky-column-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in AllCrmReasonTypes">
+                                                <td class="ws__nowrap--">{{item.ReasonTypeName}}</td>
+                                                <td><span class="ws__nowrap--" ng-show="(item.DurationFrom!=null&&item.DurationFrom!='')||(item.DurationTo!=null&&item.DurationTo!='')">{{item.DurationFrom}}{{item.DurationTypeFrom}} to {{item.DurationTo}} {{item.DurationTypeTo}}</span></td>
+                                                <td><span class="ws__nowrap--" ng-show="item.AgeFrom!=''||item.AgeTo!=''">{{item.AgeFrom}} <span ng-show="item.AgeTo!=null">to</span> {{item.AgeTo}} <span ng-show="item.AgeTo!=null">{{item.AgeDurationType}}</span> </span></td>
+
+                                                <!--<td>{{item.VisitReasonName}}</td>-->
+                                                <td>
+                                                    <ul class="referral-summary-list ai__s-- fw__w--">
+                                                        <li class="ai__s--" ng-repeat="Aitem in item.VisitReasonList track by $index">
+                                                            <label>{{Aitem.VisitReasonName}} <span ng-hide="$last">,</span></label>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>
+                                                    <span class="ws__nowrap--" ng-show="item.TransferToCall">Transfer To IOJ</span>
+                                                </td>
+                                                <td class="column__sm table-sticky-column-right">
+                                                    <div class="dis-flex align-items-center grid-gap-5">
+                                                        <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true" ng-click="EditReasonType(item)"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit"></i></a>
+                                                        <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true" ng-click="DeleteReasonType(item)"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100-- p__23--" ng-show="AllCrmReasonTypes.length==0">
+                            <a><i class="nodata__1-- d3__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Reason Types Added</h1>
+                            <label class="fs__lg-- fw__5-- tc__4A4A4A--">
+                                Add reason types to display them here.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

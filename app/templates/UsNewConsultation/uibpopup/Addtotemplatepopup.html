@@ -1,0 +1,553 @@
+﻿<div>
+    <div class="eh-header bg-white b-0">
+        <h1>Templates</h1>
+        <ul class="us-controls">
+            <li>
+                <button class="btn btn-danger" ng-click="Uibclose()">Close</button>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <div class="search-panel-input form-group col-lg-12">
+            <input type="text" class="form-outline  icons-search" ng-model="Templatesearch.DiagnosisTemplate" ng-change="changeDiagnosisSearch(Templatesearch.DiagnosisTemplate);" placeholder="Search by Template name" />
+        </div>
+        <div class="row">
+            <div class="col-lg-12 overflow-x-hidden overflow-y-auto paper-consultation">
+                <div class="two-sections col-lg-12">
+                    <div class="width-25">
+                        <section class="eh-panel">
+                            <div class="eh-body p-0  overflow-x-hidden overflow-y-auto paper-consultation" style="height:calc(100vh - 100px)">
+                                <ul class="templates-list-grid bg-f2f2f2 selec-autoplan" ng-repeat="diagnosisitem in DiagnosisTemplatesArray">
+                                    <li ng-class="diagnosisitem.IsActiveTemplate? 'active':''" ng-show="diagnosisitem.TemplateName !==''" ng-click="SelectAssmtTemplate(diagnosisitem);">
+                                        <a class="text-s14w800c000">
+                                            {{diagnosisitem.TemplateName}}
+                                            <i ng-class="diagnosisitem.IsTemplateFavorites? 'fas fa-star text-FFC700':''"></i>
+                                            <!--<i ng-class="!diagnosisitem.IsTemplateFavorites? 'far fa-star text-FFC700':''"></i>-->
+                                        </a>
+
+                                    </li>
+                                    <!--<li class="b-0 p-5" ng-repeat="i in [1,2,3,4,5]">
+                                <a class="text-s14w500c000">
+                                    Templates 1
+                                    <i class="far fa-star"></i>
+                                </a>
+                            </li>-->
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="flex overflow-x-hidden overflow-y-auto paper-consultation" style="height: calc(100vh - 70px)">
+                        <div class="eh-panel" ng-repeat="diagnosisitem in DiagnosisTemplatesArray" ng-show="diagnosisitem.IsActiveTemplate == true">
+                            <div class="eh-header bg-f2f2f2 auto-plan-select">
+                                <h1 class="font-weight-600">{{diagnosisitem.TemplateName}}</h1>
+
+                                <!--<pre>{{diagnosisitem.AnteriorValuesArray}}</pre>
+            <pre>{{diagnosisitem.PosteriorValuesArray}}</pre>-->
+                                <ul class="us-controls">                                     
+                                    <li>
+                                        <button class="form-outline" ng-click="EditDiagnosisTemplate(diagnosisitem)">Add To Template</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="asc-panel" ng-hide="(diagnosisitem.ChiefComplaintsArray | filter:{'ActiveInd':'Y'}).length == 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Cheif Complaints</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody ng-repeat="aitem in diagnosisitem.ChiefComplaintsArray | filter:{'ActiveInd':'Y'} track by $index" ng-show="diagnosisitem.IsActiveTemplate == true">
+                                            <tr>
+                                                <td colspan="2" class="p-0">
+                                                    <span>
+                                                        {{aitem.Description}}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-hide="diagnosisitem.AnteriorValuesArray.length == 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Anterior Segment</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <table class="referral-table table-bordered m-b-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label>Findings</label>
+                                                                </th>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label class="text-od">OD</label>
+                                                                </th>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label class="text-os">OS</label>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody ng-repeat="inv in diagnosisitem.AnteriorValuesArray track by $index">                                                           
+                                                            <tr>
+                                                                <td ng-if="inv.InvestigationId!=6">
+                                                                    <span>{{inv.InvestigationDesc}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span ng-repeat="alerg in inv.RemarksArray | filter:{'ActiveInd':'Y','OrganId' : 1}  track by $index">
+                                                                        {{alerg.FindingValue}}
+                                                                        <span ng-hide="$last">,</span>
+                                                                        <span class="text-gray font-style-italic" ng-repeat="item in alerg.SubFindingList">
+                                                                            {{item.FindingValue}}
+                                                                            <span ng-if="alerg.SubFindingList.length > 1">,</span>
+                                                                        </span>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span ng-repeat="alerg in inv.RemarksArray | filter:{'ActiveInd':'Y','OrganId' : 2}  track by $index">
+                                                                        {{alerg.FindingValue}}<span ng-hide="$last">,</span>
+                                                                     <span class="text-gray font-style-italic" ng-repeat="item in alerg.SubFindingList">
+                                                                            {{item.FindingValue}}
+                                                                            <span ng-if="alerg.SubFindingList.length > 1">,</span>
+                                                                        </span>
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr ng-if="inv.InvestigationId==6">
+                                                                <td>
+                                                                    <span>{{inv.InvestigationDesc}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <ul class="flex-flow-ulli-mb0 m-t-3" ng-hide="((inv.RMRD1 == ''||inv.RMRD1 == undefined) && (inv.RMRDcNS == '' ||inv.RMRDcNS == undefined)&&(inv.RMRD2 == ''||inv.RMRD2 == undefined)&&(inv.RLF == ''||inv.RLF == undefined)&&(inv.RPFH == ''||inv.RPFH == undefined))">
+                                                                        <li class="text-s14w500c000">
+                                                                            <span ng-hide="inv.RMRD1 == '' ||inv.RMRD1 == undefined">
+                                                                                <span class="text-gray fs-14"> MRD1</span>
+                                                                                <b>{{inv.RMRD1}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.RMRDcNS == ''||inv.RMRDcNS == undefined">
+                                                                                <span class="text-gray fs-14">, MRDcNS</span>
+                                                                                <b>{{inv.RMRDcNS}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.RMRD2 == ''||inv.RMRD2 == undefined">
+                                                                                <span class="text-gray fs-14">, MRD2</span>
+                                                                                <b>{{inv.RMRD2}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.RLF == ''||inv.RLF == undefined">
+                                                                                <span class="text-gray fs-14">, LF</span>
+                                                                                <b>{{inv.RLF}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.RPFH == ''||inv.RPFH == undefined">
+                                                                                <span class="text-gray fs-14">, PFH</span>
+                                                                                <b>{{inv.RPFH}}</b>
+                                                                            </span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
+                                                                <td>
+                                                                    <ul class="flex-flow-ulli-mb0 m-t-3" ng-hide="((inv.LMRD1 == ''||inv.LMRD1 == undefined) && (inv.LMRDcNS == '' ||inv.LMRDcNS == undefined)&&(inv.LMRD2 == ''||inv.LMRD2 == undefined)&&(inv.LLF == ''||inv.LLF == undefined)&&(inv.LPFH == ''||inv.LPFH == undefined))">
+                                                                        <li>
+                                                                            <span ng-hide="inv.LMRD1 == '' ||inv.LMRD1 == undefined">
+                                                                                <span class="text-gray fs-14"> MRD1</span>
+                                                                                <b>{{inv.LMRD1}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.LMRDcNS == ''||inv.LMRDcNS == undefined">
+                                                                                <span class="text-gray fs-14">, MRDcNS</span>
+                                                                                <b>{{inv.LMRDcNS}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.LMRD2 == ''||inv.LMRD2 == undefined">
+                                                                                <span class="text-gray fs-14">, MRD2</span>
+                                                                                <b>{{inv.LMRD2}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.LLF == ''||inv.LLF == undefined">
+                                                                                <span class="text-gray fs-14">, LF</span>
+                                                                                <b>{{inv.LLF}}</b>
+                                                                            </span>
+                                                                            <span ng-hide="inv.LPFH == ''||inv.LPFH == undefined">
+                                                                                <span class="text-gray fs-14">, PFH</span>
+                                                                                <b>{{inv.LPFH}}</b>
+                                                                            </span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-hide="diagnosisitem.PosteriorValuesArray.length == 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Posterior Segment</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <table class="referral-table table-bordered m-b-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label>Findings</label>
+                                                                </th>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label class="text-od">OD</label>
+                                                                </th>
+                                                                <th class="bg-f3f3f3">
+                                                                    <label class="text-os">OS</label>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody ng-repeat="inv in diagnosisitem.PosteriorValuesArray track by $index">
+                                                            <tr>
+                                                                <td ng-hide="inv.InvestigationId == 32 && inv.RemarksArray.length==0">
+                                                                    <span>{{inv.InvestigationDesc}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span ng-repeat="alerg in inv.RemarksArray | filter:{'ActiveInd':'Y','OrganId' : 1}  track by $index">
+                                                                        {{alerg.FindingValue}}<span ng-hide="$last">,</span>
+                                                                        <span class="text-gray font-style-italic" ng-repeat="item in alerg.SubFindingList">
+                                                                            {{item.FindingValue}}
+                                                                            <span ng-if="alerg.SubFindingList.length > 1">,</span>
+                                                                        </span>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span ng-repeat="alerg in inv.RemarksArray | filter:{'ActiveInd':'Y','OrganId' : 2}  track by $index">
+                                                                        {{alerg.FindingValue}}<span ng-hide="$last">,</span>
+                                                                        <span class="text-gray font-style-italic" ng-repeat="item in alerg.SubFindingList">
+                                                                            {{item.FindingValue}}
+                                                                            <span ng-if="alerg.SubFindingList.length > 1">,</span>
+                                                                        </span>
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td ng-if="inv.InvestigationId == 32 ">
+                                                                    <span>{{inv.InvestigationDesc}}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <ul class="referral-summary-list" ng-hide="((inv.RHorizontal == ''||inv.RHorizontal == undefined) && (inv.RVertical == '' ||inv.RVertical == undefined)&&(inv.RDPS == ''||inv.RDPS == undefined))">
+                                                                        <li>
+                                                                            <label ng-hide="inv.RVertical =='' || inv.RVertical == undefined">VT</label>
+                                                                            <span>{{inv.RVertical}}</span>
+
+                                                                        </li>
+                                                                        <li>
+                                                                            <label ng-hide="inv.RHorizontal =='' || inv.RHorizontal == undefined">HZ</label>
+                                                                            <span>{{inv.RHorizontal}}</span>
+                                                                        </li>
+
+                                                                        <li ng-hide="inv.RDPS =='' || inv.RDPS == undefined">
+                                                                            <label ng-hide="inv.RDPS =='' || inv.RDPS == undefined">DPS</label>
+                                                                            <span>{{inv.RDPS}}mm</span>
+
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
+                                                                <td class="valign-top" width="42%">
+                                                                    <ul class="referral-summary-list" ng-hide="((inv.LHorizontal == ''||inv.LHorizontal == undefined) && (inv.LVertical == '' ||inv.LVertical == undefined)&&(inv.LDPS == ''||inv.LDPS == undefined))">
+                                                                        <li>
+                                                                            <label ng-hide="inv.LVertical =='' ||inv.LVertical == undefined">VT</label>
+                                                                            <span>{{inv.LVertical}}</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <label ng-hide="inv.LHorizontal == ''||inv.LHorizontal == undefined">HZ</label>
+                                                                            <span>{{inv.LHorizontal}}</span>
+                                                                        </li>
+
+                                                                        <li ng-hide="inv.LDPS =='' || inv.LDPS == undefined">
+                                                                            <label ng-hide="inv.LDPS =='' || inv.LDPS == undefined">DPS</label>
+                                                                            <span>{{inv.LDPS}}mm</span>
+                                                                        </li>
+                                                                      
+                                                                    </ul>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && (diagnosisitem.DiagnosisArray| filter: { DeleteInd: 'N' }).length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Assessment Plans</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody ng-repeat="Aitem in diagnosisitem.DiagnosisArray track by $index">
+                                            <tr>
+                                                <td colspan="2" class="p-0">
+                                                    <table class="asc-table-panel">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td width="5%">
+                                                                    <label ng-hide="Aitem.LocationId1 !== 0 && Aitem.LocationId2 !== 0" ng-class="{ 'text-od': Aitem.LocationId1==1, 'text-os': Aitem.LocationId1==2}" ng-bind="Aitem.LocationId1==1?'OD':Aitem.LocationId1==2?'OS':Aitem.LocationId1==4?'General':''"></label>
+                                                                    <label class="text-ou" ng-show="Aitem.LocationId1 !== 0 && Aitem.LocationId2 !== 0">OU</label>
+                                                                </td>
+                                                                <td>
+                                                                    <label>{{Aitem.ICD10CODE}} | {{Aitem.DiagnosisName}}</label>
+                                                                </td>
+                                                                <td>
+                                                                    <label ng-class="{ 'text-od': Aitem.LocationId1==1, 'text-os': Aitem.LocationId1==2}" ng-bind="Aitem.LocationId1==1?'OD':Aitem.LocationId1==2?'OS':Aitem.LocationId1==4?'General':''"></label>
+                                                                    <span ng-hide="Aitem.DiagnosisStatusId1 == 0 && Aitem.SeverityId1 == 0">
+                                                                        (
+                                                                        <span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 1">Provisional</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 2">Active</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 3">InActive</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 4">Resolved</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 5">RouldOut</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 6">Not Examined</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId1 == 7">Entered in Error</span>
+                                                                        </span>
+                                                                        <span ng-hide="Aitem.DiagnosisStatusId1 == 0 || Aitem.SeverityId1 == 0">,</span>
+                                                                        <span>
+                                                                            <span ng-show="Aitem.SeverityId1 == 5">Sever</span>
+                                                                            <span ng-show="Aitem.SeverityId1 == 3">Moderate</span>
+                                                                            <span ng-show="Aitem.SeverityId1 == 1">Mild</span>
+                                                                            <span ng-show="Aitem.SeverityId1 == 8">Indeterminate</span>
+                                                                        </span>)
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <label ng-class="{ 'text-od': Aitem.LocationId2==1, 'text-os': Aitem.LocationId2==2}" ng-bind="Aitem.LocationId2==1?'OD':Aitem.LocationId2==2?'OS':Aitem.LocationId2==4?'General':''"></label>
+                                                                    <span ng-hide="Aitem.DiagnosisStatusId2 == 0 && Aitem.SeverityId2 == 0">
+                                                                        (
+                                                                        <span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 1">Provisional</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 2">Active</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 3">InActive</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 4">Resolved</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 5">RouldOut</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 6">Not Examined</span>
+                                                                            <span ng-show="Aitem.DiagnosisStatusId2 == 7">Entered in Error</span>
+                                                                        </span>
+                                                                        <span ng-hide="Aitem.DiagnosisStatusId2 == 0 || Aitem.SeverityId2 == 0">,</span>
+                                                                        <span>
+                                                                            <span ng-show="Aitem.SeverityId2 == 5">Sever</span>
+                                                                            <span ng-show="Aitem.SeverityId2 == 3">Moderate</span>
+                                                                            <span ng-show="Aitem.SeverityId2 == 1">Mild</span>
+                                                                            <span ng-show="Aitem.SeverityId2 == 8">Indeterminate</span>
+                                                                        </span>)
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="Aitem.AssessmentPlan.PlanofDiscussionsNotes !=''">
+                                                <th width="25%">
+                                                    <label class="text-s12w800C000">Plan of Discussion</label>
+                                                </th>
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{ Aitem.AssessmentPlan.PlanofDiscussionsNotes}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="Aitem.AssessmentPlan.AssessmentsNotes  !=''">
+                                                <th>
+                                                    <label class="text-s12w800C000">Assessments Notes</label>
+                                                </th>
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{ Aitem.AssessmentPlan.AssessmentsNotes}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="Aitem.AssessmentPlan.PatientInstructions !=''">
+                                                <th>
+                                                    <label class="text-s12w800C000"> Patient Intructions</label>
+                                                </th>
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{ Aitem.AssessmentPlan.PatientInstructions}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="Aitem.AssessmentPlan.DoctorNotes !=''">
+                                                <th>
+                                                    <label class="text-s12w800C000">Doctor Notes</label>
+                                                </th>
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{ Aitem.AssessmentPlan.DoctorNotes}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr ng-show="Aitem.AssessmentPlan.ActionsTaken !=''">
+                                                <th>
+                                                    <label class="text-s12w800C000">Other Action Taken</label>
+                                                </th>
+                                                <td>
+                                                    <span class="text-s12w400C000">{{  Aitem.AssessmentPlan.ActionsTaken}}</span>
+                                                </td>
+                                            </tr>
+                                            <!--<tr ng-repeat="Oitem in diagnosisitem.InvestigationsArray| filter:{'DeleteInd':'N'}  track by $index">
+                            <th>
+                                <label class="text-s12w800C000">Investigations</label>
+                            </th>
+                            <td>
+                                <span class="text-s12w400C000"> {{Oitem.OrgInvestigationId}} | {{Oitem.InvestigationName}}</span>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="Oitem in diagnosisitem.SurgeryArray| filter:{'DeleteInd':'N'}  track by $index">
+                            <th>
+                                <label class="text-s12w800C000">Surgery</label>
+                            </th>
+                            <td>
+                                <span class="text-s12w400C000">{{Oitem.OrgSurgeryId}} | {{Oitem.SurgeryName}}</span>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="Oitem in diagnosisitem.ProceduresArray| filter:{'DeleteInd':'N'}  track by $index">
+                            <th>
+                                <label class="text-s12w800C000">Procedures</label>
+                            </th>
+                            <td>
+                                <span class="text-s12w400C000"> {{Oitem.OrgProcedureId}} | {{Oitem.ProcedureName}}</span>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="Oitem in diagnosisitem.ReferralArray| filter:{'DeleteInd':'N'}  track by $index">
+                            <th>
+                                <label class="text-s12w800C000">Referral</label>
+                            </th>
+                            <td>
+                                <span class="text-s12w400C000">{{Oitem.Referral}}</span>
+                            </td>
+                        </tr>-->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && (diagnosisitem.InvestigationsArray| filter: { DeleteInd: 'N' }).length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Investigations</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody ng-repeat="Oitem in diagnosisitem.InvestigationsArray| filter:{'DeleteInd':'N'}  track by $index">
+                                            <tr>
+
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{Oitem.OrgInvestigationId}} | {{Oitem.InvestigationName}}</span>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && (diagnosisitem.SurgeryArray| filter: { DeleteInd: 'N' }).length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Surgery</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody ng-repeat="Oitem in diagnosisitem.SurgeryArray| filter:{'DeleteInd':'N'}  track by $index">
+
+                                            <tr>
+
+                                                <td>
+                                                    <span class="text-s12w400C000">{{Oitem.OrgSurgeryId}} | {{Oitem.SurgeryName}}</span>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && (diagnosisitem.ProceduresArray| filter: { DeleteInd: 'N' }).length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Procedures</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody ng-repeat="Oitem in diagnosisitem.ProceduresArray| filter:{'DeleteInd':'N'}  track by $index">
+
+
+                                            <tr>
+
+                                                <td>
+                                                    <span class="text-s12w400C000"> {{Oitem.OrgProcedureId}} | {{Oitem.ProcedureName}}</span>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && (diagnosisitem.ReferralArray| filter: { DeleteInd: 'N' }).length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Referral</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody>
+
+                                            <tr ng-repeat="Oitem in diagnosisitem.ReferralArray| filter:{'DeleteInd':'N'}  track by $index">
+
+                                                <td>
+                                                    <span class="text-s12w400C000">{{Oitem.Referral}}</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="asc-panel" ng-show="diagnosisitem.IsActiveTemplate == true && diagnosisitem.MedicationsArray.length != 0">
+                                <div class="asc-panel-header p-10">
+                                    <h1 class="text-black fs-13">Medical Rx</h1>
+                                </div>
+                                <div class="asc-panel-body p-0">
+                                    <table class="asc-table-admission">
+                                        <tbody>
+                                            <tr ng-repeat="Med in diagnosisitem.MedicationsArray | filter:{'DeleteInd':'N'}  track by $index">
+                                                <th width="20%" class="text-ehnote">
+                                                    {{Med.MedicationName}}
+                                                </th>
+                                                <td>
+                                                    {{Med.Sig}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="DiagnosisTemplatesArray.length == 0">
+                            <div class="col-lg-12 text-center bg-white">
+                                <div class="billing-cominsoon m-20">
+                                    <img src="img/no-data/no-data-icon.png" />
+                                    <div class="msg m-t-20">
+                                        <p class="nodata-text">Oops!!</p>
+                                        <p class="nodata-txt-line2">
+                                            No Template is Added/Found.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center EH-pagination">
+                <uib-pagination total-items="totalItems"
+                                ng-model="AssescurrentPage"
+                                ng-change="AssespageChanged(AssescurrentPage)"
+                                force-ellipses="true"
+                                boundary-links="true"
+                                  items-per-page="maxSize"
+                                max-size="maxSize"
+                                ng-if="DiagnosisTemplatesArray.length > 0">
+                </uib-pagination>
+            </div>
+        </div>
+       
+        
+    </div>
+</div>

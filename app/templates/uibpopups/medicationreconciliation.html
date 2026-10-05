@@ -1,0 +1,994 @@
+﻿<div class="modal__style--1 h-100">
+    <div class="modal__header--">
+        <h1>Medication Reconciliation</h1>
+        <ul class="d__f-- ai__c-- list__unstyled-- gap__x--8 m__0--">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                    <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span>{{cacheStorageItem.PatientName}}</span>
+                        <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                    </div>
+                    <span><i class="icons__w16-- info__w16--f"></i></span>
+                </div>
+            </li>
+            <li ng-if="obj.ReconcileMedicationSummaryView && obj.ReconciliationAllergySummaryView">
+                <button class="btn__lg-- btn__2D2D47--f" type="button" ng-click="MedicationPrint()">Print</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="SaveRosData()" ng-disabled="obj.IsClickSaveMedReconciliationBtn == true">Save</button>
+            </li>
+            <li>
+                <a class="btn__close--" ng-click="uibclose()">
+                    <i class="close__w32--"></i>
+                </a>
+            </li>
+        </ul>
+      
+    </div>
+    <div class="modal__body-- h-100">
+       <div class="position__relative-- h-100">
+           <div class="adjustable-position slim-scroll">
+               <div class="row">
+                   <div class="col-lg-12">
+                       <div class="advanced-search-filters m-b-5"> 
+                           <ul class="asc-summary-list align-items-center">
+                               <li ng-show="ApptSurgeryDetails !=='' && ApptSurgeryDetails.SurgeryName !== ''">
+                                   <span>Surgery : </span>
+                                   <label>{{ApptSurgeryDetails.SurgeryName}}</label>
+                               </li>
+                               <li ng-show="ApptSurgeryDetails !=='' && ApptSurgeryDetails.SurgeonName !== ''">
+                                   <span>Surgeon : </span>
+                                   <label>{{ApptSurgeryDetails.SurgeonName}}</label>
+                               </li>
+                               <li ng-show="SurgeryDiagnosisDetails.CoManagerName !== ''">
+                                   <span>Co-Manager : </span>
+                                   <label>{{SurgeryDiagnosisDetails.CoManagerName}}</label>
+                               </li>
+                               <li ng-show="SurgeryDiagnosisDetails.CoManagerName !== ''">
+                                   <span>Anesthesiologist : </span>
+                                   <label>{{SurgeryDiagnosisDetails.AnesthesistName}}</label>
+                               </li>
+                               <li ng-show="SurgeryDiagnosisDetails.PreAdmissionStatus !== '' || SurgeryDiagnosisDetails.CardialogistStatus !== ''">
+                                   <b>Pre-Admission Status :</b>
+                                   <ul class="asc-surgery-list p-4 bg-white border bradius-5">
+                                       <li ng-show="SurgeryDiagnosisDetails.PreAdmissionStatus !== ''">
+                                           <span>Anesthetist:</span>
+                                           <label>{{SurgeryDiagnosisDetails.PreAdmissionStatus}}</label>
+                                       </li>
+                                       <li ng-show="SurgeryDiagnosisDetails.CardialogistStatus !== ''">
+                                           <span>Cardiologist:</span>
+                                           <label>{{SurgeryDiagnosisDetails.CardialogistStatus}}</label>
+                                       </li>
+                                   </ul>
+                               </li>
+                           </ul>
+                       </div>
+                   </div>
+                   <div class="col-lg-12">
+                       <div class="asc-main-panel" ng-show="!obj.ReconciliationAllergySummaryView">
+                           <div class="asc-header-panel">
+                               <h1>Allergies</h1>
+                           </div>
+                           <div class="asc-summary-body">
+                               <div class="row mb-10">
+                                   <div class="col-lg-7">
+                                       <div class="search-panel-input" ng-show="ROSHistoriesObj.IsRcopia ==false" typehead-dropdown-direction>
+                                           <input type="text" class="icons-search"
+                                                  placeholder="Enter Allergies"
+                                                  ng-focus="FocusObj.AllergiesFocus==true"
+                                                  autocomplete="off"
+                                                  maxlength="200"
+                                                  ng-enter="addAllergy(obj.SelectedAllergyItem)"
+                                                  ng-model="obj.SelectedAllergyItem"
+                                                  typeahead-min-length="0"
+                                                  typeahead-focus-on-select="false"
+                                                  ng-blur="showAddAllergy(obj); changefocusOption();"
+                                                  typeahead-on-select="onAllergySelect(obj.SelectedAllergyItem)"
+                                                  uib-typeahead="item as item.AllergyName for item in GetAllergyList($viewValue)" />
+                                           <i class="fas fa-times-circle clear-it" ng-click="obj.SelectedAllergyItem='';" ng-hide="obj.SelectedAllergyItem=='';"></i>
+                                           <ul class="dropdown-menu pos-absolute" ng-show="ROSHistoriesObj.AddAllergyshow&&obj.SelectedAllergyItem!==''" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                               <li><a ng-click="addAllergy(obj.SelectedAllergyItem)">Add new</a></li>
+                                           </ul>
+                                       </div>
+                                       <div class="search-panel-input flex" ng-show="ROSHistoriesObj.IsRcopia !==false" typehead-dropdown-direction>
+                                           <input type="text" class="icons-search"
+                                                  placeholder="Enter Rcopia Allergies"
+                                                  autocomplete="off"
+                                                  maxlength="150"
+                                                  ng-model="obj.SelectedAllergyItem"
+                                                  ng-model-options="{debounce: 1000}"
+                                                  typeahead-min-length="3"
+                                                  typeahead-focus-on-select="false"
+                                                  typeahead-on-select="onAllergyRcopiaSelect(obj.SelectedAllergyItem)"
+                                                  uib-typeahead="item as item.BrandName for item in GetAllergyListFromRcopia($viewValue)" />
+
+                                       </div>
+                                   </div>
+                                   <div class="col-lg-5">
+                                       <ul class="flex-custom-flow">
+                                           <li>
+                                               <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                   <input type="checkbox" id="1" value="" class="checkbox" ng-model="ROSHistoriesObj.IsRcopia" />
+                                                   <span class="lbl"></span>
+                                                   <span class="text-s12w500c000 lh-2-0 fs-12">Is Rcopia</span>
+                                               </label>
+                                           </li>
+                                           <li>
+                                               <div class="dis-flex align-items-center grid-gap-5" ng-if="AllergyStatus.ShowNoKnownAllergy">
+                                                   <input type="radio" class="radio-custom" id="gfile" name="SelectedFile" value="1" ng-model="obj.isNKASelected" ng-change="onisNkaSelected()" ng-value="true">
+                                                   <label for="gfile" class="radio-custom-label text-black font-weight-600 cur-poiter mb-0 fs-12">No Known Allergy</label>
+                                               </div>
+                                           </li>
+                                           <li>
+                                               <div class="dis-flex align-items-center grid-gap-5">
+                                                   <input type="radio" class="radio-custom" id="gfile" name="SelectedFile" value="1" ng-model="obj.isNKDASelected" ng-change="onisNkdaSelected()" ng-value="true">
+                                                   <label for="gfile" class="radio-custom-label text-black font-weight-600 cur-poiter mb-0 fs-12">No Known Drug Allergy</label>
+                                               </div>
+                                           </li>
+                                       </ul>
+                                   </div>
+                               </div>
+                               <div class="row">
+                                   <div class="col-lg-12">
+                                       <ul class="asc-frequently-list" ng-show="FrequentAllergyList.length > 0">
+                                           <li>
+                                               <label>Frequently Added: </label>
+                                           </li>
+                                           <li   ng-repeat="item in FrequentAllergyList| limitTo:  showAllfreq.allrgylist"  ng-class="item.IsChecked ? 'active' : ''">
+                                               <button ng-click="AddFrequentAllergyData(item)">
+                                                   <svg class="icon-active" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                       <path d="M2.16077 6.55347L4.75949 9.15219L9.95694 3.5835" stroke="white" stroke-width="1.11374" stroke-linecap="round" stroke-linejoin="round" />
+                                                   </svg>
+                                                   <svg class="icon-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                       <path d="M11.8775 8.43694H8.67767V11.6367C8.67767 11.8065 8.61025 11.9692 8.49023 12.0893C8.37022 12.2093 8.20744 12.2767 8.03771 12.2767C7.86798 12.2767 7.70521 12.2093 7.58519 12.0893C7.46518 11.9692 7.39775 11.8065 7.39775 11.6367V8.43694H4.19794C4.02822 8.43694 3.86544 8.36951 3.74542 8.2495C3.62541 8.12948 3.55798 7.9667 3.55798 7.79698C3.55798 7.62725 3.62541 7.46447 3.74542 7.34445C3.86544 7.22444 4.02822 7.15701 4.19794 7.15701H7.39775V3.95721C7.39775 3.78748 7.46518 3.6247 7.58519 3.50469C7.70521 3.38467 7.86798 3.31725 8.03771 3.31725C8.20744 3.31725 8.37022 3.38467 8.49023 3.50469C8.61025 3.6247 8.67767 3.78748 8.67767 3.95721V7.15701H11.8775C12.0472 7.15701 12.21 7.22444 12.33 7.34445C12.45 7.46447 12.5174 7.62725 12.5174 7.79698C12.5174 7.9667 12.45 8.12948 12.33 8.2495C12.21 8.36951 12.0472 8.43694 11.8775 8.43694Z" fill="#767676" />
+                                                   </svg>
+                                                   {{item.AllergyName}}
+                                               </button>
+                                           </li>
+                                           <li class="flex">
+                                               <a class="fs__normal-- fs__md-- fw__5-- tc__1D5558-- tx__h--a" ng-if="FrequentAllergyList.length > 5" ng-click="showAllallrgyfreqclick();">
+                                                   <i class="fas fa-chevron-down" ng-if="!showAllfreq.allrgy"></i> <i class="fas fa-chevron-up" ng-if="showAllfreq.allrgy"></i>{{showAllfreq.allrgy ? 'Show Less' : 'Show More'}}
+                                               </a>
+                                           </li>
+                                       </ul>
+                                       <table class="asc-table-items" ng-show="(obj.AllergyItems| filter:{'DeleteInd' :'N' }).length > 0">
+                                           <thead>
+                                               <tr ng-show="!obj.isNKASelected && obj.AllergyItems[0].AllergyId != 1 ">
+                                                   <th width="5%"><label>S.No</label></th>
+                                                   <th>Allergies</th>
+                                                   <th width="16%">Allergy Reaction</th>
+                                                   <th width="16%">Allergy Type</th>
+                                                   <th width="16%">Onset</th>
+                                                   <th width="16%">Severity</th>
+                                                   <th width="16%">Status</th>
+                                                   <th width="10%">Actions</th>
+                                               </tr>
+                                           </thead>                                     
+                                           <tbody ng-repeat="Allergy in obj.AllergyItems|filter:{'DeleteInd':'N'} track by $index" ng-show="!obj.isNKASelected &&  Allergy.AllergyId != 1" class="bb__DDD--">
+                                               <tr>
+                                                   <td>
+                                                       <div>
+                                                           <a ng-show="Allergy.IsNKDAshow == true && Allergy.RxNormID !=null" class="d__f-- ai__c-- gap__x--4 fs__normal-- fs__lg-- tc__1D1D1D-- fw__5--" ng-click="ChangeAllergyHistoryFrequentStatus(Allergy)">
+                                                               <i class="far fa-star" ng-if="Allergy.IsFrequent=='N'"></i>
+                                                               <i class="fas fa-star tc__F7981C--" ng-if="Allergy.IsFrequent=='Y'"></i>
+                                                               {{$index+1}}
+                                                           </a>
+
+                                                           <a ng-show="Allergy.IsNKDAshow == false || Allergy.RxNormID ==null"> {{$index+1}}</a>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+                                                       <label>{{Allergy.AllergyName}}</label>
+                                                       <span class="dis-block" ng-hide="Allergy.SNOMED =='' || Allergy.SNOMED ==null">
+                                                           <span class="text-s10w500c767575">Snomed :</span>
+                                                           <b class="text-s12w600C000">{{Allergy.SNOMED}} <img src="img/consultation/add-ros-icd.svg" width="14" height="14" ng-click="AllergiesSnomedCodeShow(Allergy)" ng-show="Allergy.IsShowAllergySnomedInd" /></b>
+                                                       </span>
+                                                       <span class="dis-block" ng-hide="Allergy.RxNormID ==null || Allergy.RxNormID == ''">
+                                                           <span class="text-s10w500c767575">RxNormID :</span>
+                                                           <b class="text-s12w600C000">{{Allergy.RxNormID}}</b>
+                                                       </span>
+                                                       <div ng-show="Allergy.IsShowAllergySnomedAddInd" class="form-group dis-flex">
+                                                           <input type="text" placeholder="snomed code" class="form-control" ng-model="Allergy.AddSNOMED" required />
+                                                           <button class="btn btn-success m-l-10" ng-click="AddUpdateAllergiesSnomedCode(Allergy)">Add New</button>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+                                                       <div class="d__f-- ai__c-- fd__r-- gap__6-- fw__w--" ng-show="Allergy.IsNKDAshow == true">
+                                                           <div class="d__f-- ai__c-- gap__4-- px__7-- py__3-- bg__E3E3E3-- bradius__4-- max__w150--" ng-repeat="i in Allergy.Reactions | filter:{DeleteInd:'N'}">
+                                                               <span class="fs__md-- fw__5-- tc__212121-- d__b-- mw__0-- flex__1-- overflow-hidden ws__nowrap-- to__ellipsis--">{{i.ReactionName}}</span>
+                                                               <i svg-icon="icon__cross--2" size="14" style="color: #656565;" uib-tooltip="Remove" tooltip-append-to-body="true" ng-click="RemoveReaction(Allergy,i)"></i>
+                                                           </div>
+                                                           <div class="dropdown cstm-dropdown"
+                                                                auto-close="outsideClick"
+                                                                append-body="true" uib-dropdown dropdown-append-to-body="true" button-dropdown-direction>
+
+                                                               <button type="button"
+                                                                       class="bs__dashed-- border__1-- bc__3E6E71-- bg__EAF2F2-- py__3-- px__6-- bradius__4-- d__f-- ai__c-- gap__4-- lh__normal-- fs__md-- fw__5-- tc__1D5558--"
+                                                                       id="appendDropdownMenu{{$index+1}}" data-toggle="dropdown" aria-expanded="true" uib-dropdown-toggle>
+                                                                   <i class="icons__w16-- add__w16--o"></i> Add
+                                                               </button>
+
+                                                               <div class="dropdown-menu dr-drop-app mt__0-- py__0--" role="menu" aria-labelledby="appendDropdownMenu{{$index+1}}" uib-dropdown-menu>
+                                                                   <div class="px__5-- py__8-- position__sticky-- top__0-- bg__FFFFFF-- zindex-1">
+                                                                       <input type="text"
+                                                                              class="form-control input-sm bg-inputy"
+                                                                              placeholder="Search Allergy Reaction"
+                                                                              ng-model="Allergy.ReactionSearch" />
+                                                                   </div>
+                                                                   <div class="apptsearchdroplist">
+                                                                       <ul>
+                                                                           <li ng-repeat="i in ROSAllergyReactions | filter:{AllergyReaction:Allergy.ReactionSearch} track by i.ROSAllergyReactionsId">
+                                                                               <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                   <input type="checkbox" class="checkbox" ng-model="Allergy.SelectedReactionIds[i.ROSAllergyReactionsId]" ng-change="ChangeAllergyReactionItemselect(Allergy, i);">
+                                                                                   <span class="lbl"></span>
+                                                                                   <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="i.AllergyReaction"></span>
+                                                                               </label>
+                                                                           </li>
+                                                                       </ul>
+                                                                   </div>
+                                                               </div>
+                                                           </div>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+
+                                                       <div ng-show="Allergy.IsNKDAshow == true">
+                                                           <select class="form-outline" ng-options="item.ROSAllergyTypeId as item.AllergyType for item in ROSAllergyType"
+                                                                   ng-model="Allergy.AllergyTypeId">
+                                                               <option value="" disabled>Select Allergy Type</option>
+                                                           </select>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+
+                                                       <div class="ehr-input pop-ehr-input" ng-show="Allergy.IsNKDAshow == true">
+                                                           <!--<input type="text" class="form-outline icons-calendar" />-->
+                                                           <div class="ehr-input-group" ng-show="!Allergy.ShowDateFormat">
+                                                               <input type="text" class="w-70" ng-disabled="Allergy.DurationType === 'SB'" ng-model="Allergy.Duration" placeholder="0" numbersdots-only maxlength="4" />
+                                                               <select ng-model="Allergy.DurationType" ng-change="ChangeAllergy(Allergy)" class="b-radius-0">
+                                                                   <option value="">Select</option>
+                                                                   <option value="D">Days</option>
+                                                                   <option value="W">Weeks</option>
+                                                                   <option value="M">Months</option>
+                                                                   <option value="Y">Years</option>
+                                                                   <option value="SB">Since Birth</option>
+                                                               </select>
+                                                               <button ng-show="!Allergy.ShowDateFormat" ng-click="ChangeOnSetItem(Allergy)"><i class="far fa-keyboard"></i></button>
+                                                               <button ng-show="Allergy.ShowDateFormat" ng-click="ChangeOnSetItem(Allergy)"><i class="far fa-calendar-alt"></i></button>
+                                                           </div>
+                                                           <!-- / -->
+                                                           <!--ng-focus="Allergy.ShowDateFormat == true && Allergy.DurationDate == ''"-->
+                                                           <div class="ehr-input-group" ng-show="Allergy.ShowDateFormat">
+                                                               <input type="text" placeholder="MM-DD-YYYY" ng-model="Allergy.DurationDate" datepickerregpatient readonly
+                                                                      ng-change="ChangeFormatDate(Allergy)" />
+                                                               <button ng-show="!Allergy.ShowDateFormat" ng-click="ChangeOnSetItem(Allergy)"><i class="far fa-keyboard"></i></button>
+                                                               <button ng-show="Allergy.ShowDateFormat" ng-click="ChangeOnSetItem(Allergy)"><i class="far fa-calendar-alt"></i></button>
+                                                           </div>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+
+
+                                                       <div ng-show="Allergy.IsNKDAshow == true">
+                                                           <select class="form-outline" ng-options="item.ROSAllergySeverityId as item.AllergySeverity for item in ROSAllergySeverity"
+                                                                   ng-model="Allergy.SeverityId" ng-change="changeAllergySeverity(Allergy)">
+                                                               <option value="" disabled>Select Severity</option>
+                                                           </select>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+
+                                                       <div ng-show="Allergy.IsNKDAshow == true">
+                                                           <select class="form-outline" ng-options="item.ROSAllergyStatusId as item.AllergyStatus for item in ROSAllergyStatus"
+                                                                   ng-model="Allergy.StatusId" ng-change="changeAllergyStatus(Allergy)">
+                                                               <option>Select Status</option>
+                                                           </select>
+                                                       </div>
+                                                   </td>
+                                                   <td>
+                                                       <a ng-show="Allergy.IsNKDAshow == true" class="actions-black" href="javascript:;" ng-click="ClearSubAllergy(Allergy)" tooltip-placement="bottom-right" uib-tooltip="Clear">
+                                                           <i class="fas fa-times"></i>
+                                                       </a>
+                                                       <a ng-show="Allergy.IsNKDAshow == true" href="javascript:;" ng-click="AddAllergiesnotes(Allergy)" tooltip-placement="bottom-right" uib-tooltip="Notes">
+                                                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32" fill="none">
+                                                               <path opacity="0.2" d="M26 11H19V4L26 11Z" fill="black" />
+                                                               <path d="M26.7075 10.2925L19.7075 3.2925C19.6146 3.19967 19.5042 3.12605 19.3829 3.07586C19.2615 3.02568 19.1314 2.9999 19 3H7C6.46957 3 5.96086 3.21071 5.58579 3.58579C5.21071 3.96086 5 4.46957 5 5V27C5 27.5304 5.21071 28.0391 5.58579 28.4142C5.96086 28.7893 6.46957 29 7 29H25C25.5304 29 26.0391 28.7893 26.4142 28.4142C26.7893 28.0391 27 27.5304 27 27V11C27.0001 10.8686 26.9743 10.7385 26.9241 10.6172C26.8739 10.4958 26.8003 10.3854 26.7075 10.2925ZM20 6.41375L23.5863 10H20V6.41375ZM25 27H7V5H18V11C18 11.2652 18.1054 11.5196 18.2929 11.7071C18.4804 11.8946 18.7348 12 19 12H25V27ZM20 19C20 19.2652 19.8946 19.5196 19.7071 19.7071C19.5196 19.8946 19.2652 20 19 20H17V22C17 22.2652 16.8946 22.5196 16.7071 22.7071C16.5196 22.8946 16.2652 23 16 23C15.7348 23 15.4804 22.8946 15.2929 22.7071C15.1054 22.5196 15 22.2652 15 22V20H13C12.7348 20 12.4804 19.8946 12.2929 19.7071C12.1054 19.5196 12 19.2652 12 19C12 18.7348 12.1054 18.4804 12.2929 18.2929C12.4804 18.1054 12.7348 18 13 18H15V16C15 15.7348 15.1054 15.4804 15.2929 15.2929C15.4804 15.1054 15.7348 15 16 15C16.2652 15 16.5196 15.1054 16.7071 15.2929C16.8946 15.4804 17 15.7348 17 16V18H19C19.2652 18 19.5196 18.1054 19.7071 18.2929C19.8946 18.4804 20 18.7348 20 19Z" fill="black" />
+                                                           </svg>
+                                                       </a>
+                                                       <a href="javascript:;" ng-click="ClearAllergy(Allergy)" tooltip-placement="bottom-right" uib-tooltip="Remove Allergy">
+                                                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32" fill="none">
+                                                               <path opacity="0.2" d="M25 7V26C25 26.2652 24.8946 26.5196 24.7071 26.7071C24.5196 26.8946 24.2652 27 24 27H8C7.73478 27 7.48043 26.8946 7.29289 26.7071C7.10536 26.5196 7 26.2652 7 26V7H25Z" fill="black" />
+                                                               <path d="M27 6H5C4.73478 6 4.48043 6.10536 4.29289 6.29289C4.10536 6.48043 4 6.73478 4 7C4 7.26522 4.10536 7.51957 4.29289 7.70711C4.48043 7.89464 4.73478 8 5 8H6V26C6 26.5304 6.21071 27.0391 6.58579 27.4142C6.96086 27.7893 7.46957 28 8 28H24C24.5304 28 25.0391 27.7893 25.4142 27.4142C25.7893 27.0391 26 26.5304 26 26V8H27C27.2652 8 27.5196 7.89464 27.7071 7.70711C27.8946 7.51957 28 7.26522 28 7C28 6.73478 27.8946 6.48043 27.7071 6.29289C27.5196 6.10536 27.2652 6 27 6ZM24 26H8V8H24V26ZM10 3C10 2.73478 10.1054 2.48043 10.2929 2.29289C10.4804 2.10536 10.7348 2 11 2H21C21.2652 2 21.5196 2.10536 21.7071 2.29289C21.8946 2.48043 22 2.73478 22 3C22 3.26522 21.8946 3.51957 21.7071 3.70711C21.5196 3.89464 21.2652 4 21 4H11C10.7348 4 10.4804 3.89464 10.2929 3.70711C10.1054 3.51957 10 3.26522 10 3Z" fill="black" />
+                                                           </svg>
+                                                       </a>
+                                                   </td>
+                                               </tr>
+                                               <tr ng-show="Allergy.ShowNote === true && Allergy.IsNKDAshow == true">
+                                                   <td colspan="7">
+                                                       <textarea rows="1" class="msd-elastic: \n; ros-notes" placeholder="Enter Notes" ng-model="Allergy.Remarks" maxlength="500" ng-focus="Allergy.ShowNote === true"></textarea>
+                                                   </td>
+                                               </tr>
+                                           </tbody>
+                                           <tbody ng-repeat="Allergy in obj.AllergyItems|filter:{'DeleteInd':'N'} track by $index" ng-show="obj.isNKASelected ||Allergy.AllergyId == 1">
+                                               <tr>
+                                                   <td ng-show="obj.isNKASelected || Allergy.AllergyId == 1">
+                                                       <label class="text-s14w600C15898f text-black">{{Allergy.AllergyName}}</label>
+                                                   </td>
+                                               </tr>
+                                           </tbody>
+                                       </table>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-lg-12" ng-show="obj.ReconciliationAllergySummaryView">
+                       <div class="asc-main-panel">
+                           <div class="asc-header-panel">
+                               <h1>Allergies</h1>
+                               <ul class="us-controls">
+                                   <li>
+                                       <a href="javascript:;" tooltip-placement="left" uib-tooltip="Edit" class=" bg-2290A8 bradius-6" ng-click="RosMedicationShowhide(1)">
+                                           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16" fill="none">
+                                               <path d="M12.9987 5.71039C13.2067 5.50242 13.2067 5.1558 12.9987 4.95849L11.7509 3.71067C11.5536 3.50269 11.207 3.50269 10.999 3.71067L10.0178 4.68653L12.0175 6.68625M3.55469 11.155V13.1547H5.55441L11.4523 7.25151L9.45254 5.25179L3.55469 11.155Z" fill="white" />
+                                           </svg>
+                                       </a>
+                                   </li>
+                               </ul>
+                           </div>
+                           <div class="asc-summary-body" ng-show="(obj.AllergyItems | filter:{'DeleteInd':'N'}).length > 0">
+                               <table class="asc-summary-pre-table">
+                                   <tbody>
+                                       <tr>
+                                           <td class="pos-relative">
+                                               <ul class="allergies-list" ng-repeat="item in obj.AllergyItems|filter:{'DeleteInd':'N'} track by $index">
+                                                   <li ng-if="item.StatusId == 1">
+                                                       <div class="d__f-- fd__c-- gap__5--">
+                                                           <div class="d__f-- ai__c-- gap__5--">
+                                                               <label>{{item.AllergyName}}</label>
+                                                               <span ng-if="item.SeverityId === 1">Mild</span>
+                                                               <span ng-if="item.SeverityId === 2">Mild to moderate</span>
+                                                               <span ng-if="item.SeverityId === 3">Moderate</span>
+                                                               <span ng-if="item.SeverityId === 4">Moderate to severe</span>
+                                                               <span ng-if="item.SeverityId === 5">Severe</span>
+                                                               <span ng-if="item.SeverityId === 6">Life-threatening</span>
+                                                               <span ng-if="item.SeverityId === 8">Indeterminate</span>
+                                                               <span ng-if="item.SeverityId === 7">Fatal</span><!--{{item.ReactionName}}-->
+                                                               <span ng-if="item.Duration != '' && item.Duration != null">
+                                                                   Since {{item.Duration}}
+                                                                   <span ng-if="item.DurationType === 'D'"> Days</span>
+                                                                   <span ng-if="item.DurationType === 'W'"> Weeks</span>
+                                                                   <span ng-if="item.DurationType === 'M'"> Months</span>
+                                                                   <span ng-if="item.DurationType === 'Y'"> Years</span>
+                                                               </span>
+                                                               <span ng-show="(item.Duration == ''|| item.Duration == null ) && item.DurationType =='SB'">
+                                                                   <span ng-if="item.DurationType === 'SB'"> Since Birth</span>
+                                                               </span>
+                                                               <span ng-if="item.DurationDate !='' && item.DurationDate != null">Onset {{item.DurationDate | date:"MM-dd-yyyy"}}</span>
+                                                           </div>
+                                                           <div class="d__f-- ai__c-- fw__w-- gap__4--" ng-if="item.Reactions.length > 0">
+                                                               <div class="d__f-- ai__c-- gap__4-- px__7-- py__3-- bg__E3E3E3-- bradius__4-- max__w150--" ng-repeat="reaction in item.Reactions">
+                                                                   <span class="fs__md-- fw__5-- tc__212121-- d__b-- mw__0-- flex__1-- overflow-hidden ws__nowrap-- to__ellipsis-- c__p-- lh__normal--" title="{{reaction.ReactionName}}">{{reaction.ReactionName}}</span>
+                                                               </div>
+                                                           </div>
+                                                       </div>
+                                                   </li>
+                                                   <li ng-if="item.StatusId != 1">
+                                                       <span ng-if="item.StatusId === 2">
+                                                           <label>{{item.AllergyName}}</label> Inactive
+                                                       </span>
+                                                       <span ng-if="item.StatusId === 3">
+                                                           <label>{{item.AllergyName}}</label> Resolved
+                                                       </span>
+                                                       <span ng-if="item.StatusId === 4">
+                                                           <label>{{item.AllergyName}}</label> Indeterminate
+                                                       </span>
+                                                       <span ng-if="item.StatusId === 9">
+                                                           <label>{{item.AllergyName}}</label> Rejected
+                                                       </span>
+                                                       <span ng-if="item.StatusId === 10">
+                                                           <label>{{item.AllergyName}}</label> Completed
+                                                       </span>
+                                                       <label ng-if="item.AllergyId === 1">{{item.AllergyName}}</label>
+                                                       <label ng-if="item.AllergyId === 2">{{item.AllergyName}}</label>
+                                                   </li>
+                                                   <li ng-show="item.Remarks != '' && item.Remarks != null">
+                                                       <p><b>Notes: </b> {{item.Remarks}} </p>
+                                                   </li>
+                                               </ul>
+                                           </td>
+                                       </tr>
+                                   </tbody>
+
+                               </table>
+                           </div>
+                           <div class="asc-summary-body" ng-show="(obj.AllergyItems| filter:{'DeleteInd' :'N' }).length==0">
+                               <ul class="asc-frequently-list">
+                                   <li>
+                                       <span>Please <a ng-click="RosMedicationShowhide(1)">click here </a> to  add data.</span>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-lg-12" ng-show="!obj.ReconcileMedicationSummaryView">
+                       <div class="asc-main-panel">
+                           <div class="asc-header-panel">
+                               <h1>Medications</h1>
+                           </div>
+                           <div class="asc-summary-body">
+                               <div class="row">
+                                   <div class="col-lg-12">
+                                       <div class="search-panel-header  dis-flex justify-space-between align-items-center">
+                                           <ul class="flex-custom-flow">
+                                               <li>
+                                                   <div class="dis-flex align-items-center grid-gap-5">
+                                                       <input type="radio" class="radio-custom" id="medication" name="SelectedMedication" value="1" ng-model="RosObj.IsCurrentEyeMedication" ng-change="OnSelectCurrentMedication(1)" ng-value="true">
+                                                       <label for="medication" class="radio-custom-label text-black font-weight-600 cur-poiter mb-0 fs-14">Eye</label>
+                                                   </div>
+                                               </li>
+                                               <li>
+                                                   <div class="dis-flex align-items-center grid-gap-5">
+                                                       <input type="radio" class="radio-custom" id="medication" name="SelectedMedication" value="1" ng-model="RosObj.IsGeneralMedication" ng-change="OnSelectCurrentMedication(2)" ng-value="true">
+                                                       <label for="medication" class="radio-custom-label text-black font-weight-600 cur-poiter mb-0 fs-14">General</label>
+                                                   </div>
+                                               </li>
+                                           </ul>
+
+                                          
+                                           <div class="search-panel-header width-85" ng-show="RosObj.IsCurrentEyeMedication">
+                                               <div class="pos-relative flex search-panel-input" ng-show="!RosObj.IsCurrentEye" typehead-dropdown-driection>
+                                                   <input type="text" class="form-control icons-search input-color"
+                                                          ng-focus="true"
+                                                          placeholder="Enter Current Eye Medication"
+                                                          autocomplete="off"
+                                                          ng-model="obj.SelectedCurrentSystemicMedicationsHistoryItem"
+                                                          maxlength="200"
+                                                          typeahead-on-select="onRosCurrentSystemicMedicationsHistorylist(obj.SelectedCurrentSystemicMedicationsHistoryItem,1)"
+                                                          uib-typeahead="item as  item.MedicineName  + (item.PackSize ? ' - ' + item.PackSize : '')  + (item.PackDescription ? ' ' + item.PackDescription : '') for item in GetOrganizationMedicationlist($viewValue)"
+                                                          typeahead-focus-on-select="false"
+                                                          typeahead-min-length="0" />
+                                                   <i class="fas fa-times-circle clear-it" ng-click="obj.SelectedCurrentSystemicMedicationsHistoryItem='';" ng-hide="obj.SelectedCurrentSystemicMedicationsHistoryItem==''"></i>
+                                               </div>
+
+                                               <div class="pos-relative flex customul-dropdwn" ng-show="RosObj.IsCurrentEye" typehead-dropdown-direction>
+                                                   <input type="text" class="form-control icons-search input-color" ng-model="obj.SelectedCurrentSystemicMedicationsHistoryItem"
+                                                          typeahead-focus-on-select="false"
+                                                          typeahead-min-length="3"
+                                                          typeahead-on-select="ONSelectCurrentSystemRcopia(obj.SelectedCurrentSystemicMedicationsHistoryItem,1)"
+                                                          placeholder="Enter Rcopia Medicine Name"
+                                                          uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)" />
+                                               </div>
+                                               <div class="checkbox cn m-l-10">
+                                                   <label>
+                                                       <input name="checkbox-1" type="checkbox"
+                                                              ng-model="RosObj.IsCurrentEye" />
+                                                       <span class="checkbox-material">
+                                                           <span class="check"></span>
+                                                       </span>
+                                                       <small>Is Rcopia</small>
+                                                   </label>
+                                               </div>
+                                               <div>
+                                                   <label class="cur-poiter">
+                                                       <input name="nkcem" class="radio-custom width-0" type="radio" ng-model="obj.isNKCEMSelected" ng-change="onisNKCEMSelected(1)" ng-value="true">
+                                                       <span class="radio-custom-label cur-poiter mb-0 text-tonometry ">No known Current Eye Medication</span>
+                                                   </label>
+                                               </div>
+                                           </div>
+                                           <!-- Current Systemic Medication -->
+                                           <div class="search-panel-header width-85" ng-show="RosObj.IsGeneralMedication">
+                                               <div class="pos-relative flex search-panel-input" ng-show="!RosObj.IsCurrentSystem" typehead-dropdown-direction>
+                                                   <input type="text" class="form-control icons-search input-color"
+                                                          ng-focus="true"
+                                                          placeholder="Enter Current Systemic Medications"
+                                                          autocomplete="off"
+                                                          ng-model="obj.SelectedCurrentSystemicMedicationsHistoryItem"
+                                                          maxlength="200"
+                                                          typeahead-on-select="onRosCurrentSystemicMedicationsHistorylist(obj.SelectedCurrentSystemicMedicationsHistoryItem,2)"
+                                                          uib-typeahead="item as  item.MedicineName  + (item.PackSize ? ' - ' + item.PackSize : '')  + (item.PackDescription ? ' ' + item.PackDescription : '') for item in GetOrganizationMedicationlist($viewValue)"
+                                                          typeahead-focus-on-select="false"
+                                                          typeahead-min-length="0" />
+                                                   <i class="fas fa-times-circle clear-it" ng-click="obj.SelectedCurrentSystemicMedicationsHistoryItem='';" ng-hide="obj.SelectedCurrentSystemicMedicationsHistoryItem==''"></i>
+                                               </div>
+
+                                               <div class="pos-relative flex customul-dropdwn" ng-show="RosObj.IsCurrentSystem" typehead-dropdown-direction>
+                                                   <input type="text" class="form-control icons-search input-color" ng-model="obj.SelectedCurrentSystemicMedicationsHistoryItem"
+                                                          typeahead-focus-on-select="false"
+                                                          typeahead-min-length="3"
+                                                          typeahead-on-select="ONSelectCurrentSystemRcopia(obj.SelectedCurrentSystemicMedicationsHistoryItem,2)"
+                                                          placeholder="Enter Rcopia Medicine Name"
+                                                          uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)" />
+                                               </div>
+                                               <div class="checkbox cn m-l-10">
+                                                   <label>
+                                                       <input name="checkbox-1" type="checkbox"
+                                                              ng-model="RosObj.IsCurrentSystem" />
+                                                       <span class="checkbox-material">
+                                                           <span class="check"></span>
+                                                       </span>
+                                                       <small>Is Rcopia</small>
+                                                   </label>
+                                               </div>
+                                               <div>
+                                                   <label class="cur-poiter">
+                                                       <input name="nkcsm" class="radio-custom width-0" type="radio" ng-model="obj.isNKCSMSelected" ng-change="onisNKCSMSelected(2)" ng-value="true">
+                                                       <span class="radio-custom-label cur-poiter mb-0 text-tonometry ">No known Current Systemic Medications</span>
+                                                   </label>
+                                               </div>
+                                           </div>
+
+
+                                       </div>
+
+                                   </div>
+                               </div>                          
+                               <div class="row">
+                                   <div class="col-lg-12">
+
+                                       <ul class="asc-frequently-list" ng-show="FrequentMedicationsList.length > 0">
+                                           <li>
+                                               <label>Frequently Added: </label>
+                                           </li>
+                                           <li ng-repeat="item in FrequentMedicationsList| limitTo:  showAllfreq.medicationlist" ng-class="item.IsChecked ? 'active' : ''">
+                                               <button ng-click="AddFrequentMedicationData(item)">
+                                                   <svg class="icon-active" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                       <path d="M2.16077 6.55347L4.75949 9.15219L9.95694 3.5835" stroke="white" stroke-width="1.11374" stroke-linecap="round" stroke-linejoin="round" />
+                                                   </svg>
+                                                   <svg class="icon-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                       <path d="M11.8775 8.43694H8.67767V11.6367C8.67767 11.8065 8.61025 11.9692 8.49023 12.0893C8.37022 12.2093 8.20744 12.2767 8.03771 12.2767C7.86798 12.2767 7.70521 12.2093 7.58519 12.0893C7.46518 11.9692 7.39775 11.8065 7.39775 11.6367V8.43694H4.19794C4.02822 8.43694 3.86544 8.36951 3.74542 8.2495C3.62541 8.12948 3.55798 7.9667 3.55798 7.79698C3.55798 7.62725 3.62541 7.46447 3.74542 7.34445C3.86544 7.22444 4.02822 7.15701 4.19794 7.15701H7.39775V3.95721C7.39775 3.78748 7.46518 3.6247 7.58519 3.50469C7.70521 3.38467 7.86798 3.31725 8.03771 3.31725C8.20744 3.31725 8.37022 3.38467 8.49023 3.50469C8.61025 3.6247 8.67767 3.78748 8.67767 3.95721V7.15701H11.8775C12.0472 7.15701 12.21 7.22444 12.33 7.34445C12.45 7.46447 12.5174 7.62725 12.5174 7.79698C12.5174 7.9667 12.45 8.12948 12.33 8.2495C12.21 8.36951 12.0472 8.43694 11.8775 8.43694Z" fill="#767676" />
+                                                   </svg>
+                                                   {{item.MedicineName}}
+                                               </button>
+                                           </li>
+                                           <li class="flex">
+                                               <a class="fs__normal-- fs__md-- fw__5-- tc__1D5558-- tx__h--a" ng-if="FrequentMedicationsList.length > 5" ng-click="showAllMedicationfreqclick();">
+                                                   <i class="fas fa-chevron-down" ng-if="!showAllfreq.medication"></i> <i class="fas fa-chevron-up" ng-if="showAllfreq.medication"></i>{{showAllfreq.medication ? 'Show Less' : 'Show More'}}
+                                               </a>
+                                           </li>
+                                       </ul>
+                                       <div class="advanced-search-filters m-b-5"  ng-show="(obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd' :'N' }).length > 0">
+                                           <table class="consultation-ros-table">
+                                               <thead>
+                                                   <tr ng-show="!obj.isNKCEMSelected || !obj.isNKCSMSelected">
+                                                       <th width="4%"></th>
+                                                       <th>Medication</th>
+                                                       <th>Type</th>
+                                                       <th>Dose</th>
+                                                       <th>Dose unit</th>
+                                                       <th>Route</th>
+                                                       <th width="20%">Reason For</th>
+                                                       <th width="14%">Dose Timing</th>
+                                                       <th>Action</th>
+                                                   </tr>
+                                               </thead>
+
+                                               <tbody ng-repeat="presc in obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd':'N','MedicationLocationTypeId':1} track by $index">
+                                                   <tr ng-class="(presc.IsMedicationStopped) ? 'td-red-med':''" ng-show="presc.MedicineId != 1 && !obj.isNKCEMSelected">
+                                                       <td>
+                                                           <a class="d__f-- ai__c-- gap__x--4 fs__normal-- fs__lg-- tc__1D1D1D-- fw__5--" ng-click="ChangeMedicationHistoryFrequentStatus(presc,1)">
+                                                               <i class="far fa-star" ng-if="presc.IsFrequent=='N'"></i>
+                                                               <i class="fas fa-star tc__F7981C--" ng-if="presc.IsFrequent=='Y'"></i>
+
+                                                           </a>
+                                                       </td>
+                                                       <td width="20%">
+                                                           <span>
+                                                               {{presc.MedicineName}}
+                                                               <span ng-show="presc.DrugStrength !=null"> - {{presc.DrugStrength}}</span>
+                                                           </span>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.MedicationLocationType" ng-change="changemedicationtype(presc,presc.MedicationLocationType)">
+                                                                   <option value="">Select</option>
+                                                                   <option value="Eye">Eye</option>
+                                                                   <option value="General">General</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.DoseId" ng-change="changePopupPrescDose(presc, presc.DoseId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.DoseUnitId" ng-change="changePopupPrescDoseUnit(presc, presc.DoseUnitId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseUnitArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.RouteId" ng-change="changePopupPrescRoute(presc, presc.RouteId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in routeArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <input type="text" placeholder="Enter Remarks" ng-model="presc.MedicationreconcillationRemarks" />
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.FrequencyId" ng-change="changePopupPrescFrequency(presc, presc.FrequencyId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in frequencyArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td ng-if="hide">
+                                                           <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                               <input type="checkbox" ng-model="presc.isChecked" ng-change="ShowMedicationDate(presc)" class="checkbox">
+                                                               <span class="lbl"></span>
+                                                               <span class="text-s12w500c000 lh-2-0 fs-14">Dates</span>
+                                                           </label>
+                                                       </td>
+
+                                                       <td>
+                                                           <div class="d__f-- ai__c-- jc__c-- gap__10--x">
+                                                               <a ng-click="ClearCurrentSystemicMedications(presc,$index);" tooltip-placement="top" uib-tooltip="Delete">
+                                                                   <i class="icons__w16-- delete__w16--o"></i>
+                                                               </a>
+                                                               <a ng-click="ClearAllMedicationDates(presc);"  tooltip-placement="top" uib-tooltip="Clear">
+                                                                   <i class="icons__w16-- refresh__w16--o"></i>
+                                                               </a>
+                                                           </div>
+                                                       </td>
+                                                   </tr>
+                                                   <tr ng-show="presc.MedicineId != 1 && !obj.isNKCEMSelected">
+                                                       <td colspan="2"></td>
+                                                       <td colspan="2">
+                                                           <div class="form__group">
+                                                               <label>Last Used</label>
+                                                               <input type="text" class="icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.LastUsedDate" datepickerregpatient readonly />
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <label>Continue Field</label>
+                                                               <select ng-model="presc.Continuefield" ng-change="OnchangeContinuefield(presc,presc.Continuefield)">
+                                                                   <option value="">Select</option>
+                                                                   <option value="Yes">Yes</option>
+                                                                   <option value="No">No</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td colspan="3">
+                                                           <div class="form__group">
+                                                               <!--Resume Remarks-->
+                                                               <label>Remarks</label>
+                                                               <input type="text" placeholder="Enter Remarks" ng-model="presc.MedicationResumeRemarks" />
+                                                           </div>
+                                                       </td>
+                                                   </tr>
+                                                   <tr ng-if="yes" ng-show="presc.IsMedicationDateInd && presc.MedicineId != 1 && !obj.isNKCEMSelected" ng-class="(presc.IsMedicationStopped) ? 'td-red-med':''">
+                                                       <td width="13%">
+                                                           <div class="form-group">
+                                                               <label>Stop Date</label>
+                                                               <input type="text" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.MedicationStopDate" datepickeruniversaldate readonly ng-change="SelectMedDate(presc)" />
+                                                           </div>
+                                                       </td>
+                                                       <td colspan="3">
+                                                           <div class="form-group">
+                                                               <label>Stop Remarks</label>
+                                                               <select class="form-outline" ng-model="presc.MedicationStopRemarks" ng-change="changeStopMedication(presc, presc.StopReasonId)" ng-options="aitem.StopReason as aitem.StopReason for aitem in MedicationStopReasons">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td width="13%">
+                                                           <div class="form-group">
+                                                               <label>Resume Date</label>
+                                                               <input type="text" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.MedicationResumeDate" datepickerforapplist readonly ng-change="SelectMedDate(presc)" />
+                                                           </div>
+                                                       </td>
+                                                      
+                                                   </tr>
+                                                   <tr ng-show="presc.MedicineId == 1 || obj.isNKCEMSelected">
+                                                       <td colspan="4">
+                                                           <span class="text-s12w600c000">{{presc.MedicineName}}</span>
+                                                       </td>
+                                                   </tr>
+                                               </tbody>
+                                             
+                                               <tbody ng-repeat="presc in obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd' :'N','MedicationLocationTypeId':2 } track by $index">
+                                                   <tr ng-class="(presc.IsMedicationStopped) ? 'td-red-med':''" ng-show="presc.MedicineId != 2 && !obj.isNKCSMSelected">
+                                                       <td>
+                                                           <div>
+                                                               <a class="d__f-- ai__c-- gap__x--4 fs__normal-- fs__lg-- tc__1D1D1D-- fw__5--" ng-click="ChangeMedicationHistoryFrequentStatus(presc,2)">
+                                                                   <i class="far fa-star" ng-if="presc.IsFrequent=='N'"></i>
+                                                                   <i class="fas fa-star tc__F7981C--" ng-if="presc.IsFrequent=='Y'"></i>
+                                                                 
+                                                               </a>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <span>
+                                                               {{presc.MedicineName}}
+                                                               <span ng-show="presc.DrugStrength !=null"> - {{presc.DrugStrength}}</span>
+                                                           </span>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.MedicationLocationType" ng-change="changemedicationtype(presc,presc.MedicationLocationType)">
+                                                                   <option value="">Select</option>
+                                                                   <option value="Eye">Eye</option>
+                                                                   <option value="General">General</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.DoseId" ng-change="changePopupPrescDose(presc, presc.DoseId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.DoseUnitId" ng-change="changePopupPrescDoseUnit(presc, presc.DoseUnitId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseUnitArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.RouteId" ng-change="changePopupPrescRoute(presc, presc.RouteId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in routeArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <input type="text" placeholder="Enter Remarks" ng-model="presc.MedicationreconcillationRemarks" />
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <select ng-model="presc.FrequencyId" ng-change="changePopupPrescFrequency(presc, presc.FrequencyId)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in frequencyArray">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td ng-if="hide">
+                                                           <label class="cur-poiter dis-flex align-items-center grid-gap-5">
+                                                               <input type="checkbox" ng-model="presc.isChecked" ng-change="ShowMedicationDate(presc)" class="checkbox">
+                                                               <span class="lbl"></span>
+                                                               <span class="text-s12w500c000 lh-2-0 fs-14">Dates</span>
+                                                           </label>
+                                                       </td>
+                                                       <td>
+                                                           <div class="d__f-- ai__c-- jc__c-- gap__10--x ">
+                                                               <a ng-click="ClearCurrentSystemicMedications(presc,$index);"  tooltip-placement="top" uib-tooltip="Delete">
+                                                                   <i class="icons__w16-- delete__w16--o"></i>
+                                                               </a>
+                                                               <a ng-click="ClearAllMedicationDates(presc);"  tooltip-placement="top" uib-tooltip="Clear"><i class="icons__w16-- refresh__w16--o"></i></a>
+                                                           </div>
+                                                       </td>
+                                                   </tr>
+
+                                                   <tr ng-show="presc.MedicineId != 2 && !obj.isNKCSMSelected" >
+                                                       <td colspan="2"></td>
+                                                       <td colspan="2">
+                                                           <div class="form__group">
+                                                               <label> Last Date</label>
+                                                               <input type="text" class="icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.LastUsedDate" datepickerregpatient readonly />
+                                                           </div>
+                                                       </td>
+                                                       <td>
+                                                           <div class="form__group">
+                                                               <label>Continue Field</label>
+                                                               <select ng-model="presc.Continuefield" ng-change="OnchangeContinuefield(presc,presc.Continuefield)">
+                                                                   <option value="">Select</option>
+                                                                   <option value="Yes">Yes</option>
+                                                                   <option value="No">No</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td colspan="3">
+                                                           <div class="form__group">
+                                                               <label> Remarks</label>
+                                                               <input type="text" placeholder="Enter Remarks" ng-model="presc.MedicationResumeRemarks" />
+                                                           </div>
+                                                       </td>
+                                                   </tr>
+                                                   <tr ng-if="false" ng-show="presc.IsMedicationDateInd && presc.MedicineId != 2 && !obj.isNKCSMSelected" ng-class="(presc.IsMedicationStopped) ? 'td-red-med':''">
+                                                       <td width="13%">
+                                                           <div class="form-group">
+                                                               <label>Stop Date</label>
+                                                               <input type="text" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.MedicationStopDate" datepickeruniversaldate readonly ng-change="SelectMedDate(presc)" />
+                                                           </div>
+                                                       </td>
+                                                       <td colspan="3">
+                                                           <div class="form-group">
+                                                               <label>Stop Remarks</label>
+                                                               <select class="form-outline" ng-model="presc.MedicationStopRemarks" ng-change="changeStopMedication(presc, presc.StopReasonId)" ng-options="aitem.StopReason as aitem.StopReason for aitem in MedicationStopReasons">
+                                                                   <option value="">Select</option>
+                                                               </select>
+                                                           </div>
+                                                       </td>
+                                                       <td width="13%">
+                                                           <div class="form-group">
+                                                               <label>Resume Date</label>
+                                                               <input type="text" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" ng-model="presc.MedicationResumeDate" datepickerforapplist readonly ng-change="SelectMedDate(presc)" />
+                                                           </div>
+                                                       </td>
+                                                       <td colspan="3">
+                                                           <div class="form-group">
+                                                               <label>Resume Remarks</label>
+                                                               <input type="text" class="form-outline" placeholder="Enter Remarks" ng-model="presc.MedicationResumeRemarks" />
+                                                           </div>
+                                                       </td>
+                                                   </tr>
+                                                   <tr ng-show="presc.MedicineId == 2 || obj.isNKCSMSelected">
+                                                       <td colspan="4">
+                                                           <span class="text-s12w600c000">{{presc.MedicineName}}</span>
+                                                       </td>
+                                                   </tr>
+                                               </tbody>
+                                           </table>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-lg-12" ng-show="obj.ReconcileMedicationSummaryView">
+                       <div class="asc-main-panel">
+                           <div class="asc-header-panel">
+                               <h1>Medications</h1>
+                               <ul class="us-controls">
+                                   <li>
+                                       <a href="javascript:;" tooltip-placement="left" uib-tooltip="Edit" class=" bg-2290A8 bradius-6" ng-click="RosMedicationShowhide(2)">
+                                           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16" fill="none">
+                                               <path d="M12.9987 5.71039C13.2067 5.50242 13.2067 5.1558 12.9987 4.95849L11.7509 3.71067C11.5536 3.50269 11.207 3.50269 10.999 3.71067L10.0178 4.68653L12.0175 6.68625M3.55469 11.155V13.1547H5.55441L11.4523 7.25151L9.45254 5.25179L3.55469 11.155Z" fill="white" />
+                                           </svg>
+                                       </a>
+                                   </li>
+                               </ul>
+                           </div>
+                           <div class="asc-summary-body" ng-show="((obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd':'N'}).length > 0)">
+                               <table class="consultation-ros-table">
+                                   <thead>
+                                       <tr>
+                                           <th>Medication</th>
+                                           <th>Type</th>
+                                           <th>Dose</th>
+                                           <th>Dose unit</th>
+                                           <th>Route</th>
+                                           <th>Reason For</th>
+                                           <th>Dose Timing</th>
+                                           <th>Last Used</th>
+                                           <th>Continue Field</th>
+                                           <!--<th>Resume Date</th>-->
+                                           <!--<th>Stop Date</th>-->
+                                           <th> Remarks</th>
+                                       </tr>
+                                   </thead>
+                                   <tbody>
+                                       <tr ng-repeat="item in obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd':'N','MedicationLocationTypeId':1} track by $index" ng-class="(item.IsMedicationStopped) ? 'td-red-med':''">
+                                           <td>
+                                               <span>
+                                                   {{item.MedicineName}}
+                                                   <span ng-show="item.DrugStrength !=null"> - {{item.DrugStrength}}</span>
+                                               </span>
+                                           </td>
+                                           <td>
+                                               {{item.MedicationLocationType}}
+                                           </td>
+                                           <td>
+                                               <span>{{item.Dose}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.DoseUnit}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Route}}</span>
+                                           </td>
+                                           <td>
+                                               <span class="no-wrapappt w-100" data-toggle="tooltip" title="{{item.MedicationreconcillationRemarks}}">{{item.MedicationreconcillationRemarks}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Frequency}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.LastUsedDate | date: 'MM-dd-yyyy'}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Continuefield}}</span>
+                                           </td>
+                                           <!--<td>
+        <span>{{item.MedicationResumeDate | date: 'MM-dd-yyyy'}}</span>
+    </td>-->
+                                           <!--<td>
+        <span>{{item.MedicationStopDate | date: 'MM-dd-yyyy'}}</span>
+    </td>-->
+                                           <td>
+                                               <span class="no-wrapappt w-100" data-toggle="tooltip" title="{{item.MedicationResumeRemarks}}">{{item.MedicationResumeRemarks}}</span>
+                                           </td>
+                                       </tr>
+                                       <tr ng-repeat="item in obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd':'N','MedicationLocationTypeId':2} track by $index" ng-class="(item.IsMedicationStopped) ? 'td-red-med':''">
+                                           <td>
+                                               <span>
+                                                   {{item.MedicineName}}
+                                                   <span ng-show="item.DrugStrength !=null"> - {{item.DrugStrength}}</span>
+                                               </span>
+                                           </td>
+                                           <td>
+                                               {{item.MedicationLocationType}}
+                                           </td>
+                                           <td>
+                                               <span>{{item.Dose}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.DoseUnit}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Route}}</span>
+                                           </td>
+                                           <td>
+                                               <span class="no-wrapappt w-100" data-toggle="tooltip" title="{{item.MedicationreconcillationRemarks}}">{{item.MedicationreconcillationRemarks}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Frequency}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.LastUsedDate}}</span>
+                                           </td>
+                                           <td>
+                                               <span>{{item.Continuefield}}</span>
+                                           </td>
+                                           <!--<td>
+        <span>{{item.MedicationResumeDate | date: 'MM-dd-yyyy'}}</span>
+    </td>-->
+                                           <!--<td>
+        <span>{{item.MedicationStopDate | date: 'MM-dd-yyyy'}}</span>
+    </td>-->
+
+                                           <td>
+                                               <span class="no-wrapappt w-100" data-toggle="tooltip" title="{{item.MedicationResumeRemarks}}">{{item.MedicationResumeRemarks}}</span>
+                                           </td>
+                                       </tr>
+                                   </tbody>
+                               </table>
+                           </div>
+                           <div class="asc-summary-body" ng-show="(obj.CurrentSystemicMedicationsHistory | filter:{'DeleteInd' :'N' }).length == 0">
+                               <ul class="asc-frequently-list">
+                                   <li>
+                                       <span>Please <a ng-click="RosMedicationShowhide(2)">click here </a> to  add data.</span>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-lg-12">
+                       <div class="asc-main-panel">
+                           <div class="asc-header-panel">
+                               <h1>Reviewed By</h1>
+                           </div>
+                           <div class="asc-summary-body">
+                               <ul class="asc-summary-list align-items-center">
+                                   <li>
+                                       <label>Reviewed By</label>
+                                   </li>
+                                   <li class="w-150">
+                                       <select class="form-outline" ng-model="obj.ReconciliationReviewedById" ng-options="item.DoctorID as item.FullName for item in NurseListArray">
+                                           <option value="" disabled>Select</option>
+                                       </select>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+
+               </div>
+           </div>
+       </div>
+    </div>
+</div>

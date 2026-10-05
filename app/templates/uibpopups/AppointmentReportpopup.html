@@ -1,0 +1,945 @@
+﻿
+<div class="modal__style--1">
+    <div class="modal__header--">
+        <!--<h1 class="text-ocularhist ">Confrontation Field Test</h1>-->
+        <h1>{{ 'APPOINTMENTREPORT' | translate}} </h1>
+        <div class="">
+            <ul class="autofill-list m-b-0">
+                <li ng-click="GetAppointmentReport(2)" class="" ng-class="ApptReportObj.ByDoctor?'active':''">
+                    <a href="javascript:;">By Doctor</a>
+                </li>
+                <li ng-class="ApptReportObj.ByVisitReason?'active':''" ng-click="GetAppointmentReport(1)">
+                    <a href="javascript:;">By Visit Reason</a>
+                </li>
+                <li ng-class="ApptReportObj.ByApptWiseVisitReason?'active':''" ng-click="GetAppointmentReport(3)">
+                    <a href="javascript:;"> Visit Reason Wise Appointments</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d__f-- ai__c--">
+            <a class="btn__close--2" ng-click="closeuib()">
+                <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+            </a>
+            <!--<button class="btn btn-discard-us m-r-5" ng-click="ConfrontationCloseuib();">Close</button>-->
+        </div>
+    </div>
+    <div class="modal__body--">
+        <div ng-show="ApptReportObj.ByVisitReason">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable">
+                            <tbody>
+                                <tr>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'FROMDATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtFromDate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input/>
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'TODATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtTodate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input/>
+                                        </div>
+                                    </td>
+                                    <!--<td>
+                                    <div class="ehr-input pop-ehr-input dis-grid">
+                                        <label>{{ 'DOCTOR' | translate}} <em>*</em></label>
+                                        <ui-select ng-model="SearchObj.selectedDoctor" theme="bootstrap" on-select="changeAppointmentDoctor(SearchObj.selectedDoctor.DoctorID)">
+                                            <ui-select-match placeholder=" {{ 'SELECT' | translate}}">{{SearchObj.selectedDoctor.UserFullName?SearchObj.selectedDoctor.UserFullName:"Select Doctors"}}</ui-select-match>
+                                            <ui-select-choices repeat="item in clinicDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                                <span ng-bind-html="item.UserFullName | highlight: $select.search"></span>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                    </div>
+                                </td>-->
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Location</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                    {{shared.selectLocationString}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li ng-repeat="item in AllApptBranchLocations | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranchInPopup(item,true,'list')">
+                                                                    <span class="lbl"></span>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                                </label>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ehr-input pop-ehr-input dis-grid">
+                                            <label class="text-appt">{{ 'DOCTORS' | translate}}</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}" ng-disabled="userLoginDetails.RoleID === 1 && userLoginDetails.SuffixId != 13 && !connectedUserObj.Available">
+                                                    {{reportObj.selectDoctor}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtbForPrint.txt1" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheckForPrint" ng-click="checkAllDoctorForPrint1(AllDoctorsObj.AllDoctorCheckForPrint)">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>All Doctors</small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                            <li ng-repeat="item in sharedDoctors.MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtbForPrint.txt1}">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isCheckedList" ng-click="DoctorToggleForPrint1(item);">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="ehr-input pop-ehr-input dis-grid">
+                                            <label class="text-appt">{{ 'VISITREASON' | translate}}</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                    {{reportObj.selectVisitReason}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.visitRsnName" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllVisitReasonsCheck1" ng-click="checkAllVisitReasons1(AllDoctorsObj.AllVisitReasonsCheck1)">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                            <li ng-repeat="item in VisitreasonsforPrint | filter:{'Reason':searchHospital.visitRsnName}">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggle1(item);">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small ng-bind="item.Reason"></small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td width="14%">
+                                        <button class="btn btn-success btn-block m-t-20" title="Search" ng-click="SearchAppoint('ByVisitReason')">{{'APPLY'|translate}}</button>
+                                    </td>
+                                    <td width="14%">
+                                        <button class="btn btn-save-us m-t-20 btn-block" ng-click="AppointmentsCountByVisitReasonsPrint(item)">{{ 'PRINT' | translate}}</button>
+                                    </td>
+                                    <!--<td width="10%">
+                                    <button class="filter-btn btn-print-color m-t-20" ng-click="AppointmentsCountByVisitReasonsPrint()" title="Appointment Report">
+                                        Print <img src="img/new-icons/print-icon.png" width="15" />
+                                    </button>
+                                </td>-->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <section class="tile tile-shadow">
+                        <div class="tile-header">
+                            <!--<h1>{{'APPOINTMENTCOUNTBYDOCTOR'|translate}}</h1>-->
+                            <h1> {{'APPOINTMENTCOUNTBYVISITREASONS'|translate}}</h1>
+                        </div>
+                        <div class="tile-body">
+                            <div class="row" ng-show="Datecontainer.length > 0">
+                                <div class="col-lg-12">
+                                    <div class="overflow-x-hideen overflow-y-scroll table-responsive table-wrapper" ng-style="heightBIO()" resize>
+                                        <table class="appts-borderbotom table-text-center table">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%"><p>Doctors</p></th>
+                                                    <th width="20%"><p>Location</p></th>
+                                                    <th width="8%"><p>Total</p></th>
+                                                    <th ng-repeat="Dates in Datecontainer | limitTo : 14"><p>{{Dates | date:'MM/dd'}}</p></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="item in DataStoringArray">
+                                                <tr>
+                                                    <td class="bg-Csuccess">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500c000 text-left">{{item.DoctorName}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500c000 text-left">{{item.OrganizationName}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500C068cb0 cur-poiter">{{item.TotalAppointments}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess" ng-repeat="tobj in item.AppointmentDatesList track by $index">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w600C15898f cur-poiter">{{tobj.AppointmentCount}}</span>
+                                                            <a href="javascript:;" ng-click="ShowPatientDataByVisitReason(tobj,item)" class="pull-right" ng-hide="tobj.AppointmentCount == 0 || tobj.AppointmentCount == ''">
+                                                                <img src="img/new-icons/down-arrow.svg" width="10">
+                                                            </a>
+                                                            <div>
+                                                                <button class="filter-btn btn-print-color p-1 w-40" type="button" ng-show="tobj.IsShowThePrint" ng-click="PrintPatientByVisitReason()">
+                                                                    <img src="img/new-icons/print-icon.png" width="15">
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <!--<td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>
+                            <td class="bg-Csuccess">
+                                <div class="p-8">
+                                    <span class="text-s14w600C15898f">(10)</span>
+                                </div>
+                            </td>-->
+                                                </tr>
+                                                <tr ng-repeat="tobj in item.AppointmentDatesList track by $index">
+                                                    <td colspan="{{Datecontainer.length + 3}}" class="bg-acute" ng-show="tobj.IsShowThePrint">
+                                                        <div class="p-8">
+                                                            <table class="table-eh tableno-padding">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th width="12%">Appt.Date & Time</th>
+                                                                        <!--<th width="12%">Appt.Time</th>-->
+                                                                        <th width="12%">Mr.No</th>
+                                                                        <th width="16%">Patient Name</th>
+                                                                        <th width="12%">Visit Reason</th>
+                                                                        <th width="12%">Appointment Type</th>
+                                                                        <th width="12%">Age</th>
+                                                                        <th width="16%">Mobile</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat=" Pitem in PatientdataByVisit">
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0">
+                                                                                <b class="text-767575">{{Pitem.ConsultationDt  | date:'MM-dd-yyyy'}}</b>
+                                                                            </p>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0">
+                                                                                <b class="text-767575">{{Pitem.shorttime}}</b>
+                                                                            </p>
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <p ng-hide="Pitem.PatientDisplayId==''" class="ppt-textname no-wrapappt cur-poiter m-b-0"><b class="text-767575">{{Pitem.PatientDisplayId}}</b></p>
+                                                                            <!--<p ng-hide="Pitem.PatientDisplayId==''&&Pitem.Patient.OldMRNo==''" class="ppt-textname no-wrapappt cur-poiter m-b-0"><b class=" text-767575">{{Pitem.Patient.OldMRNo}}</b></p>-->
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0">
+                                                                                <b class="text-767575">{{Pitem.Patient.FullName}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0" >
+                                                                                <b class="text-767575">{{Pitem.VisitReason}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0" >
+                                                                                <b class="text-767575">{{Pitem.AppointmentType}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0" >
+                                                                                <b class="text-767575">{{Pitem.Patient.AgeInYears}}Y,{{Pitem.Patient.AgeInMonths}}M</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0" >
+                                                                                <b class="text-767575">{{Pitem.Patient.MobileNoUsFormate}}</b>
+                                                                            </p>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-repeat="subdata in item.VisitReasons">
+                                                    <td>
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131 text-left">{{subdata.VisitReasonName}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131">{{subdata.VisitReasonAppointmentsCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131">{{subdata.VisitReasonAppointmentsCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-repeat="data in subdata.VisitReasonDataList">
+                                                        <div class="p-8">
+                                                            <span class="text-s14wnrmlc0a6549">{{data.AppointmentCount}}</span>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="Datecontainer.length === 0">
+                                <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a date range and the doctor to view appointments.</label>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <!-- / -->
+        </div>
+
+        <div ng-show="ApptReportObj.ByApptWiseVisitReason">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable">
+                            <tbody>
+                                <tr>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'FROMDATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtFromDate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input />
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'TODATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtTodate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input />
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="form__group">
+                                            <label>Location</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                    {{shared.selectLocationString}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li ng-repeat="item in AllApptBranchLocations | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranchInPopup(item,true,'list')">
+                                                                    <span class="lbl"></span>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                                </label>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="25%">
+                                        <!--<div class="ehr-input pop-ehr-input dis-grid">-->
+                                        <!--<label>{{ 'DOCTOR' | translate}} <em>*</em></label>
+                                    <ui-select ng-model="SearchObj.selectedDoctor" theme="bootstrap" on-select="SelectDoctorForVisitReasonWiseAppt(SearchObj.selectedDoctor.DoctorID)">
+                                        <ui-select-match placeholder=" {{ 'SELECT' | translate}}">{{SearchObj.selectedDoctor.UserFullName?SearchObj.selectedDoctor.UserFullName:"Select Doctors"}}</ui-select-match>
+                                        <ui-select-choices repeat="item in AppointmentReportPrintDoctorList | filter: $select.search" null-option="EmptySelect" loose-null>
+                                            <span ng-bind-html="item.UserFullName | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                    </ui-select>-->
+                                        <div class="ehr-input pop-ehr-input dis-grid">
+                                            <label>{{ 'DOCTOR' | translate}} <em>*</em></label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}" ng-disabled="userLoginDetails.RoleID === 1 && userLoginDetails.SuffixId != 13 && !connectedUserObj.Available">
+                                                    {{reportObj.selectDoctor}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtbForPrint.txt1" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheckForPrint" ng-click="checkAllDoctorForPrint1(AllDoctorsObj.AllDoctorCheckForPrint)">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>All Doctors</small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                            <li ng-repeat="item in sharedDoctors.MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtbForPrint.txt1}">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isCheckedList" ng-click="DoctorToggleForPrint1(item);">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--</div>-->
+                                    </td>
+
+
+                                    <td width="25%">
+                                        <div class="ehr-input pop-ehr-input dis-grid">
+                                            <label class="text-appt">{{ 'VISITREASON' | translate}}</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                    {{VisitReasonReportObj.selectVisitReason}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="VisitReasonWisePrint.visitRsnName" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllVisitReasonsCheckForPatientPrint" ng-click="AllVisitReasonsByVisitReasonWiseOnPrint(AllDoctorsObj.AllVisitReasonsCheckForPatientPrint)">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                            <li ng-repeat="item in VisitReasonsWiseApptCountForPrint | filter:{'Reason':VisitReasonWisePrint.visitRsnName}">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggleForVisitReasonWise(item);">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small ng-bind="item.Reason"></small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td width="14%">
+                                        <button class="btn btn-success btn-block m-t-20" title="Search" ng-click="SearchAppoint('ByApptWiseVisitReason')">{{'APPLY'|translate}}</button>
+                                    </td>
+                                    <td width="14%" ng-if="ApptReportObj.ByApptWiseVisitReason">
+                                        <button class="btn btn-save-us btn-block m-t-20" title="Print" ng-click="VisitReasonWisePatientData('ByApptWiseVisitReason')">{{'PRINT'|translate}}</button>
+                                    </td>
+                                    <td width="18%" ng-if="ApptReportObj.ByApptWiseVisitReason">
+                                        <button class="btn btn-save-us btn-block m-t-20" title="Print" ng-click="VisitReasonWisePatientData('ByApptWiseVisitReasonWONotes')">{{'PRINT'|translate}} W/O Notes</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <section class="tile tile-shadow">
+                        <div class="tile-header">
+                            <h1>Visit Reason Wise Appointments Report</h1>
+                        </div>
+                        <div class="tile-body">
+                            <div class="row" ng-show="Datecontainer.length > 0">
+                                <div class="col-lg-12">
+                                    <div class="table-wrapper overflow-x-hideen" ng-style="heightBHE()" resize>
+                                        <table class="appts-borderbotom table-text-center" ng-repeat="item in VisitreasonByApptArray">
+                                            <thead ng-show="$first">
+                                                <tr>
+                                                    <th width="20%"><p>Doctors</p></th>
+                                                    <th width="20%"><p>Location</p></th>
+                                                    <th width="5%"><p>Total</p></th>
+                                                    <th ng-repeat="Dates in Datecontainer | limitTo : 14"><p>{{Dates | date:'MM/dd'}}</p></th>
+                                                    <th width="5%"><p>&nbsp;</p></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="bg-Csuccess" width="20%">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500c000 text-left">{{item.DoctorName}}</span>
+
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess" width="20%">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500c000 text-left">{{item.OrganizationName}}</span>
+
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess" width="5%">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500C068cb0">{{item.TotalAppointments}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess" ng-repeat="tobj in item.AppointmentDatesList track by $index">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w600C15898f">{{tobj.AppointmentCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess" width="5%">
+                                                        <div class="p-8">
+                                                            <span class="text-s14w500C068cb0"></span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody ng-repeat="subdata in item.VisitReasons">
+
+                                                <tr>
+                                                    <td width="20%">
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131 text-left">{{subdata.VisitReasonName}}</span>
+                                                        </div>
+                                                    </td>
+
+                                                    <td width="5%">
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131">{{subdata.VisitReasonAppointmentsCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td width="5%">
+                                                        <div class="p-8">
+                                                            <span class="text-s12w500c313131">{{subdata.VisitReasonAppointmentsCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-repeat="data in subdata.VisitReasonwiseApptList">
+                                                        <div class="p-8">
+                                                            <span class="text-s14wnrmlc0a6549">{{data.AppointmentCount}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td width="5%">
+                                                        <div class="p-8">
+                                                            <a href="javascript:;" ng-click="VisitReasonwiseApptReportPrint(subdata)">
+                                                                <img src="img/new-icons/down-arrow.svg" width="17" />
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="{{Datecontainer.length + 3}}" class="bg-acute" ng-show="subdata.IsShowVisitReasonPatient">
+                                                        <div class="p-8">
+                                                            <table class="table-eh tableno-padding">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th width="12%">Appointment Date</th>
+                                                                        <th width="12%">Appointment Time</th>
+                                                                        <th width="12%">Mr.No</th>
+                                                                        <th width="16%">Patient Name</th>
+                                                                        <th width="10%">Plan</th>
+                                                                        <!--<th width="12%">Visit Reason</th>
+                                                <th width="12%">Appoinment Type</th>-->
+                                                                        <th width="12%">Age</th>
+                                                                        <th width="16%">Mobile</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody ng-repeat=" Pitem in subdata.AppointmentsArray" class="bb-1">
+                                                                    <tr>
+                                                                        <td class="b-0 pb-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b>{{Pitem.ConsultationDt  | date:'MM-dd-yyyy'}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b>{{Pitem.shorttime}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b ng-hide="Pitem.PatientDisplayId==''">{{Pitem.PatientDisplayId}} <!--<span ng-show="Pitem.Patient.OldMRNo != ''">/{{Pitem.Patient.OldMRNo}}</span>--></b>
+                                                                            </p>
+                                                                        </td>
+
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b>{{Pitem.Patient.FullName}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color" ng-repeat="insitem in Pitem.PatientInsuranceList track by $index">
+                                                                                <b>{{insitem.PlanName}}</b><span ng-hide="$last">,</span>
+                                                                            </p>
+                                                                        </td>
+                                                                        <!--<td>
+                                                    <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color" >
+                                                        <b>{{Pitem.VisitReason}}</b>
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color" >
+                                                        <b>{{Pitem.AppointmentType}}</b>
+                                                    </p>
+                                                </td>-->
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b>{{Pitem.Patient.AgeInYears}}Y,{{Pitem.Patient.AgeInMonths}}M</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td class="b-0">
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color">
+                                                                                <b>{{Pitem.Patient.MobileNoUsFormate}}</b>
+                                                                            </p>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr class="" ng-show="Pitem.AppointmentNotes.length > 0">
+                                                                        <td colspan="7">
+                                                                            <b class="text-068cb0"> Notes:</b>
+                                                                            <span class="text-767575" ng-repeat="subitem in Pitem.AppointmentNotes">
+                                                                                {{subitem.Notes}}  <br />
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="Datecontainer.length === 0">
+                                <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a date range and the doctor to view appointments.</label>
+                            </div>
+                        </div>
+                    </section>
+
+
+
+                </div>
+            </div>
+            <!-- / -->
+        </div>
+
+        <div ng-show="ApptReportObj.ByDoctor">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table tableno-bordered m-b-0 apptFilterTable">
+                            <tbody>
+                                <tr>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'FROMDATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtFromDate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input />
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>  {{ 'TODATE' | translate}}</label>
+                                            <input class="icons-calendar" type="text" ng-model="SearchObj.ConsultationDtTodate" datepickerforapplist ng-change="ChangeDatesLimitForApptReport(SearchObj.ConsultationDtFromDate, SearchObj.ConsultationDtTodate);" readonly date-format-input />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Location</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                    {{shared.selectLocationString}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app overflow-hidden" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="LocationTypeObj.Name" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li ng-repeat="item in AllApptBranchLocations | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranchInPopup(item,true,'list')">
+                                                                    <span class="lbl"></span>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                                </label>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ehr-input pop-ehr-input dis-grid">
+                                            <label class="text-appt">{{ 'DOCTORS' | translate}}</label>
+                                            <div class="dropdown cstm-dropdown width-100">
+                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}" ng-disabled="userLoginDetails.RoleID === 1 && userLoginDetails.SuffixId != 13 && !connectedUserObj.Available">
+                                                    {{reportObj.selectDoctor}}
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+
+                                                    <div class="p-5">
+                                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtbForPrint.txt1" />
+                                                    </div>
+                                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheckForPrint" ng-click="checkAllDoctorForPrint1(AllDoctorsObj.AllDoctorCheckForPrint)">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small>All Doctors</small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                            <li ng-repeat="item in sharedDoctors.MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtbForPrint.txt1}">
+                                                                <div class="checkbox cn">
+                                                                    <label>
+                                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isCheckedList" ng-click="DoctorToggleForPrint1(item);">
+                                                                        <span class="checkbox-material">
+                                                                            <span class="check"></span>
+                                                                        </span>
+                                                                        <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                                    </label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="14%">
+                                        <button class="btn btn-success btn-block m-t-20" title="Search" ng-click="SearchAppoint('ByDoctor')">{{'APPLY'|translate}}</button>
+                                    </td>
+                                    <td width="14%">
+                                        <button class="btn btn-save-us btn-block m-t-20" ng-click="AppointmentsCountByVisitReasonsPrint('ByDoctor')">{{'PRINT'|translate}}</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <section class="tile tile-shadow">
+                        <div class="tile-header">
+                            <h1>{{'APPOINTMENTCOUNTBYDOCTOR'|translate}}</h1>
+                        </div>
+                        <div class="tile-body">
+                            <div class="row" ng-show="Datecontainer.length > 0">
+                                <div class="col-lg-12">
+                                    <div class="table-wrapper" ng-style="heightBIO()" resize>
+                                        <table class="appts-borderbotom table-text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%"><p>Doctors</p></th>
+                                                    <th width="20%"><p>Location</p></th>
+                                                    <th width="4%"><p>Total</p></th>
+                                                    <th ng-repeat="Dates in Datecontainer | limitTo : 14"><p>{{Dates | date:'MM/dd '}}</p></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="item in DataStoringArray">
+                                                <tr>
+                                                    <td class="bg-Csuccess">
+                                                        <div class="p-8 text-left">
+                                                            <span class="text-s14w500c000 text-left">{{item.DoctorName}} :</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Csuccess">
+                                                        <div class="p-8 text-left">
+                                                            <span class="text-s14w500c000 text-left">{{item.OrganizationName}}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="bg-Cinfo"><span class="text-s14w500C068cb0">{{item.TotalAppointments}}</span></td>
+                                                    <td class="bg-Csuccess valign-bottom" ng-repeat="tobj in item.AppointmentDatesList track by $index">
+                                                        <div class="p-4">
+                                                            <span class="text-s14w600C15898f">{{tobj.AppointmentCount}}</span>
+                                                        </div>
+                                                        <!--<button class="filter-btn btn-print-color p-1 w-40" type="button">
+                                    <img src="img/new-icons/print-icon.png" width="22">
+                                </button>-->
+                                                    </td>
+                                                </tr>
+                                                <tr class="hide">
+                                                    <td colspan="{{Datecontainer.length + 3}}" class="bg-acute">
+                                                        <div class="p-4">
+                                                            <table class="table-eh tableno-padding">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>User Name</th>
+                                                                        <th width="12%">DOB</th>
+                                                                        <th width="8%">Gender</th>
+                                                                        <th width="12%">MR. No.</th>
+                                                                        <!--<th width="12%">Old MR. No.</th>-->
+                                                                        <th width="16%">Mobile</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="i in [1,2,3,4,5]">
+                                                                        <td>
+                                                                            <p class="ppt-textname no-wrapappt cur-poiter m-b-0 App-color" >
+                                                                                <b>Chloe Gilmore Gilmore J</b>
+                                                                            </p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="text-s12w500c313131">12-03-1993</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="text-s12w500c3f5fb0">Male</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="text-s12w500c1caf71">RJT0000204</span>
+                                                                        </td>
+                                                                        <!--<td>
+                                                    <span class="text-s12w500c1caf71">RJT0000204</span>
+                                                </td>-->
+                                                                        <td>
+                                                                            <a href="javascript:;">+91 9393333577</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%" colspan="2"><p>Total Appointment</p></th>
+                                                    <th width="4%"><p>{{AllDoctorsTotalAppointments}}</p></th>
+                                                    <th ng-repeat="Appt in ShowTotalAppt | limitTo : 14">
+                                                        <p>
+                                                            <span ng-if="Appt.TotalCount != ''">{{Appt.TotalCount}}</span>
+                                                            <span ng-if="Appt.AppointmentCount == ''">-</span>
+                                                        </p>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="Datecontainer.length === 0">
+                                <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a date range and the doctor to view appointments.</label>
+                            </div>
+                        </div>
+                    </section>
+
+
+
+                </div>
+            </div>
+            <!-- / -->
+        </div>
+    </div>
+</div>
+
+ 

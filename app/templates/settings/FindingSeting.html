@@ -1,0 +1,896 @@
+<div class="setting-content h-100">
+    <div class="row h-100">
+        <div class="col-lg-12 h-100 bg-white">
+            <div class="dis-flex flex-direction-column grid-gap-5 h-100">
+                <div class="tab-pane active">
+                    <ul class="tab__style--2">
+                        <li class="active" ng-class="PopupInvActiveMenu(1)" id="tab_fac" ng-if="UserAccessRights.AllAccessRights.SettingsFindingsList">
+                            <a href="javascript:;" data-ng-click="switchtonexttab(1)">
+                                {{ 'FINDINGSANDCATEGORIES' | translate}}
+                            </a>
+                        </li>
+                        <li data-ng-class="PopupInvActiveMenu(3)" id="tab_ed" ng-if="UserAccessRights.AllAccessRights.SettingsAddUpdateFindingsTemplate">
+                            <a href="javascript:;" data-ng-click="switchtonexttab(3)">
+                                {{ 'EXAMINAIONDATA' | translate}}
+                            </a>
+                        </li>
+                        <li data-ng-class="PopupInvActiveMenu(4)" id="tab_lopc" ng-if="UserAccessRights.AllAccessRights.SettingsFindingsTemplateList">
+                            <a href="javascript:;" data-ng-click="switchtonexttab(4)">
+                                {{ 'LISTOFPROMOCODES' | translate}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dis-flex flex-direction-column grid-gap-5 h-100" ng-show="popup_value==1">
+                    <div class="subtab__style--1">
+                        <ul>
+                            <li class="active" data-ng-class="PopupInvSubTabActiveMenu(1)" ng-click="CancelAddInvClick()">
+                                <a href="javascript:;" id="tab_categorieslist" data-ng-click="switchInvSubTab(1)">
+                                    {{ 'CATEGORIESLIST' | translate}}
+                                </a>
+                            </li>
+                            <li data-ng-class="PopupInvSubTabActiveMenu(2)">
+                                <a href="javascript:;" id="tab_findinglist" data-ng-click="switchInvSubTab(2)">
+                                    {{ 'FINDINGLIST' | translate}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="dis-flex flex-direction-column grid-gap-10 height__100--">
+                                <div class="section__style--2" ng-show="showModifyMasterTreatDiv">
+                                    <div class="section__header--">
+                                        <h1>{{ 'ADDNEWFINDINGS' | translate}}</h1>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row nocolpad">
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form__group" typehead-dropdown-direction>
+                                                    <label>{{ 'SELECTCATEGORYORADDCATEGORY' | translate}}</label>
+                                                    <input type="text" name="InvCategorySearchBox"
+                                                           id="input_scategory"
+                                                           autocomplete="off"
+                                                           maxlength="100"
+                                                           placeholder="Enter Catergory" ng-model="InvestigationObject.SelectedCategoryObj"
+                                                           typeahead-min-length="3"
+                                                           ng-disabled="addInvestigationButton=='Update'"
+                                                           uib-typeahead="catItem  as catItem.CategoryName for catItem in getMasterCategories($viewValue)"
+                                                           typeahead-on-select="SelectCatFromAutoComplete(InvestigationObject.SelectedCategoryObj)">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5 col-sm-4">
+                                                <div class="form__group" typehead-dropdown-direction>
+                                                    <label for="usr"> {{ 'ENTERFINDINGNAME' | translate}}</label>
+                                                    <input type="text" name="InvCategorySearchBox" maxlength="100"
+                                                           id="input_findingname"
+                                                           placeholder="Enter Finding"
+                                                           ng-model="InvestigationObject.SelectedInvestigationObj"
+                                                           typeahead-min-length="3"
+                                                           ng-disabled="addInvestigationButton=='Update'"
+                                                           uib-typeahead="InvItem as InvItem.InvestigationName for InvItem in getMasterInvestigations($viewValue)"
+                                                           typeahead-on-select="SelectInvFromAutoComplete(InvestigationObject.SelectedInvestigationObj)">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-4" ng-show="SpecializationId != 2">
+                                                <div class="form__group">
+                                                    <label> {{ 'CODE' | translate}}</label>
+                                                    <!--ng-change="CategoryChange(InvestigationObject.SelectedCategoryObj)"-->
+                                                    <input type="text" name="InvCategorySearchBox" maxlength="10" id="input_code"
+                                                           placeholder="Enter Code" ng-model="InvestigationObject.BillingCode" ng-focus="InvestigationFocus" ng-focus-lost="LostSettingsFocus()" quotes-restrict enter-directive>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-10" ng-hide="InvestigationObject.SelectedCategoryObj.CategoryId==1||InvestigationObject.SelectedCategoryObj.CategoryId==2||InvestigationObject.SelectedCategoryObj.CategoryId==3||InvestigationObject.SelectedCategoryObj.CategoryId==4 ||InvestigationObject.SelectedCategoryObj.CategoryId==7">
+                                            <div class="col-lg-12">
+                                                <ul class="AddInvestigations mb-0 text-right">
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span> {{ 'IMAGEUPLOAD' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_imageupload" name="ImageUploadInd" ng-model="InvestigationObject.ImageUploadInd" />
+                                                            <div class="control__indicator"></div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span> {{ 'REMARKS' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_remarks" name="RemarksInd" ng-model="InvestigationObject.RemarksInd" />
+                                                            <div class="control__indicator"></div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span> {{ 'SYNC' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_sync" name="SyncImageInd" ng-model="InvestigationObject.SyncImageInd" />
+                                                            <div class="control__indicator"></div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span>Get Template {{ 'ADDNEWFINDINGS' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_gettemplateind" name="GetTemplateInd" ng-model="InvestigationObject.GetTemplateInd" />
+                                                            <div class="control__indicator"></div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span> {{ 'FREQUENCIES' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_frequencyvi" name="FrequencyValuesInd" ng-model="InvestigationObject.FrequencyValuesInd" ng-click="valuecdandFreChange(InvestigationObject.FrequencyValuesInd,1)" />
+                                                            <div class="control__indicator control_radio"></div>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="control control--checkbox fs-10">
+                                                            <span> {{ 'CDRATIOS' | translate}}</span>
+                                                            <input type="checkbox" id="checkbox_cdratiovi" name="CdRatioValuesInd" ng-model="InvestigationObject.CdRatioValuesInd" ng-click="valuecdandFreChange(InvestigationObject.CdRatioValuesInd,2)" />
+                                                            <div class="control__indicator control_radio"></div>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="section__style--2" ng-show="showModifyMasterTreatDiv">
+                                    <div class="section__header--">
+                                        <h1>{{ 'ADDPRICINGFORINVESTIGATION' | translate}}</h1>
+                                    </div>
+                                    <div class="section__body--">
+                                        <div class="row bg-success">
+                                            <div class="col-lg-12">
+                                                <table class="table tableno-bordered m-b-0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label> {{ 'HOSPITALANDCLINIC' | translate}}</label>
+                                                                    <div>
+                                                                        <button class="form__control" type="button" id="dropdownMenu2" data-toggle="dropdown" ng-disabled="addInvestigationButton=='Update'">
+                                                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-32"></i>
+                                                                            {{InvestigationObject.HospitalObj.ClinicName}}
+                                                                        </button>
+                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                <span class="input-group-addon">
+                                                                                    <span class="mainsearch-App">
+                                                                                        <i class="fas fa-search"></i>
+                                                                                    </span>
+                                                                                </span>
+                                                                                <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospitalTxt" />
+                                                                            </div>
+                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                <ul>
+                                                                                    <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospitalTxt}" ng-click="ChangeHospital(item)">
+                                                                                        <a href="javascript:;">{{item.ClinicName}}</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label for="inputEmail3"> {{ 'GENERALCOST' | translate}}<em>*</em></label>
+                                                                    <div>
+                                                                        <span class="width-20">Rs.</span>
+                                                                        <input type="text" name="minamount" placeholder="Amount" id="input_pgeneralcost" ng-model="InvestigationObject.ProcedureGeneralCost" maxlength="8" numbers-only="numbers-only" required ng-change="ChangeGeneralCost(InvestigationObject)" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label for="inputEmail3"> {{ 'SGSDISCOUNT' | translate}}<em></em></label>
+                                                                    <i class="fas fa-info-circle ab-t-r fa-lg cur-poiter top-5" data-toggle="tooltip" tooltip data-placement="top" title="State Government Scheme"></i>
+                                                                    <div>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='sgsInv1' name='sgsInvType' type='radio' value="true" ng-model="InvestigationObject.SgsType">
+                                                                            <label for='sgsInv1' class="p-t-4 height-33">Rs</label>
+                                                                        </span>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='sgsInv2' name='sgsInvType' type='radio' value="false" ng-model="InvestigationObject.SgsType">
+                                                                            <label for='sgsInv2' class="p-t-4 height-33">%</label>
+                                                                        </span>
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedureSgsValue" maxlength="8" numbers-only="numbers-only" ng-if="InvestigationObject.SgsType=='true'" ng-change="changeSgsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''||InvestigationObject.ProcedureGeneralCost==0" />
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedureSgsValue" maxlength="2" numbers-only="numbers-only" ng-if="InvestigationObject.SgsType=='false'" ng-change="changeSgsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''||InvestigationObject.ProcedureGeneralCost==0" />
+                                                                    </div>
+                                                                    <div ng-show="InvestigationObject.ProcedureSgsCost > 0"><span>Cost will be : {{InvestigationObject.ProcedureSgsCost}}</span></div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label for="inputEmail3"> {{ 'CGSDISCOUNT' | translate}}<em></em></label>
+                                                                    <i class="fas fa-info-circle ab-t-r fa-lg cur-poiter top-5" data-toggle="tooltip" tooltip data-placement="top" title="Central Government Scheme"></i>
+                                                                    <div>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='cgsInv1' name='cgsInvType' type='radio' value="true" ng-model="InvestigationObject.CgsType">
+                                                                            <label for='cgsInv1' class="p-t-4 height-33">Rs</label>
+                                                                        </span>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='cgsInv2' name='cgsInvType' type='radio' value="false" ng-model="InvestigationObject.CgsType">
+                                                                            <label for='cgsInv2' class="p-t-4 height-33">%</label>
+                                                                        </span>
+                                                                        <input type="text" name="maxamount" placeholder="Amount" maxlength="8" numbers-only="numbers-only" ng-model="InvestigationObject.ProcedureCgsValue" ng-if="InvestigationObject.CgsType=='true'" ng-change="changeCgsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''" />
+                                                                        <!--||InvestigationObject.ProcedureGeneralCost==0"-->
+                                                                        <input type="text" name="maxamount" placeholder="Amount" maxlength="2" numbers-only="numbers-only" ng-model="InvestigationObject.ProcedureCgsValue" ng-if="InvestigationObject.CgsType=='false'" ng-change="changeCgsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''" />
+                                                                    </div>
+                                                                    <div ng-show="InvestigationObject.ProcedureCgsCost > 0">
+                                                                        <span>Cost will be : {{InvestigationObject.ProcedureCgsCost}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label for="inputEmail3"> {{ 'PVTINSDISCOUNT' | translate}}<em></em></label>
+                                                                    <i class="fas fa-info-circle ab-t-r fa-lg cur-poiter top-5" data-toggle="tooltip" tooltip data-placement="top" title="Private Insurance"></i>
+                                                                    <div>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='piInv1' name='piInvType' type='radio' value="true" ng-model="InvestigationObject.PvtInsType">
+                                                                            <label for='piInv1' class="p-t-4 height-33">Rs</label>
+                                                                        </span>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='piInv2' name='piInvType' type='radio' value="false" ng-model="InvestigationObject.PvtInsType">
+                                                                            <label for='piInv2' class="p-t-4 height-33">%</label>
+                                                                        </span>
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedurePvtInsuranceValue" maxlength="8" numbers-only="numbers-only" ng-if="InvestigationObject.PvtInsType=='true'" ng-change="changePvtInsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''" />
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedurePvtInsuranceValue" maxlength="2" numbers-only="numbers-only" ng-if="InvestigationObject.PvtInsType=='false'" ng-change="changePvtInsValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''" />
+                                                                    </div>
+                                                                    <div ng-show="InvestigationObject.ProcedurePvtInsuranceCost > 0"><span>Cost will be : {{InvestigationObject.ProcedurePvtInsuranceCost}}</span></div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input__group">
+                                                                    <label for="inputEmail3"> {{ 'MAXDISCOUNT' | translate}}<em></em></label>
+                                                                    <div>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='din1' name='minType' type='radio' value="A" ng-model="InvestigationObject.ProcedureMaxDiscountType" ng-change="ChangeMaxDiscount(InvestigationObject)">
+                                                                            <label for='din1' class="p-t-4 height-33">Rs</label>
+                                                                        </span>
+                                                                        <span class="cgs-quality width-20 height-33">
+                                                                            <input id='din2' name='minType' type='radio' value="P" ng-model="InvestigationObject.ProcedureMaxDiscountType" ng-change="ChangeMaxDiscount(InvestigationObject)">
+                                                                            <label for='din2' class="p-t-4 height-33">%</label>
+                                                                        </span>
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedureMaxDiscountValue" maxlength="8" numbers-only="numbers-only" ng-if="InvestigationObject.ProcedureMaxDiscountType=='A'" ng-change="changeMaxDiscountValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''||InvestigationObject.ProcedureGeneralCost==0" />
+                                                                        <input type="text" name="maxamount" placeholder="Amount" ng-model="InvestigationObject.ProcedureMaxDiscountValue" maxlength="2" numbers-only="numbers-only" ng-if="InvestigationObject.ProcedureMaxDiscountType=='P'" ng-change="changeMaxDiscountValue(InvestigationObject)" ng-disabled="InvestigationObject.ProcedureGeneralCost==''||InvestigationObject.ProcedureGeneralCost==0" />
+                                                                    </div>
+                                                                    <div ng-show="InvestigationObject.ProcedureMaxDiscountCost > 0"><span>Cost will be : {{InvestigationObject.ProcedureMaxDiscountCost}}</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12" ng-hide="InvestigationObject.SelectedCategoryObj.CategoryId==1||InvestigationObject.SelectedCategoryObj.CategoryId==2||InvestigationObject.SelectedCategoryObj.CategoryId==3||InvestigationObject.SelectedCategoryObj.CategoryId==4 ||InvestigationObject.SelectedCategoryObj.CategoryId==7">
+                                                <div class="col-lg-3 form__group" ng-show="InvestigationObject.GetTemplateInd">
+                                                    <label>OD</label>
+                                                    <input id="rightTemplateImgId" type="file" ngf-select
+                                                           ng-model="rightTemplateFile"
+                                                           name="file"
+                                                           ngf-pattern="'image/*,application/pdf'"
+                                                           ngf-accept="'image/*,application/pdf'"
+                                                           ngf-max-size="5MB" />
+                                                    <div class="row mt-10">
+                                                        <div class="col-lg-12 invsgtthumb" ng-hide="rightTemplateFile===null||rightTemplateFile===''||rightTemplateFile===undefined">
+                                                            <img ngf-src="rightTemplateFile" id="imgtag1" class="width-100 height-100" />
+                                                            <i class="fa fa-trash" aria-hidden="true" id="btnRightId" ng-click="rightTemplateFile = null" ng-show="rightTemplateFile">
+                                                            </i>
+                                                        </div>
+                                                        <div class="col-lg-12 invsgtthumb" ng-show="rightTemplateFile===null||rightTemplateFile===''||rightTemplateFile===undefined">
+                                                            <img src="img/setting-noresulticon.png" />
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 form__group" ng-show="InvestigationObject.GetTemplateInd">
+                                                    <label>OS</label>
+                                                    <input id="leftTemplateImgId" type="file" ngf-select
+                                                           ng-model="leftTemplateFile"
+                                                           name="file"
+                                                           ngf-pattern="'image/*,application/pdf'"
+                                                           ngf-accept="'image/*,application/pdf'"
+                                                           ngf-max-size="5MB" />
+                                                    <div class="row mt-10">
+                                                        <div class="col-lg-12 invsgtthumb" ng-hide="leftTemplateFile===null||leftTemplateFile===''||leftTemplateFile===undefined">
+                                                            <img ngf-src="leftTemplateFile" class="width-100 height-100" id="imgtag2" />
+                                                            <i class="fa fa-trash" aria-hidden="true" id="btnLeftId" ng-click="leftTemplateFile = null" ng-show="leftTemplateFile"></i>
+                                                        </div>
+                                                        <div class="col-lg-12 invsgtthumb" ng-show="leftTemplateFile===null||leftTemplateFile===''||leftTemplateFile===undefined">
+                                                            <img src="img/setting-noresulticon.png" />
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="dis-flex align-items-center justify-content-end grid-gap-10">
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="addCategoryInvestigations(rightTemplateFile,leftTemplateFile);leftTemplateFile = null;rightTemplateFile = null" ng-show="addInvestigationButton=='Add'"><i class="action__icons--1 action__add--"></i>{{addInvestigationButton}}</button>
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="updateCategoryInvestigations(rightTemplateFile,leftTemplateFile)" ng-show="addInvestigationButton=='Update'"><i class="action__icons--1 action__update--"></i>{{addInvestigationButton}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--f" ng-click="CancelAddInvClick();"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="section__style--2 d__f-- fd__c-- height__100-- mb__5--">
+                                    <div class="section__header--">
+                                        <h1 ng-bind="InvSubTab == 1 ?'Categories list':'Findings list'"></h1>
+                                        <div class="form__group dis-flex align-items-center grid-gap-10" ng-if="InvSubTab != 1">
+                                            <button ng-hide="showModifyMasterTreatDiv" id="btn_addnew_fl" ng-click="ShowInvestigation()" class="btn__xl-- btn__1d5558--f white-nowrap">
+                                                <i class="action__icons--1 action__add--"></i> {{ 'ADDNEW' | translate}}
+                                            </button>
+                                            <input type="text" id="iDinvsearchText" ng-model="invsearchText" ng-change="invsearchValue(invsearchText)" placeholder="Search Investigations" />
+                                        </div>
+                                    </div>
+                                    <div class="section__body-- height__100--">
+                                        <div class="row" ng-show="InvSubTab==1">
+                                            <div class="col-lg-12">
+                                                <div class="overflow__auto--y">
+                                                    <table class="table__style--7" id="table_invsubtab">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> {{ 'CATEGORY' | translate}}</th>
+                                                                <!--<th width="100">Edit</th>
+                                <th width="100">Delete</th>-->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="cat in MainInvCategoriesArray">
+                                                                <td>{{cat.Name}}</td>
+                                                                <!--<td>
+                                    <a ng-click="editInvCategoryItem(cat)" ng-hide="cat.HospitalId==1">
+                                        <img width="17" src="img/ehnote-edit.svg" />
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="pl-10" ng-click="deleteInvCategoryItem(cat)" ng-hide="cat.HospitalId==1">
+                                        <img width="17" src="img/ico-delete-red.svg" />
+                                    </a>
+                                </td>-->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row height__100--" ng-show="InvSubTab==2">
+                                            <div class="col-lg-12" ng-show="MainInvestigationsArray.length > 0">
+                                                <div class="appintment_view_pane">
+                                                    <div class="overflow__auto-- slim-scroll">
+                                                        <table class="table__style--7 w__mc-- min__width100-- max__wnone--" id="table_minvestigations">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> {{ 'CATEGORY' | translate}}</th>
+                                                                    <th> {{ 'FINDING' | translate}}</th>
+                                                                    <th ng-show="SpecializationId != 2">{{ 'CODE' | translate}}</th>
+                                                                    <th>
+                                                                        <div class="dropdown dropdown-scroll width-100" button-dropdown-direction>
+                                                                            <button class="form-control select-dropdown boxshadowbill text-left" type="button" id="dropdownMenu2" data-toggle="dropdown">
+                                                                                {{BranchListObj.ClinicName}}
+                                                                            </button>
+                                                                            <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu2">
+                                                                                <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                    <span class="input-group-addon">
+                                                                                        <span class="mainsearch-App">
+                                                                                            <i class="fas fa-search"></i>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                    <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospitalTxt" />
+                                                                                </div>
+                                                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                    <ul>
+                                                                                        <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospitalTxt}" ng-click="changeFilterBranch(item)">
+                                                                                            <a href="javascript:;">{{item.ClinicName}}</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--<select class="b-0 width-100" ng-model="BranchListObj" ng-change="changeFilterBranch(BranchListObj)" ng-options="item as item.ClinicName for item in AllUserBranchesList">
+
+                                </select>-->
+                                                                    </th>
+                                                                    <th>{{ 'HEAD' | translate}}</th>
+                                                                    <th>{{ 'PRICE' | translate}}</th>
+                                                                    <th>{{ 'MAXDISCOUNT' | translate}}</th>
+                                                                    <th>{{ 'IMAGE' | translate}}</th>
+                                                                    <th class="text-center table-sticky-column-right">{{ 'ACTION' | translate}}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="item in MainInvestigationsArray">
+                                                                    <td>{{item.CategoryName}}</td>
+                                                                    <td>{{item.InvestigationName}}</td>
+                                                                    <td ng-show="SpecializationId != 2">{{item.BillingCode}}</td>
+                                                                    <td>{{item.BranchName}}</td>
+                                                                    <td>
+                                                                        <div class="row mb-0 mt-0">
+                                                                            <div class="col-lg-7 col-sm-7 pr-0">
+                                                                                <span class="width-50">
+                                                                                    <b>{{ 'IMAGEUPLOAD' | translate}}</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-5 col-sm-5 pl-0">
+                                                                                <b>:</b>
+                                                                                <span ng-if="item.ImageUploadInd=='Y'">
+                                                                                    {{ 'YES' | translate}} <i class="far fa-check-circle text-success"></i>
+                                                                                </span>
+                                                                                <span ng-if="item.ImageUploadInd=='N'">
+                                                                                    {{ 'NO' | translate}} <i class="far fa-times-circle text-danger"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>Image Upload:</b>
+                                    </span>
+                                    <span ng-if="item.ImageUploadInd=='Y'">
+                                        Yes <i class="far fa-check-circle text-success"></i>
+                                    </span>
+                                    <span ng-if="item.ImageUploadInd=='N'">
+                                        No <i class="far fa-times-circle text-danger"></i>
+                                    </span>
+                                </p>-->
+                                                                        <div class="row mb-0 mt-0">
+                                                                            <div class="col-lg-7 col-sm-7 pr-0">
+                                                                                <span class="width-50">
+                                                                                    <b> {{ 'FREQUENCY' | translate}}</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-5 col-sm-5 pl-0">
+                                                                                <b>:</b>
+                                                                                <span ng-if="item.GetTemplateInd=='Y'">
+                                                                                    {{ 'YES' | translate}} <i class="far fa-check-circle text-success"></i>
+                                                                                </span>
+                                                                                <span ng-if="item.GetTemplateInd=='N'">
+                                                                                    {{ 'NO' | translate}} <i class="far fa-times-circle text-danger"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row mb-0 mt-0">
+                                                                            <div class="col-lg-7 col-sm-7 pr-0">
+                                                                                <span class="width-50">
+                                                                                    <b>Cd Ratio</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-5 col-sm-5 pl-0">
+                                                                                <b>:</b>
+                                                                                <span ng-if="item.CdRatioValuesInd=='Y'">
+                                                                                    Yes <i class="far fa-check-circle text-success"></i>
+                                                                                </span><span ng-if="item.CdRatioValuesInd=='N'">
+                                                                                    No <i class="far fa-times-circle text-danger"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row mb-0 mt-0">
+                                                                            <div class="col-lg-7 col-sm-7 pr-0">
+                                                                                <span class="width-50">
+                                                                                    <b>Remarks</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-5v col-sm-5 pl-0">
+                                                                                <b>:</b>
+                                                                                <span ng-if="item.RemarksInd=='Y'">
+                                                                                    Yes <i class="far fa-check-circle text-success"></i>
+                                                                                </span><span ng-if="item.RemarksInd=='N'">
+                                                                                    No <i class="far fa-times-circle text-danger"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row mb-0 mt-0">
+                                                                            <div class="col-lg-7 col-sm-7 pr-0">
+                                                                                <span class="width-50">
+                                                                                    <b>Sync</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-5 col-sm-5 pl-0">
+                                                                                <b>:</b>
+                                                                                <span ng-if="item.SyncImageInd=='Y'">
+                                                                                    Yes <i class="far fa-check-circle text-success"></i>
+                                                                                </span><span ng-if="item.SyncImageInd=='N'">
+                                                                                    No <i class="far fa-times-circle text-danger"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--<p class="mb-0 mt-0">
+                                <span class="width-50">
+                                <b>Get Template :</b>
+                                </span>
+                                <span ng-if="item.GetTemplateInd=='Y'">
+                                Yes <i class="far fa-check-circle text-success"></i>
+                                </span>
+                                <span ng-if="item.GetTemplateInd=='N'">
+                                No <i class="far fa-times-circle text-danger"></i>
+                                </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                <span class="width-50">
+                                <b>Frequency:</b>
+                                </span>
+                                <span ng-if="item.FrequencyValuesInd=='Y'">
+                                Yes <i class="far fa-check-circle text-success"></i>
+                                </span><span ng-if="item.FrequencyValuesInd=='N'">
+                                No <i class="far fa-times-circle text-danger"></i>
+                                </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                <span class="width-50">
+                                <b>Cd Ratio:</b>
+                                </span>
+                                <span ng-if="item.CdRatioValuesInd=='Y'">
+                                Yes <i class="far fa-check-circle text-success"></i>
+                                </span><span ng-if="item.CdRatioValuesInd=='N'">
+                                No <i class="far fa-times-circle text-danger"></i>
+                                </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>Remarks:</b>
+                                    </span>
+                                    <span ng-if="item.RemarksInd=='Y'">
+                                        Yes <i class="far fa-check-circle text-success"></i>
+                                    </span><span ng-if="item.RemarksInd=='N'">
+                                        No <i class="far fa-times-circle text-danger"></i>
+                                    </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>Sync:</b>
+                                    </span>
+                                    <span ng-if="item.SyncImageInd=='Y'">
+                                        Yes <i class="far fa-check-circle text-success"></i>
+                                    </span><span ng-if="item.SyncImageInd=='N'">
+                                        No <i class="far fa-times-circle text-danger"></i>
+                                    </span>
+                                </p>-->
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 col-sm-5 p-r-2">
+                                                                                <span class="width-50">
+                                                                                    <b>Price</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-7 col-sm-7 p-l-2">
+                                                                                <b>:</b>
+                                                                                <span>
+                                                                                    {{item.GeneralCost}}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 col-sm-5 p-r-2">
+                                                                                <span class="width-50">
+                                                                                    <b>CGST</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-7 col-sm-7 p-l-2">
+                                                                                <b>:</b>
+                                                                                <span>
+                                                                                    {{item.CgsCost}}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 col-sm-5 p-r-2">
+                                                                                <span class="width-50">
+                                                                                    <b>SGST</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-7 col-sm-7 p-l-2">
+                                                                                <b>:</b>
+                                                                                <span>
+                                                                                    {{item.SgsCost}}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 col-sm-5 p-r-2">
+                                                                                <span class="width-50">
+                                                                                    <b>PI</b>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="col-lg-7 col-sm-7 p-l-2">
+                                                                                <b>:</b>
+                                                                                <span>
+                                                                                    {{item.InsuranceCost}}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>CGS :</b>
+                                    </span>
+                                    <span>
+                                        {{item.CgsCost}}
+                                    </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>SGS:</b>
+                                    </span>
+                                    <span>
+                                        {{item.SgsCost}}
+                                    </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>Price:</b>
+                                    </span>
+                                    <span>
+                                        {{item.GeneralCost}}
+                                    </span>
+                                </p>-->
+                                                                        <!--<p class="mb-0 mt-0">
+                                    <span class="width-50">
+                                        <b>PI:</b>
+                                    </span>
+                                    <span>
+                                        {{item.InsuranceCost}}
+                                    </span>
+                                </p>-->
+                                                                    </td>
+                                                                    <td class="column__sm">
+                                                                        <span ng-if="item.ProcedureMaxDiscountType == 'A'">{{item.ProcedureMaxDiscountValue}}</span>
+                                                                        <span ng-if="item.ProcedureMaxDiscountType == 'P'">{{item.GeneralCost*item.ProcedureMaxDiscountValue/100}}</span>
+                                                                    </td>
+                                                                    <td width="150">
+                                                                        <a class="text-left width-100 text-underline" href="" ng-show="item.RightTemplateUrl != ''" ng-click="showImage(item.RightTemplateUrl)">
+                                                                            <i class="far fa-eye"></i> View OD
+                                                                        </a>
+                                                                        <a class="text-left width-100 text-underline" href="" ng-show="item.LeftTemplateUrl != ''" ng-click="showImage(item.LeftTemplateUrl)">
+                                                                            <i class="far fa-eye"></i> View OS
+                                                                        </a>
+                                                                    </td>
+                                                                    <td class="column__sm table-sticky-column-right">
+                                                                        <div class="dis-flex align-items-center justify-content-center grid-gap-5">
+                                                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true" ng-click="editInvestigation(item)" ng-hide="item.HospitalId==1"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit"></i></a>
+                                                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true" ng-click="deleteInvestigation(item)" ng-hide="item.CategoryId==1||item.CategoryId==2||item.CategoryId==3||item.CategoryId==4||item.CategoryId==5 || item.CategoryId==6||item.CategoryId==7"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete"></i></a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="EH-pagination text-center">
+                                                    <uib-pagination total-items="invtotalItems"
+                                                                    ng-model="newinvestigationPageNumber"
+                                                                    ng-change="invpageChanged(newinvestigationPageNumber)"
+                                                                    ng-show="MainInvestigationsArray.length > 0"
+                                                                    max-size="investigationPageSize"
+                                                                    class=""
+                                                                    boundary-link-numbers="true"
+                                                                    rotate="false"></uib-pagination>
+                                                </div>
+                                            </div>
+
+                                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--"  ng-hide="MainInvestigationsArray.length > 0">
+                                                <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Results Found</h1>
+                                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please use left panel to start examining.. !!</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="dis-flex flex-direction-column grid-gap-5 h-100" ng-show="popup_value==2">
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="section__style--2 mt-10">
+                                <div class="section__body--">
+                                    <div class="row">
+                                        <div class="form__group col-md-4 p-0">
+                                            <label for="usr">{{ 'ADDCATEGORY' | translate}}</label>
+                                            <input ng-model="invCatergoryText" type="text" id="invcatText" />
+                                        </div>
+                                        <div class="col-md-3 mt-20">
+                                            <button class="btn__lg-- btn__1d5558--f" ng-click="addInvCategory(invCatergoryText)"><i class="action__icons--1 action__add"></i>{{AddCategory}}</button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="table__style--7">
+                                                <table id="table_referrallist">
+                                                    <thead ng-hide="ReferralList.length==0" aria-hidden="false" class="">
+                                                        <tr>
+                                                            <th class="mis-brd-right">{{ 'CATEGORY' | translate}}</th>
+                                                            <!--<th class="mis-brd-right" width="100">Edit</th>
+                                    <th class="mis-brd-right" width="100">Delete</th>-->
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="cat in MainInvCategoriesArray">
+                                                            <td>{{cat.CategoryName}}</td>
+                                                            <!--<td>
+                                        <a ng-click="editInvCategoryItem(cat)" ng-hide="cat.HospitalId==1">
+                                            <img width="17" src="img/ehnote-edit.svg" />
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a class="pl-10" ng-click="deleteInvCategoryItem(cat)" ng-hide="cat.HospitalId==1">
+                                            <img width="17" src="img/ico-delete-red.svg" />
+                                        </a>
+                                    </td>-->
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <uib-pagination total-items="MainInvCategoriesArrayCount"
+                                                            ng-model="investigationCatPageNumber"
+                                                            ng-change="changeInvCat(investigationCatPageNumber)"
+                                                            ng-show="MainInvCategoriesArray.length > 0"
+                                                            max-size="investigationPageSize"
+                                                            class="pull-right pagination-sm"
+                                                            boundary-link-numbers="true"
+                                                            rotate="false"></uib-pagination>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="dis-flex flex-direction-column grid-gap-5 h-100" ng-show="popup_value==3">
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="dis-flex flex-direction-column grid-gap-10">
+                                <div class="section__style--2 mt-10">
+                                    <div class="section__body--">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form__group">
+                                                    <label for="usr">{{ 'ENTERFINDINGTEMPLATENAME' | translate}}</label>
+                                                    <input ng-model="InvTempplateDetailsObj.TemplateName" type="text" id="docInvTemplateName" placeholder="Ex : Cataract Surgery Template" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="dis-flex align-items-center grid-gap-10 m-t-21">
+                                                    <button class="btn__xl-- btn__1d5558--f" ng-click="addUpdateUserInvestigationTemplate(docInvTemplateName)" ng-disabled="InvTempplateDetailsObj.TemplateName==''" id="btn_docinvname"><i ng-class="{'action__icons--1 action__save--': btnDocInvName === 'Save','action__icons--1 action__update--': btnDocInvName === 'Update'}"></i>{{btnDocInvName}}</button>
+                                                    <button class="btn__xl-- btn__C71D27--o" ng-click="clearAllAddUpdateInvTemplate()" ng-disabled="InvTempplateDetailsObj.TemplateName==''" id="btn_clearall"><i class="action__icons--1 action__clear--"></i>{{ 'CLEARALL' | translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /section -->
+                                <div class="section__style--2" ng-if="catItem.InvestigationDetails.length > 0 && catItem.ActiveInd=='Y' ">
+                                    <div class="section__body--">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul id="ulInvTemplateItems" class="liinvestigation" ng-repeat="catItem in SubAllCatInvList">
+                                                    <li class="tile-header Medical-allli">
+                                                        <h1>{{catItem.CategoryName}}</h1>
+                                                    </li>
+                                                    <li class="diagnosis-blockli diagnosis-blockli-li" ng-show="invitem.ActiveInd=='Y' " ng-repeat="invitem in catItem.InvestigationDetails">
+                                                        <span>{{invitem.Investigation}}</span>
+                                                        <i class="fa fa-times-circle Diagnosis--close text-danger cur-poiter" ng-click="invitem.ActiveInd ='N'"></i>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /section -->
+                                <div class="section__style--2">
+                                    <div class="section__body--">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="overflow__auto--y">
+                                                    <table class="table__style--7" id="btn_suballcatinv">
+                                                        <thead>
+                                                            <tr>
+                                                                <th width="25%">{{ 'CATEGORY' | translate}}</th>
+                                                                <th>{{ 'FINDINGS' | translate}}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="catItem in SubAllCatInvList" ng-if="catItem.InvestigationDetails.length > 0">
+                                                                <td width="25%">
+                                                                    {{catItem.CategoryName}}
+                                                                </td>
+                                                                <td>
+                                                                    <ul class="flex-flow-list">
+                                                                        <li class="width-30" ng-repeat="invitem in catItem.InvestigationDetails">
+                                                                            <div class="checkbox cn">
+                                                                                <label>
+                                                                                    <input name="checkbox-2" type="checkbox" ng-model="invitem.ActiveInd" ng-true-value="'Y'" ng-false-value="'N'" ng-change="checkTemplateInvItem(catItem,invitem)">
+                                                                                    <span class="checkbox-material">
+                                                                                        <span class="check"></span>
+                                                                                    </span>
+                                                                                    <small>{{invitem.Investigation}}</small>
+                                                                                </label>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /section -->
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+                <div class="dis-flex flex-direction-column grid-gap-5 h-100" ng-show="popup_value==4">
+                    <div class="pos-relative h-100">
+                        <div class="adjustable-position slim-scroll">
+                            <div class="section__style--2 mt-10">
+                                <div class="section__body--">
+                                    <div class="overflow__auto--y">
+                                        <table class="table__style--7" id="table_selectedorgta">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%">{{ 'TEMPLATENAME' | translate}}</th>
+                                                    <th width="60%">{{ 'FINDINGS' | translate}}</th>
+                                                    <th width="13%" class="text-center">{{ 'STATUS' | translate}}</th>
+                                                    <th width="7%" class="text-center">{{ 'ACTION' | translate}}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="tempItem in selectedOrgTemplatesArray">
+                                                    <td width="20%">
+                                                        {{tempItem.TemplateName}}
+                                                    </td>
+                                                    <td>
+                                                        <ul>
+                                                            <li ng-repeat="subitem in tempItem.TemplateDetails" class="dis-inline-block">
+                                                                <label>{{subitem.Name}} <span class="mr-10" ng-hide="$last">,</span></label>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="switch-toggle well b-r-100">
+                                                            <input id="doctempInv1{{$index}}" btn-radio="'N'" value="N" ng-change="modifyDocinvTemplate(tempItem,'status')" ng-model="tempItem.ActiveInd" ng-checked="tempItem.ActiveInd == 'N' " name="view_{{$index}}" type="radio" ng-true-value="'N'" class="ng-pristine ng-untouched ng-valid active" checked="checked">
+                                                            <label for="doctempInv1{{$index}}" onclick="" class="fs-11">{{ 'INACTIVE' | translate}}</label>
+                                                            <input id="doctempInv2{{$index}}" btn-radio="'Y'" value="Y" ng-change="modifyDocinvTemplate(tempItem,'status')" ng-model="tempItem.ActiveInd" ng-checked="tempItem.ActiveInd == 'Y' " ng-true-value="'Y'" name="view_{{$index}}" type="radio" class="ng-pristine ng-untouched ng-valid">
+                                                            <label for="doctempInv2{{$index}}" onclick="" class="fs-11">{{ 'ACTIVE' | translate}}</label>
+                                                            <a class="btn btn-primary"></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="column__sm">
+                                                        <div class="dis-flex align-items-center justify-content-center grid-gap-5">
+                                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="modifyDocinvTemplate(tempItem,'edit')" ng-show="tempItem.ActiveInd == 'Y'"></i></a>
+                                                            <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="modifyDocinvTemplate(tempItem,'delete')"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="EH-pagination text-center">
+                                        <uib-pagination total-items="TemaptetotalItems"
+                                                        ng-model="newtemplatePageNumber"
+                                                        ng-change="templatepageChanged(newtemplatePageNumber)"
+                                                        ng-show="selectedOrgTemplatesArray.length > 0"
+                                                        max-size="investigationPageSize"
+                                                        class=""
+                                                        boundary-link-numbers="true"
+                                                        rotate="false"></uib-pagination>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>

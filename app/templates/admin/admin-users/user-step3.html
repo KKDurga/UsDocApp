@@ -1,0 +1,729 @@
+<div class="row m-t-10">
+    <div class="col-lg-3">
+        <section class="tile tile-shadow">
+            <div class="tile-header">
+                <h1>Assign Branch &amp; Timings</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="user-image">
+                            <img src="img/admin-img/avatar-icon.png">
+                        </div>
+                        <div class="user-heading text-center">
+                            <h4 class="dr-name" ng-if="hosUserCollection.doctorDetails.FirstName != undefined" ng-bind="'Dr. '+ hosUserCollection.doctorDetails.FirstName + ' ' + hosUserCollection.doctorDetails.LastName"></h4>
+                            <h4 class="dr-name" ng-if="hosUserCollection.doctorDetails.FirstName == undefined"
+                                ng-bind="'Dr. '+ hosUserCollection.doctorDetails.FullName"></h4>
+
+
+
+                            <!--<span ng-if="selectedDoctor.UserSpecilityDetails !== undefined && selectedDoctor.UserSpecilityDetails.length > 0"
+                            ng-repeat="speciality in selectedDoctor.UserSpecilityDetails" ng-bind="speciality.SpecialityDesc"></span>-->
+                            <!--hosUserCollection.SpecialityDetails-->
+                            <span ng-bind="hosUserCollection.doctorDetails.SpecializationName"></span>
+
+                            <!--<pre>{{hosUserCollection}}</pre>COMENTED BY BHARATH
+                            <span ng-bind="hosUserCollection.SpecialityDetails[0].SpecialityDesc"></span>-->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /Row -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mup-info clearfix">
+                            <ul>
+                                <li>
+                                    <span>Mobile:</span>
+                                    <h5 ng-repeat="phone in hosUserCollection.UserPhone">
+                                        <span ng-if="phone.PhType == 'M'" ng-bind="'+'+phone.PhCntryCD +'- '+ phone.PhNumber">
+                                        </span>
+                                        <span ng-if="phone.PhType == 'L'" ng-bind="'+'+phone.PhAreaCD +'- '+ phone.PhNumber">
+                                        </span>
+                                    </h5>
+                                </li>
+                                <li>
+                                    <span>Username / Email: </span>
+                                    <h5 ng-bind="hosUserCollection.doctorDetails.UserLoginID"></h5>
+                                </li>
+                                <!--<li>
+                                    <span>Role: </span>
+                                    <h5 ng-bind="role.RoleName"></h5>
+                                </li>
+                                <li>
+                                    <span>Group: </span>
+                                    <h5 ng-bind="group.GroupName"></h5>
+                                </li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- /col -->
+    <div class="col-lg-3">
+        <section class="tile tile-shadow">
+            <div class="tile-header">
+                <h1>Set Branch Timings</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!--<div class="form-group">
+                    <label>Branch</label>
+                    <select class="form-style select-dropdown" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.BranchName for hospitalData in allBranchesArray" ng-model="addHospital.clinic" ng-change="changeUserBranch()" ng-if="!addHospitalDoc" ng-disabled="edit_status">
+                        <option value="">Select Branch</option>
+                    </select>
+                    <select class="form-style select-dropdown" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.BranchName for hospitalData in newAddHospitalList" ng-model="addHospital.clinic" ng-change="changeUserBranch()" ng-if="addHospitalDoc" ng-disabled="edit_status"></select>
+                </div>-->
+                        <div class="form-group">
+                            <label>Branch</label>
+                            <select class="form-style select-dropdown" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.BranchName for hospitalData in allBranchesArray" ng-model="addHospital.clinic" ng-change="changeUserBranch()" ng-if="!addHospitalDoc" ng-disabled="isEditHospitaluser">
+                                <option value="">Select Branch</option>
+                            </select>
+                            <select class="form-style select-dropdown" ng-options="hospitalData as hospitalData.HospitalInfo.HospitalDetails.BranchName for hospitalData in newAddHospitalList" ng-model="addHospital.clinic" ng-change="changeUserBranch()" ng-if="addHospitalDoc" ng-disabled="isEditHospitaluser"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-repeat="item in hosUserCollection.UserBranchRoles">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Select Role <small>*</small></label>
+                            <div class="{{((AddUpdateDoctor.$submitted || AddUpdateDoctor.rolesName.$touched) && AddUpdateDoctor.rolesName.$invalid)?'fm-box fm-error':'fm-box'}}">
+                                <!--ng-model="role.RoleObj" ng-disabled="edit_status"-->
+                                <select class="form-style select-dropdown"
+                                        required name="rolesName"
+                                        ng-model="item.RoleObj"
+                                        ng-change="changeBranchRole(item,item.RoleObj)"
+                                        ng-options="role as role.RoleName for role in rolesList" ng-disabled="item.isEditHospitaluser">
+                                    <option value="">Select role</option>
+                                </select>
+                                <span ng-show="(AddUpdateDoctor.$submitted || AddUpdateDoctor.rolesName.$touched) && AddUpdateDoctor.rolesName.$error.required" class="fm-error-text">Select role</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Select Group <small>*</small></label>
+
+
+
+                            <!--<div class="{{((AddUpdateDoctor.$submitted || AddUpdateDoctor.groupName.$touched) && AddUpdateDoctor.groupName.$invalid)?'fm-box fm-error':'fm-box'}}">-->
+                            <!--ng-model="group.GroupObj"-->
+                            <select class="form-style select-dropdown"
+                                    ng-model="item.GroupObj"
+                                    name="groupName"
+                                    ng-change="changeUserGroup(item,item.GroupObj)"
+                                    ng-options="gitem as gitem.GroupName for gitem in item.GroupArray">
+                                <option value="">Select group</option>
+                            </select>
+                            <span ng-show="(AddUpdateDoctor.$submitted || AddUpdateDoctor.groupName.$touched) && AddUpdateDoctor.groupName.$error.required" class="fm-error-text">Select group</span>
+                            <!--</div>-->
+                        </div>
+                        <a href="javascript:;" class="i-delrow" ng-click="removeRole(item,$index)" ng-show="(hosUserCollection.UserBranchRoles).length>1 && item.isEditHospitaluser===false"></a>
+                        <a href="javascript:;" class="add-no" ng-click="addMoreRole()" ng-show="$last">Add More Role & Group</a>
+                    </div>
+
+                </div>
+                <!--<div class="row">
+            <div class="form-wrap">
+                <label>Select Group <small>*</small></label>
+
+                <div class="{{((AddUpdateDoctor.$submitted || AddUpdateDoctor.groupName.$touched) && AddUpdateDoctor.groupName.$invalid)?'fm-box fm-error':'fm-box'}}">
+
+                    <select class="form-style select-dropdown"
+                            ng-model="group.GroupObj"
+                            name="groupName"
+                            ng-change="changeUserGroup(group.GroupObj)"
+                            ng-options="gitem as gitem.GroupName for gitem in subOrganizationGroupsArray  | filter:roleFilter ">
+                        <option value="">Select group</option>
+
+                    </select>
+                    <span ng-show="(AddUpdateDoctor.$submitted || AddUpdateDoctor.groupName.$touched) && AddUpdateDoctor.groupName.$error.required" class="fm-error-text">Select group</span>
+                </div>
+            </div>
+        </div>-->
+                <!--<div class="row">
+
+        </div>-->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group" ng-if="rolesID.role != 'RECPTNIST'">
+                            <label>Speciality <small>*</small></label>
+                            <div ng-class="((AddUpdateDoctor.$submitted || AddUpdateDoctor.speciality_{{$index}}.$touched) && AddUpdateDoctor.speciality_{{$index}}.$invalid)?'fm-box fm-error':'fm-box'">
+                                <div class="double-form clearfix">
+
+                                    <select class="form-style select-dropdown" required name="speciality_{{$index}}" ng-model="hosUserCollection.SpecializationObj" ng-change="getSubSpecialitiesById(hosUserCollection.SpecializationObj)" ng-options="option as option.SpecializationName for option in BranchSpecialitiesArray">
+
+                                        <option value="">Select speciality</option>
+                                        <!--<option ng-repeat="data in BranchSpecialitiesArray" value="{{data.SpecializationId}}"
+                                        ng-selected="{{data.SpecializationId == hosUserCollection.SpecializationId}}">
+                                    {{data.SpecializationName}}
+                                </option>-->
+                                    </select>
+                                    <span ng-show="(AddUpdateDoctor.$submitted || AddUpdateDoctor.speciality_{{$index}}.$touched) && AddUpdateDoctor.speciality_{{$index}}.$error.required" class="fm-error-text">Select speciality</span>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label>Departments <b>*</b></label>
+                                <select class="form-control" ng-model="DepartmentObj.SelectedDepartment" ng-options="optitem as optitem.SubSpecializationName for optitem in SelectedSplDeptArray">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn btn-primary btn-sm m-t-25 btn-block" ng-click="AddDepartmenttoUser(DepartmentObj.SelectedDepartment)">Add</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="hosUserCollection.OpthalDepartments.length > 0">
+                <div class="col-lg-12">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center" ng-repeat="ditem in hosUserCollection.OpthalDepartments" style="width:100%;display: inline-block;">
+                            <div class="col-lg-1">
+                                <input name="checkbox-12" type="checkbox" ng-model="ditem.IsPrimarySubSpecialization" ng-change="changeIsPrimary(ditem.IsPrimarySubSpecialization,ditem)" title="Set as Primary">
+                            </div>
+                            <div class="col-lg-9">
+                                <span>{{ditem.SubSpecializationName}}</span>
+
+                            </div>
+                            <div class="col-lg-1" ng-show="ditem.UserSubSpecializationId===0">
+                                <span>
+                                    <i class="fas fa-times-circle cur-pointer" ng-click="removeDepartment(ditem,$index)"></i>
+                                </span>
+                            </div>
+
+
+                        </li>
+
+
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <!--ng-show="hosUserCollection.doctorDetails.RoleId ===1||hosUserCollection.doctorDetails.RoleId ===4||hosUserCollection.doctorDetails.RoleId ===3||hosUserCollection.doctorDetails.RoleId ===5||hosUserCollection.doctorDetails.RoleId ===43||hosUserCollection.doctorDetails.RoleId ===56||hosUserCollection.doctorDetails.RoleId ===57||rolesID.roleId ===1||rolesID.roleId ===4||rolesID.roleId ===3||rolesID.roleId ===5||rolesID.roleId ===43||rolesID.roleId ===56||rolesID.roleId ===57"-->
+        <section class="tile tile-shadow" ng-show="ShowDepartmentlist">
+            <div class="tile-header">
+                <h1>Add time slot</h1>
+                <ul class="controls">
+                    <li>
+                        <a href="javascript:;" class="ts-rbtn" ng-click="resetPreviousData(TimeSlotType)">Reset</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!--<pre>{{showNormalSlot}}</pre>-->
+                        
+
+                        <div class="form-group m-b-0 dis-flex flex-c-str">
+                            <div class="width-50" ng-show="showNormalSlot">
+                                <input type="button" class="register-control btr-radius bbr-radius" value="Normal Slot" ng-model="TimeSlotType" ng-click="ChangeSlotType('Normal Slot')" ng-class="{'active-gender' : TimeSlotType == 'Normal Slot'}">
+                            </div>
+                            <div class="width-50" ng-show="showTeleNormalSlot">
+                                <input type="button" class="register-control btl-radius bbl-radius" value="Tele Slot" ng-model="TimeSlotType" ng-click="ChangeSlotType('Tele Slot')" ng-class="{'active-gender' : TimeSlotType == 'Tele Slot'}">
+                            </div>
+                        </div>
+
+                        <div ng-show="showNormalSlot &&TimeSlotType == 'Normal Slot'">
+                            <div class="form-group">
+                                <label>Consultation Fee</label>
+                                <input type="number" ng-model="hosUserCollection.UserSlotInfo.NormalSlots.ConsultationFee" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>Free Folloup for No.Of Days</label>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.NormalSlots.FreeFollowUpNoOfDays" maxlength="2" class="form-control" />
+                            </div>
+                            <div class="form-group" ng-if="rolesID.role != 'RECPTNIST'">
+                                <label>Average Consultation Time</label>
+                                <select class="form-style select-dropdown" ng-change="changemintues(TimeSlotType)" ng-model="hospital.minpercase" name="hospitalTimings">
+                                    <option value="5">05</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="60">60</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Restrict Multi-Appointments On Same Slot
+                                </label>
+                                <input type="checkbox" ng-model="hosUserCollection.UserSlotInfo.MultiSlotEnable" />
+                            </div>
+
+                        </div>
+                        <div ng-show="showTeleNormalSlot &&TimeSlotType == 'Tele Slot'">
+                            <div class="form-group">
+                                <label>Consultation Fee</label>
+                                <input type="number" ng-model="hosUserCollection.UserSlotInfo.TeleSlots.ConsultationFee" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>No.Of Tele Consultations Free</label>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.TeleSlots.FreeNoOfSlots" maxlength="2" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>Free FollowUp for no.Of days</label>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.TeleSlots.FreeFollowUpNoOfDays" maxlength="2" class="form-control" />
+                            </div>
+                            <div class="form-group" ng-if="rolesID.role != 'RECPTNIST'">
+                                <label>Average Consultation Time</label>
+                                <select class="form-style select-dropdown" ng-change="Telechangemintues()" ng-model="hospital.Teleminpercase" name="hospitalTimings">
+                                    <option value="5">05</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="60">60</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <div class="row" ng-show="rolesID.role != 'RECPTNIST'">
+                    <div class="col-lg-12" ng-class="(updateTimingsStatus)?'add-time-slot active':'add-time-slot'">
+                        <div class="se-timebox p-t-0">
+                            <div class="s-time">
+                                <label>Start Time:</label>
+                                <select class="form-style st-fbox select-dropdown" ng-change="getEndTime(startTimeHH.start)" ng-model="startTimeHH.start">
+                                    <option ng-selected="{{startTimeHH.start == time.time}}" ng-repeat="time in startValues" ng-bind="time.time" value="{{time.time}}"></option>
+                                </select>
+                                <select class="form-style st-tbox select-dropdown" ng-model="startTimeMM.end">
+                                    <option ng-selected="{{startTimeMM == data.mins}}" ng-repeat="data in consultationminituesvalue" value="{{data.mins}}">{{data.mins}}</option>
+                                </select>
+                            </div>
+                            <div class="e-time">
+                                <label>End Time:</label>
+                                <select class="form-style st-fbox select-dropdown" ng-model="endTimeHH.start">
+                                    <option ng-selected="{{endTimeHH.start == time.time}}" ng-repeat="time in endValues" ng-bind="time.time" value="{{time.time}}"></option>
+                                </select>
+                                <select class="form-style st-tbox select-dropdown" ng-model="endTimeMM.end">
+                                    <option ng-selected="{{endTimeMM == data.mins}}" ng-repeat="data in consultationminituesvalue" value="{{data.mins}}">{{data.mins}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- / -->
+                        <div class="select-days">
+                            <div class="clearfix">
+                                <label>Select Days:</label>
+                                <a href="javascript:;" class="sd-uselect" ng-click="checkAll()">
+                                    <span ng-if="selection.length != 7 "> Select All</span>
+                                    <span ng-if="selection.length == 7"> Deselect All</span>
+                                </a>
+                            </div>
+                            <ul class="d-list">
+                                <li ng-repeat="day in daycdList" class="{{selection.indexOf(day.value) !== -1?'active':''}}"><a href="javascript:;" ng-click="toggleSelection(day.value)">{{day.value}}</a></li>
+                            </ul>
+                        </div>
+                        <button class="action-primary pull-right" ng-click="submitTimings()" ng-if="!updateTimingsStatus">Add</button>
+                        <button class="action-primary pull-right" ng-click="UpdateTimings()" ng-if="updateTimingsStatus">Update</button>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--<pre>{{hosUserCollection.doctorDetails}}</pre>-->
+        <!--ng-show="hosUserCollection.doctorDetails.RoleId ===1||hosUserCollection.doctorDetails.RoleId ===3||hosUserCollection.doctorDetails.RoleId ===4||hosUserCollection.doctorDetails.RoleId ===5||hosUserCollection.doctorDetails.RoleId ===43||hosUserCollection.doctorDetails.RoleId ===56||hosUserCollection.doctorDetails.RoleId ===57||rolesID.roleId ===1||rolesID.roleId ===4||rolesID.roleId ===3||rolesID.roleId ===5||rolesID.roleId ===43||rolesID.roleId ===56||rolesID.roleId ===57"-->
+        <section class="tile tile-shadow" ng-show="ShowDepartmentlist">
+
+            <div class="form-group">
+                <label>
+                    Enable Cross ConsultationOption
+                </label>
+                <input type="checkbox" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationOption" />
+            </div>
+            <div class="tile-header" ng-if="hosUserCollection.UserSlotInfo.CrossConsultationOption">
+                <h1>Cross Consultation Details</h1>
+
+            </div>
+            <div class="tile-body" ng-if="hosUserCollection.UserSlotInfo.CrossConsultationOption">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group m-b-0 dis-flex flex-c-str">
+                            <div class="width-50">
+                                <input type="button" class="register-control btr-radius bbr-radius" value="Normal Slot" ng-model="TimeTNSlotType" ng-click="ChangeTeleSlotType('TNormal Slot')" ng-class="{'active-gender' : TimeTNSlotType == 'TNormal Slot'}">
+                            </div>
+                            <div class="width-50">
+                                <input type="button" class="register-control btl-radius bbl-radius" value="Tele Slot" ng-model="TimeSlotType" ng-click="ChangeTeleSlotType('NTele Slot')" ng-class="{'active-gender' : TimeTNSlotType == 'NTele Slot'}">
+                            </div>
+                        </div>
+
+                        <div ng-if="TimeTNSlotType == 'TNormal Slot'">
+
+                            <div class="form-group">
+                                <label>No.Of Free Tele Followups</label>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationNormalSlots.FreeNoOfTeleSlots" class="form-control" maxlength="2" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tele Followups validity</label><span>(days)</span>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationNormalSlots.FreeTeleSlotsValidity" class="form-control" maxlength="2" />
+                            </div>
+                            <!--<div class="form-group">
+                            <label>No.Of Free Followups</label>
+                            <input type="text" numbers-only="numbers-only" class="form-control" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationNormalSlots.FreeNormalSlotsValidity" maxlength="2" />
+                        </div>
+                        <div class="form-group">
+                            <label>Free Followup Days</label>
+                            <input type="text" numbers-only="numbers-only" class="form-control" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationNormalSlots.FreeNormalSlotsValidity" maxlength="2" />
+                        </div>-->
+
+                        </div>
+                        <div ng-if="TimeTNSlotType == 'NTele Slot'">
+
+                            <div class="form-group">
+                                <label>No.Of Free Normal Followups</label>
+                                <input type="number" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationTeleSlots.FreeNoOfNormalSlots" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>Free Followups Validity</label><span>(days)</span>
+                                <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationTeleSlots.FreeNormalSlotsValidity" class="form-control" maxlength="2" />
+                            </div>
+
+                            <!--<div class="form-group">
+                            <label>No.Of Free Tele Followups</label>
+                            <input type="number" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationTeleSlots.FreeNoOfTeleSlots" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label>Tele Followups validity</label>
+                            <input type="text" numbers-only="numbers-only" ng-model="hosUserCollection.UserSlotInfo.CrossConsultationTeleSlots.FreeTeleSlotsValidity" class="form-control" maxlength="2" />
+                        </div>-->
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+    <!-- /col -->
+    <div class="col-lg-6">
+        <!--<pre>{{showNormalSlot}}</pre>-->
+        <!--(hosUserCollection.doctorDetails.RoleId ===1||hosUserCollection.doctorDetails.RoleId ===3||hosUserCollection.doctorDetails.RoleId ===4||hosUserCollection.doctorDetails.RoleId ===5||hosUserCollection.doctorDetails.RoleId ===43||hosUserCollection.doctorDetails.RoleId ===56||hosUserCollection.doctorDetails.RoleId ===57||rolesID.roleId ===1||rolesID.roleId ===4||rolesID.roleId ===3||rolesID.roleId ===5||rolesID.roleId ===43||rolesID.roleId ===56||rolesID.roleId ===57)-->
+        
+        <section class="tile tile-shadow" ng-show="ShowDepartmentlist&&showNormalSlot">
+            <div class="tile-header">
+                <h1>
+                    Normal Time Slots
+                </h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="time-slot">
+                             
+                            <div class="clearfix">
+                                <div class="avail-time-slot">
+                                    <div class="no-time-slot" ng-show="isConsultationSlotsAvavilable==false">
+                                        <img src="img/admin-img/no-time-slot.png">
+                                        <p>Time slot is empty</p>
+                                    </div>
+                                    <table ng-show="isConsultationSlotsAvavilable==true">
+                                        <tr>
+                                            <th width="25%">Day</th>
+                                            <th>Time Slots</th>
+                                            <!--<th>Fees</th>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Sunday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SUN'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SUN'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Monday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'  | filter:{'DayCD':'MON'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'MON'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Tuesday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'  | filter:{'DayCD':'TUE'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i href="javascript:;" class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin"  ng-repeat="item in consultationDetails | orderBy : '-Active'  | filter:{'DayCD':'TUE'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+
+                                        </tr>
+                                        <tr>
+                                            <td>Wednesday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'   | filter:{'DayCD':'WED'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'   | filter:{'DayCD':'WED'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+
+                                        </tr>
+                                        <tr>
+                                            <td>Thursday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'    | filter:{'DayCD':'THU'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i href="javascript:;" class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'    | filter:{'DayCD':'THU'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Friday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'  | filter:{'DayCD':'FRI'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails | orderBy : '-Active'  | filter:{'DayCD':'FRI'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Saturday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in consultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SAT'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin"  ng-repeat="item in consultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SAT'} ">
+                                                <span ng-bind="item.ConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / -->
+                        <!--<div class="time-slot-action">
+                        <button type="button" class="btn warning-btn mr-5 pull-left" ng-if="addHospitalDoc" ng-click="pageChange('viewListing')">Back</button>
+                        <button type="submit" class="btn  primary-btn"
+                                ng-class="(consultationDetails.length==0) ? 'btn-disable-dental' : ''" ng-disabled="consultationDetails.length==0"
+                                ng-click="addUpdateDoctor('',3,'yes')">
+                            Save
+                        </button>
+                    </div>-->
+                        <!-- / -->
+                        <div class="receptionist-timeslot" ng-if="rolesID.role == 'RECPTNIST'">
+                            <div class="no-time-slot">
+                                <img src="img/admin-img/no-time-slot.png">
+                                <p>No time slot</p>
+                            </div>
+                        </div>
+                        <!--<div class="time-slot-action">
+                        <button type="submit" class="action-primary pull-left" name="final_submit" ng-click="addUpdateDoctor('',3,'yes')">Done</button>
+                    </div>-->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--<div class="time-slot-action">
+        <button type="button" class="btn warning-btn mr-5 pull-left" ng-if="addHospitalDoc" ng-click="pageChange('viewListing')">Back</button>
+        <button type="submit" class="btn  primary-btn"
+                ng-class="(consultationDetails.length==0) ? 'btn-disable-dental' : ''" ng-disabled="consultationDetails.length==0"
+                ng-click="addUpdateDoctor('',3,'yes')">
+            Save
+        </button>
+    </div>-->
+        <!-- / -->
+        <section class="tile tile-shadow" ng-show="ShowDepartmentlist&&showTeleNormalSlot">
+            <div class="tile-header">
+                <h1>Tele Time Slots</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="time-slot">
+                            
+                            <div class="clearfix">
+                                <div class="avail-time-slot">
+                                    <div class="no-time-slot" ng-show="isConsultationTeleSlotsAvavilable==false">
+                                        <img src="img/admin-img/no-time-slot.png">
+                                        <p>Time slot is empty</p>
+                                    </div>
+                                    <table ng-show="isConsultationTeleSlotsAvavilable==true">
+                                        <tr>
+                                            <th width="25%">Day</th>
+                                            <th>Time Slots</th>
+                                            <!--<th>Fees</th>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Sunday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SUN'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SUN'} ">
+                                                <span ng-bind="item.TeleConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+
+                                        </tr>
+                                        <tr>
+                                            <td>Monday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'  | filter:{'DayCD':'MON'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'  | filter:{'DayCD':'MON'} ">
+                                                <span ng-bind="item.TeleConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Tuesday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'  | filter:{'DayCD':'TUE'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i href="javascript:;" class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'  |filter:{'DayCD':'TUE'}">
+                                                <span ng-bind="item.TeleConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+
+                                        </tr>
+                                        <tr>
+                                            <td>Wednesday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'   | filter:{'DayCD':'WED'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'   | filter:{'DayCD':'WED'} ">
+                                                <span ng-bind="item.TeleConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Thursday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'    | filter:{'DayCD':'THU'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i href="javascript:;" class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                            <!--<td>
+                                            <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'    | filter:{'DayCD':'THU'} ">
+                                                <span ng-bind="item.TeleConsultationFee"></span>
+                                            </a>
+                                        </td>-->
+                                        </tr>
+                                        <tr>
+                                            <td>Friday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails | orderBy : '-Active'  | filter:{'DayCD':'FRI'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                             
+                                        </tr>
+                                        <tr>
+                                            <td>Saturday</td>
+                                            <td>
+                                                <a href="javascript:;" class="tin" ng-repeat="item in TeleSlotconsultationDetails  | orderBy : '-Active'  | filter:{'DayCD':'SAT'} ">
+                                                    <span ng-bind="item.StartTime +' to '+ item.EndTime" ng-click="editTimings(item)"></span>
+                                                    <i class="avt-grey" ng-click="removeTeleTimings(item)" data-tooltip="Delete"></i>
+                                                </a>
+                                            </td>
+                                             
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / -->
+                         
+                        <!-- / -->
+                        <div class="receptionist-timeslot" ng-if="rolesID.role == 'RECPTNIST'">
+                            <div class="no-time-slot">
+                                <img src="img/admin-img/no-time-slot.png">
+                                <p>No time slot</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="time-slot-action">
+            <button type="button" class="btn warning-btn mr-5 pull-left" ng-if="addHospitalDoc" ng-click="pageChange('viewListing')">Back</button>
+             
+            <button type="submit" class="btn  primary-btn"
+                    ng-class="(consultationDetails.length==0 ||TeleSlotconsultationDetails.length==0) ? 'btn-disable-dental' : ''" 
+                    ng-click="addUpdateDoctor('',3,'yes')">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+ 

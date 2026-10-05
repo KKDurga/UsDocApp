@@ -1,0 +1,336 @@
+﻿<div class="modal-header">
+    <h4 class="font-weight-700 text-1d5558 fs-20 m-0">Orders</h4>
+    <button type="button" class="btn btn-link" ng-click="uibclose()"><i class="fas fa-times"></i></button>
+</div>
+ 
+<div class="">
+    <div class="row m-b-5">
+        <div class="col-lg-12">
+            <ul class="flex-flow-ulli-mb0">
+                <li class="flex">
+                    <div class="form-group">
+                        <input type="text" class="form-outline" placeholder="Search Medications"
+                               ng-model="medicineGetObj.MedicineObject"
+                               ng-show="!MedicalrxObj.IsRcopiaa"
+                               typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Ehnote','MedicineOrders')"
+                               typeahead-focus-on-select="false"
+                               typeahead-min-length="3"
+                               uib-typeahead="Medlist as Medlist.MedicineName for Medlist in GetOrganizationMedicationlist($viewValue)"
+                               ng-change="PrescriptionChange(medicineGetObj.SearchText)" />
+                    </div>
+                </li>
+                <li class="flex">
+                    <div class="form-group">
+                        <input type="text" class="form-outline" placeholder="Enter Rcopia Medicine Name"
+                               ng-model="medicineGetObj.MedicineObject"
+                               ng-show="MedicalrxObj.IsRcopiaa"
+                               typeahead-focus-on-select="false"
+                               typeahead-min-length="3"
+                               typeahead-on-select="pushPrescriptionMedicationDetails1(medicineGetObj.MedicineObject,'Rcopia','MedicineOrders')"
+                               uib-typeahead="Medlist as Medlist.BrandName +' - '+ Medlist.Strength  +' '+ '(' + Medlist.Form +')' for Medlist in GetDrugDataListFromRcopia($viewValue)"
+                               ng-change="PrescriptionChange(MedicineObject)" />
+                    </div>
+                </li>
+                <li class="w-150">
+                    <div class="checkbox cn">
+                        <label>
+                            <input name="checkbox-1" type="checkbox" ng-model="MedicalrxObj.IsRcopiaa">
+                            <span class="checkbox-material">
+                                <span class="check"></span>
+                            </span>
+                            <small class="text-s12w700c000">Is Rcopia</small>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="bradius-6 bg-white p-5">
+        <uib-accordion close-others="oneAtATime">
+
+            <div uib-accordion-group class="panel-default" is-open="status.open" ng-if="PrescriptionMainAddObj.PrescriptionDetails.length > 0"  ng-repeat="presc in PrescriptionMainAddObj.PrescriptionDetails|filter:{'DeleteInd':'N'} track by $index">
+                <uib-accordion-heading>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <ul class="flex-flow-ulli-mb0 width-100">
+                                <li class="text-s12w700c000 flex">
+                                    {{$index+1}}.{{presc.MedicationName}}
+                                    <p class="m-0">
+                                    </p>
+                                </li>
+                                <li class="text-s12w700c000 flex">
+                                    <input type="radio" ng-model="presc.SelectedMedicationHistory" value="CurrentEyeMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)" /><b> Current Eye </b>
+                                    <input type="radio" ng-model="presc.SelectedMedicationHistory" value="CurrentSystemicMedication" ng-click="Selectedmedic(presc,presc.SelectedMedicationHistory)" /> <b>Current Systemic</b>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" ng-click="RemovePrescriptionDetailObj($index,presc);">
+                                        <i class="fas fa-times text-black m-r-3"></i>
+                                    </a>
+                                    <a href="javascript:;" ng-click="ClearMedicineItem(presc)">
+                                        <i class="fas fa-redo text-black m-l-3"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </uib-accordion-heading>
+                <div class="row m-t-6">
+                    <div class="col-lg-12 text-right dis-flex grid-gap-5 align-items-center justify-content-end">
+                        <div class="checkbox cn">
+                            <label>
+                                <input name="checkbox-1" type="checkbox" ng-model="presc.IsAllSig">
+                                <span class="checkbox-material">
+                                    <span class="check"></span>
+                                </span>
+                                <small class="text-s12w700c000">All Sig</small>
+                            </label>
+                        </div>
+                        <button class="form-outline w-90" ng-click="ShowSigFields(presc)" ng-if="presc.ActionId!=''||presc.DoseId!=''||presc.DoseUnitId!=''||presc.RouteId!=''||presc.FrequencyId!=''||presc.DoseOtherId!=''||presc.DaysSupplyId!=''||presc.Quantity!=''||presc.QuantityUnitId!=''||presc.RefillId!=''"><i class="fas fa-pen"></i> Edit</button>
+                        <button class="form-outline w-90" ng-click="AddNewMedicineIdchange(presc)"><i class="fas fa-plus"></i> Add Sigs</button>
+                    </div>
+
+                </div>
+                <div class="row m-t-6" ng-hide="adnewsigobj.IsNewSig">
+                    <div class="col-lg-12">
+                        <div class="ehr-input-group form-group">
+                            <input type="text" class="form-control" ng-if="!presc.IsAllSig" ng-model="presc.SigObj"
+                                   placeholder="Search FastSig"
+                                   ng-disabled="presc.IsMedicationStopped"
+                                   typeahead-focus-on-select="false"
+                                   typeahead-min-length="0"
+                                   typeahead-on-select="ONSigDetails(presc.SigObj,presc)"
+                                   ng-change="changeSigForMedicine(presc)"
+                                   uib-typeahead="Medlist as Medlist.Sig for Medlist in getParticularSigMedicationitems(presc.SigObj,presc)" />
+                            <input type="text" class="form-control" ng-if="presc.IsAllSig" ng-model="presc.MedicineObj"
+                                   placeholder="Search AllSig"
+                                   ng-disabled="presc.IsMedicationStopped"
+                                   typeahead-focus-on-select="false"
+                                   typeahead-min-length="0"
+                                   typeahead-on-select="ONSigDetailsSig(presc.MedicineObj,presc)"
+                                   ng-change="changeSigForMedicine(presc)"
+                                   uib-typeahead="Medlist as Medlist.Sig for Medlist in getOrganizationMedicationSigitems(presc.MedicineObj)" />
+                        </div>
+
+                        <ul class="flex-flow-ulli-mb0" ng-show="presc.SigFields == true">
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Action</label>
+                                    <select class="form-outline" ng-model="presc.ActionId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescAction(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in actionArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose</label>
+                                    <select class="form-outline" ng-model="presc.DoseId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDose(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose unit</label>
+                                    <select class="form-outline" ng-model="presc.DoseUnitId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDoseUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseUnitArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Route</label>
+                                    <select class="form-outline" ng-model="presc.RouteId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescRoute(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in routeArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose Timing</label>
+                                    <select class="form-outline" ng-model="presc.FrequencyId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescFrequency(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in frequencyArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Other</label>
+                                    <select class="form-outline" ng-model="presc.DoseOtherId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDoseOther(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseOtherArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli-mb0" ng-show="presc.SigFields == true">
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose Supply</label>
+                                    <select class="form-outline" ng-model="presc.DaysSupplyId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescDaysSupply(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in durationArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Quantity</label>
+                                    <input type="text" class="form-control" ng-model="presc.Quantity" ng-disabled="presc.IsMedicationStopped" placeholder="1" />
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Quantity unit</label>
+                                    <select class="form-outline" ng-model="presc.QuantityUnitId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescQuantityUnit(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in quantityUnitArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Refill</label>
+                                    <select class="form-outline" ng-model="presc.RefillId" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescRefill(presc)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in refillsArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Substitution</label>
+                                    <select class="form-outline" ng-model="presc.SubstitutionPermitted" ng-disabled="presc.IsMedicationStopped" ng-change="changePrescSubmission(presc)">
+                                        <option value="y">Yes</option>
+                                        <option value="n">No</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Start Date</label>
+                                    <input type="text" class="form-control icons-calendar" ng-model="presc.StartDate" datepickerregpatient readonly>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli-mb0" ng-show="presc.SigFields == true">
+                            <li colspan="2">
+                                <div class="form-group" col>
+                                    <label>Medication Instructions</label>
+                                    <input type="text" class="form-control bg-dbf6ff" placeholder="Additional directions to Patient" ng-model="presc.PatientInstructions" ng-disabled="presc.IsMedicationStopped" maxlength="500" />
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row m-t-6" ng-if="adnewsigobj.IsNewSig">
+                    <div class="col-lg-12">
+                        <ul class="flex-flow-ulli-mb0">
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Action</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.ActionId" ng-change="changePopupPrescAction(addNewOrganizationSigObj)"
+                                            ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in actionArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseId" ng-change="changePopupPrescDose(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose unit</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseUnitId" ng-change="changePopupPrescDoseUnit(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseUnitArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Route</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.RouteId" ng-change="changePopupPrescRoute(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in routeArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose Timing</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.FrequencyId" ng-change="changePopupPrescFrequency(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in frequencyArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Other</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.DoseOtherId" ng-change="changePopupPrescDoseOther(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in doseOtherArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli-mb0">
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Dose Supply</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.DaysSupplyId" ng-change="changePopupPrescDaysSupply(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in durationArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Quantity</label>
+                                    <input type="text" class="form-control" ng-model="addNewOrganizationSigObj.Quantity" placeholder="1" />
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Quantity unit</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.QuantityUnitId" ng-change="changePopupPrescQuantityUnit(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in quantityUnitArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Refill</label>
+                                    <select class="form-outline" ng-model="addNewOrganizationSigObj.RefillId" ng-change="changePopupPrescRefill(addNewOrganizationSigObj)" ng-options="aitem.MedicineDosaageFieldId as aitem.Description for aitem in refillsArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group">
+                                    <label class="text-s12w500c000">Substitution</label>
+                                    <select class="form-outline" ng-model="presc.SubstitutionPermitted" ng-change="changePrescSubmission(presc)">
+                                        <option value="y">Yes</option>
+                                        <option value="n">No</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="border-right">
+                                    <label class="cur-poiter">
+                                        <input type="checkbox" id="1" value="Latent" class="checkbox ng-pristine ng-valid ng-touched" ng-model="addNewOrganizationSigObj.IsFrequent" aria-invalid="false" style="">
+                                        <span class="lbl"></span>
+                                        <span class="list-opt-text-new">FrequentlyAdded</span>
+                                    </label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-group text-right">
+                                    <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="clearOrganizationSiginput(addNewOrganizationSigObj)">Clear</button>
+                                    <button type="button" class="etn btn-ehnote p-l-25 p-r-25" ng-click="SaveOrganizationSig(presc)">Save</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </uib-accordion>
+    </div>
+</div>

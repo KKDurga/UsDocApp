@@ -1,0 +1,2027 @@
+﻿<div class="setting-content h-100">
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>-->
+    <div class="tab-pane height__100-- active" ng-if="!createfeeschedule">
+        <div class="d__f-- fd__c-- gap__y--10 height__100--">
+            <ul class="tab__style--3 pl__8-- pt__3--">
+                <li ng-class="activeFeeTab === 5 ? 'active' : ''" ng-click="switchFeeTab(5)">
+                    <a>{{ 'PROCEDURES' | translate}}</a>
+                </li>
+                <li ng-class="activeFeeTab === 3 ? 'active' : ''" ng-click="switchFeeTab(3)">
+                    <a>Medicare Fee</a>
+                </li>
+                <li ng-class="activeFeeTab === 2 ? 'active' : ''" ng-click="switchFeeTab(2)">
+                    <a>Fee Schedules</a>
+                </li>
+                <li ng-class="activeFeeTab === 1 ? 'active' : ''" ng-click="switchFeeTab(1)">
+                    <a>Payer Fee Schedules</a>
+                </li>
+                <li ng-class="activeFeeTab === 4 ? 'active' : ''" ng-click="switchFeeTab(4)">
+                    <a>Final Fee</a>
+                </li>
+
+                <li ng-class="activeFeeTab === 6 ? 'active' : ''" ng-click="switchFeeTab(6)">
+                    <a>MPR</a>
+                </li>
+            </ul>
+            <div class="d__f-- fd__c-- gap__y--8  px__10-- height__100--" ng-if="activeFeeTab === 2">
+                <div class="d__f-- ai__c-- jc__sb--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Fee Schedules</h1>
+                    <div class="d__f-- ai__c-- jc__e-- gap__x--8">
+                        <button class="btn__lg-- btn__1d5558--o" popover-trigger="outsideClick" popover-class="opfilter-popover m-0" filter-panel popover-placement="auto" popover-append-to-body="true" uib-popover-template="filterspopover.templateUrl" ng-click="onSearchClickfilterPopover()">
+                            Filter  <i class="icons__w16-- filter__w16--o"> </i>
+                        </button>
+                        <!--<button class="btn__lg-- btn__1d5558--f">Manage Codes</button>-->
+                        <button class="btn__lg-- btn__1d5558--f" ng-click="AddFeeScheduleDetails(1)">Add Fee Schedule</button>
+                    </div>
+                </div>
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll">
+                        <table class="table__style--5">
+                            <thead>
+                                <tr>
+                                    <th width="5%"><label class="fs__md-- fw__6-- tc__1D1D1D-- lh__22--">S.No</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D-- lh__22--">Fee Schedule Name</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Payers</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Providers</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Locations</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Status</label></th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-if="FeeScheduleList.length > 0">
+                                <tr ng-repeat="item in FeeScheduleList | filter:{DeleteInd: 'N'} track by $index">
+                                    <td>
+                                        <div>
+                                            <span>{{(FeeSchedulesObj.PageNumber - 1) * 10 + ($index + 1)}}.</span>                                           
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D--" title="{{item.FeeScheduleName}}">{{item.FeeScheduleName}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <label class="d__f-- ai__c-- gap__x--6">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.Payors[0].OrganizationPayorName}}">{{item.Payors[0].OrganizationPayorName || ''}}</span>
+                                            <span class="fs__md-- fw__5-- tc__537ACF-- bg__DCE6FC-- px__8-- bradius__15-- lh__18--">+{{ item.Payors ? item.Payors.length : 0 }}</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="d__f-- ai__c-- gap__x--6">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.Providers[0].BillingProviderName}}">{{item.Providers[0].BillingProviderName || ''}}</span>
+                                            <span class="fs__md-- fw__5-- tc__537ACF-- bg__DCE6FC-- px__8-- bradius__15-- lh__18--">+{{ item.Providers ? item.Providers.length : 0 }}</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="d__f-- ai__c-- gap__x--6">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.OrganizationName}}">{{item.OrganizationName}}</span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center column__sm">
+                                        <!--<div>
+                        <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.IsActive == true ? 'Active' : 'InActive'}}</span>
+                    </div>-->
+                                        <div ng-if="item.IsActive" class="dis-flex align-items-center grid-gap-5">
+                                            <i class="fa fa-toggle-on pactive"
+                                               ng-click="UpdateStatusFeeSchedule(item, false);">
+                                            </i>{{ 'ACTIVE' | translate}}
+
+                                        </div>
+                                        <div ng-if="!item.IsActive" class="dis-flex align-items-center grid-gap-5">
+                                            <i class="fa fa-toggle-on fa-rotate-180 pinactive"
+                                               ng-click="UpdateStatusFeeSchedule(item, true);">
+                                            </i>{{ 'INACTIVE' | translate}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown cstm-dropdown ai__c--">
+                                            <button class="border__none-- p__4-- bg__none-- hover__E3E3E3--f bradius__5-- w__32-- dropdown-button" id="dropdownMenu" data-toggle="dropdown" aria-expanded="true">
+                                                <i class="icons__w20-- more__w20--b" tooltip-placement="top" uib-tooltip="More"></i>
+                                            </button>
+                                            <div class="dropdown-menu right-0 left-auto w__160-- slim-scroll bradius__8--" role="menu">
+                                                <ul class="d__f-- fd__c-- list__unstyled-- m__0-- p__4--">
+                                                    <li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="ViewFeeSchedule(item)">
+                                                        <a class="outline-icon d__n-- lh__15--"><i class="icons__w16-- viewpatientform__w16--o"></i></a>
+                                                        <a class="light-icon d__b-- lh__15--"><i class="icons__w16-- viewpatientform__w16--l"></i></a>
+                                                        <label class="fs__md-- fw__5-- tc__656565-- c__p--">View Schedule</label>
+                                                    </li>
+                                                    <li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="EditFeeSchedule(item)">
+                                                        <a class="outline-icon d__n--"><i class="icons__w16-- edit__w16--o"></i></a>
+                                                        <a class="light-icon d__b--"><i class="icons__w16-- edit__w16--l"></i></a>
+                                                        <label class="fs__md-- fw__5-- tc__656565-- c__p--">Edit</label>
+                                                    </li>
+                                                    <li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="CopyFromFeeSchedule(item)">
+                                                        <a class="outline-icon d__n--"><i class="icons__w16-- edit__w16--o"></i></a>
+                                                        <a class="light-icon d__b--"><i class="icons__w16-- edit__w16--l"></i></a>
+                                                        <label class="fs__md-- fw__5-- tc__656565-- c__p--">Copy From Fee Schedule</label>
+                                                    </li>
+                                                    <!--<li class="px__12-- py__4-- d__f-- ai__c-- gap__4-- hover__1D55581A--bg-t c__p--" ng-click="DeleteFeeSchedule(item)">
+                                    <a class="outline-icon d__n--"><i class="icons__w16-- delete__w16--o"></i></a>
+                                    <a class="light-icon d__b--"><i class="icons__w16-- delete__w16--l"></i></a>
+                                    <label class="fs__md-- fw__5-- tc__C71D27-- c__p--">Delete</label>
+                                </li>-->
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row m-t-10" ng-show="FeeScheduleList.length > 0">
+                            <div class="col-lg-12 text-center EH-pagination">
+                                <uib-pagination total-items="FeeScheduleListCount"
+                                                ng-model="FeeSchedulesObj.PageNumber"
+                                                ng-change="FeeswitchToNextPage(FeeSchedulesObj.PageNumber)"
+                                                force-ellipses="true"
+                                                boundary-link-numbers="true"
+                                                max-size="5"
+                                                items-per-page="10">
+                                </uib-pagination>
+                            </div>
+                        </div>
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="FeeScheduleList.length == 0">
+                            <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- gap__y--8 px__10-- height__100--" ng-if="activeFeeTab === 1">
+                <div class="d__f-- fd__c-- gap__y--10 height__100--">
+                    <div class="d__f-- ai__c-- jc__sb--">
+                        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Payer Fee Schedules</h1>
+                        <div class="d__f-- ai__c-- jc__e-- gap__x--8">
+                            <button class="btn__lg-- btn__1d5558--o" popover-trigger="outsideClick" popover-class="opfilter-popover m-0"
+                                    filter-panel popover-placement="auto" popover-append-to-body="true"
+                                    uib-popover-template="filtersPayerpopover.templateUrl" ng-click="onSearchClickfilterPopover()">
+                                Filter  <i class="icons__w16-- filter__w16--o"> </i>
+                            </button>
+                            <!--<button class="btn__lg-- btn__1d5558--f">Manage MPR Codes</button>-->
+                            <!--<button class="btn__lg-- btn__1d5558--f" ng-click="AddFeeScheduleDetails()">Add Fee Schedule</button>-->
+                        </div>
+                    </div>
+                    <div class="position__relative-- height__100--">
+                        <div class="adjustable-position slim-scroll pb__8--">
+                            <div class="d__f-- fd__c-- gap__y--8 ">
+                                <div class="section__style--4" ng-repeat="item in PayorWiseCptFeeList" ng-if="false">
+                                    <div class="section__header-- px__10-- py__6-- bg__E8EEEE--">
+                                        <div class="d__f-- ai__c-- gap__10--x">
+                                            <span class="fs__lg-- fw__7-- tc__1D1D1D--">{{item.OrgPayorName}} </span>
+                                            <div class="d__f-- ai__c-- gap__x--6">
+                                                <a class="fs__lg-- fw__6-- tc__1D5558-- pl__6-- " ng-click="EditPayorFeeSchedule(item)">Edit</a>
+                                                <!--<a class="fs__lg-- fw__6-- tc__1D5558-- pl__6-- bl__1D5558--">Manage</a>
+                    <a class="fs__lg-- fw__6-- tc__1D5558-- pl__6-- bl__1D5558--">Configure</a>-->
+                                            </div>
+                                        </div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">Effective Date: {{item.EffectiveTo| date:'MM-dd-yyyy'}}</span>
+                                    </div>
+                                    <div class="section__body-- px__10-- py__3--">
+                                        <table class="table__style--23 border__none--">
+                                            <thead>
+                                                <tr>
+                                                    <th width="50%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure</span></th>
+                                                    <th width="25%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifier</span></th>
+                                                    <th width="25%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                    <th width="25%"><span class="fs__md-- fw__6-- tc__1D1D1D--">ASC Fee</span></th>
+                                                    <th width="25%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="Aitem in item.ProceduresList">
+                                                    <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.ProcedureCode}}-{{Aitem.ProcedureDescription}}</span></td>
+                                                    <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.ModifierCode}}</span></td>
+                                                    <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.MedicareOfficeFee}}</span></td>
+                                                    <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.MedicareASCFee}}</span></td>
+                                                    <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.AnesthesiaCost}}</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="border__E4E4E4-- bradius__5--" ng-if="PayorWiseCptFeeList.length > 0">
+                                    <table class="table tableno-bordered m__0-- table-layout-auto" id="table_paymentsummarymain">
+                                     
+                                        <tbody class="border__none--" ng-repeat="item in PayorWiseCptFeeList">
+                                            <tr class="c__p-- hover__1D55581A--bg-t" ng-class="{'bb__DDD--': !$last && !item.isOpen, 'bg__FCFAF5--': item.isOpen }" ng-click="FeeScheduleCPTDetailsByOrgPayor(item)">
+                                                <td class="py__8-- px__6-- bradius__3--bl text-center">
+                                                    <div class="d__f-- ai__c-- gap__5--">
+                                                        <a><i class="icons__w16--" ng-class="item.isOpen ? 'arrowdownfill__w16--o' : 'arrowrightfill__w16--l'"></i></a>
+                                                        <span class="fs__lg-- fw__5-- tc__656565--">{{$index+1}}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="py__8-- px__6--">
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.OrgPayorName}}</span>
+                                                </td>
+                                                <td class="py__8-- px__6--">
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Effective Date: {{item.EffectiveTo| date:'MM-dd-yyyy'}}</span>
+                                                </td>
+                                                <td class="py__8-- px__6-- ">
+                                                    <a class="fs__lg-- fw__6-- tc__1D5558-- pl__6-- " ng-click="EditPayorFeeSchedule(item)">Edit</a>
+                                                </td>
+                                               
+                                            </tr>
+                                            <tr ng-class="{'bb__DDD--': item.isOpen}" ng-show="item.isOpen">
+                                                <td colspan="4" ng-class="{'bg__FCFAF5--': item.isOpen}">
+                                                    <table class="table tableno-bordered tableno-padding m__0-- border__DDD-- boxs__0000001A--br10" id="table_paymentsummary">
+                                                        <thead>
+                                                            <tr class="bb__DDD--">
+                                                                <th width="50%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure</span></th>
+                                                                <th width="20%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifier</span></th>
+                                                                <th width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                                <th width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">ASC Fee</span></th>
+                                                                <th width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-class="!$last ? 'bb__DDD--' : ''" ng-repeat="Aitem in FeeScheduleCPTDetail">
+                                                                <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.CPTCode}}-{{Aitem.ProcedureName}}</span></td>
+                                                                <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.ModifierCode}}</span></td>
+                                                                <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.MedicareOfficeFee}}</span></td>
+                                                                <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.MedicareASCFee}}</span></td>
+                                                                <td><span class="fs__md-- fw__5-- tc__4A4A4A--">{{Aitem.MedicareAnesthesiaCost}}</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                                        
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- gap__y--8 pl__10-- pr__20-- height__100--" ng-if="activeFeeTab === 3">
+                <div class="d__f-- ai__c-- jc__sb--">
+                    <div class="d__f-- fd__c--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Medicare Fee List</h1>
+                        <span class="fs__lg-- fw__5-- tc__656565-- ">Medicare Fee Schedule is read-only reference data maintained by the Center for Medicare & Medicaid Services (CMS)</span>
+                    </div>
+                    <ul class="list__none-- m__0-- d__f-- ai__c-- gap__x--8">
+                        <li>
+                            <button class="btn__lg--  btn__F6F6F6--f" ng-click="exportToExcel()"> <i class="icons__w16-- download__w16--o"></i> Export</button>
+                        </li>
+                        <li>
+                            <button class="btn__lg-- btn__1d5558--o" id="button__DownloadTemplate" ng-click="GetMedicareFeeCPTTemplate();">Download Template</button>
+                        </li>
+                        <li>
+                            <button class="btn__lg-- btn__1d5558--o" ng-click="resetImportFile(); triggerImport();">
+                                <i class="icons__w16-- upload__w16--o"></i> Import
+                            </button>
+                            <input type="file"
+                                   id="importExcel"
+                                   style="display:none"
+                                   accept=".xlsx,.xls"
+                                   file-input="importFile"
+                                   ng-model="importFile"
+                                   onclick="this.value = null;" />
+                        </li>
+                        <li ng-if="!IsShowAddNewCPT">
+                            <button class="btn__lg-- btn__1d5558--f ws__nowrap--" ng-click="switchToAddCPT()"> <i class="icons__w16-- add__w16--w"></i>Add CPT</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="section__style--4" ng-if="IsShowAddNewCPT">
+                    <div class="section__header-- py__3--">
+                        <h1>Add New CPT</h1>
+                        <ul class="list__none-- m__0-- d__f-- ai__c-- gap__x--8">
+                            <li>
+                                <button class="btn__sm-- btn__C71D27--o" ng-click="switchToCancelCPT()"> Cancel</button>
+                            </li>
+                            <li ng-if="MasterMedicareFeeObj.MedicareRateId === 0">
+                                <button class="btn__sm-- btn__1d5558--o" ng-click="ClearMedicareFeeStructure()">Clear</button>
+                            </li>
+                            <li>
+                                <button class="btn__sm-- btn__1d5558--f" ng-click="AddUpdateMedicareFeeStructure()">{{MasterMedicareFeeObj.MedicareRateId === 0 ? 'Save' : 'Update'}}</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="section__body--">
+                        <table class="table tableno-bordered tableno-padding m__0--">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Location <em>*</em></label>
+                                            <select ng-options="Eitem.ClinicId as Eitem.ClinicName for Eitem in Locationslist" ng-model="MasterMedicareFeeObj.OrganizationId">
+                                                <option value="" disabled>Select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>CPT Code <em>*</em></label>
+                                            <input type="text" placeholder="Enter CPT code"
+                                                   autocomplete="off"
+                                                   maxlength="100"
+                                                   name="feeschedule"
+                                                   ng-model="MasterMedicareFeeObj.Procedureobj"
+                                                   typeahead-min-length="0"
+                                                   typeahead-focus-on-select="false"
+                                                   ng-disabled="MasterMedicareFeeObj.MedicareRateId!=0"
+                                                   ng-change="changeCPTProcedure(MasterMedicareFeeObj.Procedureobj)"
+                                                   uib-typeahead="item as item.CPTCode +'-'+ item.ProcedureName for item in GetOrganizationProcedure($viewValue)"
+                                                   typeahead-on-select="onselectCptCode(MasterMedicareFeeObj.Procedureobj)" />
+                                        </div>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="form__group">
+                                            <label>Description</label>
+                                            <input type="text" placeholder="Enter Description" ng-model="MasterMedicareFeeObj.ProcedureName" />
+                                        </div>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="form__group" typehead-dropdown-direction>
+                                            <label>Modifier</label>
+                                            <input type="text" placeholder="Enter Modifier"
+                                                   id="input__modifier"
+                                                   autocomplete="off"
+                                                   maxlength="100"
+                                                   name="modifiers"
+                                                   ng-model="MasterMedicareFeeObj.ModifierObj"
+                                                   typeahead-min-length="0"
+                                                   typeahead-focus-on-select="false"
+                                                   uib-typeahead="Mitem as Mitem.ModifierName for Mitem in masterModifierList | filter:{ ModifierName: $viewValue}"
+                                                   typeahead-on-select="OnSelectModifierName(MasterMedicareFeeObj.ModifierObj)" />
+                                        </div>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="form__group">
+                                            <label>Status Code</label>
+                                            <select ng-options="pitem.MedicareStatusCodeId as pitem.CodeName for pitem in MasterMedicareStatusCodes" ng-model="MasterMedicareFeeObj.StatusCodeId" ng-change="onStatusCodeSelect(MasterMedicareFeeObj.StatusCodeId)">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Office <em>*</em></label>
+                                            <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="MasterMedicareFeeObj.MedicareOfficeFee" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Facility Fee<em>*</em></label>
+                                            <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="MasterMedicareFeeObj.MedicareASCFee" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Anesthesia Cost<em>*</em></label>
+                                            <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="MasterMedicareFeeObj.AnesthesiaCost" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="13%">
+                                        <div class="form__group pb__5--">
+                                            <label class="fs__lg-- fw__5-- tc__1D1D1D--">Effective Date<em>*</em></label>
+                                            <div class="dropdown cstm-dropdown width-100" ng-if="false">
+                                                <button class="btn__lg-- btn__DEDEDE--o jc__sb-- width__100--" id="dropdown_effdate1" data-toggle="dropdown">
+                                                    {{ MasterMedicareFeeObj.EffectiveFrom ? (MasterMedicareFeeObj.EffectiveFrom| date:"MM-dd-yyyy") : 'Select Date'}}
+                                                    <i class="icons__w16-- calender__w16--o"></i>
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app l__auto--  right__0-- bradius__5--" role="menu" ng-click="$event.stopPropagation();">
+                                                    <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                                        <div uib-datepicker class="appt-calendar" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form__group position__relative--">
+                                                <input type="text" class="icons-calendar cur-default bg-white"
+                                                       id="input__fromdate"
+                                                       ng-model="MasterMedicareFeeObj.EffectiveFrom"
+                                                       placeholder="MM-DD-YYYY"
+                                                       datepickeruniversal readonly />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="13%">
+                                        <div class="form__group pb__5--">
+                                            <label class="fs__lg-- fw__5-- tc__1D1D1D--">End Date<em>*</em></label>
+                                            <div class="dropdown cstm-dropdown width-100" ng-if="false">
+                                                <button class="btn__lg-- btn__DEDEDE--o jc__sb-- width__100--" id="dropdown_enddate1" data-toggle="dropdown">
+                                                    {{ MasterMedicareFeeObj.EffectiveTo ? (MasterMedicareFeeObj.EffectiveTo| date:"MM-dd-yyyy") : 'Select Date'}}
+                                                    <i class="icons__w16-- calender__w16--o"></i>
+                                                </button>
+                                                <div class="dropdown-menu dr-drop-app l__auto--  right__0-- bradius__5--" role="menu" ng-click="$event.stopPropagation();">
+                                                    <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                                        <div uib-datepicker class="appt-calendar" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form__group">
+                                                <input type="text" class="icons-calendar cur-default bg-white"
+                                                       id="input__todate"
+                                                       ng-model="MasterMedicareFeeObj.EffectiveTo"
+                                                       placeholder="MM-DD-YYYY"
+                                                       datepickeruniversal readonly />
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>PC TC IND</label>
+                                            <select ng-options="pitem.PctcIndicatorId as pitem.CodeName for pitem in MasterPctcIndicators" ng-model="MasterMedicareFeeObj.PCTCIndicatorId" ng-change="onPCTCCodeSelect(MasterMedicareFeeObj.PCTCIndicatorId)">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Global Days</label>
+                                            <select ng-options="pitem.GlobalSurgeryDaysId as pitem.CodeName for pitem in MasterGlobalSurgeryDays" ng-model="MasterMedicareFeeObj.GlobalDaysId" ng-change="onGlobalDaysSelect(MasterMedicareFeeObj.GlobalDaysId)">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Multi Proc</label>
+                                            <select ng-options="pitem.MultipleProcedureIndicatorId as pitem.CodeName for pitem in MasterMultipleProcedureIndicator" ng-model="MasterMedicareFeeObj.MultipleProcedureIndicator">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Revenue Code</label>
+                                            <input type="text" placeholder="Enter RevenueCode" ng-model="MasterMedicareFeeObj.RevenueCode" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Bilateral Surgery</label>
+                                            <select ng-options="pitem.BilateralSurgeryIndicatorId as pitem.CodeName for pitem in MasterBilateralSurgeryIndicator"
+                                                    ng-model="MasterMedicareFeeObj.BilateralSurgeryIndicator">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Assistant Surgery</label>
+                                            <select ng-options="pitem.AssistantSurgeonIndicatorId as pitem.IndicatorDescription for pitem in MasterAssistantSurgeonIndicator" ng-model="MasterMedicareFeeObj.AssistantSurgeonIndicator">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Co Surgery</label>
+                                            <select ng-options="pitem.CoSurgeonIndicatorId as pitem.IndicatorDescription for pitem in MasterCoSurgeonIndicator" ng-model="MasterMedicareFeeObj.CoSurgeonIndicator">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form__group">
+                                            <label>Team Surgery</label>
+                                            <select ng-options="pitem.TeamSurgeonIndicatorId as pitem.IndicatorDescription for pitem in MasterTeamSurgeonIndicator" ng-model="MasterMedicareFeeObj.TeamSurgeonIndicator">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="form__group">
+                                            <label>Phys. Supervision - Dx Proc</label>
+                                            <select ng-options="pitem.SupervisionCode as pitem.SupervisionDescription for pitem in MasterPhysicianSupervision" ng-model="MasterMedicareFeeObj.PhysicianSupervisionofDiagnosticProcedures">
+                                                <option value="" disabled>select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="section__style--4 height__100--" ng-if="IsShowAllFeeList">
+                    <div class="section__header-- py__3--">
+                        <h1>All Fee List</h1>
+                        <ul class="list__none-- m__0-- d__f-- ai__c-- jc__e-- gap__x--8 width__56--">
+                            <li>
+                                <input type="text" placeholder="Search Procedure/CPT" class="input__style--1 icons-search" ng-model="MedicareSearchObj.CPTSearchText" />
+                            </li>
+                            <li>
+                                <div class="form__group">
+                                    <select ng-options="Eitem.ClinicId as Eitem.ClinicName for Eitem in Locationslist"
+                                            ng-model="MedicareSearchObj.LocationId"
+                                            ng-change="OnSelectMedicareLocation()">
+                                        <option value="">All Locations</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form__group">
+                                    <div class="dropdown cstm-dropdown" ng-if="false">
+                                        <button class="btn__lg-- btn__DEDEDE--o jc__sb-- w__140--" id="dropdown_effdate" data-toggle="dropdown">
+                                            Effective Date
+                                            <!-- {{ Filterobj.CommunicationDate ? (Filterobj.CommunicationDate| date:"MM-dd-yyyy") : 'Effective Date'}}-->
+                                            <i class="icons__w16-- calender__w16--o"></i>
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app l__auto--  right__0-- bradius__5--" role="menu" ng-click="$event.stopPropagation();">
+                                            <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                                <div uib-datepicker class="appt-calendar" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="icons-calendar cur-default bg-white"
+                                           ng-model="MedicareSearchObj.EffectiveFromDate"
+                                           placeholder="MM-DD-YYYY"
+                                           datepickeruniversal readonly />
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form__group">
+                                    <div class="dropdown cstm-dropdown" ng-if="false">
+                                        <button class="btn__lg-- btn__DEDEDE--o jc__sb-- w__140--" id="dropdown_enddate" data-toggle="dropdown">
+                                            End Date
+                                            <!-- {{ Filterobj.CommunicationDate ? (Filterobj.CommunicationDate| date:"MM-dd-yyyy") : 'End Date'}}-->
+                                            <i class="icons__w16-- calender__w16--o"></i>
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app l__auto--  right__0-- bradius__5--" role="menu" ng-click="$event.stopPropagation();">
+                                            <div class="p__6-- border-bottom d__f-- fd__c-- gap__10--">
+                                                <div uib-datepicker class="appt-calendar" datepicker-options="jscalendaroptions" show-weeks="false" min-Date="0"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="icons-calendar cur-default bg-white"
+                                           ng-model="MedicareSearchObj.EffectiveToDate"
+                                           placeholder="MM-DD-YYYY"
+                                           datepickeruniversal readonly />
+                                </div>
+                            </li>
+                            <li>
+                                <button class="btn__lg-- btn__1d5558--f" ng-click="GetProcedureMedicareDetails()">Apply</button>
+                            </li>
+                            <li>
+                                <button class="btn__lg-- btn__1d5558--o" ng-click="ClearMedicareSearch()">Clear</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="section__body--  p__0-- height__100-- border__none--">
+                        <div class="position__relative-- height__100--">
+                            <div class="adjustable-position slim-scroll overflow-x-auto">
+                                <div class="p__3-- bg__F0F0F0-- width__auto--">
+                                    <table class="table__style--20 bg__FFFFFF-- table-layout-auto white-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Location</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifiers</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Status Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Effective Date</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">End Date</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Revenue Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">PCTC IND</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Glob.Days</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Multi Proc.</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Bilat. Surgery </span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Asst. Surgery </span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Co-Surgery </span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Team Surgery </span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Phys. Supervision - Dx Proc</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Actions</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-if="AllMedicareFeeList.length > 0">
+                                            <tr ng-repeat="item in AllMedicareFeeList | filter:{DeleteInd: 'N'} track by $index">
+                                                <td>
+                                                    <span>{{(MasterMedicareFeeObj.PageNumber - 1) * 10 + ($index + 1)}}.</span>
+                                                </td>
+                                                <td class="p__8--">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(Locationslist | filter:{ClinicId:item.OrganizationId}:true)[0].ClinicName}}</span>
+                                                </td>
+                                                <td class="p__8--">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                                </td>
+                                                <td class="p__8--">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ModifierCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="max__width210--">
+                                                        <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.ProcedureName}}">{{item.ProcedureName}}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterMedicareStatusCodes | filter:{Code: item.StatusCode}:true)[0].CodeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__6-- tc__1D1D1D--">$ {{item.MedicareOfficeFee | number:2}}</span>
+
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__6-- tc__1D1D1D--">$ {{item.MedicareASCFee | number:2}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__6-- tc__1D1D1D--">$ {{item.AnesthesiaCost | number:2}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.EffectiveFrom | date:'MM-dd-yyyy'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.EffectiveTo | date:'MM-dd-yyyy'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.RevenueCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterPctcIndicators | filter:{PctcIndicatorId: item.PCTCIndicatorId}:true)[0].CodeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterGlobalSurgeryDays | filter:{GlobalSurgeryDaysId: item.GlobalDaysId}:true)[0].CodeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterMultipleProcedureIndicator | filter:{MultipleProcedureIndicatorId: item.MultipleProcedureIndicator}:true)[0].CodeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterBilateralSurgeryIndicator | filter:{BilateralSurgeryIndicatorId: item.BilateralSurgeryIndicator}:true)[0].CodeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterAssistantSurgeonIndicator | filter:{AssistantSurgeonIndicatorId: item.AssistantSurgeonIndicator}:true)[0].IndicatorDescription}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterCoSurgeonIndicator | filter:{CoSurgeonIndicatorId: item.CoSurgeonIndicator}:true)[0].IndicatorDescription}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterTeamSurgeonIndicator | filter:{TeamSurgeonIndicatorId: item.TeamSurgeonIndicator}:true)[0].IndicatorDescription}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(MasterPhysicianSupervision | filter:{SupervisionCode: item.PhysicianSupervisionofDiagnosticProcedures}:true)[0].SupervisionDescription}}</span>
+                                                </td>
+                                                <td class="column__sm">
+                                                    <div class="dis-flex align-items-center grid-gap-5 justify-content-center">
+                                                        <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><i class="ehr-edit aside-icon-ros" data-tooltip="Edit" ng-click="EditMedicareFeelist(item)"></i></a>
+                                                        <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="DeleteMedicareFeelist(item)"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="AllMedicareFeeList.length == 0">
+                                        <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-t-10" ng-show="AllMedicareFeeList.length > 0">
+                            <div class="col-lg-12 text-center EH-pagination">
+                                <uib-pagination total-items="MedicareFeeListCount"
+                                                ng-model="MasterMedicareFeeObj.PageNumber"
+                                                ng-change="switchToNextPage(MasterMedicareFeeObj.PageNumber)"
+                                                force-ellipses="true"
+                                                boundary-link-numbers="true"
+                                                max-size="5"
+                                                items-per-page="10">
+                                </uib-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-common" ng-show="ShowRecordSaving">
+                    <div class="modal-common-dialog">
+                        <div class="modal-content modal-sm m-auto">
+                            <div class="modal-body">
+                                <h3>
+                                    <b>Please Wait . . .</b>
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </h3>
+                                <p class="text-ehnote fs-13">
+                                    Exporting your data to Excel. Please wait…
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- gap__y--8 px__10-- pb__5-- height__100--" ng-if="activeFeeTab === 4">
+                <div class="d__f-- ai__c-- jc__sb--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Final Fee Schedules</h1>
+                    <div class="d__f-- ai__c-- jc__e-- gap__x--8 width__80--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="Serach CPT code" ng-model="FinalFeeObj.SearchText" />
+                        <div class="form__group">
+                            <input type="text" id="input_payernamep" class="icon__search--width-200"
+                                   autocomplete="off"
+                                   name="InsurancePayor"
+                                   placeholder="Enter Payer Name"
+                                   ng-model="FinalFeeObj.PayorObj"
+                                   typeahead-min-length="0"
+                                   typeahead-on-select="ChangeInsurancePayor(FinalFeeObj.PayorObj)"
+                                   uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                            <div class="dropdown cstm-dropdown width-100" ng-if="false">
+                                <button class="form__control text-left w__130--" id="dropdownMenu3" data-toggle="dropdown" ng-click="onFinalFeePayorDropdownOpen(FinalFeeObj.PayorObj,'Final')">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                    {{ FinalFeeObj.SelectFinalPayorText }}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text"
+                                               class="form__control input-sm bg-inputy ng-pristine ng-untouched ng-valid"
+                                               placeholder="Search"
+                                               ng-model="FinalFeeObj.PayorObj"
+                                               ng-change="SearchPayorList('Final')"
+                                               autocomplete="off" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in FilteredPayorList">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11"
+                                                               type="checkbox"
+                                                               ng-model="item.IsChecked"
+                                                               ng-click="toggleFinalFeePayor(item)" />
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>{{ item.PayorName }}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form__group">
+                            <div class="dropdown cstm-dropdown width-100">
+                                <button class="form__control text-left w__130--" id="dropdownMenu3" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                    {{ FinalFeeObj.SelectFinalProviderText }}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy ng-pristine ng-untouched ng-valid" placeholder="Search" ng-model="searchHospital.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in filterProviderList | filter:{'BillingProviderName':searchHospital.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="OnSelectFinalProvider(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>{{item.BillingProviderName}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group">
+                            <div class="dropdown cstm-dropdown width-100">
+                                <button class="form__control text-left w__130--"
+                                        id="dropdownMenu3"
+                                        data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-10"></i>
+                                    {{ FinalFeeObj.SelectFinalLocationText }}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy ng-pristine ng-untouched ng-valid" placeholder="Search" ng-model="FinalFeeObj.LocationObj" ng-change="SearchLocationList()" autocomplete="off" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in FinalFeeLocationlist">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11"
+                                                               type="checkbox"
+                                                               ng-model="item.IsChecked"
+                                                               ng-click="toggleLocationSelection(item)" />
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>{{item.ClinicName}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn__lg-- btn__1d5558--f" ng-click="GetFinalFeeScheduleDetails()">Apply</button>
+                        <button class="btn__lg-- btn__1d5558--" ng-click="ResetFinalFilters()">Reset <i class="icons__w16-- refresh__w16--o"></i></button>
+                    </div>
+                </div>
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll overflow-x-auto pr__6--">
+                        <table class="table__style--5 table-layout-auto ws__nowrap--">
+                            <thead>
+                                <tr>
+                                    <th width="8%"><label class="fs__md-- fw__6-- tc__1D1D1D-- lh__22--">S.No</label></th>
+                                    <th width="8%"><label class="fs__md-- fw__6-- tc__1D1D1D-- lh__22--">CPT Code</label></th>
+                                    <th width="10%"><label class="fs__md-- fw__6-- tc__1D1D1D-- lh__22--">Procedure Code</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Description</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Payer</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Providers</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Locations</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee(Med)</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee(Med)</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost(Med)</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee(Final)</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee(Final)</label></th>
+                                    <th><label class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost(Final)</label></th>
+                                    <th width="6%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Source</label></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-if="FinalFeeList.length > 0">
+                                <tr ng-repeat="item in FinalFeeList track by $index">
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(FinalFeeObj.PageNumber - 1) * 50 + ($index + 1)}}.</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div class="max__width210--">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt">{{item.ProcedureName}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div class="max__width210--">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt">{{item.OrganizationPayorName}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div class="max__width210--">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt">{{item.BillingProviderName}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div class="max__width210--">
+                                            <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt">{{item.OrganizationName}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{item.MedicareOfficeFee | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{item.MedicareASCFee | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{item.AnesthesiaCost | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{(item.FinalMedicareOfficeFee || 0) | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{(item.FinalMedicareASCFee || 0) | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div>
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">${{(item.FinalMedicareAnesthesiaCost || 0) | number : 2}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py__6-- px__10--">
+                                        <div class="max__width210--">
+                                            <a class="fs__md-- fw__5-- tc__1D1D1D-- tx__underline-- no-wrapappt">{{item.FeeScheduleName}}</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="FinalFeeList.length == 0">
+                            <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-t-10" ng-show="FinalFeeList.length > 0">
+                    <div class="col-lg-12 text-center EH-pagination">
+                        <uib-pagination total-items="FinalFeeListCount"
+                                        ng-model="FinalFeeObj.PageNumber"
+                                        ng-change="switchToFinalNextPage(FinalFeeObj.PageNumber)"
+                                        force-ellipses="true"
+                                        boundary-link-numbers="true"
+                                        max-size="10"
+                                        items-per-page="50">
+                        </uib-pagination>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d__f-- fd__c-- gap__y--8  px__10-- height__100--" ng-if="activeFeeTab === 5">
+                <div ng-include="'templates/settings/AddProcedure.html'" ng-controller="UsAddProcedureCtrl" class="height__100--"></div>
+
+            </div>
+
+            <div class="d__f-- fd__c-- gap__y--8 px__10-- height__100--" ng-if="activeFeeTab === 6">
+
+                <div ng-include="'templates/settings/AddMPR.html'" ng-controller="UsAddMPRCtrl" class="height__100--"></div>
+
+            </div>
+
+
+
+
+        </div>
+    </div>
+
+    <div class="d__f-- fd__c-- height__100-- bg__FFFFFF--" ng-if="createfeeschedule">
+        <div class="d__f-- ai__c-- jc__sb-- px__10-- py__6-- bb__DDD--">
+            <div class="d__f-- gap__x--8 ai__c--">
+                <a class="p__5-- bg__F5F5F5-- border__E4E4E4-- bradius__4--" ng-click="closeschedule()"><i class="icons__w16-- lessthan__w16--b"></i></a>
+                <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- ">Create Fee Schedule</h1>
+            </div>
+            <div class="d__f-- gap__x--8 ai__c--">
+                <button class="btn__lg-- btn__1d5558--f" ng-click="AddUpdateCPTFeeScheduleDetails()">{{ FeeSchedulesObj.FeeScheduleId == 0 ? 'Create' : 'Update' }}</button>
+                <button class="btn__lg-- btn__C71D27--o" ng-click="closeschedule()">Cancel</button>
+            </div>
+        </div>
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll  bg__F9F9F9-- p__10--">
+                <div class="d__f-- fd__c-- gap__10--y">
+                    <div class="bg__FFFFFF-- p__10-- bradius__6-- boxs__0000001F--b border__DDD--">
+                        <div class="row nocolpad d__f-- fw__w--">
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form__group pb__5--">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Fee Schedule Name<em>*</em></label>
+                                    <input type="text" placeholder="Enter Fee Schedule name" ng-model="FeeSchedulesObj.FeeScheduleName" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-4">
+                                <div class="form__group pb__5--">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Location<em>*</em></label>
+                                    <select ng-options="Eitem.ClinicId as Eitem.ClinicName for Eitem in Locationslist" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"
+                                            ng-model="FeeSchedulesObj.OrganizationId" ng-change="OnSelectFeeLocation()">
+                                        <option value="" disabled>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-3">
+                                <div class="form__group">
+                                    <label>Billing Provider<em>*</em></label>
+                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                        <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                            {{FeeSchedulesObj.SelectProviderText}}
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2" ng-click="stopClosingDropDown($event)">
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Search Billing Provider" ng-model="searchHospital.txt1" />
+                                            </div>
+                                            <div class="apptsearchdroplist">
+                                                <ul>
+                                                    <li ng-repeat="item in FeeSchedulesObj.Providers | filter:{'BillingProviderName':searchHospital.txt1}">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectProvider(item)">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BillingProviderName"></span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-12">
+                                <!--<div class="d__f-- fd__c--  pb__5--">
+            <label class="fs__lg-- fw__5-- tc__1D1D1D--">Available for<em>*</em></label>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <label class="c__p-- d__f-- ai__c-- gap__5--">
+                    <input type="checkbox" class="checkbox" ng-model="FeeSchedulesObj.IsAvailableForInsurance">
+                    <span class="lbl"></span>
+                    <span class="fs__lg--  fw__5-- tc__1D1D1D--">Insurance Payers</span>
+                </label>
+                <label class="c__p-- d__f-- ai__c-- gap__5--">
+                    <input type="checkbox" class="checkbox" ng-model="FeeSchedulesObj.IsAvailableForPatientBill">
+                    <span class="lbl"></span>
+                    <span class="fs__lg--  fw__5-- tc__1D1D1D--">Patient Bills</span>
+                </label>
+            </div>
+        </div>-->
+                                <div class="d__f-- fd__c-- pb__5--">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Bill Type<em>*</em></label>
+                                    <div class="d__f-- ai__c-- gap__10--x">
+                                        <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                            <input type="radio" name="availableFor" class="radio" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0" 
+                                                   ng-change="ChangeFeeScheduleType(FeeSchedulesObj.AvailableFor)" ng-model="FeeSchedulesObj.AvailableFor" value="Insurance">
+                                            <span class="lbl"></span>
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">Insurance </span>
+                                        </label>
+                                        <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                            <input type="radio" name="availableFor" class="radio" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"
+                                                   ng-change="ChangeFeeScheduleType(FeeSchedulesObj.AvailableFor)" ng-model="FeeSchedulesObj.AvailableFor" value="PatientBill">
+                                            <span class="lbl"></span>
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">Patient Bills</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-sm-8" ng-if="FeeSchedulesObj.AvailableFor!='PatientBill'">
+                                <div class="d__f-- fd__c-- form__group pb__5--">
+                                    <div class="d__f-- ai__c-- jc__sb--">
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D--">Payers (multiple select is allowed)</label>
+                                        <div class="d__f-- ai__c-- gap__x--6">
+                                            <div class="d__ib--">
+                                                <input type="radio"
+                                                       class="radio-custom width-0"
+                                                       id="input_ruv1"
+                                                       ng-model="FeeSchedulesObj.PayorSelectionType"
+                                                       value="Payer">
+                                                <label for="input_ruv1" class="radio-custom-label cur-pointer mb-0 text-label">
+                                                    Payer
+                                                </label>
+                                            </div>
+                                            <div class="d__ib--">
+                                                <input type="radio"
+                                                       class="radio-custom width-0"
+                                                       id="input_ruv2"
+                                                       ng-model="FeeSchedulesObj.PayorSelectionType"
+                                                       value="PayerGroup">
+                                                <label for="input_ruv2" class="radio-custom-label cur-pointer mb-0 text-label">
+                                                    Payer Group
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction ng-show="FeeSchedulesObj.PayorSelectionType === 'Payer'">
+                                        <button class="form__control text-left"
+                                                id="dropdownMenuPayor"
+                                                ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"
+                                                data-toggle="dropdown"
+                                                ng-click="onPayorDropdownOpen(FeeSchedulesObj.PayorObj)">
+                                            <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                            {{ FeeSchedulesObj.SelectPayorText }}
+                                        </button>
+
+                                        <div class="dropdown-menu dr-drop-app"
+                                             role="menu"
+                                             aria-labelledby="dropdownMenuPayor"
+                                             ng-click="stopClosingDropDown($event)">
+                                            <!-- Search input -->
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       placeholder="Search Payor"
+                                                       ng-model="FeeSchedulesObj.PayorObj"
+                                                       ng-change="SearchPayorList()"
+                                                       autocomplete="off" />
+                                            </div>
+
+                                            <!-- Checkbox list -->
+                                            <div class="apptsearchdroplist">
+                                                <ul>
+                                                    <li ng-repeat="item in FilteredPayorList">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox"
+                                                                   class="checkbox"
+                                                                   ng-model="item.IsChecked"
+                                                                   ng-click="togglePayorSelection(item)" />
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{ item.PayorName }}</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="text" class="icons-search"
+                                           ng-show="FeeSchedulesObj.PayorSelectionType === 'PayerGroup'"
+                                           id="input_payorgroup"
+                                           maxlength="100"
+                                           autocomplete="off"
+                                           name="InsuranceGroupPayor"
+                                           placeholder="Enter Payer Group Name"
+                                           ng-model="FeeSchedulesObj.PayorGroupObj"
+                                           typeahead-min-length="0"
+                                           typeahead-on-select="OnSelectGroupPayor(FeeSchedulesObj.PayorGroupObj)"
+                                           uib-typeahead="item as item.OrgPayorGroupName for item in GetOrganizationPayorGroupList($viewValue)" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-2">
+                                <div class="form__group pb__5--">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Effective Date<em>*</em></label>
+                                    <div class="form__group position__relative--">
+                                        <input type="text" class="icons-calendar cur-default bg-white"
+                                               id="input__effectivedatefrom"
+                                               ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"
+                                               ng-model="FeeSchedulesObj.EffectiveFrom"
+                                               placeholder="MM-DD-YYYY"
+                                               datepickeruniversal readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-2">
+                                <div class="form__group pb__5--">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">End Date<em>*</em></label>
+                                    <div class="form__group position__relative--">
+                                        <input type="text" class="icons-calendar cur-default bg-white"
+                                               id="input__effectivedateto"
+                                               ng-disabled="FeeSchedulesObj.FeeScheduleId!=0"
+                                               ng-model="FeeSchedulesObj.EffectiveTo"
+                                               placeholder="MM-DD-YYYY"
+                                               datepickeruniversal readonly />
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="d__f-- fd__c-- gap__5--y pb__5--" ng-if="FeeSchedulesObj.Payors.length > 0">
+                                    <span class="fs__lg-- fw__6-- tc__1D1D1D--">Selected Payers</span>
+                                    <div class="d__f-- fw__w-- gap__5--">
+                                        <div class="d__f-- fw__w-- gap__8--">
+                                            <div class="d__f-- ai__c-- gap__x--15 bg__F9F9F9-- border__E9E9E9-- bradius__4-- px__5-- py__3--" ng-repeat="item in FeeSchedulesObj.Payors | filter:{IsChecked: true} track by $index" ng-if="item.OrganizationPayorId != 0">
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.OrganizationPayorName}}
+                                                </span>
+                                                <a><i class="icons__w16-- close__w16--o" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0" ng-click="RemoveSelectedPayors(item)"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d__f-- fd__c-- gap__5--y pb__5--" ng-if="(FeeSchedulesObj.Providers | filter:{IsChecked:true}).length > 0">
+                                    <span class="fs__lg-- fw__6-- tc__1D1D1D--">Selected Providers</span>
+                                    <div class="d__f-- fw__w-- gap__5--">
+                                        <div class="d__f-- fw__w-- gap__8--">
+                                            <div class="d__f-- ai__c-- gap__x--15 bg__F9F9F9-- border__E9E9E9-- bradius__4-- px__5-- py__3--" ng-repeat="item in FeeSchedulesObj.Providers | filter:{IsChecked: true} track by $index" ng-if="item.OrganizationBillingProviderId != 0">
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                                    {{item.BillingProviderName}}
+                                                </span>
+                                                <a><i class="icons__w16-- close__w16--o" ng-disabled="FeeSchedulesObj.FeeScheduleId!=0" ng-click="RemoveSelectedProviders(item)"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d__f-- fd__c-- bg__FFFFFF-- bradius__6-- boxs__0000001F--b border__DDD--">
+                        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- py__8-- px__12-- bb__DDD-- m__0-- lh__20--">Professional Fees</h1>
+                        <div class="d__f-- fd__c-- gap__10--y p__10-- ">
+                            <label class="fs__lg-- fw__5-- tc__1D1D1D--">Fee Calculation Method <em>*</em></label>
+                            <div class="d__f-- ai__c-- gap__10--x" ng-if="false">
+                                <div class="d__ib--">
+                                    <input type="radio" class="radio-custom width-0"
+                                           id="input_feefservice"
+                                           ng-model="FeeSchedulesObj.ScheduleTypeId"
+                                           ng-value="1" ng-change="changeScheduleType()">
+                                    <label for="input_feefservice" class="radio-custom-label cur-poiter mb-0 text-label">
+                                        Fee for Service
+                                    </label>
+                                </div>
+
+                                <div class="d__ib--">
+                                    <input type="radio" class="radio-custom width-0"
+                                           id="input_medicare"
+                                           ng-model="FeeSchedulesObj.ScheduleTypeId"
+                                           ng-value="2" ng-change="changeScheduleType()">
+                                    <label for="input_medicare" class="radio-custom-label cur-poiter mb-0 text-label">
+                                        % of Medicare
+                                    </label>
+                                </div>
+
+                                <div class="d__ib--">
+                                    <input type="radio" class="radio-custom width-0"
+                                           id="input_ruv"
+                                           ng-model="FeeSchedulesObj.ScheduleTypeId"
+                                           ng-value="3" ng-change="changeScheduleType()">
+                                    <label for="input_ruv" class="radio-custom-label cur-poiter mb-0 text-label">
+                                        RVU
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="tab-container">
+                                <ul class="tab__style--3 pl__8-- pt__3--">
+                                    <li ng-class="FeeSchedulesObj.ScheduleTypeId === 1 ? 'active' : ''"
+                                        ng-click="FeeSchedulesObj.ScheduleTypeId = 1; changeScheduleType()">
+                                        <a>Fee for Service</a>
+                                    </li>
+                                    <li ng-class="FeeSchedulesObj.ScheduleTypeId === 2 ? 'active' : ''"
+                                        ng-click="FeeSchedulesObj.ScheduleTypeId = 2; changeScheduleType()">
+                                        <a>% of Medicare</a>
+                                    </li>
+                                    <li ng-class="FeeSchedulesObj.ScheduleTypeId === 3 ? 'active' : ''"
+                                        ng-click="FeeSchedulesObj.ScheduleTypeId = 3; changeScheduleType()">
+                                        <a>RVU</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="d__f-- fd__c--" ng-if="FeeSchedulesObj.ScheduleTypeId==1">
+                                <div class="d__f-- jc__sb-- ai__c-- pb__4--">
+                                    <div class="form__group ">
+                                        <!--<input type="text" placeholder="Search Procedure/CPT" class="icons-search input__style--1" ng-model="FeeSchedulesObj.SearchProcedure" ng-change="filterProcedures()" />-->
+                                        <input type="text" placeholder="Enter CPT code"
+                                               class="icons-search input__style--1"
+                                               autocomplete="off"
+                                               maxlength="100"
+                                               ng-model="FeeSchedulesObj.Procedureobj"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               ng-change="changeCPTProcedure(FeeSchedulesObj.Procedureobj)"
+                                               uib-typeahead="item as item.CPTCode +'-'+ item.ProcedureName for item in GetSearchProcedureMedicareDetails($viewValue)"
+                                               typeahead-on-select="onselectCptCost(FeeSchedulesObj.Procedureobj)" />
+                                    </div>
+                                    <div class="d__f-- ai__b-- gap__10--x" ng-if="false">
+                                        <span class="fs__lg-- fw__6-- tc__1D1D1D--">Default fee:<em>*</em></span>
+                                        <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--8">
+                                            <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- btl-radius bbl-radius">%</span>
+                                            <input type="text" placeholder="150" maxlength="5" class="border__none-- w__100-- btr-radius bbr-radius" ng-model="FeeSchedulesObj.DefaultFee" ng-change="calculateFee(FeeSchedulesObj.DefaultFee,1)" numbersdots-only="numbersdots-only" validtwodecimal-number />
+                                        </div>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--">of Medicare</span>
+                                    </div>
+                                </div>
+                                <div class="border__DDD-- bradius__4-- table-responsive slim-scroll overflow__auto--">
+                                    <table class="table__style--23" ng-if="false">
+                                        <thead>
+                                            <tr>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="4%"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="8%" ng-if="FeeSchedulesObj.FeeScheduleId!=0"><span class="fs__md-- fw__6-- tc__1D1D1D--">Payor</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="8%"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="12%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="32%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifiers</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Active</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-if="FeeSchedulesObj.TempProceduresList.length > 0">
+                                            <tr ng-repeat="item in FeeSchedulesObj.TempProceduresList track by $index">
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{$index + 1}}.</span>
+                                                </td>
+                                                <td ng-if="FeeSchedulesObj.FeeScheduleId!=0">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.OrganizationPayorName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="">{{item.ProcedureName}}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="item.MedicareOfficeFee" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="item.MedicareASCFee" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none--  w__80-- btr-radius bbr-radius" ng-model="item.AnesthesiaCost" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <input type="text" placeholder="Enter" ng-model="item.ModifierCode" disabled />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- gap__5--" ng-click="syncProcedure(item, $index, 'Active')">
+                                                        <i class="fa" ng-class="item.ActiveInd === 'Y' ? 'fa-toggle-on pactive' : 'fa-toggle-off pinactive'"></i>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table__style--23 table-layout-auto">
+                                        <thead>
+                                            <tr>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--" ng-if="FeeSchedulesObj.FeeScheduleId!=0"><span class="fs__md-- fw__6-- tc__1D1D1D--">Payor</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifiers</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap-- ta__c--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Require Pre-Auth</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap-- ta__c--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Not Covered</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap-- ta__c--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Capitated Service</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap-- ta__c--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Referral Required</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Active</span></th>
+                                                <th class="bg__none-- bb__DDD-- p__8-- ws__nowrap--" ng-if="FeeSchedulesObj.FeeScheduleId==0"><span class="fs__md-- fw__6-- tc__1D1D1D--"></span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-if="FeeSchedulesObj.TempProceduresList.length > 0">
+                                            <tr ng-repeat="item in FeeSchedulesObj.TempProceduresList track by $index">
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{$index + 1}}.</span>
+                                                </td>
+                                                <td ng-if="FeeSchedulesObj.FeeScheduleId!=0">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.OrganizationPayorName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.ProcedureName}}">{{item.ProcedureName}}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none-- w__80-- btr-radius bbr-radius" ng-model="item.MedicareOfficeFee" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none-- w__80-- btr-radius bbr-radius" ng-model="item.MedicareASCFee" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                        <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                        <input type="text" placeholder="Enter" class="border__none-- w__80-- btr-radius bbr-radius" ng-model="item.AnesthesiaCost" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form__group">
+                                                        <input type="text" placeholder="Enter" ng-model="item.ModifierCode" disabled />
+                                                    </div>
+                                                </td>
+                                                <td class="ta__c--">
+                                                    <label class="checkbox__style--1">
+                                                        <input type="checkbox" ng-model="item.RequirePreAuth" ng-change="syncProcedure(item, $index, 'RequirePreAuth')">
+                                                    </label>
+                                                </td>
+                                                <td class="ta__c--">
+                                                    <label class="checkbox__style--1">
+                                                        <input type="checkbox" ng-model="item.ProcedureNotCoveredByInsurance" ng-change="syncProcedure(item, $index, 'ProcedureNotCoveredByInsurance')">
+                                                    </label>
+                                                </td>
+                                                <td class="ta__c--">
+                                                    <label class="checkbox__style--1">
+                                                        <input type="checkbox" ng-model="item.CapitatedService" ng-change="syncProcedure(item, $index, 'CapitatedService')">
+                                                    </label>
+                                                </td>
+                                                <td class="ta__c--">
+                                                    <label class="checkbox__style--1">
+                                                        <input type="checkbox" ng-model="item.IsReferralRequired" ng-change="syncProcedure(item, $index, 'IsReferralRequired')">
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <div class="d__f-- ai__c-- gap__5--" ng-click="syncProcedure(item, $index, 'Active')">
+                                                        <i class="fa" ng-class="item.ActiveInd === 'Y' ? 'fa-toggle-on pactive' : 'fa-toggle-off pinactive'"></i>
+                                                    </div>
+                                                  
+                                                </td>
+                                                <td ng-if="FeeSchedulesObj.FeeScheduleId==0">
+                                                    <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true">
+                                                        <i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="DeleteFreeCpt($index,item)"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-show="FeeSchedulesObj.TempProceduresList.length == 0">
+                                        <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c--" ng-if="FeeSchedulesObj.ScheduleTypeId==2">
+                                <div class="row">
+                                    <div class="col-lg-5 col-sm-6">
+                                        <div class="d__f-- fd__c-- gap__5--y pb__10--">
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D-- ">Medicare for Services<em>*</em> </span>
+                                            <div class="d__f-- gap__x--6 border__DDD-- bradius__5--">
+                                                <span class="fs__xl-- fw__6-- tc__1D1D1D-- py__5-- px__8-- bg__E4E4E4-- bradius__4--l">%</span>
+                                                <input type="text" class="width__100-- border__none-- bradius__4--r" placeholder="Enter" ng-model="FeeSchedulesObj.MedicarePercentValue" ng-change="calculateFee(FeeSchedulesObj.MedicarePercentValue,2)" numbersdots-only="numbersdots-only" maxlength="5" validtwodecimal-number />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-sm-6">
+                                        <div class="d__f-- fd__c-- gap__5--y pb__10--">
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D-- ">Anesthesia Conversion Factor </span>
+                                            <div class="d__f-- gap__x--6 border__DDD-- bradius__5--">
+                                                <span class="fs__xl-- fw__6-- tc__1D1D1D-- py__5-- px__8-- bg__E4E4E4-- bradius__4--l">%</span>
+                                                <input type="text" class="width__100-- border__none-- bradius__4--r" placeholder="Enter" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-sm-6">
+                                        <div class="d__f-- fd__c-- gap__5--y pb__10--">
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D-- ">Medicare for Fixed Rate HCPCS other than DMEPOS<em>*</em> </span>
+                                            <div class="d__f-- gap__x--6 border__DDD-- bradius__5--">
+                                                <span class="fs__xl-- fw__6-- tc__1D1D1D-- py__5-- px__8-- bg__E4E4E4-- bradius__4--l">%</span>
+                                                <input type="text" class="width__100-- border__none-- bradius__4--r" placeholder="Enter" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-sm-6">
+                                        <div class="d__f-- fd__c-- gap__5--y pb__10--">
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D-- ">Medicare DMEPOS<em>*</em></span>
+                                            <div class="d__f-- gap__x--6 border__DDD-- bradius__5--">
+                                                <span class="fs__xl-- fw__6-- tc__1D1D1D-- py__5-- px__8-- bg__E4E4E4-- bradius__4--l">%</span>
+                                                <input type="text" class="width__100-- border__none-- bradius__4--r" placeholder="Enter" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border__DDD-- bradius__4--">
+                                    <div class="slim-scroll overflow__auto--y max__h330--">
+                                        <table class="table__style--23">
+                                            <thead>
+                                                <tr>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="4%"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="8%"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="12%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="32%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                                    <th class="bg__none-- bb__DDD-- p__8--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifiers</span></th>
+                                                    <!--<th class="bg__none-- bb__DDD-- p__8--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Active</span></th>-->
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-if="FeeSchedulesObj.DisplayProceduresList.length > 0">
+                                                <tr ng-repeat="item in FeeSchedulesObj.DisplayProceduresList track by $index">
+                                                    <td>
+                                                        <span class="fs__md-- fw__5-- tc__1D1D1D--">{{(FeeSchedulesObj.CostPageNumber - 1) * 100 + ($index + 1)}}.</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="">{{item.ProcedureName}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                            <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                            <input type="text" placeholder="Enter" class="border__none--  width__100-- btr-radius bbr-radius" ng-model="item.MedicareOfficeFee" ng-disabled="true" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                            <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                            <input type="text" placeholder="Enter" class="border__none--  width__100-- btr-radius bbr-radius" ng-model="item.MedicareASCFee" ng-disabled="true" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                                            <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">$</span>
+                                                            <input type="text" placeholder="Enter" class="border__none--  width__100-- btr-radius bbr-radius" ng-model="item.AnesthesiaCost" ng-disabled="true" ng-change="syncProcedure(item, $index, '')" numbersdots-only="numbersdots-only" maxlength="8" validtwodecimal-number />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form__group">
+                                                            <input type="text" placeholder="Enter" ng-model="item.ModifierCode" disabled />
+                                                        </div>
+                                                    </td>
+                                                    <!--<td>
+                                                        <div class="d__f-- ai__c-- gap__5--" ng-click="syncProcedure(item, $index, 'Active')">
+                                                            <i class="fa" ng-class="item.ActiveInd === 'Y' ? 'fa-toggle-on pactive' : 'fa-toggle-off pinactive'"></i>
+                                                        </div>
+                                                    </td>-->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row m-t-10" ng-show="FeeSchedulesObj.DisplayProceduresList.length > 0">
+                                        <div class="col-lg-12 text-center EH-pagination">
+                                            <uib-pagination total-items="MedicareFeeListCount"
+                                                            ng-model="FeeSchedulesObj.CostPageNumber"
+                                                            ng-change="Getdispalycost(FeeSchedulesObj.CostPageNumber)"
+                                                            force-ellipses="true"
+                                                            boundary-link-numbers="true"
+                                                            max-size="5"
+                                                            items-per-page="100">
+                                            </uib-pagination>
+                                        </div>
+                                    </div>
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-show="FeeSchedulesObj.DisplayProceduresList.length == 0">
+                                        <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="d__f-- fd__c--" ng-if="FeeSchedulesObj.ScheduleTypeId==3">
+                                <div class="row">
+                                    <div class="col-lg-5 col-sm-6">
+                                        <div class="d__f-- fd__c-- gap__5--y pb__10--">
+                                            <span class="fs__lg-- fw__5-- tc__1D1D1D-- ">RVU<em>*</em> </span>
+                                            <div class="d__f-- gap__x--6 border__DDD-- bradius__5--">
+                                                <span class="fs__xl-- fw__6-- tc__1D1D1D-- py__5-- px__8-- bg__E4E4E4-- bradius__4--l">$</span>
+                                                <input type="text" class="width__100-- border__none-- bradius__4--r" placeholder="Enter" ng-model="FeeSchedulesObj.RVU" ng-change="calculateFee(FeeSchedulesObj.RVU,3)" numbersdots-only="numbersdots-only" maxlength="5" validtwodecimal-number />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="addfeeschedule.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <div class="d__f-- fd__c-- gap__y--5 pl__10--">
+                <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0-- ">Fee Schedule - {{FeeScheduleSummary.FeeScheduleName}}</h1>
+                <span class="fs__md-- fw__5-- tc__656565-- ">Review fee schedule details, rates,and configuration settings</span>
+            </div>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <button class="btn__lg-- btn__1d5558--f" ng-click="UpdateFeeSchedule()">Make Changes</button>
+                <a class="btn__close--2" ng-click="uibclose()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </div>
+        </div>
+        <div class="modal__body--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__y--15">
+                        <table class="table tableno-bordered m__0--">
+                            <tbody>
+                                <tr>
+                                    <td width="30%">
+                                        <div class="d__f-- fd__c-- gap__y--2">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Schedule Name</span>
+                                            <span class="fs__md-- fw__5-- tc__3C3C3C--">{{FeeScheduleSummary.FeeScheduleName}}</span>
+                                        </div>
+                                    </td>
+                                    <td width="10%">
+                                        <div class="d__f-- fd__c-- gap__y--2 ">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Status</span>
+                                            <div>
+                                                <span class="fs__md-- fw__5-- tc__3BAC66-- bg__E2F3E8-- py__3-- px__6-- bradius__10-- ">{{FeeScheduleSummary.IsActive == true ? 'Active' : 'InActive'}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="d__f-- fd__c-- gap__y--2">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Available for</span>
+                                            <div class="d__f-- gap__10--x">
+                                                <span class="fs__md-- fw__5-- tc__656565-- bg__F5F5F5-- py__3-- px__6-- bradius__4-- " ng-if="FeeScheduleSummary.IsAvailableForInsurance">Insurance Payers</span>
+                                                <span class="fs__md-- fw__5-- tc__656565-- bg__F5F5F5-- py__3-- px__6-- bradius__4-- " ng-if="FeeScheduleSummary.IsAvailableForPatientBill">Patient Bills</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="d__f-- fd__c--  gap__y--2">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Calculation Method</span>
+                                            <div>
+                                                <span class="fs__md-- fw__5-- tc__537ACF-- bg__DCE6FC-- py__3-- px__6-- bradius__10-- ">{{FeeScheduleSummary.ScheduleType}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td width="10%">
+                                        <div class="d__f-- fd__c-- gap__y--2 ">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Effective Date</span>
+                                            <span class="fs__md-- fw__5-- tc__3C3C3C--">{{FeeScheduleSummary.EffectiveFrom | date:'MM-dd-yyyy'}}</span>
+                                        </div>
+                                    </td>
+                                    <td width="10%">
+                                        <div class="d__f-- fd__c--  gap__y--2">
+                                            <span class="fs__md-- fw__6-- tc__1D1D1D--">Expiry Date</span>
+                                            <span class="fs__md-- fw__5-- tc__3C3C3C--">{{FeeScheduleSummary.EffectiveTo | date:'MM-dd-yyyy'}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="d__f-- fd__c-- gap__10--y">
+                                            <div class="d__f-- fd__c-- gap__5--y">
+                                                <span class="fs__md-- fw__6-- tc__1D1D1D-- "> Payers({{(FeeScheduleSummary.Payors ? FeeScheduleSummary.Payors.length : 0)}})</span>
+                                                <div class="d__f-- gap__8-- fw__w--">
+                                                    <div class="py__2-- px__8-- bg__F5F5F5-- bradius__5--" ng-repeat="item in FeeScheduleSummary.Payors">
+                                                        <span class="fs__md-- fw__5-- tc__656565--">{{item.OrganizationPayorName}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d__f-- fd__c-- gap__5--y">
+                                                <span class="fs__md-- fw__6-- tc__1D1D1D-- "> Providers({{(FeeScheduleSummary.Providers ? FeeScheduleSummary.Providers.length : 0)}})</span>
+                                                <div class="d__f-- gap__8-- fw__w--">
+                                                    <div class="py__2-- px__8-- bg__F5F5F5-- bradius__5--" ng-repeat="item in FeeScheduleSummary.Providers">
+                                                        <span class="fs__md-- fw__5-- tc__656565--">{{item.BillingProviderName}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d__f-- fd__c-- gap__5--y">
+                                                <span class="fs__md-- fw__6-- tc__1D1D1D-- ">Location</span>
+                                                <div class="d__f-- gap__8-- fw__w--">
+                                                    <div class="py__2-- px__8-- bg__F5F5F5-- bradius__5--">
+                                                        <span class="fs__md-- fw__5-- tc__656565--">{{FeeScheduleSummary.OrganizationName}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td colspan="3" class="valign-top">
+                                        <div class="d__f-- fd__c-- gap__y--15 pt__8--">
+                                            <div class="d__f-- fd__c-- gap__y--8 bg__DCE6FC-- p__10-- bradius__5--">
+                                                <span class="fs__md-- fw__6-- tc__1D1D1D--">Base Calculations reference current Medicare fee schedule rates</span>
+                                                <div>
+                                                    <a class="bg__FFF-- py__4-- px__10-- bradius__15-- tc__537ACF-- border__1D5558--">
+                                                        <span ng-if="FeeScheduleSummary.ScheduleTypeId == 3">$</span>
+                                                        {{ FeeScheduleSummary.MedicarePercentValue }}
+                                                        <span ng-if="FeeScheduleSummary.ScheduleTypeId == 1">%</span>
+                                                        {{ FeeScheduleSummary.ScheduleType }}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="d__f-- fd__c-- gap__y--8  bg__F5F5F5-- p__10-- bradius__5--">
+                                                <span class="fs__md-- fw__6-- tc__1D1D1D--">Schedule info</span>
+                                                <div class="d__f--">
+                                                    <div class="d__f-- fd__c-- width__50--">
+                                                        <span class="fs__md-- fw__6-- tc__656565--">Created on: <span class="fs__md-- fw__6-- tc__1D1D1D--">{{FeeScheduleSummary.CreatedDt | date:'MM-dd-yyyy'}}</span></span>
+                                                        <span class="fs__md-- fw__6-- tc__656565--">Created by:<span class="fs__md-- fw__6-- tc__1D1D1D--"> {{FeeScheduleSummary.CreatedByName}} </span></span>
+                                                    </div>
+                                                    <div class="d__f-- fd__c--">
+                                                        <span class="fs__md-- fw__6-- tc__656565--">Modified on: <span class="fs__md-- fw__6-- tc__1D1D1D--">{{FeeScheduleSummary.ModifiedDt | date:'MM-dd-yyyy'}}</span></span>
+                                                        <span class="fs__md-- fw__6-- tc__656565--">Modified by:<span class="fs__md-- fw__6-- tc__1D1D1D--"> {{FeeScheduleSummary.CreatedByName}} </span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d__f-- fd__c-- gap__y--8 px__10--">
+                            <h1 class="fs__lg-- fw__6-- tc__1D1D1D-- m__0--">CPT Rates</h1>
+                            <div class="form__group width__30--">
+                                <!--<input type="text" placeholder="Search Procedure/CPT" class="icons-search input__style--1" ng-model="FeeScheduleSummary.SearchProcedure" ng-change="filterCPTRates()" />-->
+                            </div>
+                            <div class="border__DDD-- bradius__4-- table-responsive slim-scroll">
+                                <table class="table__style--23">
+                                    <thead>
+                                        <tr>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="4%"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="8%"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="32%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="12%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Office Fee</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="12%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Facility Fee</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Anesthesia Cost</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="10%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifiers</span></th>
+                                            <th class="bg__none-- bb__DDD-- p__6--" width="5%"><span class="fs__md-- fw__6-- tc__1D1D1D--">Active</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-if="FeeScheduleSummary.OrgPayorData.length > 0">
+                                        <tr ng-repeat="item in FeeScheduleSummary.OrgPayorData track by $index">
+                                            <td class="p__8--">
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">{{$index + 1}}.</span>
+                                            </td>
+                                            <td class="p__8--">
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.CPTCode}}</span>
+                                            </td>
+                                            <td class="p__8--">
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcedureCode}}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt" title="{{item.ProcedureName}}">{{item.ProcedureName}}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">$ {{item.MedicareOfficeFee | number : 2}}</span>
+
+                                            </td>
+                                            <td>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">$ {{item.MedicareASCFee | number : 2}}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fs__md-- fw__5-- tc__1D1D1D--">$ {{item.AnesthesiaCost | number : 2}}</span>
+                                            </td>
+                                            <td>
+                                                <div class="form__group">
+                                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ModifierCode}}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <span class="fs__md-- fw__6-- py__4-- px__6-- bradius__5--" ng-class="item.ActiveInd === 'Y' ? 'tc__3BAC66-- bg__E2F3E8--': 'tc__656565-- bg__F5F5F5--'">{{ item.ActiveInd === 'Y' ? 'Active' : 'Inactive' }} </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="FeeScheduleSummary.OrgPayorData.length == 0">
+                                    <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Data Found</h1>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="filterspopover.html">
+    <div class="d__f-- fd__c--">
+        <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+            <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+            <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+        </div>
+        <div class="two-sections height__100--">
+            <div class="width__40-- br__DDD-- px__8-- py__3--">
+                <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'payor'">
+                    <li data-target="#payor" data-toggle="tab" ng-click="activeTab = 'payor'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'payor' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Payors</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+                    <li data-target="#Providers" data-toggle="tab" ng-click="activeTab = 'Providers'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Providers' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Providers</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+                    <li data-target="#Locations" data-toggle="tab" ng-click="activeTab = 'Locations'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Locations' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Locations</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+                    <li data-target="#status" data-toggle="tab" ng-click="activeTab = 'status'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'status' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Status</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content flex p__8-- height__100--">
+                <div class="tab-pane fade in active height__100--" id="payor">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="FeeSchedulesObj.PayorObj" ng-change="SearchPayorList()" autocomplete="off" />
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(FilteredPayorList | filter:{'OrganizationPayorName':FeeSchedulesObj.PayorObj}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in FilteredPayorList | filter:{'OrganizationPayorName':FeeSchedulesObj.PayorObj}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectPayers(item)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.PayorName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade height__100--" id="Providers">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.txt1">
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(BillingProviderList | filter:{'BillingProviderName':searchHospital.txt1}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in filterProviderList | filter:{'BillingProviderName':searchHospital.txt1}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectBillingProvider(item)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.BillingProviderName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade height__100--" id="Locations">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.txt2">
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(filterLocationslist | filter:{'ClinicName':searchHospital.txt2}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in filterLocationslist | filter:{'ClinicName':searchHospital.txt2}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectLocation(item)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ClinicName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade height__100--" id="status">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.txt3">
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(StatusList | filter:{'StatusName':searchHospital.txt3}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in StatusList | filter:{ StatusName: searchHospital.txt3 } track by $index">
+                                            <div class="dis-block m-t-5">
+                                                <input type="radio"
+                                                       class="radio-custom width-0"
+                                                       id="status_{{$index}}"
+                                                       name="statusGroup"
+                                                       ng-model="SelectedStatus"
+                                                       ng-value="item"
+                                                       ng-click="OnSelectStatus(item)" />
+
+                                                <label for="status_{{$index}}"
+                                                       class="radio-custom-label cur-poiter mb-0 text-label font-weight-500 text-black fs-13">
+                                                    {{item.StatusName}}
+                                                </label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+            <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" title="Clear Filters" ng-click="ResetAll()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="ApplyFilters()">{{ 'APPLY' | translate}}</button>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="filtersPayerpopover.html">
+    <div class="d__f-- fd__c--">
+        <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+            <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+            <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+        </div>
+        <div class="two-sections height__100--">
+            <div class="width__40-- br__DDD-- px__8-- py__3--">
+                <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'payor'">
+                    <li data-target="#payor" data-toggle="tab" ng-click="activeTab = 'payor'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'payor' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Payors</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+
+                    <li data-target="#Locations" data-toggle="tab" ng-click="activeTab = 'Locations'">
+                        <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Locations' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                            <span class="fs__lg--">Locations</span>
+                            <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="tab-content flex p__8-- height__100--">
+                <div class="tab-pane fade in active height__100--" id="payor">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="PayorWiseCptObj.PayorObj" ng-change="SearchPayorList()" autocomplete="off" />
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(FilteredPayorList | filter:{'OrganizationPayorName':FeeSchedulesObj.PayorObj}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in FilteredPayorList | filter:{'OrganizationPayorName':PayorWiseCptObj.PayorObj}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectPayers(item)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.PayorName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade height__100--" id="Locations">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <input type="text" class="input__style--1 icons-search" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.txt2">
+                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                            <div class="section__header-- px__10-- jc__e--">
+                                <label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--" ng-bind="(filterLocationslist | filter:{'ClinicName':searchHospital.txt2}).length"></span>Results Found</label>
+                            </div>
+                            <div class="section__body-- border__E4E4E4-- height__100--">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                        <li ng-repeat="item in filterLocationslist | filter:{'ClinicName':searchHospital.txt2}">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="OnSelectLocation(item)">
+                                                <span class="lbl"></span>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.ClinicName}}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+            <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" title="Clear Filters" ng-click="PayorResetAll()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="ApplyPayorFilters()">{{ 'APPLY' | translate}}</button>
+        </div>
+    </div>
+</script>

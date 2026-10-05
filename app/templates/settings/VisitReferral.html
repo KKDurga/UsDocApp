@@ -1,0 +1,110 @@
+<div class="setting-content h-100">
+    <div class="dis-flex flex-direction-column grid-gap-5 h-100">
+        <div class="pos-relative h-100">
+            <div class="adjustable-position slim-scroll">
+                <div class="dis-flex flex-direction-column grid-gap-10 height__100--">
+                    <div class="section__style--2" ng-if="addedReferralSource">
+                        <div class="section__header--">
+                            <h1>{{ 'ADDREFERRALSOURCE' | translate}}</h1>
+                        </div>
+                        <div class="section__body--">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <form name="referralform" class="" novalidate>
+                                        <div class="row">
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form__group">
+                                                    <label for="Referral_Source">{{ 'REFERRALSOURCE' | translate}}</label>
+                                                    <select id="Referral_Source" ng-model="referral.referralSource"
+                                                            ng-options="item as item.MasterReferralSourceName for item in ReferralSouceMaster" ng-disabled="editReferral">
+                                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                                    </select>
+                                                    <div class="clearfix"></div>
+                                                    <div class="error-mesg-wrap" ng-show="(referralform.$submitted || referralform.referralTitle.$touched) && referralform.referralTitle.$error.required">
+                                                        <span class="list list-inset error-msg">{{ 'ENTERREFERRALSOURCETITLE' | translate}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-sm-4">
+                                                <div class="form__group">
+                                                    <label for="Referral_Source_title">{{ 'ENTERREFERRALSOURCETITLE' | translate}}</label>
+                                                    <input class="Referral_Source_title" type="text" id="referralTitle1" name="referralTitle1" placeholder="Enter title for Referral Source" maxlength="50" ng-model="referral.referralTitle" ng-focus="referralFocus" ng-focus-lost="LostSettingsFocus()" required>
+                                                    <div class="clearfix"></div>
+                                                    <div class="error-mesg-wrap" ng-show="(referralform.$submitted || referralform.referralTitle.$touched) && referralform.referralTitle.$error.required">
+                                                        <span class="list list-inset error-msg">{{ 'ENTERREFERRALSOURCETITLE' | translate}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- /col -->
+                                            <div class="col-lg-4 col-sm-4 m-t-22 dis-flex align-items-center grid-gap-10">
+                                                <button class="btn__xl-- btn__1d5558--f" id="btn_savereferral" ng-click="submitClick(referralform)"><i ng-class="{'action__icons--1 action__save--': SaveReferral === 'Save','action__icons--1 action__update--': SaveReferral === 'Update'}"></i>{{SaveReferral}}</button>
+                                                <button class="btn__xl-- btn__C71D27--f" id="btn_cancel" ng-click="closeAddReferral()"><i class="action__icons--1 action__cancel--"></i>{{ 'CANCEL' | translate}}</button>
+                                            </div>
+                                        </div>
+                                        <div width="150">
+                                            <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section__style--2 d__f-- fd__c-- height__100--">
+                        <div class="section__header--">
+                            <h1>{{ 'REFERRALSOURCELIST' | translate}}</h1>
+                            <button class="btn__lg-- btn__1d5558--f" id="btn_addnew" ng-click="viewAddReferral()" ng-disabled="addedReferralSource"><i class="action__icons--1 action__add--"></i>Add New</button>
+                        </div>
+                        <div class="section__body-- height__100--">
+                            <div class="row"  ng-hide="ReferralList.length==0">
+                                <div class="col-lg-12">
+                                    <div class="overflow__auto--y">
+                                        <table class="table__style--7" id="S_table_rsl">
+                                            <thead ng-hide="ReferralList.length==0">
+                                                <tr>
+                                                    <!--<th class="" width="30">S.No</th>-->
+                                                    <th>{{ 'REFERRALSOURCE' | translate}} </th>
+                                                    <th class="">{{ 'REFERRALSOURCETITLES' | translate}}</th>
+                                                    <th class="text-center table-sticky-column-right">{{ 'EDIT' | translate}}</th>
+                                                    <!--<th class="text-center" width="50">Delete</th>-->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="appointment-row" ng-repeat="referral in ReferralList">
+                                                    <!--<td>{{$index + 1}}</td>-->
+                                                    <td>{{referral.masterReferralSourceName}}</td>
+                                                    <td>{{referral.ReferralTitle}}</td>
+                                                    <td class="text-center column__sm table-sticky-column-right">
+                                                        <a class="cur-poiter" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true" ng-hide="(referral.ReferralTitle == 'OTHERS' || referral.OrganizationId == 1)"><i class="ehr-edit aside-icon-ros" ng-click="EditClick(referral)" data-tooltip="Edit"></i></a>
+                                                    </td>
+                                                    <!--<td class="text-center">
+                                <a class="cur-poiter" ng-if="(referral.ActiveIND == 'Y' && referral.ReferralTitle != 'OTHERS')"><i class="ehr-delete aside-icon-ros" data-tooltip="Delete" ng-click="RemoveClick(referral)"></i></a>
+                            </td>-->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-5" ng-show="ReferralList.length > 0">
+                                <div class="col-lg-12 text-center EH-pagination">
+                                    <uib-pagination total-items="totalItems"
+                                                    ng-model="ReferralcurrentPage"
+                                                    ng-change="ReferralpageChanged(ReferralcurrentPage)"
+                                                    force-ellipses="true"
+                                                    boundary-links="true"
+                                                    max-size="maxSize">
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--"  ng-show="ReferralList.length == 0">
+                                <a><i class="nodata__1-- d3__nodata--1"></i></a>
+                                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Referral List Found</h1>
+                                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Add your referral source and it will appear here.</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

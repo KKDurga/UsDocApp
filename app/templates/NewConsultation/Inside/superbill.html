@@ -1,0 +1,188 @@
+﻿<div class="history-panel">
+    <div class="history-repeat">
+        <div class="history-header">
+            <h1>
+                <i class="headicon-icn superbill-ehcons"></i> Super Bill
+            </h1>
+            <div>
+                <ul class="autofill-list m-b-0">
+                    <li>
+                        <fieldset>
+                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0" id="icDid_1" value="Yes" ng-model="newobja.IsIcDtype">
+                                <label for="icDid_1" class="radio-custom-label cur-poiter mb-0">ICD</label>
+                            </div>
+                            <div class="dis-inline-block ml-15">
+                                <input type="radio" class="radio-custom width-0" id="cpTid_1" value="No" ng-model="newobja.IsIcDtype">
+                                <label for="cpTid_1" class="radio-custom-label cur-poiter mb-0">CPT</label>
+                            </div>
+                        </fieldset>
+                    </li>
+                    <li>
+                        <input ng-focus="FocusObj.SuperBillFocus === true" type="text" class="form-control input-color icons-search w-400"
+                               name="DiagnosiseIcd"
+                               placeholder="Search ICD Diagnosis"
+                               ng-model="newobja.DiagnosisObject"
+                               maxlength="100"
+                               typeahead-min-length="0"
+                               typeahead-focus-on-select="false"
+                               ng-if="newobja.IsIcDtype=='Yes'"
+                               uib-typeahead="item as item.ICD10DIAGNAME + ' - ' + item.ICD10CODE for item in changeDiagnosisICD($viewValue)"
+                               typeahead-on-select="AddDiagnosisICDtoSuperBill(newobja.DiagnosisObject)"
+                               ng-blur="changefocusOption();" />
+
+
+
+
+                        <input ng-focus="FocusObj.SuperBillFocus === true" type="text" class="form-control input-color icons-search w-400"
+                               name="ProceduresIcd"
+                               placeholder="Search CPT Procedures"
+                               ng-model="newobja.ProceduresObject"
+                               maxlength="100"
+                               typeahead-min-length="0"
+                               typeahead-focus-on-select="false"
+                               ng-if="newobja.IsIcDtype=='No'"
+                               uib-typeahead="item as item.ProcedureName  for item in changeProceduresCPT($viewValue)"
+                               typeahead-on-select="AddProceduresCPTtoSuperBill(newobja.ProceduresObject)"
+                               ng-blur="changefocusOption();" />
+                    </li>
+
+                    <!--<li>
+                        <button type="button" class="btn btn-sm btn-warning" ng-click="showDiagnosisPopup()">ICD</button>
+                        <button type="button" class="btn btn-danger" ng-click="showProceduresPopup()">CPT</button>
+                    </li>-->
+                    <li>
+                        <button class="btn-autofill btn-consultation btn" ng-click="SuperBillClaimsPopup()">Bill Claim</button>
+                    </li>
+                    <!--<li>
+        <i class="pull-right glyphicon glyphicon-chevron-down" style="cursor:pointer"></i>
+    </li>-->
+                </ul>
+            </div>
+        </div>
+        <div class="history-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="no-data-text p-b-0"  ng-show="cacheStorageItem.SuperBillDiagnosisArray.length  === 0 && cacheStorageItem.SuperBillProceduresArray.length  === 0">
+                        <span>No Super Bill added.</span>
+                        <a href="" ng-click="FocusObj.SuperBillFocus = true;">Click here</a>
+                        <span>or on search box to add Super Bill.</span>
+                    </div>
+                    <div class="single-panel" ng-show="cacheStorageItem.SuperBillDiagnosisArray.length  > 0 || cacheStorageItem.SuperBillProceduresArray.length  > 0">
+                        <div class="single-body p-t-5 p-b-5">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <section class="section-ehnote" ng-if="cacheStorageItem.SuperBillDiagnosisArray.length  > 0">
+                                        <div class="ehnote-header">
+                                            <h1>
+                                                Diagnosis
+                                            </h1>
+                                            <ul class="controls-cons">
+                                                <li>
+                                                    <label class="cur-poiter">
+                                                        <span class="text-scheduled">Select All</span>
+                                                        <input type="checkbox" id="IsDiagSelectAll3" class="checkbox" ng-model="newobja.IsDiagSelectAll" ng-change="changeDiagSelectAll(newobja)">
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="ehnote-body">
+                                            <table class="table assessment-table">
+                                                <tbody>
+                                                    <tr ng-repeat="item in cacheStorageItem.SuperBillDiagnosisArray track by $index">
+                                                        <td class="valign-top" width="10%">
+                                                            <span class="text-92060">
+                                                                {{item.ICD10Code}}
+                                                            </span>
+                                                        </td>
+                                                        <td class="valign-top">
+                                                            <span class="complaint-remarks">
+                                                                {{item.Description}}
+                                                            </span>
+                                                            <p class="mb-0">
+                                                                <b class="complaint-text">Remarks: </b>
+                                                                <span class="complaint-remarks ng-binding" ng-show="!item.IsediMode">
+                                                                    {{item.Comments}}
+                                                                </span>
+                                                                <input type="text" class="form-control" placeholder="+Add Remarks Here" ng-model="item.Comments" ng-show="item.IsediMode" />
+                                                            </p>
+                                                        </td>
+                                                        <td class="p-r-2 text-right">
+                                                            <label class="cur-poiter">
+                                                                <input class="checkbox" name="checkbox-2" id="chkSb{{$index+1}}" type="checkbox" ng-model="item.IsBillSelected" ng-disabled="item.IsBillingDone">
+                                                                <span class="lbl"></span>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+                                    <!-- / -->
+                                    <section class="section-ehnote" ng-if="cacheStorageItem.SuperBillProceduresArray.length  > 0">
+                                        <div class="ehnote-header">
+                                            <h1>
+                                                Procedures
+                                            </h1>
+                                            <ul class="controls-cons">
+                                                <li>
+                                                    <label class="cur-poiter">
+                                                        <span class="text-scheduled">Select All</span>
+                                                        <input type="checkbox" id="IsProcedureSelectAll3" class="checkbox" ng-model="newobja.IsProcedureSelectAll" ng-change="changeProcSelectAll(newobja)">
+                                                        <span class="lbl"></span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="ehnote-body">
+                                            <table class="table assessment-table">
+                                                <tbody>
+                                                    <tr ng-repeat="item in cacheStorageItem.SuperBillProceduresArray track by $index">
+                                                        <td class="valign-top">
+                                                            <span class="text-92060">
+                                                                {{item.CPTCode}}
+                                                            </span>
+                                                        </td>
+                                                        <td class="valign-top">
+                                                            <span class="complaint-remarks">
+                                                                {{item.Description}}
+                                                            </span>
+                                                        </td>
+                                                        <td class="valign-top" width="28%">
+                                                            <ul class="heading-conticn">
+                                                                <li>
+                                                                    <span class="complaint-remarks m-r-5"> {{item.Quantity}} Unit/s</span>
+                                                                </li>
+                                                            </ul>
+
+
+                                                           
+                                                        </td>
+                                                        <td class="p-r-2 justify-content-end">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-2" id="chkSb{{$index+1}}" type="checkbox" ng-model="item.IsBillSelected" ng-disabled="item.IsBillingDone">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small></small>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

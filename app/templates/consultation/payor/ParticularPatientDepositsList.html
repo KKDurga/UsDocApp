@@ -1,0 +1,278 @@
+﻿
+<div class="modal-header">
+    <h2 class="modal-title">
+        Deposits 
+    </h2>
+    <button type="button" class="close m-r-10 m-b-3 m-t-0" ng-click="ClosePopup()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="tile-header">
+            <h1>Add Deposits</h1>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="eh-panel">
+                    <div class="eh-body">
+                        <table class="table tableno-bordered billing-tabledata bg-white m-b-0">
+                            <thead>
+                                <tr class="table-bg-header">
+                                    <th class="w-100">Date</th>
+                                    <th>Mode<em>*</em></th>
+                                    <th>Trance ID</th>
+                                    <th class="w-120">Amount<em>*</em></th>
+                                    <th>Billing Provider</th>
+                                    <th>Towards To</th>
+                                    <th ng-show="PatientDepositsObj.DepositTypeId == 1 || PatientDepositsObj.DepositTypeId == '1'">Towards Appointments </th>
+                                    <th>Deposited By<em>*</em></th>
+                                </tr>
+                            </thead>
+                            <tbody class="billing-tabledata">
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="register-input" ng-model="PatientDepositsObj.DepositDate" datepickerforusformat placeholder="MM-DD-YYYY" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select class="register-input" ng-model="PatientDepositsObj.PaymentModeId"
+                                                    ng-options="list.PaymentModeId as list.PaymentModeName for list in masterPaymentModes"
+                                                    ng-change="ChangePaymentMode(PatientDepositsObj.PaymentModeId, PatientDepositsObj)">
+                                                <option value="" selected>Select</option>
+                                            </select>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="register-input" ng-model="PatientDepositsObj.TraceId" placeholder="Transaction Number" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="register-input" ng-model="PatientDepositsObj.DepositAmount" placeholder="Amount" numbers-only="numbers-only" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select class="register-input"
+                                                    ng-model="PatientDepositsObj.BillingProviderObj"
+                                                    ng-options="item as item.BillingProviderName for item in FacilitiesList">
+                                                <!--ng-change="ChangeBillingprovider(AddPatientDepositObj.BillingProviderObj);">-->
+                                                <option value=""> All</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select class="register-input" ng-model="PatientDepositsObj.DepositTypeId"
+                                                    ng-change="ChangeDepositType(PatientDepositsObj.DepositTypeId);">
+                                                <option value="1">Co-Payment</option>
+                                                <option value="2">Deposit</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td ng-show="PatientDepositsObj.DepositTypeId == 1 || PatientDepositsObj.DepositTypeId == '1'">
+                                        <div class="form-group">
+                                            <select class="register-input" ng-model="PatientDepositsObj.AppointmentId"
+                                                    ng-options="list.AppointmentId as list.DoctorName +'-'+list.AppointmentDate for list in PatientDepositsObj.Selectedpatientobj.AppointmentmentsArray">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="register-input" ng-model="PatientDepositsObj.DepositedBy" placeholder="" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+ 
+        <div class="row" ng-show="PatientDepositsObj.PaymentModeId==2">
+
+            <div class="col-lg-3 p-r-0">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" class="form-control" name="cardNumber" placeholder="Enter card number" ng-model="PatientDepositsObj.CardNumber" numbers-only maxlength="19" ng-change="cardnumberchangeevent(AdvanceBillObj.PaymentInfoObject.CardDetails.CardNumber)">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label>Name on Card</label>
+                    <input type="text" class="form-control" name="nameOnCard" placeholder="Enter name on card"
+                           ng-model="PatientDepositsObj.CardHolderName" alphabets-only>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label title="Payment">Card Type</label>
+                    <select class="form-control"
+                            ng-model="PatientDepositsObj.CardTypeId"
+                            ng-options="list.Id as list.Name for list in CardTypeDetails">
+                        <option value=""> select</option>
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label>Expire Date</label>
+                    <input type="text" class="form-control" name="nameOfBank" placeholder="MM/YY"
+                           ng-model="PatientDepositsObj.CardExpiry" maxlength="7"
+                           ng-keydown="ExpireremoveTagOnBackspace($event,PatientDepositsObj.CardExpiry)">
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-show="PatientDepositsObj.PaymentModeId==3">
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label>Cheque Number :</label>
+                    <input type="text" placeholder="Enter Cheque Number" ng-model="PatientDepositsObj.ChequeNo" class="form-control" numbers-only="numbers-only" aria-invalid="false" maxlength="6">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label>Cheque Date :</label>
+                    <!--<input type="text" class="form-control" name="ChequeDate" placeholder="Enter Cheque Date" ng-model="PatientDepositsObj.ChequeDate">-->
+                    <input class="form-control icons-calendar"
+                           ng-model="PatientDepositsObj.ChequeDate"
+                           datepickerapnlus readonly />
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 text-right m-t-10">
+                <div class="form-group">
+                    <button type="button" class="btn btn-save-us w-100" ng-click="AddUpdatePatientDeposit()">Save Deposit</button>
+                    <button type="button" class="btn btn-danger w-100" ng-click="ClosePopup()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12" >
+            <section class="tile tile-shadow" ng-show="PatientDepositsListArray.length !==0">
+                <div class="tile-header">
+                    <h1>Patient Deposits List</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered m-b-5 table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Choose</th>
+                                    <th>Deposit Date</th>
+                                    <th>Billing Provider</th>
+                                    <th>Receipt No.</th>
+                                    <th>Deposit Amount</th>
+                                    <th>Billed Amount</th>
+                                    <th>Unbilled Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>                         
+                            <tbody>
+                                <tr ng-repeat="item in  PatientDepositsListArray">
+                                    <td>
+                                        <!--<input type="radio" class="form-control" id="selctedpator{{item.PatientDepositId}}" name="selected{{item.PatientDepositId}}"
+                                               ng-model="isSelected" ng-change="ChangeDepositSelection(item.PatientDepositId)" />-->
+
+                                        <input type="checkbox" ng-model="item.CheckListInd" ng-change="ChangeDeposite(item.CheckListInd,item)">
+                                    </td>
+                                    <td ng-bind="item.DepositDate | date:'dd-MM-yyyy'"></td>
+                                    <td>
+
+                                        <span ng-show="item.BillingProviderId===0">All</span>
+                                        <span ng-show="item.BillingProviderId!==0">{{item.BillingProviderName}}</span>
+                                    </td>
+                                    <td>{{item.ReceiptNo}}</td>
+                                    <td>{{item.DepositAmount}}</td>
+                                    <td>{{item.BilledAmount}}</td>
+                                    <td>{{item.UnBilledAmount}}</td>
+                                    <td>
+                                        <button class="btn btn-new" ng-click="AddDespositePrint(item)">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+                                <tr ng-show="ShowPatientListArray.length==0">
+                                    <td colspan="6">
+                                        <div class="col-lg-12">
+                                            <div class="billing-cominsoon text-center">
+                                                <img src="img/no-data/no-results.png">
+                                                <div class="msg">
+                                                    <p class="goback-text">No Deposit</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </section>
+
+            <div class="row mb-10">
+                <div class="col-lg-12 text-center EH-pagination">
+                    <uib-pagination ng-if="PatientDepositsListArray.length > 0"
+                                    total-items="PatientDepositsListcount"
+                                    ng-model="SearchPatientDepositsObj.PageNumber"
+                                    ng-change="changePageNumber(SearchPatientDepositsObj.PageNumber)"
+                                    items-per-page="SearchPatientDepositsObj.PageSize"
+                                    class=""
+                                    boundary-link-numbers="true"
+                                    boundary-links="true"
+                                    max-size="maxSize"
+                                    rotate="false"></uib-pagination>
+                </div>
+            </div>
+            <section class="tile tile-shadow" ng-show="PatientDepositsListArray.length ===0">
+                <div class="tile-header">
+                    <h1>Patient Deposits List</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="billing-cominsoon text-center">
+                                <img src="img/no-data/no-results.png">
+                                <div class="msg">
+                                    <p class="goback-text">No Data Found</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger" ng-click="ClosePopup()">Close</button>
+    <button type="button" class="btn btn-success" ng-click="SavePopup()">Add Deposit to Payment</button>
+</div>
+
+
+
+
+

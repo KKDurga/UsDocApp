@@ -1,0 +1,269 @@
+﻿<div class="row">
+    <div class="col-lg-12">
+        <section class="tile tile-shadow">
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                <tbody>
+                                    <tr>
+                                        <td class="w-130">
+                                            <div class="form-group">
+                                                <label>Deposit From Date</label>
+                                                <input class="form-control icons-calendar" ng-model="SearchPatientDepositsObj.DepositFrom"
+                                                       ng-change="changeTPAwiseFromDate(TPAwiseFromDate)" datepickerforinventory readonly />
+                                            </div>
+                                        </td>
+                                        <td class="w-130">
+                                            <div class="form-group">
+                                                <label>To Date</label>
+                                                <input class="form-control icons-calendar" ng-model="SearchPatientDepositsObj.DepositTo"
+                                                       ng-change="changeTPAwiseToDate(TPAwiseToDate)" datepickerforinventory readonly />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label>Payment Mode</label>
+                                                <select class="form-control"
+                                                        ng-model="SearchPatientDepositsObj.PaymentModeId"
+                                                        ng-options="list.PaymentModeId as list.PaymentModeName for list in masterPaymentModes">
+                                                    <option value=""> select</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <fieldset class="pos-relative bottom-2">
+                                                    <div class="dis-inline-block">
+                                                        <input type="radio" class="radio-custom width-0" id="patientNameId" name="patientSearch" ng-model="SearchPatientDepositsObj.Type" aria-invalid="false" ng-value="1">
+                                                        <label for="patientNameId" class="radio-custom-label cur-poiter mb-0">Name. </label>
+                                                    </div>
+
+                                                    <div class="dis-inline-block">
+                                                        <input type="radio" class="radio-custom width-0" id="patientNameId2" name="patientSearch" ng-model="SearchPatientDepositsObj.Type" aria-invalid="false" ng-value="2">
+                                                        <label for="patientNameId2" class="radio-custom-label cur-poiter mb-0">Mobile No. </label>
+                                                    </div>
+                                                    <div class="dis-inline-block">
+                                                        <input type="radio" class="radio-custom width-0" id="patientNameId1" name="patientSearch" ng-model="SearchPatientDepositsObj.Type" aria-invalid="false" ng-value="3">
+                                                        <label for="patientNameId1" class="radio-custom-label cur-poiter mb-0">MR No. </label>
+                                                    </div>
+                                                </fieldset>
+                                                <div class="form-group pr-0 m-b-0">
+                                                    <div class="btn-group select-form-uib dropdown open">
+                                                        <input type="text" class="form-control pl-15"
+                                                               placeholder="Search By Name"
+                                                               typeahead-min-length="1"
+                                                               ng-if="SearchPatientDepositsObj.Type == 1"
+                                                               ng-model="SearchPatientDepositsObj.SearchText"
+                                                               ng-change="ChangePatientList()">
+                                                        <input type="text" class="form-control pl-15"
+                                                               placeholder="Search By Mobile No"
+                                                               ng-if="SearchPatientDepositsObj.Type == 2"
+                                                               ng-model="SearchPatientDepositsObj.SearchText"
+                                                               ng-change="ChangePatientList()">
+                                                        <input type="text" class="form-control pl-15" placeholder="Search By MR No"
+                                                               ng-if="SearchPatientDepositsObj.Type == 3"
+                                                               ng-model="SearchPatientDepositsObj.SearchText"
+                                                               ng-change="ChangePatientList()">
+                                                        <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="SearchObj.ShowpatientListdiv">
+                                                            <li class="list-group-item text-dark cur-poiter" ng-show="patientList.length > 0"
+                                                                ng-repeat="patientitem in patientList" ng-click="SelectedPatient(patientitem)">
+                                                                <span class="badge badge-primary">{{patientitem.MobileNo}}</span>
+                                                                {{patientitem.fullname}}
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <button type="button" class="btn primary-btn w-100 m-t-25" ng-click="SearchPatientDepositslist('onclick')">Search</button>
+                                                <button type="button" class="btn btn-danger m-t-25" ng-click="ClearPatientDeposits()">Clear</button>
+                                                <button class="btn btn-info m-t-25" ng-click="GotoAddDeposit()"> Add Deposit</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- / -->
+<div class="row" >
+    <div class="col-lg-12">
+        <section class="tile tile-shadow" ng-show="PatientDepositsListArray.length !==0">
+            <div class="tile-header">
+                <h1>Patient Deposits List</h1>
+            </div>
+            <div class="tile-body">
+                <div class="table-responsive">
+                    <table class="table tableAccordion">
+                        <thead>
+                            <tr>
+                                <th>Deposit Date.</th>
+                                <th width="15%">Patient Details</th>
+                                <th>Billing Provider</th>
+                                <th>Payment Mode</th>
+                                <th>Deposit Amount</th>
+                                <th>Billed Amount</th>
+                                <th>UnBilled Amount</th>
+                                <th>Deposited By</th>
+                                <th width="17%">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="item in PatientDepositsListArray">
+                            <tr class="accotab-head">
+                                <td ng-bind="item.DepositDate | date:'dd-MM-yyyy'"></td>                                
+                                <td> 
+                                    <span>Name : </span><span>{{item.PatientFullname}}</span>
+                                <br />
+                                    <span>MrNo. : </span> <span>{{item.PatientDisplayId}}</span><br />
+                                </td>
+                            <!--<td> <label>{{item.PatientFullname}}</label></td>-->
+                                <td> {{item.BillingProviderName}}</td>
+                                <td> {{item.DepositAmount}}</td>
+                                <td><div class="col-lg-12" ng-repeat="pitem in item.PaymentsArray">
+                                        <span>{{pitem.PaymentMode}}</span>
+                                    </div>
+                                </td>
+                             
+                                <td> {{item.BilledAmount}}</td>
+                                <td> {{item.UnBilledAmount}}</td>
+                                <td> {{item.DepositedBy}}</td>
+                                
+                                <td>
+                                    <button class="btn btn-new" ng-click="AddDespositePrint(item)">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                    <button class="btn btn-danger" ng-click="settleForThisDeposit">Settle</button>
+                                    <button class="btn btn-new" ng-click="ShowContent(item)">
+                                        <i class="fas fa-chevron-down" ng-if="!item.ContentShow"></i>
+                                        <i class="fas fa-chevron-up" ng-if="item.ContentShow"></i>
+                                    </button>
+
+                                </td>
+                            </tr>
+                            <tr class="accotab-body" ng-if="item.ContentShow">
+                                <td colspan="8">
+                                    <div>
+                                        <section class="section-ehnote">
+                                            <div class="section-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="table-responsive responsive-text">
+                                                            <table class="table table-bordered m-b-0" ng-show="PatientDepositDetailArray.length !==0">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Settled Date.</th>
+                                                                        <th>ReceiptNo</th>
+                                                                        <th>Settled By</th>
+                                                                        <th>Total Amount</th>
+                                                                        <!--<th>Ins Amount</th>-->
+                                                                        <th>Patient CoPay</th>
+                                                                        <th>Ins Paid</th>
+                                                                        <th>Patient Paid</th>
+                                                                        <th>TotalBalance</th>
+
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in  PatientDepositDetailArray">
+
+                                                                        <td ng-bind="item.SettledDate | date:'dd-MM-yyyy'"></td>
+                                                                        <td>  {{item.ReceiptNo}}  </td>
+                                                                        <td>  {{item.SettledBy}}  </td>
+                                                                        <td>  {{item.TotalAmount}}  </td>
+                                                                        <!--<td>  5000 </td>-->
+                                                                        <td>  {{item.TotalPatientCopay}}  </td>
+                                                                        <td>  {{item.TotalInsurancePaid}}  </td>
+                                                                        <td>  {{item.TotalPatientPaid}}  </td>
+                                                                        <td>  {{item.TotalBalance}}  </td>
+
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+
+                                                            <div class="col-lg-12" ng-show="PatientDepositDetailArray.length==0">
+                                                                <div class="billing-cominsoon text-center">
+                                                                    <img src="img/no-data/no-results.png">
+                                                                    <div class="msg">
+                                                                        <p class="goback-text">No Data Found</p>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+
+
+
+                    </table>
+                </div>
+                <div class="row" ng-if="DepositArray.length === 0">
+                    <div class="col-lg-12">
+                        <div class="billing-cominsoon text-center">
+                            <img src="img/no-data/no-results.png">
+                            <div class="msg">
+                                <p class="goback-text">No Results Found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="row mb-10">
+            <div class="col-lg-12 text-center EH-pagination">
+                <uib-pagination ng-if="PatientDepositsListArray.length > 0"
+                                total-items="PatientDepositsListcount"
+                                ng-model="SearchPatientDepositsObj.PageNumber"
+                                ng-change="changePageNumber(SearchPatientDepositsObj.PageNumber)"
+                                items-per-page="SearchPatientDepositsObj.PageSize"
+                                class=""
+                                boundary-link-numbers="true"
+                                boundary-links="true"
+                                max-size="maxSize"
+                                rotate="false"></uib-pagination>
+            </div>
+        </div>
+        <section class="tile tile-shadow" ng-show="PatientDepositsListArray.length ===0">
+            <div class="tile-header">
+                <h1>Patient Deposits List</h1>
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="billing-cominsoon text-center">
+                            <img src="img/no-data/no-results.png">
+                            <div class="msg">
+                                <p class="goback-text">No Data Found</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+ 
+ 

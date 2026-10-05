@@ -1,0 +1,614 @@
+﻿<!--  admin.html already wraps this include in .adjustable-position, which is
+      absolutely positioned. A second one in here would sit in a parent with no
+      in-flow content left, collapse it to nothing and clip the whole screen,
+      so the tab bodies are plain flow children.  -->
+<div class="d__f-- fd__c-- gap__10-- bg__FFFFFF-- height__100--">
+
+    <ul class="tab__style--7 px__10-- pt__10--">
+        <li ng-class="(NMIActiveTab == 'Merchants') ? 'active' : ''">
+            <a href="javascript:;" id="a_nmisettings_merchantstab" ng-click="switchNMITab('Merchants')">NMI Merchants</a>
+        </li>
+        <li ng-class="(NMIActiveTab == 'Devices') ? 'active' : ''">
+            <a href="javascript:;" id="a_nmisettings_devicestab" ng-click="switchNMITab('Devices')">NMI Payment Devices</a>
+        </li>
+    </ul>
+
+    <!--==================================================================
+        Tab 1 : NMI Merchants
+        ==================================================================-->
+    <div class="d__f-- fd__c-- gap__10-- p__10--" ng-if="NMIActiveTab == 'Merchants'">
+
+        <!--=========== Add / Update merchant (sits above the list, hidden until + Add / Edit) ===========-->
+        <section class="tile tile-shadow m__0--" ng-if="ShowMerchantForm">
+            <div class="d__f-- jc__sb-- ai__c-- bb__DDD-- px__12-- py__8--">
+                <label class="fs__xl-- fw__7-- tc__1D5558-- fs__normal-- m__0--">
+                    {{ IsMerchantEditMode ? 'Update Merchant Account' : 'Add Merchant Account' }}
+                </label>
+                <a href="javascript:;" id="a_nmimerchant_closeform" ng-click="CancelMerchantForm()">
+                    <i class="icons__w16-- close__w16--l"></i>
+                </a>
+            </div>
+
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Branch <span class="tc__C71D27--">*</span></label>
+                            <select id="select_nmimerchant_branch" name="merchantBranch"
+                                    ng-model="MerchantObj.OrganizationId"
+                                    ng-disabled="IsMerchantEditMode"
+                                    ng-options="b.BranchId as b.BranchName for b in NMIBranchesOnly">
+                                <option value="">Select Branch</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Merchant Name <span class="tc__C71D27--">*</span></label>
+                            <input type="text" id="input_nmimerchant_name" name="merchantName" maxlength="400"
+                                   ng-model="MerchantObj.MerchantName" placeholder="Enter Merchant Name" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Merchant Gateway Id <span class="tc__C71D27--">*</span></label>
+                            <input type="text" id="input_nmimerchant_gatewayid" name="merchantGatewayId" maxlength="20"
+                                   ng-model="MerchantObj.MerchantGatewayId" placeholder="Enter Gateway Id" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Merchant Username <span class="tc__C71D27--">*</span></label>
+                            <input type="text" id="input_nmimerchant_username" name="merchantUsername" maxlength="200"
+                                   autocomplete="off"
+                                   ng-model="MerchantObj.MerchentUsername" placeholder="Enter Merchant Username" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Merchant Password</label>
+                            <input type="password" id="input_nmimerchant_password" name="merchantPassword" maxlength="200"
+                                   autocomplete="new-password" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.MerchentPassword" placeholder="Enter Merchant Password" />
+                            <input type="text" id="input_nmimerchant_passwordmasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasPassword ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Private API Key <span class="tc__C71D27--" ng-if="!IsMerchantEditMode">*</span></label>
+                            <input type="password" id="input_nmimerchant_privateapikey" name="privateApiKey" maxlength="200"
+                                   autocomplete="off" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.PrivateAPIKey" placeholder="Enter Private API Key" />
+                            <input type="text" id="input_nmimerchant_privateapikeymasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasPrivateAPIKey ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Private V4 API Key</label>
+                            <input type="password" id="input_nmimerchant_privatev4apikey" name="privateV4ApiKey" maxlength="100"
+                                   autocomplete="off" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.PrivateV4APIKey" placeholder="Enter Private V4 API Key" />
+                            <input type="text" id="input_nmimerchant_privatev4apikeymasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasPrivateV4APIKey ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Webhook Signing Key</label>
+                            <input type="password" id="input_nmimerchant_webhooksigningkey" name="webhookSigningKey" maxlength="100"
+                                   autocomplete="off" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.WebhookSigningKey" placeholder="Enter Webhook Signing Key" />
+                            <input type="text" id="input_nmimerchant_webhooksigningkeymasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasWebhookSigningKey ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Tokenization Key</label>
+                            <input type="password" id="input_nmimerchant_tokenizationkey" name="tokenizationKey" maxlength="200"
+                                   autocomplete="off" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.TokenizationKey" placeholder="Enter Tokenization Key" />
+                            <input type="text" id="input_nmimerchant_tokenizationkeymasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasTokenizationKey ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Public Checkout Key</label>
+                            <input type="password" id="input_nmimerchant_publiccheckoutkey" name="publicCheckOutKey" maxlength="100"
+                                   autocomplete="off" ng-if="!IsMerchantEditMode"
+                                   ng-model="MerchantObj.PublicCheckOutKey" placeholder="Enter Public Checkout Key" />
+                            <input type="text" id="input_nmimerchant_publiccheckoutkeymasked" ng-if="IsMerchantEditMode"
+                                   value="{{ MerchantObj.HasPublicCheckOutKey ? MaskedSecureValue : 'Not set' }}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-8">
+                        <div class="form__group">
+                            <label>Webhook Url</label>
+                            <input type="text" id="input_nmimerchant_webhookurl" name="webhookUrl" maxlength="1000"
+                                   ng-model="MerchantObj.WebhookUrl" placeholder="Enter Webhook Url" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Processor Id</label>
+                            <input type="text" id="input_nmimerchant_processorid" name="processorId" maxlength="100"
+                                   ng-model="MerchantObj.ProcessorId" placeholder="Enter Processor Id" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Processor Name</label>
+                            <input type="text" id="input_nmimerchant_processorname" name="processorName" maxlength="250"
+                                   ng-model="MerchantObj.ProcessorName" placeholder="Enter Processor Name" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Status</label>
+                            <select id="select_nmimerchant_status" name="merchantStatus"
+                                    ng-model="MerchantObj.StatusId"
+                                    ng-options="s.StatusId as s.StatusName for s in MerchantStatusList"></select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <!--  empty label so the buttons sit on the same line as the inputs  -->
+                        <div class="form__group">
+                            <label>&nbsp;</label>
+                            <div class="d__f-- ai__c-- jc__e-- gap__10--">
+                                <button type="button" class="btn__lg-- btn__C71D27--o" id="button_nmimerchant_clear"
+                                        ng-click="ClearMerchantForm()">
+                                    Clear
+                                </button>
+                                <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmimerchant_save"
+                                        ng-disabled="IsSavingMerchant" ng-click="SaveMerchant()">
+                                    {{ IsSavingMerchant ? 'Saving...' : 'Save' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" ng-if="IsMerchantEditMode">
+                    <div class="col-lg-12">
+                        <label class="fs__md-- fw__5-- tc__656565--">
+                            Gateway credentials are never sent back by the server. They stay as saved and cannot be
+                            changed here &mdash; remove the merchant and add it again to replace a key.
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--=========== List header ===========-->
+        <div class="d__f-- jc__sb-- ai__c-- bb__DDD-- px__12-- py__8--">
+            <label class="fs__xl-- fw__7-- tc__1D5558-- fs__normal-- m__0--">
+                NMI Merchant Accounts <span ng-if="MerchantFilteredList.length > 0">({{MerchantFilteredList.length}})</span>
+            </label>
+            <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmimerchant_add"
+                    ng-if="!ShowMerchantForm" ng-click="ShowAddMerchant()">
+                + Add Merchant
+            </button>
+        </div>
+
+        <!--=========== Filters ===========-->
+        <div class="p__12-- bg__FFFFFF-- border__E4E4E4-- bradius__8--">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Branch</label>
+                        <select id="select_nmimerchantfilter_branch" name="merchantFilterBranch"
+                                ng-model="MerchantSearchObj.BranchId"
+                                ng-options="b.BranchId as b.BranchName for b in NMIBranchesList"></select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Status</label>
+                        <select id="select_nmimerchantfilter_status" name="merchantFilterStatus"
+                                ng-model="MerchantSearchObj.Status"
+                                ng-options="s.Value as s.Text for s in MerchantStatusFilterList"></select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Search</label>
+                        <input type="text" id="input_nmimerchantfilter_search" class="icons-search" name="merchantFilterSearch"
+                               ng-model="MerchantSearchObj.SearchText"
+                               placeholder="Merchant Name / Gateway Id / Username" />
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <!--  empty label so the buttons sit on the same line as the inputs  -->
+                    <div class="form__group">
+                        <label>&nbsp;</label>
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmimerchantfilter_apply"
+                                    ng-click="ApplyMerchantFilters()">
+                                Apply
+                            </button>
+                            <button type="button" class="btn__lg-- btn__1d5558--o" id="button_nmimerchantfilter_clear"
+                                    ng-click="ClearMerchantFilters()">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--=========== List ===========-->
+        <div class="table-responsive">
+            <table class="table__style--5">
+                <thead>
+                    <tr>
+                        <th width="17%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Merchant Name</label></th>
+                        <th width="14%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Branch</label></th>
+                        <th width="9%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Gateway Id</label></th>
+                        <th width="13%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Username</label></th>
+                        <th width="11%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Processor</label></th>
+                        <th width="16%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Webhook Url</label></th>
+                        <th width="9%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Status</label></th>
+                        <th width="11%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Action</label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in MerchantPagedList track by $index">
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.MerchantName}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.OrganizationName || item.Name || getNMIBranchName(item.OrganizationId)}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.MerchantGatewayId}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.MerchentUsername}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.ProcessorName}}</span></td>
+                        <td>
+                            <!--  clipped to keep the row on one line, the icon carries the rest.
+                                  fd__r-- because table__style--5 stacks any div sitting straight in a td  -->
+                            <div class="d__f-- fd__r-- ai__c-- gap__5--" ng-if="item.WebhookUrl">
+                                <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.WebhookUrl | limitTo : 22 }}{{ item.WebhookUrl.length > 22 ? '...' : '' }}</span>
+                                <i class="icons__w16-- info__w16--o" id="i_nmimerchant_webhookurl_{{$index}}"
+                                   tooltip-placement="left" tooltip-append-to-body="true"
+                                   uib-tooltip="{{item.WebhookUrl}}"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch__style--4"
+                                   tooltip-placement="top" uib-tooltip="{{isMerchantActive(item) ? 'Set InActive' : 'Set Active'}}">
+                                <input type="checkbox" id="checkbox_nmimerchant_status_{{$index}}"
+                                       ng-checked="isMerchantActive(item)"
+                                       ng-click="ToggleMerchantStatus(item)" />
+                                <span data-on="Active" data-off="InActive"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <!--  fd__r-- because table__style--5 stacks any div sitting straight in a td  -->
+                            <div class="d__f-- fd__r-- ai__c-- gap__15-- no-wrapappt">
+                                <a href="javascript:;" id="a_nmimerchant_edit_{{$index}}"
+                                   ng-click="EditMerchant(item)"
+                                   tooltip-placement="top" uib-tooltip="Edit">
+                                    <i class="icons__w16-- edit__w16--o"></i>
+                                </a>
+                                <a href="javascript:;" id="a_nmimerchant_delete_{{$index}}"
+                                   ng-click="DeleteMerchant(item)"
+                                   tooltip-placement="top" uib-tooltip="Delete">
+                                    <i class="icons__w16-- delete__w16--o"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y py__20-- bg__EBEDEE7D--" ng-if="MerchantPagedList.length == 0">
+                <a><i class="nodata__1-- a2__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Merchant Accounts Yet</h1>
+                <label class="fs__normal-- fs__lg-- fw__5-- tc__4A4A4A--">There are no merchant accounts for the selected filters.</label>
+            </div>
+        </div>
+
+        <!--=========== Pagination ===========-->
+        <div class="row m-t-10" ng-show="MerchantFilteredList.length > MerchantSearchObj.PageSize">
+            <div class="col-lg-12 EH-pagination text-center">
+                <uib-pagination total-items="MerchantFilteredList.length"
+                                ng-model="MerchantSearchObj.PageNumber"
+                                ng-change="MerchantPageChanged()"
+                                items-per-page="MerchantSearchObj.PageSize"
+                                max-size="10"
+                                class=""
+                                boundary-link-numbers="true"
+                                rotate="false"></uib-pagination>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--==================================================================
+        Tab 2 : NMI Payment Devices
+        ==================================================================-->
+    <div class="d__f-- fd__c-- gap__10-- p__10--" ng-if="NMIActiveTab == 'Devices'">
+
+        <!--=========== Add / Update device (sits above the list, hidden until + Add / Edit) ===========-->
+        <section class="tile tile-shadow m__0--" ng-if="ShowDeviceForm">
+            <div class="d__f-- jc__sb-- ai__c-- bb__DDD-- px__12-- py__8--">
+                <label class="fs__xl-- fw__7-- tc__1D5558-- fs__normal-- m__0--">
+                    {{ IsDeviceEditMode ? 'Update Payment Device' : 'Add Payment Device' }}
+                </label>
+                <a href="javascript:;" id="a_nmidevice_closeform" ng-click="CancelDeviceForm()">
+                    <i class="icons__w16-- close__w16--l"></i>
+                </a>
+            </div>
+
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Branch <span class="tc__C71D27--">*</span></label>
+                            <select id="select_nmidevice_branch" name="deviceBranch"
+                                    ng-model="DeviceObj.OrganizationId"
+                                    ng-change="onDeviceBranchSelect()"
+                                    ng-disabled="IsDeviceEditMode"
+                                    ng-options="b.BranchId as b.BranchName for b in NMIBranchesOnly">
+                                <option value="">Select Branch</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Merchant Name <span class="tc__C71D27--">*</span></label>
+                            <select id="select_nmidevice_merchant" name="deviceMerchant"
+                                    ng-if="!IsDeviceEditMode"
+                                    ng-model="DeviceObj.NMIMerchantId"
+                                    ng-change="onDeviceMerchantSelect()"
+                                    ng-disabled="!DeviceObj.OrganizationId || IsLoadingBranchMerchants"
+                                    ng-options="m.NMIMerchantId as m.MerchantName for m in BranchMerchantList">
+                                <option value="">{{ IsLoadingBranchMerchants ? 'Loading...' : 'Select Merchant' }}</option>
+                            </select>
+                            <input type="text" id="input_nmidevice_merchantname" ng-if="IsDeviceEditMode"
+                                   value="{{DeviceObj.MerchantName}}" disabled />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Registration Code <span class="tc__C71D27--" ng-if="!IsDeviceEditMode">*</span></label>
+                            <input type="text" id="input_nmidevice_registrationcode" name="registrationCode" maxlength="20"
+                                   ng-model="DeviceObj.RegistrationCode"
+                                   ng-disabled="IsDeviceEditMode"
+                                   placeholder="Enter Registration Code" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Device Number</label>
+                            <input type="text" id="input_nmidevice_devicenumber" name="deviceNumber" maxlength="50"
+                                   ng-model="DeviceObj.DeviceNumber" placeholder="Enter Device Number" />
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Device Name <span class="tc__C71D27--">*</span></label>
+                            <input type="text" id="input_nmidevice_devicename" name="deviceName" maxlength="50"
+                                   ng-model="DeviceObj.DeviceName" placeholder="Enter Device Name" />
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Registration Date</label>
+                            <input type="text" class="icons-calendar" id="input_nmidevice_registrationdate"
+                                   ng-model="DeviceObj.RegistrationDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerforapplist readonly />
+                        </div>
+                    </div>
+                    <!--<div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Device Type</label>
+                            <input type="text" id="input_nmidevice_devicetype" name="deviceType" maxlength="50"
+                                   ng-model="DeviceObj.DeviceType" placeholder="Enter Device Type" />
+                        </div>
+                    </div>-->
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>Device Description</label>
+                            <input type="text" id="input_nmidevice_devicedescription" name="deviceDescription" maxlength="300"
+                                   ng-model="DeviceObj.DeviceDescription" placeholder="Enter Device Description" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-md-4">
+                        <div class="form__group">
+                            <label>
+                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">Default</span>
+                                <input type="checkbox" class="checkbox" id="checkbox_nmidevice_isdefault"
+                                       ng-model="DeviceObj.IsDefaultCheckbox"
+                                       ng-change="toggleDefaultIndicator()" />
+                                <span class="lbl"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-8">
+                        <!--  empty label so the buttons sit on the same line as the inputs  -->
+                        <div class="form__group">
+                            <label>&nbsp;</label>
+                            <div class="d__f-- ai__c-- jc__e-- gap__10--">
+                                <button type="button" class="btn__lg-- btn__C71D27--o" id="button_nmidevice_clear"
+                                        ng-click="ClearDeviceForm()">
+                                    Clear
+                                </button>
+                                <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmidevice_save"
+                                        ng-disabled="IsSavingDevice" ng-click="SaveDevice()">
+                                    {{ IsSavingDevice ? (IsDeviceEditMode ? 'Saving...' : 'Registering...') : (IsDeviceEditMode ? 'Save' : 'Register Device') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label class="fs__md-- fw__5-- tc__656565--" ng-if="!IsDeviceEditMode">
+                            Saving registers the device with NMI using the selected merchant, then stores it here.
+                        </label>
+                        <label class="fs__md-- fw__5-- tc__656565--" ng-if="IsDeviceEditMode">
+                            Branch, merchant and registration code are fixed once a device is registered &mdash;
+                            de-activate it and register a new one to move it.
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--=========== List header ===========-->
+        <div class="d__f-- jc__sb-- ai__c-- bb__DDD-- px__12-- py__8--">
+            <label class="fs__xl-- fw__7-- tc__1D5558-- fs__normal-- m__0--">
+                NMI Payment Devices <span ng-if="DeviceFilteredList.length > 0">({{DeviceFilteredList.length}})</span>
+            </label>
+            <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmidevice_add"
+                    ng-if="!ShowDeviceForm" ng-click="ShowAddDevice()">
+                + Add Device
+            </button>
+        </div>
+
+        <!--=========== Filters ===========-->
+        <div class="p__12-- bg__FFFFFF-- border__E4E4E4-- bradius__8--">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Branch</label>
+                        <select id="select_nmidevicefilter_branch" name="deviceFilterBranch"
+                                ng-model="DeviceSearchObj.BranchId"
+                                ng-options="b.BranchId as b.BranchName for b in NMIBranchesList"></select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Status</label>
+                        <select id="select_nmidevicefilter_status" name="deviceFilterStatus"
+                                ng-model="DeviceSearchObj.Status"
+                                ng-options="s.Value as s.Text for s in DeviceStatusFilterList"></select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <div class="form__group">
+                        <label>Search</label>
+                        <input type="text" id="input_nmidevicefilter_search" class="icons-search" name="deviceFilterSearch"
+                               ng-model="DeviceSearchObj.SearchText"
+                               placeholder="Device Name / Number / Type / Merchant" />
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <!--  empty label so the buttons sit on the same line as the inputs  -->
+                    <div class="form__group">
+                        <label>&nbsp;</label>
+                        <div class="d__f-- ai__c-- gap__10--">
+                            <button type="button" class="btn__lg-- btn__1d5558--f" id="button_nmidevicefilter_apply"
+                                    ng-click="ApplyDeviceFilters()">
+                                Apply
+                            </button>
+                            <button type="button" class="btn__lg-- btn__1d5558--o" id="button_nmidevicefilter_clear"
+                                    ng-click="ClearDeviceFilters()">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--=========== List ===========-->
+        <div class="table-responsive">
+            <table class="table__style--5">
+                <thead>
+                    <tr>
+                        <th width="16%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Device Name</label></th>
+                        <th width="13%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Branch</label></th>
+                        <th width="14%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Merchant Name</label></th>
+                        <th width="12%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Device Number</label></th>
+                        <th width="10%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Device Type</label></th>
+                        <th width="10%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Registration Date</label></th>
+                        <th width="7%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Default</label></th>
+                        <th width="8%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Status</label></th>
+                        <th width="10%"><label class="fs__md-- fw__6-- tc__1D1D1D--">Action</label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in DevicePagedList track by $index">
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.DeviceName}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{getNMIBranchName(item.OrganizationId)}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.MerchantName}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.DeviceNumber}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.DeviceType}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{item.RegistrationDate | date:'MM-dd-yyyy'}}</span></td>
+                        <td><span class="fs__md-- fw__5-- tc__1D1D1D--">{{isDeviceDefault(item) ? 'Yes' : 'No'}}</span></td>
+                        <td>
+                            <!--  a registration that failed is left showing the NMI error rather than a toggle  -->
+                            <span ng-if="item.StatusId == 3" class="status__red--"
+                                  tooltip-placement="top" uib-tooltip="{{item.ErrorDescription}}"
+                                  tooltip-enable="!!item.ErrorDescription">Failed</span>
+                            <label class="switch__style--4" ng-if="item.StatusId != 3"
+                                   tooltip-placement="top" uib-tooltip="{{item.StatusId == 1 ? 'Set InActive' : 'Set Active'}}">
+                                <input type="checkbox" id="checkbox_nmidevice_status_{{$index}}"
+                                       ng-checked="item.StatusId == 1"
+                                       ng-click="ToggleDeviceStatus(item)" />
+                                <span data-on="Active" data-off="InActive"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <!--  fd__r-- because table__style--5 stacks any div sitting straight in a td  -->
+                            <div class="d__f-- fd__r-- ai__c-- gap__15-- no-wrapappt">
+                                <a href="javascript:;" id="a_nmidevice_edit_{{$index}}"
+                                   ng-click="EditDevice(item)"
+                                   tooltip-placement="top" uib-tooltip="Edit">
+                                    <i class="icons__w16-- edit__w16--o"></i>
+                                </a>
+                                <a href="javascript:;" id="a_nmidevice_delete_{{$index}}"
+                                   ng-click="DeleteDevice(item)"
+                                   tooltip-placement="top" uib-tooltip="Delete">
+                                    <i class="icons__w16-- delete__w16--o"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y py__20-- bg__EBEDEE7D--" ng-if="DevicePagedList.length == 0">
+                <a><i class="nodata__1-- a2__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Payment Devices Yet</h1>
+                <label class="fs__normal-- fs__lg-- fw__5-- tc__4A4A4A--">There are no devices registered for the selected filters.</label>
+            </div>
+        </div>
+
+        <!--=========== Pagination ===========-->
+        <div class="row m-t-10" ng-show="DeviceFilteredList.length > DeviceSearchObj.PageSize">
+            <div class="col-lg-12 EH-pagination text-center">
+                <uib-pagination total-items="DeviceFilteredList.length"
+                                ng-model="DeviceSearchObj.PageNumber"
+                                ng-change="DevicePageChanged()"
+                                items-per-page="DeviceSearchObj.PageSize"
+                                max-size="10"
+                                class=""
+                                boundary-link-numbers="true"
+                                rotate="false"></uib-pagination>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,746 @@
+﻿<div class="tab-pane active" id="Investigations">    
+    <div class="row">
+        <div class="col-md-12 border-bottom mb-10" ng-hide="caseidhistory.length == 0">
+            <div class="previous-cases ">
+                <ul class="nav nav-tabs pr-tab">
+                    <li ng-repeat="data in caseidhistory |  startFrom:currentPage*pageSize | limitTo:pageSize" ng-click="getActiveID(data.CaseId)" ng-class="patientcaseid == data.CaseId?'active':'' ">
+                        <a id="1" ng-click="getPatientCaseHistoryById(data.CaseId)">
+                            <div class="interm-consult">
+                                <strong><p ng-bind="data.consultationDt | date : format : 'dd-MM-yyyy'"></p></strong>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="pull-right">
+                        <button class="btn primary-btn" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+                        <span><strong>{{currentPage+1}}/{{numberOfPages()}}</strong></span>
+                        <button class="btn blue-btn" ng-disabled="currentPage >= caseidhistory.length/pageSize - 1" ng-click="currentPage=currentPage+1"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <div class="col-md-12 p-0" ng-hide="caseidhistory.length == 0">
+        <div class="follow-ups ">
+            <div class="summary-reports" ng-show='casehistory.length > 0'>
+                <div ng-repeat="caseitem in casehistoryITEM" ng-init="parentindex=$index" parent-index="{{$index}}">
+                    <div class="clearfix"></div>
+                    <div ng-repeat="casedetailsdata in caseitem.caseHistroy" child-index="{{$index}}" ng-init="childindex=$index">
+                        <div id="allrow" class="accordion_alignment">
+
+                            <div class="summary-reports-inner">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-8 p-0">
+                                            <span ng-bind="casedetailsdata.patientCase.ConsultationDate | date :   format : 'MMM-dd-yyyy'" class="detailspatient"></span>
+                                            <span class="detailspatient"> | Dr. </span> 
+                                            <span ng-bind="casedetailsdata.patientCase.DoctorDetails[0].DoctorName" class="detailspatient"></span>
+                                        </div>                                     
+                                        <div class="col-lg-3">
+                                            <ul class="controls" ng-show="AnteriorSegmentArray.length>0 ||PosteriorSegmentArray.length>0||AdditionalInvestgationArray.length>0">
+                                                <li class="checkbox m-0 pull-right">
+                                                    <label class="p-0">
+                                                        <input type="checkbox" value="invcheckbox" ng-click="IsSelectedprintItem(investigationprintItem,casedetailsdata)" ng-model="investigationprintItem">
+                                                        <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span> Images With print
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-lg-1 p-0">
+                                            <a tooltip="Print" class="print-gc-pr m-t-0" ng-disabled="isSelectedprintItemValue" ng-click="PrintSelected(casedetailsdata)">Print</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="past-record-table">
+                                
+                                <div class="row" ng-if="UnaidedArray.length>0 || glassArray.length>0 || RefractionArray.length>0 || AcceptenceArray.length>0 || KeretometerArray.length > 0 || OcularDominanceArray.length>0 || PinholeArray.length>0 || LCVArray.length>0 || BinocularArray.length>0">
+                                    <div class="col-lg-12">
+                                        <section class="tile tile-shadow br-1">
+                                            <div class="tile-header">
+                                                <h1 class="custom-font">Vision</h1>
+
+
+                                            </div>
+                                            <div class="tile-body">
+                                                <!--Inevstigations Start-->
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-12" ng-if="UnaidedArray.length>0">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Vision</th>
+                                                                        <th colspan="3" class="text-center">Distance Vision</th>
+                                                                        <th colspan="3" class="text-center">Near Vision</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr class="text-center">
+                                                                        <th class="text-center" colspan="1"></th>
+                                                                        <th class="text-center" colspan="1">OD</th>
+                                                                        <th class="text-center">OS</th>
+                                                                        <th class="text-center">OU</th>
+                                                                        <th class="text-center">OD</th>
+                                                                        <th class="text-center">OS</th>
+                                                                        <th class="text-center">OU</th>
+                                                                    </tr>
+                                                                    <tr class="text-center" ng-repeat="item in UnaidedArray">
+                                                                        <th>{{item.InvestigationID===1?'Unaided':(item.InvestigationID===7?'BCVA':(item.InvestigationID===30?'With GL':''))}}</th>
+                                                                        <td>{{item.InvestigationDetails.DVrightEye}}</td>
+                                                                        <td>{{item.InvestigationDetails.DVleftEye}}</td>
+                                                                        <td>{{item.InvestigationDetails.DVBoth}}</td>
+                                                                        <td>{{item.InvestigationDetails.NVrightEye}}</td>
+                                                                        <td>{{item.InvestigationDetails.NVleftEye}}</td>
+                                                                        <td>{{item.InvestigationDetails.NVBoth}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--Glasses & Near Start-->
+                                                <div class="summary-label col-lg-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered" ng-if="glassArray.length>0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Glasses</th>
+                                                                    <th colspan="5" class="text-center">OD</th>
+                                                                    <th colspan="5" class="text-center">OS</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr class="text-center">
+                                                                    <th class="text-center" colspan="1"></th>
+                                                                    <th class="text-center" colspan="1">Sph</th>
+                                                                    <th class="text-center">Cyl</th>
+                                                                    <th class="text-center">Axis</th>
+                                                                    <th class="text-center">Prism</th>
+                                                                    <th class="text-center">V/A</th>
+                                                                    <th class="text-center" colspan="1">Sph</th>
+                                                                    <th class="text-center">Cyl</th>
+                                                                    <th class="text-center">Axis</th>
+                                                                    <th class="text-center">Prism</th>
+                                                                    <th class="text-center">V/A</th>
+                                                                </tr>
+                                                                <tr class="text-center" ng-repeat="item in glassArray">
+                                                                    <th ng-bind="item.type"></th>
+                                                                    <td ng-bind="item.RSphere"></td>
+                                                                    <td ng-bind="item.RCylinder"></td>
+                                                                    <td ng-bind="item.RAxis"></td>
+                                                                    <td ng-bind="item.RPrism"></td>
+                                                                    <td ng-bind="item.RVa"></td>
+                                                                    <td ng-bind="item.LSphere"></td>
+                                                                    <td ng-bind="item.LCylinder"></td>
+                                                                    <td ng-bind="item.LAxis"></td>
+                                                                    <td ng-bind="item.LPrism"></td>
+                                                                    <td ng-bind="item.LVa"></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <!--Glasses & Near End-->
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-6" ng-if="RefractionArray.length>0">
+                                                        <h5><b>Refraction</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th></th>
+                                                                        <th colspan="4" class="text-center">Refraction</th>
+                                                                        <th colspan="4" class="text-center">Cycloplegic Refraction</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th class="text-left">Eyes</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Adition</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Adition</th>
+                                                                    </tr>
+                                                                    <tr class="text-center">
+                                                                        <th>OD</th>
+                                                                        <td>{{RefractionArray[0].RightEye.RSpherical}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.RCylindrical}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.RAxis}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.RAdition}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.CRSpherical}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.CRCylindrical}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.CRAxis}}</td>
+                                                                        <td>{{RefractionArray[0].RightEye.CRAdition}}</td>
+                                                                    </tr>
+                                                                    <tr class="text-center">
+                                                                        <th>OS</th>
+                                                                        <td>{{RefractionArray[0].LeftEye.RSpherical}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.RCylindrical}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.RAxis}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.RAdition}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.CRSpherical}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.CRCylindrical}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.CRAxis}}</td>
+                                                                        <td>{{RefractionArray[0].LeftEye.CRAdition}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="summary-label col-lg-6" ng-if="AcceptenceArray.length>0">
+                                                        <h5><b>Acceptance</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th></th>
+                                                                        <th colspan="4" class="text-center">Acceptance</th>
+                                                                        <th colspan="4" class="text-center">Cycloplegic Acceptance</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th class="text-left">Eyes</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Add</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Add</th>
+                                                                    </tr>
+                                                                    <tr class="text-center">
+                                                                        <th>OD</th>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ASpherical}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ACylindrical}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.AAxis}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.AAdition}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ACSpherical}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ACCylindrical}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ACAxis}}</td>
+                                                                        <td>{{AcceptenceArray[0].RightEye.ACAdition}}</td>
+                                                                    </tr>
+                                                                    <tr class="text-center">
+                                                                        <th>OS</th>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ASpherical}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ACylindrical}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.AAxis}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.AAdition}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ACSpherical}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ACCylindrical}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ACAxis}}</td>
+                                                                        <td>{{AcceptenceArray[0].LeftEye.ACAdition}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-5" ng-if="KeretometerArray.length>0">
+                                                        <h5><b>Keratometer</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th colspan="2" class="text-center">OD</th>
+                                                                        <th colspan="2" class="text-center">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th class="text-center">Horizontal Axis</th>
+                                                                        <th class="text-center">Vertical Axis</th>
+                                                                        <th class="text-center">Horizontal Axis</th>
+                                                                        <th class="text-center">Vertical Axis</th>
+                                                                    </tr>
+
+                                                                    <tr class="text-center" ng-repeat="item in KeretometerArray">
+                                                                        <td>{{item.RightEye.RHorizontalAxis+(item.RightEye.RHorizontalAxis || item.RightEye.RHorizontalNewAxis?'@':'')+item.RightEye.RHorizontalNewAxis}}</td>
+                                                                        <td>{{item.RightEye.RVerticalAxis+(item.RightEye.RVerticalAxis || item.RightEye.RVerticalNewAxis?'@':'')+item.RightEye.RVerticalNewAxis}}</td>
+                                                                        <td>{{item.LeftEye.LHorizontalAxis+(item.LeftEye.LHorizontalAxis || item.LeftEye.LHorizontalNewAxis?'@':'')+item.LeftEye.LHorizontalNewAxis}}</td>
+                                                                        <td>{{item.LeftEye.LVerticalAxis+(item.LeftEye.LVerticalAxis || item.LeftEye.LVerticalNewAxis?'@':'')+item.LeftEye.LVerticalNewAxis}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="summary-label col-lg-4" ng-if="OcularDominanceArray.length>0">
+                                                        <h5><b>Ocular Dominance</b> </h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-left">{{OcularDominanceArray[0].Value}}</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr class="text-left">
+                                                                        <td ng-if="OcularDominanceArray[0].Remarks!=''">
+                                                                            <strong>Remarks: </strong>{{OcularDominanceArray[0].Remarks}}
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="summary-label col-lg-3" ng-if="PinholeArray.length>0">
+                                                        <h5><b>Pinhole</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-center">OD</th>
+                                                                        <th class="text-center">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr class="text-center" ng-repeat="item in PinholeArray">
+                                                                        <td width="100" ng-bind="item.RightEye.REye"></td>
+                                                                        <td width="100" ng-bind="item.LeftEye.LEye"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-6" ng-if="LCVArray.length>0">
+                                                        <h5><b>LCVA</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-center" colspan="3">OD</th>
+                                                                        <th class="text-center" colspan="3">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                    </tr>
+                                                                    <tr class="text-center" ng-repeat="item in LCVArray">
+                                                                        <td ng-bind="item.RightEye.RSph"></td>
+                                                                        <td ng-bind="item.RightEye.RCyl"></td>
+                                                                        <td ng-bind="item.RightEye.RAxis"></td>
+                                                                        <td ng-bind="item.LeftEye.LSph"></td>
+                                                                        <td ng-bind="item.LeftEye.LCyl"></td>
+                                                                        <td ng-bind="item.LeftEye.LAxis"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="summary-label col-lg-6" ng-if="BinocularArray.length>0">
+                                                        <h5><b>Binocular Balancing</b></h5>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-center" colspan="4">OD</th>
+                                                                        <th class="text-center" colspan="4">OS</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Adition</th>
+                                                                        <th class="text-center">Sph</th>
+                                                                        <th class="text-center">Cyl</th>
+                                                                        <th class="text-center">Axis</th>
+                                                                        <th class="text-center">Adition</th>
+                                                                    </tr>
+                                                                    <tr class="text-center" ng-repeat="item in BinocularArray">
+                                                                        <td ng-bind="item.RightEye.RSph"></td>
+                                                                        <td ng-bind="item.RightEye.RCyl"></td>
+                                                                        <td ng-bind="item.RightEye.RAxis"></td>
+                                                                        <td ng-bind="item.RightEye.RAdition"></td>
+                                                                        <td ng-bind="item.LeftEye.LSph"></td>
+                                                                        <td ng-bind="item.LeftEye.LCyl"></td>
+                                                                        <td ng-bind="item.LeftEye.LAxis"></td>
+                                                                        <td ng-bind="item.LeftEye.LAdition"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div ng-if="casedetailsdata.patientInvestigationDetails.InvestigationDetailsObj != undefined" class="col-lg-12 p-0">
+                                        <div ng-repeat="item in casedetailsdata.patientInvestigationDetails.InvestigationDetailsObj">
+                                            <!-- Color Vision -->
+                                            <div class="col-lg-12">
+                                                <section class="tile tile-shadow br-1" ng-if="item.CategoryID == 2">
+                                                    <div class="tile-header">
+                                                        <h1 class="custom-font">Color vision</h1>
+                                                    </div>
+                                                    <div class="tile-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered">
+                                                                        <tbody>
+                                                                            <tr ng-repeat="subitem in item.CategoryConditions">
+                                                                                <th ng-bind="subitem.InvestigationDesc" width="20%"></th>
+                                                                                <td ng-bind="subitem.InvestigationNote"></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <!-- /Color Vision -->
+                                                <!-- Ocular Motility -->
+                                                <section class="tile tile-shadow br-1" ng-if="item.CategoryID == 3">
+                                                    <div class="tile-header">
+                                                        <h1 class="custom-font">Ocular Motility</h1>
+                                                    </div>
+                                                    <div class="tile-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-6 summary-Investigation" ng-repeat="subitem in item.CategoryConditions |filter:{'InvestigationAttributeID':1}">
+                                                                <h5 ng-bind="subitem.InvestigationAttributeDesc"></h5>
+                                                                <div class="table-responsive">
+                                                                  
+                                                                    <table class="table table-bordered" ng-show="(subitem.OcularPositionValues |  filter:{ 'Value': ''}).length != 0">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>RSR LIO</th>
+                                                                                <th>RSR LIO</th>
+                                                                                <th>RSR LMR</th>
+                                                                                <th>RIR LSO</th>
+                                                                                <th>RIR RSO</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td ng-repeat="childitem in subitem.OcularPositionValues" class="text-center">
+                                                                                    <span ng-if="childitem.ValueType=='negative'">- </span><span ng-bind="childitem.Value"></span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <article class="col-lg-12 p-10" ng-show="(item.CategoryConditions |filter:{'InvestigationAttributeID':1})[0].Notes !=''">
+                                                                    <strong>Remarks:</strong> <span ng-bind="subitem.Notes"></span>
+                                                                </article>
+                                                            </div>
+                                                            <div class="col-lg-6 summary-Investigation" ng-repeat="subitem in item.CategoryConditions | filter:{'InvestigationAttributeID':2}">
+                                                                <h5 ng-bind="subitem.InvestigationAttributeDesc"></h5>
+                                                                <div class="table-responsive" ng-show="(subitem.OcularPositionValues |  filter:{ 'Value': ''}).length != 0">
+                                                                    <table class="table table-bordered">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>LSR RIO</th>
+                                                                                <th>RIO LSR</th>
+                                                                                <th>RMR LLR</th>
+                                                                                <th>LIR LSO</th>
+                                                                                <th>RSO LIR</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td ng-repeat="childitem in subitem.OcularPositionValues" class="text-center">
+                                                                                    <span ng-if="childitem.ValueType=='negative'">- </span><span ng-bind="childitem.Value"></span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <article class="col-lg-12 p-10" ng-show="(item.CategoryConditions |filter:{'InvestigationAttributeID':2})[0].Notes !=''">
+                                                                    <strong>Remarks:</strong> <span ng-bind="subitem.Notes"></span>
+                                                                </article>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <!-- /Ocular Motility -->
+                                                <!-- Tonometry Test -->
+                                                <section class="tile tile-shadow br-1" ng-if="item.CategoryID == 4">
+                                                    <div class="tile-header">
+                                                        <h1 class="custom-font">Tonometry Test</h1>
+
+                                                    </div>
+                                                    <div class="tile-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12 summary-Investigation">
+                                                                <div class="table-responsive mt-10">
+                                                                    <table class="table table-bordered">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Tonometry Tests</th>
+                                                                                <th>OD</th>
+                                                                                <th>OS</th>
+                                                                                <th>Time</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody ng-repeat="item1 in item.CategoryConditions">
+                                                                            <tr ng-if="item1.InvestigationID == 1">
+                                                                                <th>Non Contact Tonometry</th>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.RightEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.LeftEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.Time"></span></td>
+                                                                            </tr>
+                                                                            <tr ng-if="item1.InvestigationID == 2">
+                                                                                <th>Applanation Tonometry</th>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.RightEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.LeftEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.Time"></span></td>
+                                                                            </tr>
+                                                                            <tr ng-if="item1.InvestigationID == 3">
+                                                                                <th>Contact Tonometry</th>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.RightEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.LeftEye"></span></td>
+                                                                                <td><span ng-bind="item1.InvestigationAttributeValues.Time"></span></td>
+                                                                            </tr>
+                                                                            <tr ng-if="item1.InvestigationID == 4">
+                                                                                <th>Digital</th>
+                                                                                <td colspan="3"><span ng-bind="item1.Value"></span></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <!-- /Tonometry Test -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
+
+
+                                <div class="row" ng-if="AnteriorSegmentArray.length>0">
+                                    <div class="col-lg-12" >
+                                        <section class="tile tile-shadow br-1">
+                                            <div class="tile-header">
+                                                <h1 class="custom-font">Anterior Segment</h1>
+                                            </div>
+                                            <div class="tile-body">
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-12">
+                                                      
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Anterior Segment</th>
+                                                                        <th width="32%">OD</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                        <th width="32%">OS</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in AnteriorSegmentArray">
+                                                                        <th ng-bind="item.InvestigationDesc"></th>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.RightEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.RightEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.RightEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.RightEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.RightEyeImage.length>0"></i>
+                                                                                <span ng-show="item.InvestigationDetails.RightEyeImage.length==0">N/A</span>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.LeftEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.LeftEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.LeftEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.LeftEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.LeftEyeImage.length>0"></i>
+                                                                                <span ng-show="item.InvestigationDetails.LeftEyeImage.length==0">N/A</span>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        
+                                    </div>
+                                </div>
+
+
+                                <div class="row" ng-if="PosteriorSegmentArray.length>0">
+                                    <div class="col-lg-12">
+                                        <section class="tile tile-shadow br-1">
+                                            <div class="tile-header">
+                                                <h1 class="custom-font">Posterior Segment</h1>
+                                            </div>
+                                            <div class="tile-body">
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-12">
+                                                      
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Posterior Segment</th>
+                                                                        <th width="32%">OD</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                        <th width="32%">OS</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in PosteriorSegmentArray">
+                                                                        <th ng-bind="item.InvestigationDesc"></th>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.RightEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.RightEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.RightEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.RightEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.RightEyeImage.length>0"></i>
+                                                                                <span ng-show="item.InvestigationDetails.RightEyeImage.length==0">N/A</span>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.LeftEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.LeftEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.LeftEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.LeftEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.LeftEyeImage.length>0"></i>
+                                                                                <span ng-show="item.InvestigationDetails.LeftEyeImage.length==0">N/A</span>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row" ng-if="AdditionalInvestgationArray.length>0">
+                                    <div class="col-lg-12" >
+                                        <section class="tile tile-shadow br-1">
+                                            <div class="tile-header">
+                                                <h1 class="custom-font">Aditional Investigations</h1>
+                                            </div>
+                                            <div class="tile-body">
+                                                <div class="row">
+                                                    <div class="summary-label col-lg-12">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Aditional Investigations</th>
+                                                                        <th width="32%">OD</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                        <th width="32%">OS</th>
+                                                                        <th width="100" class="text-center">Image</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in AdditionalInvestgationArray">
+                                                                        <th ng-bind="item.InvestigationDesc"></th>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.RightEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.RightEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.RightEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.RightEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-show="item.InvestigationDetails.RightEyeImage!==''" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.RightEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.RightEyeImage.length>0">
+                                                                                </i>
+                                                                                <span ng-show="item.InvestigationDetails.RightEyeImage.length==0">N/A</span>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeCdRatio ==''">
+                                                                                <b>CD Ratio: </b>
+                                                                                <span ng-bind="item.InvestigationDetails.LeftEyeCdRatio"></span>
+                                                                            </p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEyeFreq ==0"><b>Frequency :</b> <span ng-bind="item.InvestigationDetails.LeftEyeFreq == 'positive'?'FR+':'FR-'"></span></p>
+                                                                            <p ng-hide="item.InvestigationDetails.LeftEye ==''"><b>Findings :</b><span ng-bind="item.InvestigationDetails.LeftEye"></span> </p>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="" ng-show="item.InvestigationDetails.LeftEyeImage!==''" ng-click="GetDoctorInvestigationImg(item.InvestigationDetails.LeftEyeImage)">
+                                                                                <i class="fa text-primary fa-image" ng-show="item.InvestigationDetails.LeftEyeImage.length>0"></i>
+                                                                            </a>
+                                                                            <span ng-show="item.InvestigationDetails.LeftEyeImage.length==0">N/A</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+     
+    <div class="col-md-12 p-0" ng-show="caseidhistory.length == 0">
+        <div class="no-record-wrap">
+            <img src="img/no-data/no-past records_review.png" />
+            <div class="no-records-txt-line2">No previous investigations by this patient</div>
+        </div>
+    </div>
+</div>

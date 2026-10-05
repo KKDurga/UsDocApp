@@ -1,0 +1,278 @@
+﻿<div ng-controller="USCoordinatorFollowUpCtrl">
+    <ul class="">
+        <li role="presentation" ng-click="SelectTab(1);" tabindex="0" ng-class="(TabObj.Tab === 1) ? 'active':''">
+            <a class="ng-binding">
+                <i class="fas fa-tachometer-alt fa-lg"></i> Surgery Reminders
+            </a>
+        </li>
+        <li role="presentation" ng-click="SelectTab(2);" tabindex="0" ng-class="(TabObj.Tab === 2) ? 'active':''">
+            <a>
+                <i class="far fa-calendar-alt fa-lg"></i> PreAdmission Reminders
+            </a>
+        </li>
+    </ul>
+    <div ng-if="TabObj.Tab === 1">
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                        <tbody>
+                                            <tr>
+                                                <td class="w-175">
+                                                    <div class="form-group">
+                                                        <label> From Date</label>
+                                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="CounsellorSearchObj.FromDate" datepickerforapplist readonly>
+                                                    </div>
+                                                </td>
+                                                <td class="w-175">
+                                                    <div class="form-group">
+                                                        <label>To Date</label>
+                                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="CounsellorSearchObj.ToDate" datepickerapnlus readonly>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <div class="form-group">
+                                                        <fieldset class="pos-relative bottom-2" style="line-height: 25px;">
+                                                            <div class="dis-inline-block">
+                                                                <input type="radio" class="radio-custom width-0" id="PatientNameId" name="patientSearch" ng-value="1" aria-invalid="false" ng-model="patientsearchType" ng-click="searchPatientIdTxt==''">
+                                                                <label for="PatientNameId" class="radio-custom-label cur-poiter mb-0">Name</label>
+                                                            </div>
+                                                            <div class="dis-inline-block ml-15">
+                                                                <input type="radio" class="radio-custom width-0 " id="PatientmrId" name="patientSearch" ng-value="2" aria-invalid="false" ng-model="patientsearchType" ng-click="searchPatientTxt==''">
+                                                                <label for="PatientmrId" class="radio-custom-label cur-poiter mb-0">MR No</label>
+                                                            </div>
+                                                        </fieldset>
+                                                        <div class="form-group pr-0">
+                                                            <div class="inner-addon left-addon">
+                                                                <i class="fa fa-search fs-18 color-ddd" aria-hidden="true"></i>
+                                                                <input type="text" class="form-control pl-15" placeholder="Search By Name/Mobile" ng-if="patientsearchType == 1" ng-model="CounsellorSearchObj.SearchName">
+                                                                <input type="text" class="form-control pl-15" placeholder="Search By Mr.No" ng-if="patientsearchType == 2" ng-model="CounsellorSearchObj.SearchMrno">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="valign-bottom">
+                                                    <div class="form-group">
+                                                        <button class="btn btn-success" ng-click="GetCordinatorFollowUpList();">Search</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" ng-show="CordinatorFollowUpList.length>0">
+                <table class="asc-table">
+                    <thead>
+                        <tr>
+                            <th class="w-40 text-center">S.No</th>
+                            <th width="18%">Patient Name</th>
+                            <th>MobileNo</th>
+                            <th>Followup Date</th>
+                            <th>Surgery Details</th>
+                            <th>Remarks</th>
+                            <th>Status</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in CordinatorFollowUpList track by $index">
+                            <td ng-click="ChangeFollowUpSubcontent(item)">
+                                <span class="text-s12wnormlc000 text-center">{{$index+1}}</span>
+                            </td>
+                            <td ng-click="ChangeFollowUpSubcontent(item)">
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-35 m-b-0">
+                                        <img ng-show="item.S3URL !==''" src="{{item.S3URL}}" class="img-profile-thumb" />
+                                        <img ng-show="item.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                    </li>
+                                    <li class="flex m-b-0">
+                                        <span class="text-s12w500c000 dis-block">{{item.PatientFullName}}</span>
+                                        <span class="text-s12wnormlc000">{{item.PatientDisplayId}}</span>
+                                        <!--<span class="text-s12wnormlc000 m-l-5"></span>-->
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <!--<span class="text-s12w500c313131">{{item.MobileNo}}</span>-->
+                                <span class="text-s12w500c313131">{{item.UserMobilenumberFormat}}</span>
+                            </td>
+                            <td>
+
+                                <span class="text-s12w500c313131" ng-bind="item.FollowupDate| date : 'MM-dd-yyyy'"></span>
+                            </td>
+
+                            <td>
+                                <span ng-show="item.SurgeryList.length>0" class="text-s12w500c313131 dis-block no-wrapappt" title="{{item.PayorName}}"
+                                      ng-repeat="Aitem in item.SurgeryList">
+                                    {{Aitem.OrganizationSurgeryName}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-s12w500c313131">{{item.Remarks}}</span>
+                                an
+                            </td>
+                            <td>
+                                <span class="text-s12w500c313131">{{item.CoordinatorStatus}}</span>
+                            </td>
+
+                        </tr>
+
+
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-12 text-center" ng-show="CordinatorFollowUpList.length==0">
+                <div class="billing-cominsoon m-t-20">
+                    <img src="img/no-data/no-data-icon.png">
+                    <div class="msg m-t-20">
+                        <p class="nodata-text">Oops!!</p>
+                        <p class="nodata-txt-line2">
+                            No Surgeries available with selected dates.
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="TabObj.Tab === 2">
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                        <tbody>
+                                            <tr>
+                                                <td class="w-175">
+                                                    <div class="form-group">
+                                                        <label> From Date</label>
+                                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="CounsellorSearchObj.FromDate" datepickerforapplist readonly>
+                                                    </div>
+                                                </td>
+                                                <td class="w-175">
+                                                    <div class="form-group">
+                                                        <label>To Date</label>
+                                                        <input class="form-control icons-calendar cur-default bg-white" ng-model="CounsellorSearchObj.ToDate" datepickerapnlus readonly>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <div class="form-group">
+                                                        <fieldset class="pos-relative bottom-2" style="line-height: 25px;">
+                                                            <div class="dis-inline-block">
+                                                                <input type="radio" class="radio-custom width-0" id="PatientNameId" name="patientSearch" ng-value="1" aria-invalid="false" ng-model="patientsearchType" ng-click="searchPatientIdTxt==''">
+                                                                <label for="PatientNameId" class="radio-custom-label cur-poiter mb-0">Name</label>
+                                                            </div>
+                                                            <div class="dis-inline-block ml-15">
+                                                                <input type="radio" class="radio-custom width-0 " id="PatientmrId" name="patientSearch" ng-value="2" aria-invalid="false" ng-model="patientsearchType" ng-click="searchPatientTxt==''">
+                                                                <label for="PatientmrId" class="radio-custom-label cur-poiter mb-0">MR No</label>
+                                                            </div>
+                                                        </fieldset>
+                                                        <div class="form-group pr-0">
+                                                            <div class="inner-addon left-addon">
+                                                                <i class="fa fa-search fs-18 color-ddd" aria-hidden="true"></i>
+                                                                <input type="text" class="form-control pl-15" placeholder="Search By Name/Mobile" ng-if="patientsearchType == 1" ng-model="CounsellorSearchObj.SearchName">
+                                                                <input type="text" class="form-control pl-15" placeholder="Search By Mr.No" ng-if="patientsearchType == 2" ng-model="CounsellorSearchObj.SearchMrno">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="valign-bottom">
+                                                    <div class="form-group">
+                                                        <button class="btn btn-success" ng-click="SelectTab(2);">Search</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" ng-show="PreAdmissionApptsArray.length>0">
+                <table class="asc-table">
+                    <thead>
+                        <tr>
+                            <th class="w-40 text-center">S.No</th>
+                            <th width="18%">Patient Name</th>
+                            <th>MobileNo</th>
+                            <th>Appointment Date</th>
+                            <th>Surgery Details</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in PreAdmissionApptsArray track by $index" ng-click="OnclickPreAdmissionAppt(item);">
+                            <td>
+                                <span class="text-s12wnormlc000 text-center">{{$index+1}}</span>
+                            </td>
+                            <td>
+                                <ul class="flex-flow-ulli">
+                                    <li class="w-35 m-b-0">
+                                        <img ng-show="item.Patient.S3URL !==''" src="{{item.Patient.S3URL}}" class="img-profile-thumb" />
+                                        <img ng-show="item.Patient.S3URL ==''" src="img/icon-male-new.png" class="img-profile-thumb" />
+                                    </li>
+                                    <li class="flex m-b-0">
+                                        <span class="text-s12w500c000 dis-block">{{item.Patient.FullName}}</span>
+                                        <span class="text-s12wnormlc000">{{item.Patient.PatientDisplayId}}</span>
+                                        <!--<span class="text-s12wnormlc000 m-l-5"></span>-->
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <!--<span class="text-s12w500c313131">{{item.MobileNo}}</span>-->
+                                <span class="text-s12w500c313131">{{item.UserMobilenumberFormat}}</span>
+                            </td>
+                            <td>
+
+                                <span class="text-s12w500c313131" ng-bind="item.ConsultationDt"></span>
+                            </td>
+
+                            <td>
+                                <span ng-show="item.PreAdmSurgeryList.length > 0" class="text-s12w500c313131 dis-block no-wrapappt"
+                                      ng-repeat="Aitem in item.PreAdmSurgeryList">
+                                    {{Aitem.SurgeryName}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-s12w500c313131">{{item.PreAdmissionStatus}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-12 text-center" ng-show="PreAdmissionApptsArray.length == 0">
+                <div class="billing-cominsoon m-t-20">
+                    <img src="img/no-data/no-data-icon.png">
+                    <div class="msg m-t-20">
+                        <p class="nodata-text">Oops!!</p>
+                        <p class="nodata-txt-line2">
+                            No Appointments available with selected dates.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

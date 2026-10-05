@@ -1,0 +1,826 @@
+<!--New Logs design added my mahendra on 21/09/2026-->
+<div ng-controller="EhnoteMaintainLogsCtrl" class="d__f-- fd__c-- h__100p-- minh__0px-- bg__FFFFFF-- o__h--">
+
+    <div class="d__f-- ai__c-- gap__10-- px__16-- py__10-- fs__0--">
+        <h1 id="logs__headerTitle" class="m__0-- fs__3l-- fw__7-- lh__1-3-- tc__111827--">All Users Log List</h1>
+    </div>
+
+    <div class="bb__C8DEDE-- bg__F0F7F7-- px__16-- py__8-- fs__0--">
+        <div class="web__view--">
+            <div class="d__f-- ai__fe-- fw__w-- g__12--">
+                <div class="d__f-- fd__c-- g__4--">
+                    <div class="d__f-- ai__c-- gap__10--">
+                        <label class="radio__style--1" for="logs__webSearchTypeName">
+                            <input type="radio" id="logs__webSearchTypeName" name="mlogsSearchType" ng-value="1" ng-model="PatLogSearchType">
+                            Name
+                        </label>
+                        <label class="radio__style--1" for="logs__webSearchTypeMrNo">
+                            <input type="radio" id="logs__webSearchTypeMrNo" name="mlogsSearchType" ng-value="2" ng-model="PatLogSearchType">
+                            MR No
+                        </label>
+                        <label class="radio__style--1" for="logs__webSearchTypeOldMrNo">
+                            <input type="radio" id="logs__webSearchTypeOldMrNo" name="mlogsSearchType" ng-value="3" ng-model="PatLogSearchType">
+                            Old MR No
+                        </label>
+                    </div>
+                    <div class="form__group--1 position__relative-- w__240px--">
+                        <input type="text" id="logs__webSearchInput"
+                               ng-model="SeachByPatientObj[LogsSearchKeys[PatLogSearchType]]"
+                               ng-change="SearchLogsData(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]])"
+                               ng-enter="checkclick(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]], PatLogSearchType)"
+                               placeholder="{{LogsSearchPlaceholders[PatLogSearchType]}}"
+                               style="padding-right: 56px;">
+                        <a id="logs__webSearchClear" class="position__absolute-- top__3-- right-25 d__f-- ai__c-- jc__c-- w__22-- h__22-- br__4-- bg__EF4444-- c__p--" ng-if="SeachByPatientObj[LogsSearchKeys[PatLogSearchType]]" ng-click="newclearPatientApptSearchinCal()" role="button" tabindex="0" uib-tooltip="Clear search"><i class="icons__w16-- cancel__w16--w"></i></a>
+                        <!-- Search button (replaces the previous design's Search button beside the input) -->
+                        <button type="button" id="logs__webSearchBtn" class="position__absolute-- top__3-- right__2-- d__f-- ai__c-- jc__c-- w__22-- h__22-- p__0-- bd__0-- br__4-- bg__1D5558-- tc__FFFFFF-- c__p--" uib-tooltip="Search" ng-click="checkclick(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]], PatLogSearchType)">
+                            <i svg-icon="icon__search--o" size="12" class="tc__FFFFFF--"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="web__view--">
+                    <div class="form__group--1">
+                        <label>Date Range</label>
+                        <div id="logs__webDateRange" class="input__fromTo-- c__p--"
+                             popover-trigger="outsideClick"
+                             popover-class="date-range-popover drp__popover--"
+                             popover-is-open="logsUi.drpWebOpen"
+                             popover-placement="bottom-left"
+                             popover-append-to-body="true"
+                             uib-popover-template="'templates/UIBPopovers/fromToCalender.html'"
+                             from-to-date-picker
+                             from-date="MainTainLogsObj.FromDate"
+                             to-date="MainTainLogsObj.ToDate"
+                             block-future>
+                            <input id="logs__webFromDate" type="text" placeholder="From Date" ng-value="MainTainLogsObj.FromDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                            <span class="arrow">→</span>
+                            <input id="logs__webToDate" type="text" placeholder="To Date" ng-value="MainTainLogsObj.ToDate | date:'MM-dd-yyyy'" readonly class="c__p--" />
+                            <label class="icon-box">
+                                <i svg-icon="icon__calender--" size="13" class="tc__1D5558--"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users (multi select) -->
+                <div class="dropdown cstm-dropdown w__180px--" button-dropdown-direction>
+                    <div class="form__group--1" data-toggle="dropdown">
+                        <label>Users</label>
+                        <div class="position__relative--">
+                            <input type="text" id="logs__webUsersInput" class="c__p--" ng-value="searchUserInLogs" title="{{searchUserInLogs}}" readonly>
+                            <i svg-icon="icon__arrowdown--" size="12" class="position__absolute-- top-7 right__8-- pe__n-- tc__9CA3AF--"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="$event.stopPropagation()">
+                        <div class="p-5">
+                            <input id="logs__webUsersSearch" type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchUserInLogstab.txt1">
+                        </div>
+                        <div class="drop-menu-Scroll apptsearchdroplist">
+                            <ul>
+                                <li>
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input id="logs__webUsersOption--all" name="checkbox-mlogs-users" type="checkbox" ng-model="MainTainLogsObj.AllUsersCheck" ng-click="LogsCheckAllUsers(MainTainLogsObj.AllUsersCheck)">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small>All Users</small>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li ng-repeat="item in LogMaintainAllUsersList | filter:{'FullName':searchUserInLogstab.txt1}">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input id="logs__webUsersOption--{{$index}}" name="checkbox-mlogs-users" type="checkbox" ng-model="item.isChecked" ng-click="LogsMaintainToggle(item);">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small ng-bind="item.UserFullName + '-' + item.NPI"></small>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Actions (multi select) -->
+                <div class="dropdown cstm-dropdown w__180px--" button-dropdown-direction>
+                    <div class="form__group--1" data-toggle="dropdown">
+                        <label>Actions</label>
+                        <div class="position__relative--">
+                            <input type="text" id="logs__webActionsInput" class="c__p--" ng-value="searcActionName" title="{{searcActionName}}" readonly>
+                            <i svg-icon="icon__arrowdown--" size="12" class="position__absolute-- top-7 right__8-- pe__n-- tc__9CA3AF--"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="$event.stopPropagation()">
+                        <div class="p-5">
+                            <input id="logs__webActionsSearch" type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searcActionNameTab.txt1">
+                        </div>
+                        <div class="drop-menu-Scroll apptsearchdroplist">
+                            <ul>
+                                <li>
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input id="logs__webActionsOption--all" name="checkbox-mlogs-actions" type="checkbox" ng-model="MainLogActionObj.AllUsersActionCheck" ng-click="LogsCheckAllUsersActions(MainLogActionObj.AllUsersActionCheck)">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small>All Actions</small>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li ng-repeat="item in MainLogActionObj | filter:{'ActionLogName':searcActionNameTab.txt1}">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input id="logs__webActionsOption--{{$index}}" name="checkbox-mlogs-actions" type="checkbox" ng-model="item.isChecked" ng-click="LogsMaintainActionToggle(item);">
+                                            <span class="checkbox-material"><span class="check"></span></span>
+                                            <small ng-bind="item.ActionLogName"></small>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Apply / Reset -->
+                <div class="d__f-- ai__c-- g__10-- h__28--">
+                    <button type="button" id="logs__webApplyBtn" class="btn__lg-- btn__1d5558--f h__28--" ng-click="searchMainReports()">Apply</button>
+                    <a href="javascript:;" id="logs__webResetBtn" class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" role="button" tabindex="0" title="Clear Filters" ng-click="RefreshMainReports()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab__view--">
+            <div class="d__f-- ai__c-- fw__w-- g__12--">
+                <fieldset class="d__f-- ai__c-- g__14-- m__0-- p__0-- bd__0--">
+                    <div class="d__if-- ai__c--">
+                        <input type="radio" class="radio-custom w__0--" id="logs__tabSearchTypeName" name="mlogsTabSearchType" ng-value="1" ng-model="PatLogSearchType">
+                        <label for="logs__tabSearchTypeName" class="radio-custom-label cur-poiter mb__0-- d__if-- ai__c-- fs__md-- fw__6-- tc__4B5563-- ws__nw--">Name</label>
+                    </div>
+                    <div class="d__if-- ai__c--">
+                        <input type="radio" class="radio-custom w__0--" id="logs__tabSearchTypeMrNo" name="mlogsTabSearchType" ng-value="2" ng-model="PatLogSearchType">
+                        <label for="logs__tabSearchTypeMrNo" class="radio-custom-label cur-poiter mb__0-- d__if-- ai__c-- fs__md-- fw__6-- tc__4B5563-- ws__nw--">MR No</label>
+                    </div>
+                    <div class="d__if-- ai__c--">
+                        <input type="radio" class="radio-custom w__0--" id="logs__tabSearchTypeOldMrNo" name="mlogsTabSearchType" ng-value="3" ng-model="PatLogSearchType">
+                        <label for="logs__tabSearchTypeOldMrNo" class="radio-custom-label cur-poiter mb__0-- d__if-- ai__c-- fs__md-- fw__6-- tc__4B5563-- ws__nw--">Old MR No</label>
+                    </div>
+                </fieldset>
+
+                <div class="p__r-- d__f-- ai__c--">
+                    <input type="text" id="logs__tabSearchInput" class="bg-inputy w__220px-- h__32-- pl__10-- pr__28-- br__7-- fs__md-- tc__1D1D1D-- outline__none--"
+                           ng-model="SeachByPatientObj[LogsSearchKeys[PatLogSearchType]]"
+                           ng-change="SearchLogsData(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]])"
+                           ng-enter="checkclick(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]], PatLogSearchType)"
+                           placeholder="{{LogsSearchPlaceholders[PatLogSearchType]}}">
+                    <button id="logs__tabSearchClear" type="button" class="position__absolute-- right__6-- d__f-- ai__c-- jc__c-- w__18-- h__18-- p__0-- bd__0-- br__50--p bg__transparent tc__9CA3AF-- c__p-- hover__F3F4F6--bg" ng-if="SeachByPatientObj[LogsSearchKeys[PatLogSearchType]]" ng-click="newclearPatientApptSearchinCal()" title="Clear search">
+                        <i svg-icon="icon__cross--" size="10"></i>
+                    </button>
+                </div>
+
+                <button type="button" id="logs__tabSearchBtn" class="btn__lg-- btn__1d5558--f h__32-- px__16-- br__7-- fw__7-- ws__nw--" ng-click="checkclick(SeachByPatientObj[LogsSearchKeys[PatLogSearchType]], PatLogSearchType)">{{ 'SEARCH' | translate}}</button>
+                <button type="button" id="logs__tabFilterBtn" class="btn__lg-- btn__1d5558--o h__32-- px__16-- br__7-- fw__7-- ws__nw-- g__6--" ng-click="logsUi.showFilter = true">
+                    <i svg-icon="icon__filter--" size="14"></i>
+                    Filter
+                    <span class="d__if-- ai__c-- jc__c-- w__18-- h__18-- br__50--p bg__1D5558-- tc__FFFFFF-- fs__xs-- fw__7--"
+                          ng-if="(MainTainLogsObj.FromDate || MainTainLogsObj.ToDate ? 1 : 0) + (MainTainLogsObj.AllUsersCheck === false ? 1 : 0) + (MainLogActionObj.AllUsersActionCheck === false ? 1 : 0) > 0">{{(MainTainLogsObj.FromDate || MainTainLogsObj.ToDate ? 1 : 0) + (MainTainLogsObj.AllUsersCheck === false ? 1 : 0) + (MainLogActionObj.AllUsersActionCheck === false ? 1 : 0)}}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex__1-- minh__0px-- d__f-- fd__c-- p__10--">
+        <div class="flex__1-- min__h200-- d__f-- fd__c-- bradius__8-- border__C8DEDE-- boxs__1D5558-- overflow-hidden bg__FFF--">
+            <div class="position__relative-- flex__1-- minh__0px--">
+                <div class="adjustable-position table-responsive slim-scroll m__0-- border__none-- overflow__auto--">
+                    <table id="logs__table" class="table__style--31 tab:minw__1500px-- tl__f--" ng-class="!LogsFilteredList.length ? 'height__100--' : ''">
+                        <thead>
+                            <tr>
+                                <th class="w__50px-- ws__pl-- p__8--">S.No</th>
+                                <th class="w__110px-- ws__pl-- p__8--">Date &amp; Time</th>
+                                <th class="w__8p-- ws__pl-- p__8--">User</th>
+                                <th class="w__12p-- ws__pl-- p__8--">DOS</th>
+                                <th class="w__12p-- ws__pl-- p__8--">Patient Name &amp; MR NO</th>
+                                <th class="w__10p-- ws__pl-- p__8--">Module &amp; Screen</th>
+                                <th class="w__12p-- ws__pl-- p__8--">Action &amp; Screen</th>
+                                <th class="w__10p-- ws__pl-- p__8--">Old Value</th>
+                                <th class="ws__pl-- p__8--">New Value</th>
+                                <th class="w__110px-- ws__pl-- p__8--">Status</th>
+                                <th class="w__90px-- min__w60-- position__sticky-- z-index-four bl__E4E4E4-- right__0-- ws__pl-- p__8--">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- LogsFilteredList = all loaded rows; only the current page slice is rendered -->
+                            <tr id="logs__tableRow--{{$index}}" ng-repeat="item in (LogsFilteredList = MaintainingLogsDataArray) | limitTo:LogsPager.pageSize:(LogsPager.currentPage - 1) * LogsPager.pageSize">
+                                <td class="p__8-- ws__n-- ta__c--">{{(LogsPager.currentPage - 1) * LogsPager.pageSize + $index + 1}}.</td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="d__b-- fw__6--" title="{{item.ActionDate | date:'MM/dd/yyyy'}}">{{item.ActionDate | date:'MM/dd/yyyy'}}</span>
+                                    <span class="d__b-- tc__4B5563--" title="{{item.ModifiedTime | date:'HH:mm'}}">{{item.ModifiedTime | date:'HH:mm'}}</span>
+                                </td>
+                                <td class="p__8-- ws__n--"><span class="d__b--" title="{{item.UserName}}">{{item.UserName}}</span></td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="d__b--" ng-if="item.AppointmentDate!=null" title="{{item.AppointmentDate | date:'MM/dd/yyyy'}} &amp; {{item.StartTime | date:'HH:mm'}}">{{item.AppointmentDate | date:'MM/dd/yyyy'}} &amp; {{item.StartTime | date:'HH:mm'}}</span>
+                                    <span class="d__b-- fw__7--" ng-if="item.AppointmentDoctorname!=null" title="{{item.AppointmentDoctorname}}">{{item.AppointmentDoctorname}}</span>
+                                    <span class="d__b-- fs__md-- fw__4-- tc__111827--" ng-if="item.VisitReason!=null" title="{{item.VisitReason}}">{{item.VisitReason}}</span>
+                                </td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="d__b-- fw__7-- tc__2563A8--" title="{{item.PatientFullName}}">{{item.PatientFullName}}</span>
+                                    <span class="d__b-- fw__5-- tc__8A8F98--" ng-hide="item.OldMrno==''&&item.MRNo==0" title="{{item.MRNo}}">{{item.MRNo}}</span>
+                                </td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="d__b-- fw__7--" ng-if="item.ModuleName" title="{{item.ModuleName}}">{{item.ModuleName}}</span>
+                                    <span class="d__b-- mt__5--" ng-if="item.ScreenType" title="{{item.ScreenType}}">{{item.ScreenType}}</span>
+                                </td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="d__ib-- px__10-- py__3-- br__999-- fs__sm-- fw__7-- ws__nw--" ng-class="LogsActionBadgeClass(item.ActionType)" ng-if="item.ActionType">{{item.ActionType}}</span>
+                                    <span class="d__b-- mt__5--" ng-if="item.SubModuleName" title="{{item.SubModuleName}}">{{item.SubModuleName}}</span>
+                                </td>
+                                <td class="p__8-- ws__n--"><span class="d__b--" title="{{item.OldActionDescription}}">{{item.OldActionDescription}}</span></td>
+                                <td class="p__8--"><span class="d__b-- o__h-- to__e-- ws__nw--" uib-tooltip="{{item.NewActionDescription}}" tooltip-append-to-body="true" tooltip-placement="auto">{{item.NewActionDescription}}</span></td>
+                                <td class="p__8-- ws__n--">
+                                    <span class="btn__status-- btn__2D2AA2D--" ng-if="item.Status && item.Status != 'Failure'" title="{{item.Status}}">{{item.Status}}</span>
+                                    <span id="logs__statusFailure--{{$index}}" class="btn__status-- btn__E03C3C-- g__4-- c__p--" ng-if="item.Status == 'Failure'" uib-popover="{{item.Remarks}}" popover-placement="auto" popover-trigger="outsideClick" popover-append-to-body="true" popover-class="custom-popover">{{item.Status}} <i class="icons__w16-- info__w16--l"></i></span>
+                                </td>
+                                <td class="min__w60-- position__sticky-- right__0-- zindex-2 bl__E4E4E4-- text-center p__8-- ws__n--">
+                                    <div class="d__f-- fd__r-- ai__c-- jc__c-- gap__6--">
+                                        <button id="logs__quickSummaryBtn--{{$index}}" type="button" class="btn__arrow--" uib-tooltip="Quick Summary" tooltip-append-to-body="true" tooltip-placement="top" ng-if="item.ScreenType=='Signed off'" ng-click="navtoQuicksummarypopupprofile(item)">
+                                            <i class="icons__w16-- drawarrow__w16--f"></i>
+                                        </button>
+                                        <button id="logs__viewChangesBtn--{{$index}}" type="button" class="btn__arrow--" uib-tooltip="View Changes" tooltip-append-to-body="true" tooltip-placement="top" ng-hide="item.OldActionDescription == '' && item.NewActionDescription == ''" ng-click="openCheckInPopup(item)">
+                                            <i class="icons__w16-- eye__w16--f"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Empty state (show when there are no records) -->
+                            <tr id="logs__tableEmpty" class="height__100--" ng-if="!LogsFilteredList.length">
+                                <td colspan="11" class="hover__FFFFFF--bg">
+                                    <div class="d__f-- fd__c-- ai__c-- jc__c-- g__8-- py__55-- px__16-- ta__c--">
+                                        <i class="nodata__1-- a1__nodata--1"></i>
+                                        <h1 class="m__0-- fs__2l-- fw__6-- tc__1D1D1D--">No Results Found</h1>
+                                        <p class="m__0-- fs__md-- tc__9CA3AF--">Try changing the search or filters.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Footer / pagination — same structure as Billing > Postings (client side, LogsPager.pageSize rows per page) -->
+            <div class="d__f-- ai__c-- gap__20-- px__14-- py__7-- bt__E4E4E4-- bg__F9FAFB-- fs__md-- tc__9CA3AF--">
+                <div class="d__f-- ai__c-- gap__10-- ml__auto-- flex__shrink--0">
+                    <span id="logs__paginationRange">
+                        <b class="tc__1D1D1D--">{{LogsFilteredList.length ? (LogsPager.currentPage - 1) * LogsPager.pageSize + 1 : 0}} – {{LogsPager.currentPage * LogsPager.pageSize > (LogsFilteredList.length || 0) ? (LogsFilteredList.length || 0) : LogsPager.currentPage * LogsPager.pageSize}}</b>
+                        of
+                        <b class="tc__1D1D1D--">{{LogsFilteredList.length || 0}}</b>
+                    </span>
+                    <button id="logs__paginationPrev" type="button" class="btn__arrow--" title="Previous"
+                            ng-disabled="LogsPager.currentPage <= 1"
+                            ng-class="{'disabled': LogsPager.currentPage <= 1}"
+                            ng-click="LogsPageChange(-1, LogsFilteredList.length)">
+                        <i svg-icon="icon__arrow--" size="10" class="tc__4B5563-- icon__filp--"></i>
+                    </button>
+                    <button id="logs__paginationNext" type="button" class="btn__arrow--" title="Next"
+                            ng-disabled="LogsPager.currentPage * LogsPager.pageSize >= (LogsFilteredList.length || 0)"
+                            ng-class="{'disabled': LogsPager.currentPage * LogsPager.pageSize >= (LogsFilteredList.length || 0)}"
+                            ng-click="LogsPageChange(1, LogsFilteredList.length)">
+                        <i svg-icon="icon__arrow--" size="10" class="tc__4B5563--"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── FILTER POPUP (tab only) — previous popup design ───────────── -->
+    <div class="position__fixed-- inset__0-- z__1000-- d__f-- ai__c-- jc__c-- p__16-- bg__00000073--" ng-if="logsUi.showFilter" ng-click="logsUi.showFilter = false">
+        <div id="logs__filterPopup" class="w__100p-- maxh__90p-- d__f-- fd__c-- br__14-- bg__FFFFFF-- boxs__00000033--vo60 o__h-- maxw__560px--" role="dialog" aria-labelledby="logs__filterPopupTitle" ng-click="$event.stopPropagation()" ng-init="logsUi.filterCat = logsUi.filterCat || 'daterange'">
+            <div class="d__f-- ai__fs-- jc__sb-- g__16-- px__20-- py__16-- bb__E5E7EB-- fs__0--">
+                <h1 id="logs__filterPopupTitle" class="m__0-- fs__5l-- fw__7-- lh__1-4-- tc__111827--">Filter</h1>
+                <a id="logs__filterPopupClose" class="btn__close--2" ng-click="logsUi.showFilter = false" title="Close">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </div>
+
+            <div class="d__f-- h__400px-- minh__0px--">
+                <!-- Categories -->
+                <div class="w__180px-- fs__0-- d__f-- fd__c-- g__2-- p__10-- br__E5E7EB-- oy__a--">
+                    <button id="logs__filterCategory--dateRange" type="button" class="d__f-- ai__c-- jc__sb-- g__8-- w__100p-- px__12-- py__11-- bd__0-- br__8-- fs__lg-- fw__6-- ta__l-- c__p--" ng-class="logsUi.filterCat === 'daterange' ? 'bg__E8F2F2-- tc__1D5558--' : 'bg__transparent tc__4B5563-- hover__F3F4F6--bg'" ng-click="logsUi.filterCat = 'daterange'">
+                        <span class="d__f-- ai__c-- g__9-- minw__0px--"><i svg-icon="icon__calender--" size="16"></i>Date Range</span>
+                        <i svg-icon="icon__arrow--" size="12"></i>
+                    </button>
+                    <button id="logs__filterCategory--users" type="button" class="d__f-- ai__c-- jc__sb-- g__8-- w__100p-- px__12-- py__11-- bd__0-- br__8-- fs__lg-- fw__6-- ta__l-- c__p--" ng-class="logsUi.filterCat === 'users' ? 'bg__E8F2F2-- tc__1D5558--' : 'bg__transparent tc__4B5563-- hover__F3F4F6--bg'" ng-click="logsUi.filterCat = 'users'">
+                        <span class="d__f-- ai__c-- g__9-- minw__0px--"><i svg-icon="icon__users--" size="16"></i>Users<span class="d__if-- ai__c-- jc__c-- w__18-- h__18-- br__50--p bg__1D5558-- tc__FFFFFF-- fs__xs-- fw__7--" ng-if="MainTainLogsObj.AllUsersCheck === false">{{(LogMaintainAllUsersList | filter:{isChecked:true}:true).length}}</span></span>
+                        <i svg-icon="icon__arrow--" size="12"></i>
+                    </button>
+                    <button id="logs__filterCategory--actions" type="button" class="d__f-- ai__c-- jc__sb-- g__8-- w__100p-- px__12-- py__11-- bd__0-- br__8-- fs__lg-- fw__6-- ta__l-- c__p--" ng-class="logsUi.filterCat === 'actions' ? 'bg__E8F2F2-- tc__1D5558--' : 'bg__transparent tc__4B5563-- hover__F3F4F6--bg'" ng-click="logsUi.filterCat = 'actions'">
+                        <span class="d__f-- ai__c-- g__9-- minw__0px--"><i svg-icon="icon__leftalignlist--" size="16"></i>Actions<span class="d__if-- ai__c-- jc__c-- w__18-- h__18-- br__50--p bg__1D5558-- tc__FFFFFF-- fs__xs-- fw__7--" ng-if="MainLogActionObj.AllUsersActionCheck === false">{{(MainLogActionObj | filter:{isChecked:true}:true).length}}</span></span>
+                        <i svg-icon="icon__arrow--" size="12"></i>
+                    </button>
+                </div>
+
+                <!-- Panel -->
+                <div class="flex__1-- minw__0px-- d__f-- fd__c-- g__12-- px__18-- py__16-- o__h--">
+                    <div class="bg-inputy d__f-- ai__c-- g__8-- h__36-- px__12-- br__8-- fs__0--" ng-if="logsUi.filterCat !== 'daterange'">
+                        <i svg-icon="icon__search--" size="16"></i>
+                        <input id="logs__filterPanelSearchInput" type="text" class="flex__1-- minw__0px-- bd__0-- bg__transparent outline__none-- fs__lg-- tc__111827--" placeholder="{{ 'SEARCH' | translate}}" ng-model="logsUi.filterSearch[logsUi.filterCat]">
+                    </div>
+
+                    <!-- Date range (tab): separate From / To inputs — the combined range field is web only -->
+                    <div class="d__f-- g__10-- fs__0--" ng-if="logsUi.filterCat === 'daterange'">
+                        <div class="form__group--1 flex__1-- minw__0px--">
+                            <label for="logs__tabFromDate">From Date</label>
+                            <input type="text" id="logs__tabFromDate" class="icons-calendar c__p--" placeholder="MM-DD-YYYY" ng-model="MainTainLogsObj.FromDate" datepickeruniversaldatelogs readonly>
+                        </div>
+                        <div class="form__group--1 flex__1-- minw__0px--">
+                            <label for="logs__tabToDate">To Date</label>
+                            <input type="text" id="logs__tabToDate" class="icons-calendar c__p--" placeholder="MM-DD-YYYY" ng-model="MainTainLogsObj.ToDate" datepickeruniversaldatelogs mindate="{{MainTainLogsObj.FromDate}}" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Users (multi select) -->
+                    <div class="flex__1-- minh__0px-- d__f-- fw__w-- ac__fs-- g__8-- p__2-- oy__a--" ng-if="logsUi.filterCat === 'users'">
+                        <span id="logs__filterUsersPill--all" class="px__14-- py__7-- br__999-- fs__md-- fw__6-- ws__nw-- c__p--" ng-class="MainTainLogsObj.AllUsersCheck ? 'border__1D5558-- bg__1D5558-- tc__FFFFFF--' : 'border__E4E4E4-- bg__FFFFFF-- tc__4B5563-- hover__F3F4F6--bg'" ng-click="MainTainLogsObj.AllUsersCheck = !MainTainLogsObj.AllUsersCheck; LogsCheckAllUsers(MainTainLogsObj.AllUsersCheck)">All Users</span>
+                        <span id="logs__filterUsersPill--{{$index}}" class="px__14-- py__7-- br__999-- fs__md-- fw__6-- ws__nw-- c__p--" ng-repeat="item in LogMaintainAllUsersList | filter:{'FullName':logsUi.filterSearch.users || ''}" ng-class="item.isChecked ? 'border__1D5558-- bg__1D5558-- tc__FFFFFF--' : 'border__E4E4E4-- bg__FFFFFF-- tc__4B5563-- hover__F3F4F6--bg'" ng-click="item.isChecked = !item.isChecked; LogsMaintainToggle(item)" ng-bind="item.UserFullName + '-' + item.NPI"></span>
+                    </div>
+
+                    <!-- Actions (multi select) -->
+                    <div class="flex__1-- minh__0px-- d__f-- fw__w-- ac__fs-- g__8-- p__2-- oy__a--" ng-if="logsUi.filterCat === 'actions'">
+                        <span id="logs__filterActionsPill--all" class="px__14-- py__7-- br__999-- fs__md-- fw__6-- ws__nw-- c__p--" ng-class="MainLogActionObj.AllUsersActionCheck ? 'border__1D5558-- bg__1D5558-- tc__FFFFFF--' : 'border__E4E4E4-- bg__FFFFFF-- tc__4B5563-- hover__F3F4F6--bg'" ng-click="MainLogActionObj.AllUsersActionCheck = !MainLogActionObj.AllUsersActionCheck; LogsCheckAllUsersActions(MainLogActionObj.AllUsersActionCheck)">All Actions</span>
+                        <span id="logs__filterActionsPill--{{$index}}" class="px__14-- py__7-- br__999-- fs__md-- fw__6-- ws__nw-- c__p--" ng-repeat="item in MainLogActionObj | filter:{'ActionLogName':logsUi.filterSearch.actions || ''}" ng-class="item.isChecked ? 'border__1D5558-- bg__1D5558-- tc__FFFFFF--' : 'border__E4E4E4-- bg__FFFFFF-- tc__4B5563-- hover__F3F4F6--bg'" ng-click="item.isChecked = !item.isChecked; LogsMaintainActionToggle(item)" ng-bind="item.ActionLogName"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d__f-- ai__c-- jc__fe-- g__18-- px__20-- py__12-- bt__E5E7EB-- fs__0--">
+                <a href="javascript:;" class="d__if-- ai__c-- g__6-- fs__lg-- fw__7-- tc__1D5558--" id="logs__filterResetBtn" title="Clear Filters" ng-click="RefreshMainReports()">
+                    <i svg-icon="icon__reset--o" size="16"></i>Reset
+                </a>
+                <button type="button" id="logs__filterApplyBtn" class="btn__xl-- btn__1d5558--f minw__110px-- h__38-- br__8--" ng-click="searchMainReports() !== false && (logsUi.showFilter = false)">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── LOGS HISTORY POPUP (Change Details / Log Details) — opened by openCheckInPopup(item) ── -->
+    <div class="position__fixed-- inset__0-- z__1000-- d__f-- ai__c-- jc__c-- p__16-- bg__00000073--" ng-if="LogsHistoryPopup.isOpen" ng-click="closeLogsHistoryPopup()">
+        <div id="logs__detailsPopup" class="w__100p-- maxh__90p-- d__f-- fd__c-- br__14-- bg__FFFFFF-- boxs__00000033--vo60 o__h--" ng-class="LogsHistoryPopup.isEdited ? 'maxw__1100px--' : 'maxw__560px--'" role="dialog" ng-click="$event.stopPropagation()">
+            <div class="d__f-- ai__c-- jc__sb-- g__16-- px__20-- py__16-- bb__E5E7EB-- fs__0--">
+                <h1 id="logs__detailsPopupTitle" class="m__0-- fs__5l-- fw__7-- lh__1-4-- tc__111827-- ws__nowrap--">{{LogsHistoryPopup.isEdited ? 'Change Details' : 'Log Details'}}</h1>
+                <div class="d__f-- ai__fs-- g__16--">
+                    <div class="ta__r--" ng-if="LogsHistoryPopup.LogItem.PatientFullName">
+                        <span class="d__b-- mb__3-- fs__xl-- fw__7-- tc__111827--">{{LogsHistoryPopup.LogItem.PatientFullName}}</span>
+                        <ul class="d__f-- fw__w-- jc__fe-- gy__4-- gx__10-- m__0-- p__0-- list__none-- fs__md-- tc__4B5563--">
+                            <li>MR No : <b class="fw__7-- tc__111827--">{{LogsHistoryPopup.LogItem.MRNo}}</b></li>
+                            <li>Sex : <b class="fw__7-- tc__111827--">{{LogsHistoryPopup.LogItem.Sex}}</b></li>
+                            <li>Age : <b class="fw__7-- tc__111827--">{{LogsHistoryPopup.LogItem.Age}}</b></li>
+                            <li>DOB : <b class="fw__7-- tc__111827--">{{LogsHistoryPopup.LogItem.DOB | date:'MM-dd-yyyy'}}</b></li>
+                        </ul>
+                    </div>
+                    <a id="logs__detailsPopupClose" class="btn__close--2" ng-click="closeLogsHistoryPopup()" title="Close">
+                        <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Single value (only the old or only the new description exists) -->
+            <div class="p__20-- fs__xl-- lh__1-5-- tc__111827-- ws__pl-- oy__a--" ng-if="!LogsHistoryPopup.isEdited">{{LogsHistoryPopup.LogItem.NewActionDescription || LogsHistoryPopup.LogItem.OldActionDescription}}</div>
+
+            <!-- Old value vs new value -->
+            <div class="d__f-- fd__c-- md:fd__r-- minh__0px-- oy__a--" ng-if="LogsHistoryPopup.isEdited">
+                <div class="flex__1-- minw__0px--">
+                    <div class="d__f-- fd__c-- g__8-- px__20-- py__16-- bg__FAFBFB-- bb__E5E7EB--">
+                        <div class="fs__md-- tc__9CA3AF--">
+                            <span ng-if="LogsHistoryPopup.LogItem.ModuleName">Module : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ModuleName}}</b>&nbsp;&nbsp;</span><span ng-if="LogsHistoryPopup.LogItem.SubModuleName">Screen : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.SubModuleName}}</b>&nbsp;&nbsp;</span><span ng-if="LogsHistoryPopup.LogItem.ScreenType">Section : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ScreenType}}</b></span>
+                        </div>
+                    </div>
+                    <div class="px__20-- py__18--">
+                        <div class="fs__lg-- fw__5-- lh__1-5-- tc__111827-- ws__pl--">{{LogsHistoryPopup.LogItem.OldActionDescription}}</div>
+                    </div>
+                </div>
+                <div class="flex__1-- minw__0px-- bl__E5E7EB--">
+                    <div class="d__f-- fd__c-- g__8-- px__20-- py__16-- bg__FAFBFB-- bb__E5E7EB--">
+                        <div class="d__f-- ai__c-- fw__w-- g__6-- fs__lg-- tc__4B5563--" ng-if="LogsHistoryPopup.LogItem.UserName">
+                            <i class="icons__w16-- profle__w16--l"></i>
+                            <span>Edited by <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.UserName}}</b></span>
+                        </div>
+                        <div class="d__f-- ai__c-- fw__w-- g__6-- fs__lg-- tc__4B5563--">
+                            <i class="icons__w16-- calender__w16--l"></i>
+                            <span>On <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ActionDate | date:'MM/dd/yyyy'}}</b></span>
+                            <i class="icons__w16-- time__w16--l"></i>
+                            <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ModifiedTime | date:'HH:mm'}}</b>
+                            <span class="d__ib-- px__10-- py__2-- br__999-- fs__sm-- fw__7--" ng-class="LogsActionBadgeClass(LogsHistoryPopup.LogItem.ActionType)" ng-if="LogsHistoryPopup.LogItem.ActionType">{{LogsHistoryPopup.LogItem.ActionType}}</span>
+                        </div>
+                        <div class="fs__md-- tc__9CA3AF--">
+                            <span ng-if="LogsHistoryPopup.LogItem.ModuleName">Module : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ModuleName}}</b>&nbsp;&nbsp;</span><span ng-if="LogsHistoryPopup.LogItem.SubModuleName">Screen : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.SubModuleName}}</b>&nbsp;&nbsp;</span><span ng-if="LogsHistoryPopup.LogItem.ScreenType">Section : <b class="fw__6-- tc__111827--">{{LogsHistoryPopup.LogItem.ScreenType}}</b></span>
+                        </div>
+                    </div>
+                    <div class="px__20-- py__18--">
+                        <div class="fs__lg-- fw__5-- lh__1-5-- tc__111827-- ws__pl--">{{LogsHistoryPopup.LogItem.NewActionDescription}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--New Logs design ended-->
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ═══ PREVIOUS MODIFICATION LOGS UI — hidden, preserved intact ═══ -->
+<div ng-if="false" ng-controller="EhnoteMaintainLogsCtrl" class="height__100-- d__f-- fd__c-- height__100-- gap__10-- p__8-- bg__FFFFFF--">
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+        <table class="table tableno-bordered tableno-padding mb-0 table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input type="text" class="icons-calendar" ng-model="MainTainLogsObj.FromDate" datepickeruniversaldatelogs readonly />
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input type="text" class="icons-calendar" ng-model="MainTainLogsObj.ToDate" datepickeruniversaldatelogs readonly mindate="{{MainTainLogsObj.FromDate}}" changeyear="changeYear" changemonth="changeMonth" />
+
+                        </div>
+                    </td>
+                    <td width="25%">
+                        <div class="form__group">
+                            <label>Users</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{searchUserInLogs}}">
+                                    {{searchUserInLogs}} <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchUserInLogstab.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="MainTainLogsObj.AllUsersCheck" ng-click="LogsCheckAllUsers(MainTainLogsObj.AllUsersCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Users</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in LogMaintainAllUsersList | filter:{'FullName':searchUserInLogstab.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="LogsMaintainToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.UserFullName + '-' + item.NPI"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="25%">
+                        <div class="form__group">
+                            <label>Actions</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{searcActionName}}">
+                                    {{searcActionName}} <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searcActionNameTab.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="MainLogActionObj.AllUsersActionCheck" ng-click="LogsCheckAllUsersActions(MainLogActionObj.AllUsersActionCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Actions</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MainLogActionObj | filter:{'ActionLogName':searcActionNameTab.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="LogsMaintainActionToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.ActionLogName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="15%" class="valign-bottom">
+                        <div class="d__f-- gap__x--8 ai__c--">
+                            <button class="btn__xl-- btn__2D2D47--f" ng-click="searchMainReports()">Apply</button>
+                            <button class="b-0 bg-none" ng-click="RefreshMainReports()" title="Clear Filters">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="section__style--4 height__100--">
+        <div class="section__header-- mb__10--">
+            <h1>All Users Log List</h1>
+            <ul class="us-controls">
+                <li>
+                    <fieldset class="pos-relative">
+                        <div class="dis-inline-block">
+                            <input type="radio" class="radio-custom width-0" id="CalNameId" name="patSearchType" ng-value="1" ng-model="PatLogSearchType" ng-click="radiobtnChnaging(SeachByPatientObj,PatLogSearchType)" value="1">
+                            <label for="CalNameId" class="radio-custom-label cur-poiter mb-0 text-label">Name</label>
+                        </div>
+                        <div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0" id="CalmrMobileId" name="patSearchType" ng-value="2" ng-model="PatLogSearchType" ng-click="radiobtnChnaging(SeachByPatientObj,PatLogSearchType)" value="2">
+                            <label for="CalmrMobileId" class="radio-custom-label cur-poiter mb-0 text-label">MR No</label>
+                        </div>
+                        <div class="dis-inline-block ml-5">
+                            <input type="radio" class="radio-custom width-0" id="CaloldMRId" name="patSearchType" ng-value="3" ng-model="PatLogSearchType" ng-click="radiobtnChnaging(SeachByPatientObj,PatLogSearchType)" value="3">
+                            <label for="CaloldMRId" class="radio-custom-label cur-poiter mb-0 text-label">Old MR No</label>
+                        </div>
+                    </fieldset>
+                </li>
+                <li>
+                    <div class="ehr-input pop-ehr-input flex">
+                        <div class="ehr-input-group">
+                            <input type="text" class="bg-inputy" placeholder="Search by Name" ng-show="PatLogSearchType === 1" ng-model="SeachByPatientObj.searchPatientTxt" ng-change="SearchLogsData(SeachByPatientObj.searchPatientTxt)">
+                            <input type="text" class="bg-inputy" placeholder="Search by MR No" ng-show="PatLogSearchType === 2" ng-model="SeachByPatientObj.searchPatientIdTxt" ng-change="SearchLogsData(SeachByPatientObj.searchPatientIdTxt)">
+                            <input type="text" class="bg-inputy" placeholder="Search by Old MR No" ng-show="PatLogSearchType === 3" ng-model="SeachByPatientObj.searchPatientOldMR" ng-change="SearchLogsData(SeachByPatientObj.searchPatientOldMR)">
+                            <button type="button" ng-hide="SearchObj.searchPatientTxt =='' && SearchObj.searchPatientIdTxt =='' && SearchObj.searchPatientOldMR ==''" ng-click="newclearPatientApptSearchinCal()" role="button" tabindex="0"><i class="fas fa-backspace"></i></button>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-group">
+                        <button type="button" class="btn-search btn" ng-show="PatLogSearchType === 1" ng-click="checkclick(SeachByPatientObj.searchPatientTxt,PatLogSearchType)">{{ 'SEARCH' | translate}}</button>
+                        <button type="button" class="btn-search btn" ng-show="PatLogSearchType === 2" ng-click="checkclick(SeachByPatientObj.searchPatientIdTxt,PatLogSearchType)">{{ 'SEARCH' | translate}}</button>
+                        <button type="button" class="btn-search btn" ng-show="PatLogSearchType === 3" ng-click="checkclick(SeachByPatientObj.searchPatientOldMR,PatLogSearchType)">{{ 'SEARCH' | translate}}</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="section__body-- position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll overflow__auto--x c__p--" drag-scroll>
+                <table class="table__style--7 ws__nowrap--" ng-if="MaintainingLogsDataArray.length > 0">
+                    <thead>
+                        <tr>
+                            <th width="5%">S.No</th>
+                            <th width="10%">Date & Time</th>
+                            <!--<th width="2%">Time</th>-->
+                            <th width="12%">User</th>
+                            <th width="20%">DOS </th>
+                            <th width="22%">Patient Name & MR NO</th>
+                            <th width="8%">Module</th>
+                            <th width="14%">Action & Screen</th>
+                            <th width="8%">Section</th>
+                            <th width="20%">Old Value</th>
+                            <th>New Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+                    <tbody ng-repeat="item in MaintainingLogsDataArray | filter:searchtxt">
+                        <tr>
+                            <td class="text-center">{{$index + 1}}</td>
+                            <td>
+                                <label>{{item.ActionDate | date:'MM/dd/yyyy'}} </label>
+                                <p class="m-b-0">
+                                    {{item.ModifiedTime | date:'HH:mm'}}
+                                </p>
+                            </td>
+                            <!--<td width="2%">{{item.ModifiedTime | date:'HH:mm'}}</td>-->
+                            <td>{{item.UserName}}</td>
+                            <td>
+                                <ul class="asc-surgery-list dis-block">
+                                    <li ng-if="item.AppointmentDate!=null">
+                                        <span> {{item.AppointmentDate| date:'MM/dd/yyyy'}} & {{item.StartTime| date:'HH:mm'}}</span>
+                                    </li>
+                                    <li ng-if="item.AppointmentDoctorname!=null">
+                                        <label>{{item.AppointmentDoctorname}}</label>
+                                    </li>
+                                    <li ng-if="item.VisitReason!=null">
+                                        <label class="m-b-0 text-068cb0">{{item.VisitReason}}</label>
+                                    </li>
+                                </ul>
+                                <!--<sapn ng-if="item.AppointmentDate!=null">{{item.AppointmentDate| date:'MM/dd/yyyy'}}</sapn>
+                                <sapn ng-if="item.AppointmentDate!=null">{{item.AppointmentDoctorname}}</sapn>
+                                <sapn ng-if="item.AppointmentDate!=null">{{item.VisitReason}}</sapn>-->
+                            </td>
+                            <td>
+                                <label class="text-369FA5"> {{item.PatientFullName}} </label>
+                                <p class="mb-0 text-appts-mrno fs-12" ng-hide="item.OldMrno==''&&item.MRNo==0">{{item.MRNo}}</p>
+                            </td>
+                            <td>{{item.ModuleName}}</td>
+                            <td>
+                                <label>{{item.ActionType}} </label>
+                                <p class="mb-0">{{item.SubModuleName}}</p>
+                            </td>
+                            <td>{{item.ScreenType}}</td>
+                            <td>
+                                <div class="no-wrapappt w-100 cur-pointer" title="{{item.OldActionDescription}}">{{item.OldActionDescription}}</div>
+                            </td>
+                            <td>
+                                <div class="no-wrapappt w-100 cur-pointer" title="{{item.NewActionDescription}}">{{item.NewActionDescription}}</div>
+                            </td>
+                            <td>
+                                <div class="d__f-- ai__c-- gap__10--">
+                                    <label class="no-wrapappt c__p--" title="{{item.Status}}">{{item.Status}}</label>
+                                    <a ng-if="item.Status=='Failure'" uib-popover="{{item.Remarks}}" popover-placement="auto" popover-trigger="outsideClick" popover-append-to-body="true" popover-class="custom-popover"><i class="icons__w16-- info__w16--f"></i></a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d__f-- ai__c-- jc__c-- gap-x-10">
+                                    <a ng-if="item.ScreenType=='Signed off'" ng-click="navtoQuicksummarypopupprofile(item)" uib-tooltip="Quick Summary" tooltip-append-to-body="true" tooltip-placement="auto"><i class="drawarrow__w16--f icons__w16--"></i></a>
+                                    <a ng-click="openCheckInPopup(item)" ng-hide="item.OldActionDescription == '' && item.NewActionDescription == ''" uib-tooltip="Change Details" tooltip-append-to-body="true" tooltip-placement="auto"><i class="icons__w16-- info__w16--l"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table__style--7 height__100--" ng-if="MaintainingLogsDataArray.length == 0">
+                    <thead>
+                        <tr>
+                            <th width="5%">S.No</th>
+                            <th width="10%">Date & Time</th>
+                            <!--<th width="2%">Time</th>-->
+                            <th width="12%">User</th>
+                            <th width="20%">DOS </th>
+                            <th width="17%">Patient Name & MR NO</th>
+                            <th width="8%">Action</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7">
+                                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                    <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Results Found</h1>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<script type="text/ng-template" id="logsHistroy.html">
+    <div class="modal__style--1">
+        <div class="modal__header-- bb__none--">
+            <h1>Change Details</h1>
+            <div class="d__f-- ai__c-- gap__15--">
+                <div class="d__f-- ai__c-- gap__10--">
+                    <img src={{LogItem.S3URL}} alt="" width="28" height="28" class="br__20--" image-viewer ng-if="LogItem.S3URL !=''" />
+                    <div class="d__f-- fd__c-- ">
+                        <span class="fs__lg-- fw__5-- tc__3C3C3C--">{{LogItem.PatientFullName}}</span>
+                        <ul class="list__unstyled-- m__0-- d__f-- ai__c-- gap__5--">
+                            <li class="lh__10--">
+                                <label class="fs__md-- fw__4-- tc__656565--">MR.No : <span class="tc__1D1D1D--">{{LogItem.MRNo}}</span></label>
+                            </li>
+                            <li class="lh__10--">
+                                <label class="fs__md-- fw__4-- tc__656565--">Sex : <span class="tc__1D1D1D--">{{LogItem.Sex}}</span></label>
+                            </li>
+                            <li class="lh__10--">
+                                <label class="fs__md-- fw__4-- tc__656565--">Age : <span class="tc__1D1D1D--">{{LogItem.Age}}</span></label>
+                            </li>
+                            <li class="lh__10--">
+                                <label class="fs__md-- fw__4-- tc__656565-- ">DOB : <span class="tc__1D1D1D--">{{LogItem.DOB | date:'MM-dd-yyyy'}}</span></label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <a class="btn__close--2" ng-click="uibclose()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </div>
+        </div>
+        <div class="modal__body-- p__0--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <table class="table table-bordered m__0-- table-layout-fix">
+                        <tbody>
+                            <tr ng-if="false">
+                                <td class="bg__F9F9F9--">
+                                    <div class="d__f-- fd__c-- gap__5--">
+                                        <div class="d__f-- ai__c-- gap__5--">
+                                            <i class="icons__w16-- profle__w16--l"></i>
+                                            <label class="fs__md-- fw__4-- tc__656565--"> Added by <span class="fs__lg-- fw__6-- tc__1D1D1D--">Dr. Rebecca B Williamson </span></label>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__15--">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <i class="calender__w16--l icons__w16--"></i>
+                                                <label class="fs__md-- fw__4-- tc__656565--"> On <span class="fs__lg-- fw__6-- tc__1D1D1D--"> 07/21/2025</span></label>
+                                            </div>
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <i class="time__w16--l icons__w16--"></i>
+                                                <span class="fs__lg-- fw__6-- tc__1D1D1D--"> 12:43</span>
+                                            </div>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__15--">
+                                            <label class="fs__md-- fw__4-- tc__656565--">Module : <span class="fs__lg-- fw__6-- tc__1D1D1D--">ASC </span></label>
+                                            <label class="fs__md-- fw__4-- tc__656565--">Screen : <span class="fs__lg-- fw__6-- tc__1D1D1D--">Pre-Op </span></label>
+                                            <label class="fs__md-- fw__4-- tc__656565--">Section : <span class="fs__lg-- fw__6-- tc__1D1D1D--">General Checklist </span></label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="vl__top--">
+                                    <div class="d__f-- fd__c-- gap__5--">
+                                        <div class="d__f-- ai__c-- gap__5--">
+                                            <i class="icons__w16-- profle__w16--l"></i>
+                                            <label class="fs__md-- fw__4-- tc__656565--"> Edited by <span class="fs__lg-- fw__6-- tc__1D1D1D--">Dr. Jonathan West B Williamson  </span></label>
+                                        </div>
+                                        <div class="d__f-- ai__c-- gap__15--">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <i class="calender__w16--l icons__w16--"></i>
+                                                <label class="fs__md-- fw__4-- tc__656565--"> On <span class="fs__lg-- fw__6-- tc__1D1D1D--"> 07/21/2025</span></label>
+                                            </div>
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <i class="time__w16--l icons__w16--"></i>
+                                                <span class="fs__lg-- fw__6-- tc__1D1D1D--"> 09:23</span>
+                                            </div>
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <i class="icons__w16-- profle__w16--l"></i>
+                                                <label class="fs__md-- fw__4-- tc__656565--"> Label <span class="fs__lg-- fw__6-- tc__E57C00-- px__5-- py__3-- br__5-- bg__FFF5EA--">Edited  </span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg__F9F9F9--">
+                                    <div class="d__f-- fd__c-- gap__5-- pre-line">
+                                        <!--<span class="fs__lg-- fw__6-- tc__FFFFFF-- bg__4B8BA3-- px__5-- w__30-- br__5--">OD</span>
+                                        <label class="fs__lg-- fw__6-- tc__1D1D1D--">S82.851D -<span class="tc__4A4A4A--"> Displaced transverse fracture of shaft of unspecified tibia subsequent encounter for closed fracture with routine healing</span></label>
+                                        <label class="fs__lg-- fw__6-- tc__1D1D1D--">Acute</label>
+                                        <label class="fs__lg-- fw__6-- tc__1D1D1D--">Severe,<span class="tc__606060--">Provisional</span> </label>
+                                        <div class=" d__f-- fd__c-- gap__5--">
+                                            <label class="fs__lg-- fw__6-- tc__1D1D1D--">Patient Instructions</label>
+
+                                            <p class="fs__lg-- fw__4-- tc__1D1D1D-- m__0--">
+                                                Educated the patient about the nature of cataract surgery, benefits, potential risks, and complications such as infection, posterior capsular opacification, and need for glasses for near vision.
+                                                Informed consent obtained after ensuring the patient understood the procedure and postoperative expectations..
+                                            </p>
+                                        </div>-->
+                                        {{LogItem.OldActionDescription}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d__f-- fd__c-- gap__5-- pre-line">
+                                        {{LogItem.NewActionDescription}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<style>
+    .custom-popover {
+        max-width: 400px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        padding-top: 5px !important;
+        margin-top: 0 !important;
+    }
+</style>

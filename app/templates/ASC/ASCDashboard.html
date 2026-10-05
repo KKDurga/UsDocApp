@@ -1,0 +1,695 @@
+<div class="d__f-- fd__c-- gap__10-- bg__F9F9F9-- height__100-- p__10--" ng-controller="UsASCDashboardCtrl">
+
+    <!--Shared by the ASC Reports details and the Confirmation Alerts tab, so it sits outside both.-->
+    <style>
+        /* Sized to its columns like the reporting sheet, so a short date range doesn't stretch the label column;
+           a long range scrolls sideways inside .asc-sheet-scroll with the label column frozen on the left. */
+        .asc-sheet-scroll {
+            overflow-x: auto;
+            max-width: 100%;
+            padding-bottom: 6px;
+        }
+
+        .asc-sheet {
+            font-variant-numeric: tabular-nums;
+            width: auto !important;
+        }
+
+            .asc-sheet th, .asc-sheet td {
+                padding: 5px 8px !important;
+                white-space: nowrap;
+                vertical-align: middle !important;
+            }
+
+            .asc-sheet .asc-sheet__label {
+                position: sticky;
+                left: 0;
+                z-index: 2;
+                box-shadow: inset -1px 0 0 #dddddd;
+                text-align: right;
+                width: 340px;
+                min-width: 340px;
+                background: #f2f2f2;
+                font-weight: 500;
+            }
+
+            .asc-sheet .asc-sheet__weekday, .asc-sheet .asc-sheet__date, .asc-sheet .asc-sheet__cell, .asc-sheet .asc-sheet__total {
+                min-width: 80px;
+            }
+
+            .asc-sheet .asc-sheet__weekday {
+                text-align: center;
+                font-weight: 400;
+                color: #52514e;
+            }
+
+            .asc-sheet .asc-sheet__date {
+                text-align: center;
+                font-weight: 700;
+            }
+
+            .asc-sheet .asc-sheet__caption {
+                font-style: italic;
+                font-weight: 400;
+            }
+
+            .asc-sheet .asc-sheet__band td {
+                background: #dde8f3;
+                font-weight: 700;
+                color: #0b0b0b;
+            }
+
+            .asc-sheet .asc-sheet__cell {
+                text-align: center;
+            }
+
+            .asc-sheet .asc-sheet__total {
+                text-align: center;
+                font-weight: 700;
+                font-size: 15px;
+            }
+
+            .asc-sheet .asc-sheet__bold {
+                font-weight: 700;
+            }
+
+            .asc-sheet .tone-total {
+                color: #0b0b0b;
+                font-weight: 700;
+            }
+
+            .asc-sheet .tone-good {
+                color: #006300;
+            }
+
+            .asc-sheet .tone-bad {
+                color: #d03b3b;
+            }
+
+            .asc-sheet .tone-neutral {
+                color: #52514e;
+            }
+
+            .asc-sheet .asc-sheet__provider td {
+                background: #fff8d6;
+                font-weight: 700;
+                color: #0b0b0b;
+                cursor: pointer;
+            }
+
+            .asc-sheet .asc-sheet__provider .asc-sheet__label {
+                text-align: left;
+            }
+
+                .asc-sheet .asc-sheet__provider .asc-sheet__label i {
+                    width: 14px;
+                    color: #52514e;
+                }
+
+            .asc-sheet .asc-sheet__summary {
+                display: inline-block;
+                position: sticky;
+                left: 356px;
+                font-weight: 400;
+                color: #52514e;
+            }
+
+        .asc-sheet-search {
+            max-width: 280px;
+        }
+
+        .asc-sheet .asc-sheet__link {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .asc-detail-backdrop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(11,11,11,0.35);
+            z-index: 1040;
+        }
+
+        .asc-detail-popup {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 1400px;
+            max-width: 96vw;
+            background: #ffffff;
+            box-shadow: -2px 0 10px rgba(11,11,11,0.2);
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asc-detail-popup__body {
+            overflow: auto;
+            padding: 10px;
+        }
+    </style>
+
+    <!--Incomplete EHR Records and Confirmation Alerts are only built the first time their tab is opened, and every tab keeps its state while switching back and forth.-->
+    <ul class="tab__style--1 pl__5--" ng-init="ASCDashboardTab = { 'Tab': 'ASCReports', 'IsIncompleteEhrLoaded': false, 'IsConfirmationAlertsLoaded': false }">
+        <li ng-class="ASCDashboardTab.Tab === 'ASCReports' ? 'active' : ''">
+            <a id="a__ASCDashboardReportsTab--" ng-click="ASCDashboardTab.Tab = 'ASCReports'">ASC Reports</a>
+        </li>
+        <li ng-class="ASCDashboardTab.Tab === 'ConfirmationAlerts' ? 'active' : ''">
+            <a id="a__ASCDashboardConfirmationAlertsTab--" ng-click="ASCDashboardTab.Tab = 'ConfirmationAlerts'; ASCDashboardTab.IsConfirmationAlertsLoaded = true">Confirmation Alerts</a>
+        </li>
+        <li ng-class="ASCDashboardTab.Tab === 'IncompleteEhr' ? 'active' : ''">
+            <a id="a__ASCDashboardIncompleteEhrTab--" ng-click="ASCDashboardTab.Tab = 'IncompleteEhr'; ASCDashboardTab.IsIncompleteEhrLoaded = true">Incomplete EHR Records</a>
+        </li>
+    </ul>
+
+    <div class="d__f-- fd__c-- gap__10-- height__100--" ng-show="ASCDashboardTab.Tab === 'ASCReports'">
+
+    <div class="p__3-- bg__FFFFFF-- border__E4E4E4-- br__4--">
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="10%">
+                        <div class="form__group">
+                            <label class="text-appt">From Date </label>
+                            <input type="text" id="input__ASCDashboardFromDate--" class="form__control icons-calendar" ng-model="DashboardFilter.FromDate" datepickerforapplist readonly date-format-input>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group">
+                            <label class="text-appt">To Date</label>
+                            <input type="text" id="input__ASCDashboardToDate--" class="form__control icons-calendar" ng-model="DashboardFilter.ToDate" datepickerforapplist readonly date-format-input>
+                        </div>
+                    </td>
+                    <!--<td width="24%">
+                        <div class="form__group">
+                            <label class="text-appt">Visit Type</label>
+                            <div class="d__f-- ai__c-- gap__10--">
+                                <div class="checkbox cn m__0--" ng-repeat="item in DashboardVisitTypes track by item.VisitTypeId">
+                                    <label>
+                                        <input name="checkbox-visittype" type="checkbox" ng-model="item.isChecked">
+                                        <span class="checkbox-material">
+                                            <span class="check"></span>
+                                        </span>
+                                        <small ng-bind="item.Name"></small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </td>-->
+                    <td width="12%">
+                        <div class="form__group">
+                            <label class="text-appt">Location</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left pr__20--" id="button__ASCDashboardLocation--" data-toggle="dropdown" title="{{DashboardLocations.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{DashboardLocations.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="DashboardLocations.SearchText" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-location" type="checkbox" ng-model="DashboardLocations.AllCheck" ng-change="checkAllDashboardLocations()">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Locations</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in DashboardLocations.List | filter:{'DisplayName':DashboardLocations.SearchText} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-location" type="checkbox" ng-model="item.isChecked" ng-change="toggleDashboardLocation()">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label class="text-appt">{{ 'DOCTORS' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="button__ASCDashboardDoctor--" data-toggle="dropdown" title="{{DashboardDoctors.SelectedText}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{DashboardDoctors.SelectedText}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="DashboardDoctors.SearchText" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-doctor" type="checkbox" ng-model="DashboardDoctors.AllCheck" ng-click="checkAllDashboardItems(DashboardDoctors)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Doctors</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in DashboardDoctors.List | filter:{'DisplayName':DashboardDoctors.SearchText}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-doctor" type="checkbox" ng-model="item.isChecked" ng-click="toggleDashboardItem(DashboardDoctors)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.DisplayName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button popover-trigger="click"
+                                popover-append-to-body="true"
+                                popover-class="opfilter-popover m-0 min__w500--"
+                                popover-placement="bottom-right"
+                                popover-is-open="isPopoverOpen"
+                                ng-click="togglePopover()"
+                                uib-popover-template="payerFilterPopover.templateUrl"
+                                type="button" class="btn__sm-- btn__1d5558--o gap__10-- mt__20-- ws__nowrap--">
+                            More Filter <i class="icons__w16--  filter__w16--o"></i>
+                        </button>
+                        <script type="text/ng-template" id="payerFilterPopover.html" ng-if="isPopoverOpen">
+                            <div class="d__f-- fd__c--  ">
+                                <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                                    <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                    <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                </div>
+
+                                <div class="h__250--  over-scrol-y p__5--">
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Payer Name</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li>
+                                                    <a href="javascript:;" class="fs__lg-- fw__5-- fs__normal-- tc__006080--" ng-click="ClearAllDashboardPayors()">
+                                                        Clear All
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text"
+                                                       id="input__ASCDashboardPayer--"
+                                                       autocomplete="off"
+                                                       class="input__style--2"
+                                                       name="InsurancePayor"
+                                                       placeholder="Search Payer"
+                                                       ng-model="DashboardFilter.PayorObj"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       typeahead-on-select="onSelectDashboardPayor($item)"
+                                                       uib-typeahead="item as item.OrganizationPayorName for item in GetDashboardPayors($viewValue)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="item in DashboardFilter.AllPayorList track by item.PayorId">
+                                                            <td>
+                                                                {{item.PayorName}}
+                                                            </td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteDashboardPayor($index)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Procedure</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li>
+                                                    <a href="javascript:;" class="fs__lg-- fw__5-- fs__normal-- tc__006080--" ng-click="ClearAllDashboardProcedures()">
+                                                        Clear All
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text" placeholder="Enter CPT code"
+                                                       class="input__style--2"
+                                                       id="input__ASCDashboardProcedure--"
+                                                       autocomplete="off"
+                                                       maxlength="100"
+                                                       name="treatment"
+                                                       ng-model="DashboardFilter.ServiceObj"
+                                                       typeahead-min-length="0"
+                                                       typeahead-focus-on-select="false"
+                                                       uib-typeahead="treatitem as treatitem.ProcedureCode +'-'+treatitem.ProcedureName for treatitem in GetDashboardProcedures($viewValue)"
+                                                       typeahead-on-select="onSelectDashboardProcedure($item)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="sitem in DashboardFilter.AllProcedureList track by sitem.ProcedureId">
+                                                            <td>
+                                                                {{sitem.ProcedureCode}} - {{sitem.ProcedureName}}
+                                                            </td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteDashboardProcedure($index)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                    <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" id="a__ASCDashboardMoreFilterReset--" ng-click="ResetMoreFilters()"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                                    <button class="btn__lg-- btn__1d5558--f" id="button__ASCDashboardMoreFilterApply--" ng-click="ApplyMoreFilters()">{{ 'APPLY' | translate}}</button>
+                                </div>
+                            </div>
+                        </script>
+                    </td>
+                    <td width="12%">
+                        <div class="d__f-- ai__c-- gap__10-- mt__20--">
+                            <button id="button__ASCDashboardApply--" class="btn__lg-- btn__1d5558--f" ng-click="ApplyASCDashboardFilters()">{{ 'APPLY' | translate}}</button>
+                            <a id="button__ASCDashboardReset--" class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" role="button" tabindex="0" title="Clear Filters" ng-click="ResetASCDashboardFilters()">Reset<i class="icons__w16-- refresh__w16--o"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="position__relative-- height__100--" ng-if="!DashboardDetails.Show">
+        <div class="adjustable-position">
+            <div class="col-lg-12 p__0--">
+                <div class="col-lg-4 col-md-4">
+                    <div class="iconbox-single dis-block">
+                        <div class="box-title m-b-5 justify-space-between">
+                            <div class="dis-flex">
+                                <div class="circle-icon" style="background: #0091D5;">
+                                    <i class="far fa-calendar-alt"></i>
+                                </div>
+                                <div class="circle-text">
+                                    <h3 class="text-green ng-binding" ng-bind="Summryobj.PreAdmissionAppointments"></h3>
+                                    <p class="count_bottom text-green green ng-binding">
+                                        Pre-Admission Appointments
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="dashboard-info m-t-25">
+
+                                <a href="javascript:void(0);" title="View Details" tooltip class="app-td-icon ap-iv view-vitals-popup pull-right"
+                                   ng-click="getDashboardDetailInfo(7);"><i class="fa fa-bars"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="iconbox-single dis-block">
+                        <div class="box-title m-b-5 justify-space-between">
+                            <div class="dis-flex">
+                                <div class="circle-icon" style="background: #00bfff;">
+                                    <i class="far fa-calendar-check fa-lg"></i>
+                                </div>
+                                <div class="circle-text">
+                                    <h3 class="text-primary ng-binding" ng-bind="Summryobj.ASCAppointments"></h3>
+                                    <p class="count_bottom text-primary green">
+                                        ASC Appointments
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-info m-t-25">
+
+                                <a href="javascript:void(0);" title="View Details" tooltip class="app-td-icon ap-iv view-vitals-popup pull-right"
+                                   ng-click="getDashboardDetailInfo(4);"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="iconbox-single dis-block">
+                        <div class="box-title m-b-5 justify-space-between">
+                            <div class="dis-flex">
+                                <div class="circle-icon" style="background: #DDA0DD;">
+                                    <i class="fas fa-calendar-alt fa-lg"></i>
+                                </div>
+                                <div class="circle-text">
+                                    <h3 class="text-primary">{{Summryobj.LaserAppointments}}</h3>
+                                    <p class="count_bottom text-primary green">
+                                        Laser Appointments
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="dashboard-info m-t-25">
+                                <a href="javascript:void(0);" title="View Details" tooltip style="margin-right: -6px;"
+                                   class="app-td-icon ap-iv view-vitals-popup pull-right"
+                                   ng-click="getDashboardDetailInfo(14);"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="position__relative-- height__100--" ng-if="DashboardDetails.Show">
+        <div class="adjustable-position">
+            <div class="d__f-- ai__c-- jc__sb-- pb__5--">
+                <a href="javascript:;" class="back-list mb-0" id="a__ASCDashboardBack--" ng-click="HideDashboardDetails()">Back to Dashboard</a>
+                <div class="d__f-- ai__c-- gap__10--">
+                    <div class="dis-inline-block">
+                        <input type="radio" class="radio-custom w__0--" id="radio__ASCDashboardViewStatus--" name="ascDashboardDetailsView" value="AppointmentStatus" ng-model="DashboardDetails.View" ng-change="changeDashboardDetailsView()">
+                        <label for="radio__ASCDashboardViewStatus--" class="radio-custom-label cur-poiter mb__0--">Appointment Status</label>
+                    </div>
+                    <div class="dis-inline-block">
+                        <input type="radio" class="radio-custom w__0--" id="radio__ASCDashboardViewProvider--" name="ascDashboardDetailsView" value="Provider" ng-model="DashboardDetails.View" ng-change="changeDashboardDetailsView()">
+                        <label for="radio__ASCDashboardViewProvider--" class="radio-custom-label cur-poiter mb__0--">Provider</label>
+                    </div>
+                    <!--Exports the view that is selected; the Provider view exports every doctor, not just this page.-->
+                    <div class="position__relative-- p__2--">
+                        <a class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" id="a__ASCDashboardExcelExports--" ng-click="ASCExcelStatus()" tooltip-placement="top" uib-tooltip="Excel exports">
+                            <i svg-icon="icon__download--" size="14" style="color: #6A7282"></i>
+                        </a>
+                    </div>
+                    <button type="button" class="btn__lg-- btn__1d5558--f" id="button__ASCDashboardExportExcel--" ng-disabled="ASCExport.Busy" ng-click="ClickForASCExcelExport()">Export Excel</button>
+                </div>
+            </div>
+            <section class="tile text-shadow" ng-if="DashboardDetails.View === 'AppointmentStatus'">
+                <div class="tile-header mb-0">
+                    <h1>{{DashboardDetails.Name}} Appointments Details</h1>
+                </div>
+                <div class="tile-body">
+                    <div class="asc-sheet-scroll">
+                        <table class="table table-bordered m-b-0 asc-sheet">
+                            <thead>
+                                <tr>
+                                    <th class="asc-sheet__label"></th>
+                                    <th class="asc-sheet__weekday" ng-repeat="day in DashboardDetails.Days track by $index">{{day.Weekday}}</th>
+                                    <th class="asc-sheet__weekday">Total</th>
+                                </tr>
+                                <tr>
+                                    <th class="asc-sheet__label asc-sheet__caption">Service Date </th>
+                                    <th class="asc-sheet__date" ng-repeat="day in DashboardDetails.Days track by $index">{{day.ShortDate}}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="asc-sheet__band">
+                                    <td class="asc-sheet__label">{{DashboardDetails.BandTitle}}</td>
+                                    <td ng-attr-colspan="{{DashboardDetails.Days.length + 1}}"></td>
+                                </tr>
+                                <tr ng-repeat="metric in DashboardDetails.Metrics track by metric.Key" ng-if="DashboardDetails.Rows.length > 0">
+                                    <td class="asc-sheet__label" ng-class="['tone-' + metric.Tone, { 'asc-sheet__bold': metric.Bold }]">{{metric.Label}}</td>
+                                    <td class="asc-sheet__cell" ng-class="['tone-' + metric.Tone, { 'asc-sheet__link': row[metric.Key] }]" title="{{row[metric.Key] ? 'View patients' : ''}}" ng-click="row[metric.Key] && openDashboardDetailPopup(metric, row.Date, null)" ng-repeat="row in DashboardDetails.Rows track by $index">{{row[metric.Key] || ''}}</td>
+                                    <td class="asc-sheet__total" ng-class="['tone-' + metric.Tone, { 'asc-sheet__link': DashboardDetails.Totals[metric.Key] }]" title="{{DashboardDetails.Totals[metric.Key] ? 'View patients' : ''}}" ng-click="DashboardDetails.Totals[metric.Key] && openDashboardDetailPopup(metric, null, null)">{{DashboardDetails.Totals[metric.Key]}}</td>
+                                </tr>
+                                <tr ng-if="DashboardDetails.Rows.length === 0">
+                                    <td ng-attr-colspan="{{DashboardDetails.Days.length + 2}}">
+                                        <p class="text-center m-b-0">No Appointments!</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="tile text-shadow m-t-10" ng-if="DashboardDetails.View === 'AppointmentStatus' && DashboardDetails.Rows.length > 0">
+                <div class="tile-header mb-0">
+                    <h1>{{DashboardDetails.BandTitle}} confirmation by service date</h1>
+                </div>
+                <div class="tile-body">
+                    <div fusioncharts class="hide-trail-logo"
+                         width="100%"
+                         height="340"
+                         type="stackedcolumn2d"
+                         dataSource="{{DashboardDetails.ChartSource}}"></div>
+                </div>
+            </section>
+            <section class="tile text-shadow" ng-if="DashboardDetails.View === 'Provider'">
+                <div class="tile-header mb-0">
+                    <h1>By Provider Group</h1>
+                </div>
+                <div class="tile-body">
+                    <p class="text-center m-b-0" ng-if="DashboardDetails.Providers === null">Loading provider details...</p>
+                    <p class="text-center m-b-0" ng-if="DashboardDetails.ProvidersFailed">Couldn't load provider details.</p>
+                    <p class="text-center m-b-0" ng-if="DashboardDetails.Providers.length === 0 && !DashboardDetails.ProvidersFailed">No provider appointments!</p>
+                    <div ng-if="DashboardDetails.Providers.length > 0">
+                        
+                        <div class="asc-sheet-scroll">
+                            <table class="table table-bordered m-b-0 asc-sheet">
+                                <thead>
+                                    <tr>
+                                        <th class="asc-sheet__label"></th>
+                                        <th class="asc-sheet__weekday" ng-repeat="day in DashboardDetails.Days track by $index">{{day.Weekday}}</th>
+                                        <th class="asc-sheet__weekday">Total</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="asc-sheet__label asc-sheet__caption">Service Date</th>
+                                        <th class="asc-sheet__date" ng-repeat="day in DashboardDetails.Days track by $index">{{day.ShortDate}}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="provider in DashboardDetails.Providers | filter:{'DoctorName':DashboardDetails.ProviderSearch} track by provider.DoctorId">
+                                    <tr class="asc-sheet__provider" role="button" tabindex="0" aria-expanded="{{provider.Expanded}}" ng-click="toggleProvider(provider)" ng-keyup="$event.keyCode === 13 && toggleProvider(provider)">
+                                        <td class="asc-sheet__label">
+                                            <i class="fas" ng-class="provider.Expanded ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+                                            {{provider.DoctorName}}
+                                        </td>
+                                        <td ng-attr-colspan="{{DashboardDetails.Days.length + 1}}">
+                                            <span class="asc-sheet__summary">{{provider.Totals.Appointments}} appts &middot; {{provider.Totals.NotConfirmed}} not confirmed &middot; {{provider.Totals.IncompleteStatus}} incomplete</span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat="metric in DashboardDetails.Metrics track by metric.Key" ng-if="provider.Expanded">
+                                        <td class="asc-sheet__label" ng-class="['tone-' + metric.Tone, { 'asc-sheet__bold': metric.Bold }]">{{metric.Label}}</td>
+                                        <td class="asc-sheet__cell" ng-class="['tone-' + metric.Tone, { 'asc-sheet__link': cell[metric.Key] }]" title="{{cell[metric.Key] ? 'View patients' : ''}}" ng-click="cell[metric.Key] && openDashboardDetailPopup(metric, cell.Date, provider)" ng-repeat="cell in provider.Cells track by $index">{{cell[metric.Key] || ''}}</td>
+                                        <td class="asc-sheet__total" ng-class="['tone-' + metric.Tone, { 'asc-sheet__link': provider.Totals[metric.Key] }]" title="{{provider.Totals[metric.Key] ? 'View patients' : ''}}" ng-click="provider.Totals[metric.Key] && openDashboardDetailPopup(metric, null, provider)">{{provider.Totals[metric.Key]}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="d__f-- ai__c-- jc__sb-- gap__10-- pt__5--" ng-show="DashboardDetails.ProviderCount > DashboardDetails.ProviderPageSize">
+                        <span class="fs__lg-- tc__1D1D1D--">{{DashboardDetails.ProviderCount}} doctors</span>
+                        <uib-pagination total-items="DashboardDetails.ProviderCount"
+                                        ng-model="DashboardDetails.ProviderPageNumber"
+                                        ng-change="changeProviderPage()"
+                                        items-per-page="DashboardDetails.ProviderPageSize"
+                                        class="pagination-sm m__0--"
+                                        boundary-link-numbers="false"
+                                        boundary-links="true"
+                                        max-size="5"
+                                        rotate="true"
+                                        previous-text="<"
+                                        next-text=">"
+                                        direction-links="true"></uib-pagination>
+                    </div>
+                </div>
+            </section>
+            <div class="asc-detail-backdrop" ng-if="DashboardDetailPopup.Show" ng-click="closeDashboardDetailPopup()"></div>
+            <div class="asc-detail-popup" ng-if="DashboardDetailPopup.Show">
+                <div class="d__f-- ai__c-- jc__sb-- bb__DDD-- px__12-- py__8--">
+                    <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">{{DashboardDetailPopup.Title}}</h1>
+                    <a href="javascript:;" id="a__ASCDashboardPopupClose--" ng-click="closeDashboardDetailPopup()"><i class="icons__w16-- close__w16--l"></i></a>
+                </div>
+                <div class="asc-detail-popup__body">
+                    <p class="text-center m-b-0" ng-if="DashboardDetailPopup.Loading">Loading...</p>
+                    <p class="text-center m-b-0" ng-if="DashboardDetailPopup.Failed">Couldn't load the patient list.</p>
+                    <table class="table table-bordered m-b-0" ng-if="!DashboardDetailPopup.Loading &amp;&amp; !DashboardDetailPopup.Failed">
+                        <thead>
+                            <tr>
+                                <th>Appt. Date</th>
+                                <th>MR.No</th>
+                                <th>Patient</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>DOB</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Visit Reason</th>
+                                <th>Procedure</th>
+                                <th>Doctor</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in DashboardDetailPopup.Rows track by $index">
+                                <td class="ws__nowrap--">{{item.AppointmentDate | date:'MM-dd-yyyy'}}</td>
+                                <td>{{item.MRNumber}}</td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.Gender}}</td>
+                                <td class="ws__nowrap--">
+                                    <span ng-if="item.AgeInYears !== null">{{item.AgeInYears}} y</span>
+                                </td>
+                                <td class="ws__nowrap--">{{item.DOB | date:'MM-dd-yyyy'}}</td>
+                                <td class="ws__nowrap--">{{item.MobileNo}}</td>
+                                <td>{{item.EmailId}}</td>
+                                <td>{{item.AppointmentVisitReason}}</td>
+                                <td>
+                                    <span ng-if="item.ProcedureCode">{{item.ProcedureCode}} - </span>{{item.ProcedureName}}
+                                </td>
+                                <td>{{item.AppointmentDoctorName}}</td>
+                                <td class="ws__nowrap--">{{item.AppointmentCreatedDt | date:'MM-dd-yyyy hh:mm a'}}</td>
+                            </tr>
+                            <tr ng-if="DashboardDetailPopup.Rows.length === 0">
+                                <td colspan="12">
+                                    <p class="text-center m-b-0">No Appointments!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="height__100--"
+         ng-if="ASCDashboardTab.IsConfirmationAlertsLoaded"
+         ng-show="ASCDashboardTab.Tab === 'ConfirmationAlerts'"
+         ng-include="'templates/ASC/ASCConfirmationAlerts.html'"></div>
+
+    <div class="height__100--"
+         ng-if="ASCDashboardTab.IsIncompleteEhrLoaded"
+         ng-show="ASCDashboardTab.Tab === 'IncompleteEhr'"
+         ng-include="'templates/ASC/ASCIncompleteEhrReport.html'"></div>
+
+</div>

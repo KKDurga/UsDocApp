@@ -1,0 +1,401 @@
+﻿            <!-- Header bar -->
+<div class="d__f-- ai__c-- jc__sb--">
+    <div class="d__f-- fd__c--">
+        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">MPR (Multiple Procedure Reduction) Codes</h1>
+        <span class="fs__lg-- fw__5-- tc__656565--">
+            Configure reduction percentages applied when multiple procedures are billed together.
+        </span>
+    </div>
+    <div class="d__f-- ai__c-- jc__e-- gap__x--8">
+        <button class="btn__lg-- btn__F6F6F6--f"
+                ng-click="ExportMPRToExcel()"
+                ng-disabled="!MPRList || !MPRList.length">
+            <i class="icons__w16-- download__w16--o"></i> Export
+        </button>
+        <button class="btn__lg-- btn__1d5558--f"
+                ng-click="OpenAddMPR()">
+            <i class="icons__w16-- add__w16--w"></i> Add MPR Code
+        </button>
+    </div>
+</div>
+
+<!-- ── Search / filter bar ── -->
+<div class="section__style--4">
+    <div class="section__header-- py__3--">
+        <h1>Search &amp; Filter</h1>
+        <ul class="list__none-- m__0-- d__f-- ai__c-- jc__e-- gap__x--8 width__70--">
+            <li>
+                <input type="text"
+                       placeholder="Search CPT / Description"
+                       class="input__style--1 icons-search"
+                       ng-model="MPRSearchObj.SearchText" />
+            </li>
+            <li>
+                <select class="form__control w__160--"
+                        ng-model="MPRSearchObj.RankId"
+                        ng-options="r.RankId as r.RankName for r in MPRRankList">
+                    <option value="">All Ranks</option>
+                </select>
+            </li>
+            <li>
+                <select class="form__control w__160--"
+                        ng-model="MPRSearchObj.LocationId"
+                        ng-options="l.ClinicId as l.ClinicName for l in Locationslist">
+                    <option value="">All Locations</option>
+                </select>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f"
+                        ng-click="GetMPRList()">
+                    Apply
+                </button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--o"
+                        ng-click="ClearMPRSearch()">
+                    Clear
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- ── Add / Edit form (inline, toggled) ── -->
+<div class="section__style--4" ng-if="IsShowMPRForm">
+    <div class="section__header-- py__3--">
+        <h1>{{ MPRObj.MPRCodeId === 0 ? 'Add New MPR Code' : 'Edit MPR Code' }}</h1>
+        <ul class="list__none-- m__0-- d__f-- ai__c-- gap__x--8">
+            <li>
+                <button class="btn__sm-- btn__C71D27--o"
+                        ng-click="CancelMPRForm()">
+                    Cancel
+                </button>
+            </li>
+            <li ng-if="MPRObj.MPRCodeId === 0">
+                <button class="btn__sm-- btn__1d5558--o"
+                        ng-click="ClearMPRForm()">
+                    Clear
+                </button>
+            </li>
+            <li>
+                <button class="btn__sm-- btn__1d5558--f"
+                        ng-click="SaveMPRCode()">
+                    {{ MPRObj.MPRCodeId === 0 ? 'Save' : 'Update' }}
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="section__body--">
+        <table class="table tableno-bordered tableno-padding m__0--">
+            <tbody>
+                <!-- Row 1 -->
+                <tr>
+                    <!-- Location -->
+                    <td width="15%">
+                        <div class="form__group">
+                            <label>Location <em>*</em></label>
+                            <select ng-options="l.ClinicId as l.ClinicName for l in Locationslist"
+                                    ng-model="MPRObj.OrganizationId">
+                                <option value="" disabled>Select</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <!-- CPT Code typeahead -->
+                    <td width="18%">
+                        <div class="form__group">
+                            <label>CPT Code <em>*</em></label>
+                            <input type="text"
+                                   placeholder="Enter CPT code"
+                                   autocomplete="off"
+                                   maxlength="100"
+                                   ng-model="MPRObj.Procedureobj"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   ng-disabled="MPRObj.MPRCodeId !== 0"
+                                   uib-typeahead="item as item.CPTCode +'-'+ item.ProcedureName for item in GetOrganizationProcedure($viewValue)"
+                                   typeahead-on-select="OnSelectMPRCpt(MPRObj.Procedureobj)" />
+                        </div>
+                    </td>
+
+                    <!-- Description (read-only) -->
+                    <td width="22%">
+                        <div class="form__group">
+                            <label>Description</label>
+                            <input type="text"
+                                   placeholder="Auto-filled"
+                                   ng-model="MPRObj.ProcedureName"
+                                   disabled />
+                        </div>
+                    </td>
+
+                    <!-- Rank -->
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>Rank <em>*</em></label>
+                            <select ng-options="r.RankId as r.RankName for r in MPRRankList"
+                                    ng-model="MPRObj.RankId">
+                                <option value="" disabled>Select</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <!-- Reduction % -->
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>Reduction % <em>*</em></label>
+                            <div class="d__f-- ai__c-- border__DDD-- bradius__4-- gap__x--6">
+                                <span class="fs__xl-- fw__5-- tc__1D1D1D-- py__5-- px__8-- bg__E9E9E9-- br__DDD-- btl-radius bbl-radius">%</span>
+                                <input type="text"
+                                       placeholder="0-100"
+                                       class="border__none-- w__80-- btr-radius bbr-radius"
+                                       ng-model="MPRObj.ReductionPercentage"
+                                       numbersdots-only="numbersdots-only"
+                                       maxlength="6"
+                                       validtwodecimal-number />
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Modifier -->
+                    <td width="12%">
+                        <div class="form__group" typehead-dropdown-direction>
+                            <label>Modifier</label>
+                            <input type="text"
+                                   placeholder="Enter Modifier"
+                                   autocomplete="off"
+                                   maxlength="100"
+                                   ng-model="MPRObj.ModifierObj"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="m as m.ModifierName for m in masterModifierList | filter:{ModifierName: $viewValue}"
+                                   typeahead-on-select="OnSelectMPRModifier(MPRObj.ModifierObj)" />
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Row 2 -->
+                <tr>
+                    <!-- Effective Date -->
+                    <td>
+                        <div class="form__group pb__5--">
+                            <label>Effective Date <em>*</em></label>
+                            <input type="text"
+                                   class="icons-calendar cur-default bg-white"
+                                   ng-model="MPRObj.EffectiveFrom"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickeruniversal readonly />
+                        </div>
+                    </td>
+
+                    <!-- End Date -->
+                    <td>
+                        <div class="form__group pb__5--">
+                            <label>End Date <em>*</em></label>
+                            <input type="text"
+                                   class="icons-calendar cur-default bg-white"
+                                   ng-model="MPRObj.EffectiveTo"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickeruniversal readonly />
+                        </div>
+                    </td>
+
+                    <!-- Apply to -->
+                    <td colspan="2">
+                        <div class="form__group pb__5--">
+                            <label>Apply To</label>
+                            <div class="d__f-- ai__c-- gap__10--x">
+                                <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                    <input type="checkbox" class="checkbox"
+                                           ng-model="MPRObj.ApplyToOfficeFee">
+                                    <span class="lbl"></span>
+                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Office Fee</span>
+                                </label>
+                                <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                    <input type="checkbox" class="checkbox"
+                                           ng-model="MPRObj.ApplyToFacilityFee">
+                                    <span class="lbl"></span>
+                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Facility Fee</span>
+                                </label>
+                                <label class="c__p-- d__f-- ai__c-- gap__5--">
+                                    <input type="checkbox" class="checkbox"
+                                           ng-model="MPRObj.ApplyToAnesthesia">
+                                    <span class="lbl"></span>
+                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">Anesthesia</span>
+                                </label>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Notes -->
+                    <td colspan="2">
+                        <div class="form__group">
+                            <label>Notes</label>
+                            <input type="text"
+                                   placeholder="Optional notes"
+                                   ng-model="MPRObj.Notes"
+                                   maxlength="250" />
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── MPR list table ── -->
+<div class="section__style--4 height__100--">
+    <div class="section__header-- py__3--">
+        <h1>MPR Code List</h1>
+        <span class="fs__md-- fw__5-- tc__656565--">
+            Total: <strong>{{ MPRListCount || 0 }}</strong> records
+        </span>
+    </div>
+    <div class="section__body-- p__0-- height__100-- border__none--">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll overflow-x-auto">
+                <div class="p__3-- bg__F0F0F0-- width__auto--">
+                    <table class="table__style--20 bg__FFFFFF-- table-layout-auto white-nowrap">
+                        <thead>
+                            <tr>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">S.No</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Location</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">CPT Code</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Procedure Code</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Description</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Rank</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Reduction %</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Modifier</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Apply To</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Effective Date</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">End Date</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Notes</span></th>
+                                <th class="bg__none-- bb__DDD-- p__6--"><span class="fs__md-- fw__6-- tc__1D1D1D--">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody ng-if="MPRList && MPRList.length > 0">
+                            <tr ng-repeat="item in MPRList | filter:{DeleteInd:'N'} track by $index">
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ $index + 1 }}.</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">
+                                        {{ (Locationslist | filter:{ClinicId:item.OrganizationId}:true)[0].ClinicName }}
+                                    </span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.CPTCode }}</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.ProcedureCode }}</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <div class="max__width210--">
+                                        <span class="fs__md-- fw__5-- tc__1D1D1D-- no-wrapappt"
+                                              title="{{ item.ProcedureName }}">{{ item.ProcedureName }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="p__8--">
+                                    <!-- Rank badge -->
+                                    <span class="fs__md-- fw__5-- px__8-- py__3-- bradius__10--"
+                                          ng-class="{
+                                          'tc__3BAC66-- bg__E2F3E8--' : item.RankId= = =1,
+                                          'tc__537ACF-- bg__DCE6FC--' : item.RankId= = =2,
+                                          'tc__E89B00-- bg__FFF3CD--' : item.RankId= = =3,
+                                          'tc__656565-- bg__F5F5F5--' : item.RankId>
+                                        3
+                                        }">
+                                        {{ (MPRRankList | filter:{RankId:item.RankId}:true)[0].RankName }}
+                                    </span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__6-- tc__1D1D1D--">{{ item.ReductionPercentage | number:2 }}%</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.ModifierCode }}</span>
+                                </td>
+
+                                <!-- Apply-to chips -->
+                                <td class="p__8--">
+                                    <div class="d__f-- gap__4-- fw__w--">
+                                        <span class="fs__sm-- fw__5-- tc__537ACF-- bg__DCE6FC-- px__5-- py__2-- bradius__4--"
+                                              ng-if="item.ApplyToOfficeFee">Office</span>
+                                        <span class="fs__sm-- fw__5-- tc__3BAC66-- bg__E2F3E8-- px__5-- py__2-- bradius__4--"
+                                              ng-if="item.ApplyToFacilityFee">Facility</span>
+                                        <span class="fs__sm-- fw__5-- tc__E89B00-- bg__FFF3CD-- px__5-- py__2-- bradius__4--"
+                                              ng-if="item.ApplyToAnesthesia">Anesthesia</span>
+                                    </div>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.EffectiveFrom | date:'MM-dd-yyyy' }}</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <span class="fs__md-- fw__5-- tc__1D1D1D--">{{ item.EffectiveTo | date:'MM-dd-yyyy' }}</span>
+                                </td>
+
+                                <td class="p__8--">
+                                    <div class="max__width160--">
+                                        <span class="fs__md-- fw__5-- tc__656565-- no-wrapappt"
+                                              title="{{ item.Notes }}">{{ item.Notes }}</span>
+                                    </div>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="p__8--">
+                                    <div class="d__f-- ai__c-- gap__x--5 jc__c--">
+                                        <a class="cur-poiter"
+                                           tooltip-placement="top"
+                                           uib-tooltip="Edit"
+                                           tooltip-append-to-body="true"
+                                           ng-click="EditMPRCode(item)">
+                                            <i class="ehr-edit aside-icon-ros"></i>
+                                        </a>
+                                        <a class="cur-poiter"
+                                           tooltip-placement="top"
+                                           uib-tooltip="Delete"
+                                           tooltip-append-to-body="true"
+                                           ng-click="DeleteMPRCode(item)">
+                                            <i class="ehr-delete aside-icon-ros"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Empty state -->
+                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--"
+                         ng-if="!MPRList || MPRList.length === 0">
+                        <a><i class="nodata__1-- e1__nodata--1"></i></a>
+                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No MPR Codes Found</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="row m-t-10" ng-show="MPRList && MPRList.length > 0">
+            <div class="col-lg-12 text-center EH-pagination">
+                <uib-pagination total-items="MPRListCount"
+                                ng-model="MPRSearchObj.PageNumber"
+                                ng-change="SwitchMPRPage(MPRSearchObj.PageNumber)"
+                                force-ellipses="true"
+                                boundary-link-numbers="true"
+                                max-size="5"
+                                items-per-page="10">
+                </uib-pagination>
+            </div>
+        </div>
+    </div>
+</div>

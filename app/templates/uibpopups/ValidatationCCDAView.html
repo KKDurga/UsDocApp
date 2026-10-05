@@ -1,0 +1,92 @@
+﻿<div class="email-header">
+    <h1>CCDA Attachment</h1>
+    <ul class="flex-flow-ulli-mb0">
+
+        <li ng-show="AttachmentObj.showConfigure">
+            <button class="btn btn-link mr-10" ng-click="viewOriginalCCDA(true)" ng-show="!showActualCCDA">Actual CCDA</button>
+            <button class="btn btn-link mr-10" ng-click="viewOriginalCCDA(false)" ng-show="showActualCCDA">Modified CCDA</button>
+        </li>
+        <li>
+            <button class="btn btn-success mr-10" ng-click="openCCDATemplateCreationPop()" ng-show="AttachmentObj.showConfigure">Configure</button>
+        </li>
+        <li>
+            <button class="btn btn-info mr-10" ng-click="GetCCDAXmlData()">Download CCDA</button>
+        </li>
+        <li>
+            <a href="javascript:;" ng-click="closePopup()">
+                CLOSE
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="bg-f5f5f5 overflow-y-scroll overflow-x-hidden" style="height: calc(100vh - 39px)">
+    <div class="row">
+        <div class="col-lg-12">
+            <uib-accordion class="case-history" close-others="oneAtATime">
+                <uib-accordion-group is-open="mitem.isaccordianOpen" ng-repeat="mitem in staticAccordianArray" class="mb-0">
+                    <uib-accordion-heading>
+                        <div class="row width-100 cur-poiter fs-13" ng-click="openParticulrAccordian(mitem)">
+                            <div class="col-lg-12">
+                                <div class="form-group mb-0 dis-flex align-items-center justify-space-between" ng-if="mitem.Id ==1">
+                                    <label class="mb-0" title="Bill ID">CCDA File</label>
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': mitem.isaccordianOpen, 'glyphicon-chevron-right': !mitem.isaccordianOpen}"></i>
+                                </div>
+                                <div class="form-group mb-0 dis-flex align-items-center justify-space-between" ng-if="errorsDetails.length > 0 && !ZerroErrorsWithParseError && mitem.Id ==2">
+                                    <label class="mb-0 text-red" title="Bill ID">  CCDA Errors : <span class="badge btn-danger">{{totalErrorsCount}}</span></label>
+                                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': mitem.isaccordianOpen, 'glyphicon-chevron-right': !mitem.isaccordianOpen}"></i>
+                                </div>
+                                <div class="form-group mb-0 dis-flex align-items-center justify-space-between"  ng-show="errorsDetails.length == 0 && !ZerroErrorsWithParseError  && mitem.Id ==2">
+                                    <label class="mb-0 text-success" title="CCDA"> <i class="fas fa-check fs-18 text-success"></i>  Valid CCDA </label>
+                                    
+                                </div>
+                                <div class="dis-flex align-items-center justify-space-between p-10 bg-danger grid-gap-15" ng-show="errorsDetails.length == 0 && ZerroErrorsWithParseError  && mitem.Id ==2">
+                                    <i class="fas fa-times fs-30 text-red"></i>
+                                    <label class="flex m-0 text-red fs-13 font-weight-500 text-left">
+                                        <span class="fs-13 font-weight-500 dis-block">C-CDA Document Details: C-CDA_IG_Plus_Vocab / Readme.txt -</span>
+                                        {{parseFailedErrorMsgDescription}}
+                                    </label>
+                                    <i class="fas fa-info-circle fs-30 text-red"></i>
+                                    <br />
+                                    <label class="mb-0 text-red" title="Bill ID">  CCDA Errors : <span class="badge btn-danger">{{totalErrorsCount}}</span></label>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </uib-accordion-heading>
+
+                    <div class="row" ng-if="mitem.Id ==1">
+                        <div class="col-lg-12">
+                            <iframe width="100%" height="550" ng-src='{{ccdaIframeUrl}}'></iframe>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="mitem.Id ==2">
+                        <div class="col-lg-12">
+                            <ul class="referral-summary-list dis-block ccda-error" ng-repeat="eitem in errorsDetails">
+                                <li>
+                                    <p>
+                                        <b>Error -</b>
+                                        <span>
+                                            {{eitem.ErrorDescription}}
+                                        </span>
+                                    </p>
+                                </li>
+                                <li>
+                                    <label>
+                                        {{eitem.ErrorXpath}}
+                                    </label>
+                                </li>
+                                <li>
+                                    <a class="text-underline">Line Number:</a>
+                                    <label> {{eitem.DocumentLineNumber}}</label>
+                                </li>
+                            </ul>
+                             
+                        </div>
+                    </div>
+                </uib-accordion-group>
+            </uib-accordion>
+        </div>
+    </div>
+
+</div>

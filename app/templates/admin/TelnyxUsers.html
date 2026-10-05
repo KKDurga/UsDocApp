@@ -1,0 +1,142 @@
+<div class="p-15">
+
+    <!-- ===== Header ===== -->
+    <div class="dis-flex align-items-center justify-content-between m-b-15">
+        <div>
+            <h4 class="m-b-0">Call Credentials</h4>
+            <span class="font-12 color-grey">Provision Telnyx calling credentials for receptionists per branch</span>
+        </div>
+    </div>
+
+    <!-- ===== Selection bar (EHRUS cream band) ===== -->
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- m-b-15">
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <!-- Branch dropdown -->
+                    <td width="24%">
+                        <div class="form__group">
+                            <label>Branch</label>
+                            <!--<select class="form-control"
+                                    ng-model="telnyxSettings.SelectedHospitalId"
+                                    ng-change="onBranchSelect(telnyxSettings.SelectedHospitalId)"
+                                    ng-options="b.HospitalId as b.HospitalName for b in telnyxBranches">
+                                <option value="">Select Branch</option>
+                            </select>-->
+                            <select class="form-control"
+                                    ng-model="telnyxSettings.SelectedHospitalId"
+                                    ng-change="onBranchSelect(telnyxSettings.SelectedHospitalId)"
+                                    ng-options="b.ClinicId as b.ClinicName for b in telnyxBranches">
+                                <option value="">Select Branch</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <!-- Receptionist dropdown (enabled after branch pick) -->
+                    <td width="24%">
+                        <div class="form__group">
+                            <label>User</label>
+                            <select class="form-control"
+                                    ng-model="telnyxSettings.SelectedUserId"
+                                    ng-change="onUserSelect(telnyxSettings.SelectedUserId)"
+                                    ng-disabled="!telnyxSettings.SelectedHospitalId"
+                                    ng-options="u.DoctorID as u.FullName for u in AllReceptionUsersList">
+                                <option value="">Select User</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <!-- Credential name -->
+                    <td width="26%">
+                        <div class="form__group">
+                            <label>Credential Name</label>
+                            <input type="text" class="form-control"
+                                   ng-model="telnyxSettings.CredentialName"
+                                   ng-disabled="true"
+                                   placeholder="username-Hospital" />
+                        </div>
+                    </td>
+
+                    <!-- Create + Clear -->
+                    <td class="valign-bottom">
+                        <div class="dis-flex align-items-center grid-gap-10 m-b-2">
+                            <button class="btn__xl-- btn__2D2D47--f"
+                                    ng-disabled="!telnyxSettings.SelectedUserId || creatingCredential"
+                                    ng-click="createUserCredential()">
+                                {{ creatingCredential ? 'Creating�' : 'Create User' }}
+                            </button>
+                            <button class="btn__xl-- btn__C71D27--o" ng-click="clearSelection()">Clear</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== Provisioned credentials list ===== -->
+    <div class="dis-flex align-items-center justify-content-between m-b-10">
+        <h5 class="m-b-0">Provisioned Credentials</h5>
+
+        <!-- Status filter -->
+        <div class="dis-flex align-items-center grid-gap-10">
+            <label class="m-b-0 font-12 color-grey">Status</label>
+            <select class="form-control w-150"
+                    ng-model="telnyxSettings.StatusFilter"
+                    ng-change="onStatusFilterChange()">
+                <option value="">All</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive border__E4E4E4-- br__4--">
+        <table class="table table-hover m-b-0">
+            <thead>
+                <tr>
+                    <th>Branch</th>
+                    <th>User</th>
+                    <th>Credential Name</th>
+                    <th>Telnyx Credential ID</th>
+                    <th>Created On</th>
+                    <th>Created By</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="c in telnyxCredentialList">
+                    <td>{{ c.HospitalName }}</td>
+                    <td>{{ c.UserName }}</td>
+                    <td class="font-mono font-12 color-grey word-break-all">{{c.CredentialName}} ({{ c.SipUsername }})</td>
+                    <td class="font-mono font-12 color-grey word-break-all">{{ c.TelynxUserCredentialId }}</td>
+                    <td class="font-12">{{ c.CreatedDt | date:'MMM d, y' }}</td>
+                    <td class="font-12">{{ c.CreatedByName }}</td>
+                    <td class="text-center">
+                        <div class="dis-flex align-items-center justify-content-center">
+                            <span ng-class="c.IsActive ? 'status__green--dot status__green--' : 'status__red--dot status__red--'"
+                                  title="{{ c.StatusUpdatedDt ? 'Changed ' + (c.StatusUpdatedDt | date:'MMM d, y') + ' by ' + c.StatusUpdatedByName : '' }}">
+                                {{ c.IsActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:;" class="m-r-10"
+                           ng-click="toggleUserCredentialStatus(c)"
+                           ng-style="{ color: c.IsActive ? '#2DAA2D' : '#8A8A8A' }"
+                           title="{{ c.IsActive ? 'Deactivate credential' : 'Activate credential' }}">
+                            <i class="fa" ng-class="c.IsActive ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+                        </a>
+                        <a href="javascript:;" ng-click="deleteUserCredential(c)" title="Remove credential">
+                            <i class="fa fa-trash color-red"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr ng-if="!telnyxCredentialList.length">
+                    <td colspan="8" class="text-center color-grey p-20">No credentials created yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

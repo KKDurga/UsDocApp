@@ -1,0 +1,289 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Surgery Details</h1>
+        <ul class="us-controls">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                    <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span>{{cacheStorageItem.PatientName}}</span>
+                        <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                    </div>
+                    <span><i class="icons__w16-- info__w16--f"></i></span>
+                </div>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-click="SaveEditSurgeryStaff(EditSurgeryObj);">Save</button>
+            </li>
+            <li>
+                <a class="btn__close--" ng-click="close()">
+                    <i class="close__w32--"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <div class="row">
+            <div class="col-lg-12 m__5--y" ng-show="ApptSurgeryDetails.length === 0">
+                <ul class="flex-flow-ulli">
+                    <li>
+                        <label class="text-s14w800c000">Surgery:</label>
+                    </li>
+                    <li class="flex">
+                        <div class="search-panel-input width-100" typehead-dropdown-direction>
+                            <input type="text" maxlength="100"
+                                   ng-model="EditSurgeryObj.SearchProcedureObj" placeholder="Select Orders"
+                                   typeahead-min-length="0" typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.ProcedureCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                                   typeahead-on-select="OnClickAdvisedProcedure(EditSurgeryObj.SearchProcedureObj)" ng-model-options="{ debounce: 500 }">
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- Summary View -->
+
+            <div class="col-lg-12" ng-show="ApptSurgeryDetails.length > 0">
+                <ul class="referral-summary-list" ng-repeat="item in ApptSurgeryDetails | limitTo: 1 track by $index">
+                    <li>
+                        <span>Surgery : </span>
+                        <label>
+                            <span  ng-if="item.CPTCode !=''"><b>{{item.CPTCode}}-</b></span>{{item.SurgeryName}}
+                        </label>
+                    </li>
+                    <li>
+                        <span>Site:</span>
+                        <label>({{item.OrganId === 1 ? 'OD' : (item.OrganId === 2 ? 'OS': (item.OrganId === 3 ? 'OU':(item.LocationId === 2 ? 'General':''))) }})</label>
+                    </li>
+                    <li>
+                        <span>-</span>
+                        <label>{{item.SurgeryEyeStatusName}}</label>
+                    </li>
+                    <!--<li ng-if="item.DiagnosisList.length > 0">
+                    <span>Diagnosis :</span>
+                    <label>
+                        <span ng-repeat="kitem in item.DiagnosisList track by $index">
+                            {{kitem.ICDCode}}-{{kitem.DiagnosisName}}<span ng-if="!$last">,</span>
+                        </span>
+                    </label>
+                </li>-->
+                </ul>
+
+
+
+                <ul class="flex-flow-ulli-mb0 mb-5 assessments-title-head dis-block" ng-repeat="item in ApptSurgeryDetails | limitTo: 1 track by $index">
+                    <li>
+                        <label> Diagnosis :</label>
+                    </li>
+                    <li class="flex dis-flex align-items-center justify-space-between" ng-hide="(item.DiagnosisList| filter:{DeleteInd: 'N'}).length == 10">
+                        <div class="search-panel-input width-50" typehead-dropdown-direction>
+
+                            <input type="text" class="input__style--1 icons-search"
+                                   name="Diagnosise"
+                                   placeholder="Search Diagnosis From Organization"
+                                   ng-model="EditSurgeryObj.DiagnosisObject"
+                                   maxlength="100"
+                                   typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.ICD10CODE + ' - ' + item.DiagnosisName for item in GetDiagnosisList($viewValue)"
+                                   typeahead-on-select="onSelectIntraOpDiagnosis(EditSurgeryObj.DiagnosisObject,item)" />
+                        </div>
+                    </li>
+                    <li>
+                        <table class="table tableno-bordered tableno-padding m-b-0">
+                            <tbody>
+                                <tr ng-repeat="Ditem in item.DiagnosisList | filter:{DeleteInd: 'N'} track by $index">
+                                    <td>
+                                        <label class="fs-13">{{$index+1}}.{{Ditem.ICDCode}}-{{Ditem.DiagnosisName}}</label>
+                                    </td>
+                                    <!--<td width="14%">
+                                    <div class="form-group">
+                                        <select class="form-control height-20"
+                                                ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                ng-model="Ditem.LocationId1">
+                                            <option value="">{{ 'LOCATION' | translate}}</option>
+                                        </select>
+                                    </div>
+                                </td>-->
+                                    <td width="5%">
+                                        <a class="actions-black pull-right" href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Remove" ng-click="RemoveDiagnosis(item,Ditem)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                <circle cx="10" cy="10" r="10" fill="#FC4848" />
+                                                <path d="M14.4964 6.51071C14.7745 6.2326 14.7745 5.78169 14.4964 5.50357V5.50357C14.2183 5.22546 13.7674 5.22546 13.4893 5.50357L10 8.99286L6.51071 5.50357C6.2326 5.22546 5.78169 5.22546 5.50357 5.50357V5.50357C5.22546 5.78169 5.22546 6.2326 5.50357 6.51071L8.99286 10L5.50357 13.4893C5.22546 13.7674 5.22546 14.2183 5.50357 14.4964V14.4964C5.78169 14.7745 6.2326 14.7745 6.51071 14.4964L10 11.0071L13.4893 14.4964C13.7674 14.7745 14.2183 14.7745 14.4964 14.4964V14.4964C14.7745 14.2183 14.7745 13.7674 14.4964 13.4893L11.0071 10L14.4964 6.51071Z" fill="white" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </li>
+                </ul>
+                <ul class="flex-flow-ulli-mb0 mb-5 assessments-title-head dis-block">
+                    <li>
+                        <label> Additional Surgery :</label>
+                    </li>
+                    <li class="flex dis-flex align-items-center justify-space-between" ng-hide="(ApptAdditionalSurgeryDetails | filter:{DeleteInd: 'N'}).length==4">
+                        <div class="search-panel-input width-50" typehead-dropdown-direction>
+
+                            <input type="text" class="input__style--1 icons-search" maxlength="100"
+                                   ng-model="EditSurgeryObj.SearchAdditionalProcedureObj"
+                                   placeholder="Select Orders" typeahead-min-length="0"
+                                   typeahead-focus-on-select="false"
+                                   uib-typeahead="item as item.ProcedureCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)"
+                                   typeahead-on-select="OnAdditionalProcedure(EditSurgeryObj.SearchAdditionalProcedureObj)"
+                                   ng-model-options="{ debounce: 500 }">
+
+
+                        </div>
+                    </li>
+                    <li>
+                        <table class="table tableno-bordered tableno-padding m-b-0">
+                            <tbody>
+                                <tr ng-repeat="item in ApptAdditionalSurgeryDetails | filter:{DeleteInd: 'N'} track by $index">
+                                    <td>
+                                        <label class="fs-13">{{$index+1}}.{{item.Description}}</label>
+                                    </td>
+                                    <td width="14%">
+                                        <div class="form-group">
+                                            <select class="form-control height-20"
+                                                    ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                    ng-model="item.OrganId">
+                                                <option value="">{{ 'LOCATION' | translate}}</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td width="5%">
+                                        <a class="actions-black pull-right" href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Remove" ng-click="RemoveAdditionalSurgery(item)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                <circle cx="10" cy="10" r="10" fill="#FC4848" />
+                                                <path d="M14.4964 6.51071C14.7745 6.2326 14.7745 5.78169 14.4964 5.50357V5.50357C14.2183 5.22546 13.7674 5.22546 13.4893 5.50357L10 8.99286L6.51071 5.50357C6.2326 5.22546 5.78169 5.22546 5.50357 5.50357V5.50357C5.22546 5.78169 5.22546 6.2326 5.50357 6.51071L8.99286 10L5.50357 13.4893C5.22546 13.7674 5.22546 14.2183 5.50357 14.4964V14.4964C5.78169 14.7745 6.2326 14.7745 6.51071 14.4964L10 11.0071L13.4893 14.4964C13.7674 14.7745 14.2183 14.7745 14.4964 14.4964V14.4964C14.7745 14.2183 14.7745 13.7674 14.4964 13.4893L11.0071 10L14.4964 6.51071Z" fill="white" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </ul>
+            </div>
+            <!-- Summary View -->
+            <div class="col-lg-12">
+                <table class="table tableno-bordered tableno-padding m-b-0">
+                    <tbody ng-repeat="item in ApptSurgeryDetails | limitTo: 1 track by $index">
+                        <tr>
+                            <td width="33%">
+                                <div class="form__group">
+                                    <label>Surgeon</label>
+                                    <select class="" ng-model="item.SurgeonId" ng-options="item.DoctorID as item.SecondUserFullName for item in EditSurgeryObj.AllDoctorsList" ng-disabled="cacheStorageItem.AppointmentTypeId === 4 || cacheStorageItem.AppointmentTypeId === 14 || (item.AscAppointmentId != 0 && item.AscAppointmentId != null)">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+
+                            </td>
+                            <td width="33%">
+                                <div class="form__group">
+                                    <label>Anesthesiologist</label>
+                                    <select class=" " ng-model="item.AnesthetistId" ng-options="item.DoctorID as item.FullName for item in EditSurgeryObj.AllAnesthetistList">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <label>Nurse</label>
+                                    <select class=" " ng-model="item.NurseId" ng-options="item.DoctorID as item.FullName for item in EditSurgeryObj.AllNurseList">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="dis-flex grid-gap-10 align-items-center">
+                                    <div class="form__group">
+                                        <label>Eye</label>
+                                        <select class=" "
+                                                ng-options="Eitem.OrganId as Eitem.OrganName for Eitem in GetOrganNameList"
+                                                ng-model="item.OrganId"
+                                                ng-change="ChangeEyeType(item)">
+                                            <option value="" disabled>{{ 'LOCATION' | translate}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label>Select Eye Surgery</label>
+                                        <select class=" "
+                                                ng-options="Sitem.SurgeryEyeStatusId as Sitem.SurgeryEyeStatusName for Sitem in GetSelectEyeSurgeryList"
+                                                ng-model="item.SurgeryEyeStatusId"
+                                                ng-change="ChangeSelectEyeSurgery(item);">
+                                            <option value="">Select Eye Surgery</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="align-items-center">
+                                    <fieldset class="pos-relative">
+                                        <label>Co-Manager</label>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" id="Internal" value="internal" class="radio-custom width-0" ng-model="selectedOption" ng-change="ChangeSelectoption(selectedOption)" />
+                                            <label for="Internal" class="radio-custom-label text-black">Internal</label>
+                                        </div>
+
+                                        <div class="dis-inline-block">
+                                            <input type="radio" id="External" value="external" class="radio-custom width-0" ng-model="selectedOption" ng-change="ChangeSelectoption(selectedOption)" />
+                                            <label for="External" class="radio-custom-label text-black">External</label>
+                                        </div>
+                                    </fieldset>
+
+                                    <div class="form__group" ng-show="selectedOption == 'internal'">
+                                        <select class=" " ng-model="item.InternalCoManagerId" ng-options="item.DoctorID as item.FullName for item in EditSurgeryObj.AllDoctorsList" ng-change="ChangeInternalCoManager(ApptSurgeryDetails)">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form__group" ng-show="selectedOption == 'external'" typehead-dropdown-direction>
+                                        <!--<select class="form-outline" ng-model="item.ExternalCoManagerId" ng-options="item.DoctorID as item.FullName for item in EditSurgeryObj.AllDoctorsList">
+                                        <option value="">select</option>
+                                    </select>-->
+                                        <input type="text" autocomplete="off" name="InsurancePayor" ng-model-options="{ debounce: 500 }" placeholder="Enter PCP" ng-model="EditSurgeryObj.PCPobj" typeahead-min-length="0" typeahead-on-select="onSelectApptPcpDoctor(EditSurgeryObj.PCPobj,item)" uib-typeahead="item as item.FullName +' - '+item.NPI  for item in searchReferalDoctors($viewValue,1)">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <label>DOS</label>
+                                    <input type="text" placeholder="MM-DD-YYYY" class="icons-calendar" ng-model="item.AscAppointmentDate" datepickeryearmonthchangeinforward ng-disabled="true" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form__group">
+                                    <label>POP1  </label>
+                                    <input type="text" placeholder="MM-DD-YYYY" class="  icons-calendar" ng-model="item.FirstFollowupDate" datepickeryearmonthchangeinforward ng-disabled="true" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <label>POP2  </label>
+                                    <input type="text" placeholder="MM-DD-YYYY" class="  icons-calendar" ng-model="item.SecondFollowupDate" datepickeryearmonthchangeinforward ng-disabled="true" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <label>POP3  </label>
+                                    <input type="text" placeholder="MM-DD-YYYY" class="  icons-calendar" ng-model="item.ThirdFollowupDate" datepickeryearmonthchangeinforward ng-disabled="true" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 

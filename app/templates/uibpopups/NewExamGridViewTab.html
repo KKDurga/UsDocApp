@@ -1,0 +1,577 @@
+<!-- ============================================================================
+     NEW EXAM VIEW (TABLET PROTOTYPE) - COMBINED GRID VIEW
+     ----------------------------------------------------------------------------
+     Tablet-only. Opened from the new Examination design's
+     "Add Findings -> Open Grid View" link, inside the application's existing
+     right-side drawer (offcanves-right modal__width--70).
+
+     ONE drawer holds BOTH segments: every Anterior organ, then every Posterior
+     organ, in a single continuously scrolling panel. The left rail is a
+     ScrollSpy built on the same contract the Web View's anterior/posterior
+     ScrollSpy already uses - a scroll container, .newExamGridSection markers and
+     an active id kept in sync both ways (click -> scroll, scroll -> active).
+
+     It runs on the Examination controller's own scope (scope: $scope), so every
+     action here is the SAME function the tablet Examination grid already calls -
+     nothing is duplicated:
+        AnteriorSegmentArrayNew / PoteriorSegmentArrayNew  - organ rows
+        Anteriorfavariotes / NewAnteriorFindingsMasterArray - anterior findings
+        Posteriorfavariotes / NewPosteriorFindingsMasterArray - posterior findings
+        isFindingSelected / ToggleFindingASValue / ToggleFindingPSValue
+        toggleASRowExpand / togglePSRowExpand
+        isASSubFindingChecked / toggleASSubFinding
+        isPSSubFindingChecked / togglePSSubFinding
+        MRDvaluesFilteredArray + ChangeFindingASValue1 + isMRDValueSelected
+        PosteriorRightEyeArray / PosteriorLeftEyeArray + ChangeFindingPSValue + isCDRSelected
+     Selections write straight through to the exam, so the drawer needs no
+     Apply step - closing it simply returns to the exam.
+     ============================================================================ -->
+<div class="d__f-- fd__c-- height__100-- o__h-- bg__FFF--">
+
+    <!-- ===== HEADER ===== -->
+    <div class="d__f-- ai__c-- gap__8-- px__16-- py__12-- bb__E5E7EB-- flex__shrink--0">
+        <span class="fs__xl-- fw__8-- tc__111827-- lh__1-3--">Grid View</span>
+        <span class="py__2-- px__8-- bradius__4-- fs__sm-- fw__7-- bg__E8F2F2-- tc__1D5558-- border__C8DEDE--">Anterior &amp; Posterior</span>
+        <span class="flex__1--"></span>
+        <a class="w__28-- h__28-- d__f-- ai__c-- jc__c-- bradius__6-- c__p-- tc__6B7280-- hover__0000000F--bg"
+           title="Close" ng-click="NewExamGridClose()">
+            <i svg-icon="icon__cross--" size="14"></i>
+        </a>
+    </div>
+
+    <!-- ===== BODY: ScrollSpy rail | continuous content ===== -->
+    <div class="d__f-- flex__1-- minh__0px-- o__h--">
+
+        <!-- ---------- LEFT RAIL ---------- -->
+        <div class="w__145-- flex__shrink--0 br__E5E7EB-- bg__FAFBFC-- o__a-- slim-scroll">
+
+            <div class="py__7-- px__12-- fs__sm-- fw__8-- tc__1D1D1D-- tt__u-- ls__0half-- bb__E5E7EB--">Anterior</div>
+            <div class="h__40-- d__f-- ai__c-- px__16-- fs__md-- c__p-- o__h-- ws__nowrap-- to__ellipsis-- hover__F0F2F5--bg"
+                 ng-repeat="item in AnteriorSegmentArrayNew | filter:{ActiveInd:'Y'} | orderBy:'OrderBY' track by $index"
+                 id="newExamGridNav_A{{item.InvestigationId}}"
+                 ng-click="NewExamGridGoTo('A' + item.InvestigationId)"
+                 ng-class="NewExamGridActiveKey == ('A' + item.InvestigationId) ? 'bg__E8F2F2-- bl__1D5558--2 tc__1D5558-- fw__7--' : 'fw__5-- tc__4B5563--'">
+                {{item.InvestigationDesc}}
+            </div>
+
+            <div class="py__7-- px__12-- fs__sm-- fw__8-- tc__1D1D1D-- tt__u-- ls__0half-- bb__E5E7EB-- bt__E5E7EB--">Posterior</div>
+            <div class="h__40-- d__f-- ai__c-- px__16-- fs__md-- c__p-- o__h-- ws__nowrap-- to__ellipsis-- hover__F0F2F5--bg"
+                 ng-repeat="item in PoteriorSegmentArrayNew | filter:{ActiveInd:'Y'} | orderBy:'OrderBY' track by $index"
+                 id="newExamGridNav_P{{item.InvestigationId}}"
+                 ng-click="NewExamGridGoTo('P' + item.InvestigationId)"
+                 ng-class="NewExamGridActiveKey == ('P' + item.InvestigationId) ? 'bg__E8F2F2-- bl__1D5558--2 tc__1D5558-- fw__7--' : 'fw__5-- tc__4B5563--'">
+                {{item.InvestigationDesc === 'Disc/ON' ? 'Disc' : item.InvestigationDesc}}
+            </div>
+        </div>
+
+        <!-- ---------- RIGHT ---------- -->
+        <div class="flex__1-- minw__0px-- d__f-- fd__c-- o__h--">
+
+            <!-- OD / OS column headers - fixed above the scroll -->
+            <div class="d__f-- flex__shrink--0 bb__E5E7EB--">
+                <div class="flex__1-- minw__0px-- d__f-- ai__c-- gap__6-- px__10-- py__8-- bg__EFF6FF-- br__BFDBFE--">
+                    <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__8-- bg__DBEAFE-- tc__1D4ED8--">OD</span>
+                    <span class="fs__md-- fw__8-- tc__1D4ED8--">Right Eye</span>
+                </div>
+                <div class="flex__1-- minw__0px-- d__f-- ai__c-- gap__6-- px__10-- py__8-- bg__FEFCE8--">
+                    <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__8-- bg__FDE68A-- tc__92400E--">OS</span>
+                    <span class="fs__md-- fw__8-- tc__92400E--">Left Eye</span>
+                </div>
+            </div>
+
+            <!-- the one continuously scrolling panel the ScrollSpy watches -->
+            <div class="flex__1-- minh__0px-- o__a-- slim-scroll" id="newExamGridScrollPanel">
+
+                <!-- ============ ANTERIOR ============ -->
+                <div class="newExamGridSection"
+                     ng-repeat="item in AnteriorSegmentArrayNew | filter:{ActiveInd:'Y'} | orderBy:'OrderBY' track by $index"
+                     id="newExamGridSec_A{{item.InvestigationId}}" data-gvkey="A{{item.InvestigationId}}">
+
+                    <div class="px__12-- py__6-- bg__F4F5F7-- bb__E5E7EB-- fs__md-- fw__8-- tc__374151--">
+                        {{item.InvestigationDesc}}
+                    </div>
+
+                    <!-- MRD: the prototype's Grid View renders each sub-measure as its own
+                         card - a shaded title strip over an OD | OS split, with the values
+                         as individual boxes that light up when chosen. Data and actions are
+                         unchanged: same MRDvaluesFilteredArray, same isMRDValueSelected,
+                         same ChangeFindingASValue1. -->
+                    <div class="px__12-- py__10--" ng-if="item.InvestigationId == 6">
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">MRD 1</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 6}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OD')">{{mitem.FindingDescription}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 6}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OS')">{{mitem.FindingDescription}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">MRD c NS</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 7}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OD')">{{mitem.FindingDescription}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 7}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OS')">{{mitem.FindingDescription}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">MRD 2</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 9}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OD')">{{mitem.FindingDescription}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 9}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OS')">{{mitem.FindingDescription}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">LF</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 10}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OD')">{{mitem.FindingDescription}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 10}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OS')">{{mitem.FindingDescription}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">PFH</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 31}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OD')">{{mitem.FindingDescription}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                      ng-repeat="mitem in MRDvaluesFilteredArray | filter:{FindingId: 31}:true track by $index"
+                                      ng-class="isMRDValueSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                      ng-click="ChangeFindingASValue1(newAnteriorObj, mitem, 6, 'OS')">{{mitem.FindingDescription}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- findings: favourites first, then the rest -->
+                    <div ng-if="item.InvestigationId != 6">
+                        <div class="d__f-- bb__F3F4F6--"
+                             ng-repeat="mitem in Anteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true} track by $index">
+                            <div class="flex__1-- minw__0px-- br__E5E7EB--" ng-include="'gvCellAOD.html'"></div>
+                            <div class="flex__1-- minw__0px--" ng-include="'gvCellAOS.html'"></div>
+                        </div>
+
+                        <div class="d__f-- ai__c-- gap__6-- px__12-- py__4-- bg__F0F2F5-- bb__E5E7EB-- fs__sm-- fw__7-- tc__9CA3AF-- tt__u-- ls__0half--"
+                             ng-if="(Anteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true}).length > 0 &amp;&amp; (NewAnteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false}).length > 0">
+                            <span class="h__1-- flex__1-- bg__D1D5DB--"></span>
+                            <span>Other findings</span>
+                            <span class="h__1-- flex__1-- bg__D1D5DB--"></span>
+                        </div>
+
+                        <div class="d__f-- bb__F3F4F6--"
+                             ng-repeat="mitem in NewAnteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false} track by $index">
+                            <div class="flex__1-- minw__0px-- br__E5E7EB--" ng-include="'gvCellAOD.html'"></div>
+                            <div class="flex__1-- minw__0px--" ng-include="'gvCellAOS.html'"></div>
+                        </div>
+
+                        <div class="py__20-- px__12-- ta__c-- fs__md-- tc__9CA3AF--"
+                             ng-if="(Anteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true}).length == 0 &amp;&amp; (NewAnteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false}).length == 0">
+                            No findings for this organ.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ POSTERIOR ============ -->
+                <div class="newExamGridSection"
+                     ng-repeat="item in PoteriorSegmentArrayNew | filter:{ActiveInd:'Y'} | orderBy:'OrderBY' track by $index"
+                     id="newExamGridSec_P{{item.InvestigationId}}" data-gvkey="P{{item.InvestigationId}}">
+
+                    <div class="px__12-- py__6-- bg__F4F5F7-- bb__E5E7EB-- fs__md-- fw__8-- tc__374151--">
+                        {{item.InvestigationDesc === 'Disc/ON' ? 'Disc' : item.InvestigationDesc}}
+                    </div>
+
+                    <!-- CDR, grouped by measurement. The group comes from newExamCdrMeasure(),
+                         which reads the measure out of the value text the same way isCDRSelected()
+                         does ("0.1 V.T." -> V.T.), so grouping and selection can never disagree.
+                         Values with no measure of their own - a user-added "0.73", free text - fall
+                         into the plain CDR group. A group with nothing in it is not rendered.
+                    
+                         Boxes, colours, spacing and the selection pair are unchanged: the same MRD
+                         card treatment, the same isCDRSelected() / ChangeFindingPSValue() that write
+                         to the live PoteriorSegmentArrayNew. The FindingId filter still scopes every
+                         repeat to CDR alone. -->
+                    <div class="px__12-- py__10--" ng-if="item.InvestigationId == 32">
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--"
+                             ng-if="(PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'V.T.'}:true).length > 0 || (PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'V.T.'}:true).length > 0">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">VT Values</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'V.T.'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OD')">{{mitem._cdrValue}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'V.T.'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OS')">{{mitem._cdrValue}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--"
+                             ng-if="(PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'HZ'}:true).length > 0 || (PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'HZ'}:true).length > 0">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">HZ Values</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'HZ'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OD')">{{mitem._cdrValue}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'HZ'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OS')">{{mitem._cdrValue}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--"
+                             ng-if="(PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'DPS'}:true).length > 0 || (PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'DPS'}:true).length > 0">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">DPS Values</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'DPS'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OD')">{{mitem._cdrValue}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:'DPS'}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OS')">{{mitem._cdrValue}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border__E5E7EB-- bradius__8-- mb__10-- o__h--"
+                             ng-if="(PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:''}:true).length > 0 || (PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:''}:true).length > 0">
+                            <div class="bg__F4F5F7-- px__12-- py__6-- fs__md-- fw__8-- tc__374151--">CDR Values</div>
+                            <div class="d__f--">
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__F8FAFC-- br__CFD3D4--2">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorRightEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:''}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 1) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OD')">{{mitem._cdrValue}}</span>
+                                </div>
+                                <div class="flex__1-- minw__0px-- px__10-- py__8-- d__f-- fw__w-- gap__6-- ac__fs-- bg__FFFDF5--">
+                                    <span class="px__10-- py__5-- bradius__6-- fs__md-- fw__6-- ws__nowrap-- c__p-- hover__1D5558--border"
+                                          ng-repeat="mitem in PosteriorLeftEyeArray | filter:{'FindingId': item.InvestigationId} | filter:{_cdrMeasure:''}:true track by $index"
+                                          ng-class="isCDRSelected(item, mitem, 2) ? 'bg__E8F2F2-- border__1D5558-- tc__1D5558--' : 'bg__FFF-- border__E5E7EB-- tc__374151--'"
+                                          ng-click="ChangeFindingPSValue(newPosteriorObj, mitem, 32, 'OS')">{{mitem._cdrValue}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="item.InvestigationId != 32">
+                        <div class="d__f-- bb__F3F4F6--"
+                             ng-repeat="mitem in Posteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true} track by $index">
+                            <div class="flex__1-- minw__0px-- br__E5E7EB--" ng-include="'gvCellPOD.html'"></div>
+                            <div class="flex__1-- minw__0px--" ng-include="'gvCellPOS.html'"></div>
+                        </div>
+
+                        <div class="d__f-- ai__c-- gap__6-- px__12-- py__4-- bg__F0F2F5-- bb__E5E7EB-- fs__sm-- fw__7-- tc__9CA3AF-- tt__u-- ls__0half--"
+                             ng-if="(Posteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true}).length > 0 &amp;&amp; (NewPosteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false}).length > 0">
+                            <span class="h__1-- flex__1-- bg__D1D5DB--"></span>
+                            <span>Other findings</span>
+                            <span class="h__1-- flex__1-- bg__D1D5DB--"></span>
+                        </div>
+
+                        <div class="d__f-- bb__F3F4F6--"
+                             ng-repeat="mitem in NewPosteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false} track by $index">
+                            <div class="flex__1-- minw__0px-- br__E5E7EB--" ng-include="'gvCellPOD.html'"></div>
+                            <div class="flex__1-- minw__0px--" ng-include="'gvCellPOS.html'"></div>
+                        </div>
+
+                        <div class="py__20-- px__12-- ta__c-- fs__md-- tc__9CA3AF--"
+                             ng-if="(Posteriorfavariotes | filter:{FindingId: item.InvestigationId, IsFavoriteInd: true}).length == 0 &amp;&amp; (NewPosteriorFindingsMasterArray | filter:{FindingId: item.InvestigationId, IsFavoriteInd: false}).length == 0">
+                            No findings for this organ.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- tail spacer so the last organ can still reach the top of the panel -->
+                <div class="h__300--"></div>
+
+            </div><!-- /scroll panel -->
+        </div><!-- /right -->
+    </div><!-- /body -->
+</div>
+
+<!-- ============================================================================
+     One cell per (segment, eye). Held once each and pulled in with ng-include so
+     the four variants cannot drift apart. Each child scope inherits `item` (the
+     organ row) and `mitem` (the finding) by reference, so every write lands on
+     the same objects the Examination grid is bound to.
+     ============================================================================ -->
+<script type="text/ng-template" id="gvCellAOD.html">
+    <div class="d__f-- ai__c-- gap__10-- px__12-- minh__30px-- py__6-- c__p-- hover__F9FAFB--bg"
+         ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1) ? 'bg__E8F2F2--' : ''"
+         ng-click="(mitem.FindingsValues &amp;&amp; mitem.FindingsValues.length > 0) ? toggleASRowExpand(mitem, item, 1) : ToggleFindingASValue(newAnteriorObj, mitem, 5, 'OD')">
+
+        <!-- A finding that owns sub-findings shows the expand chevron INSTEAD of the
+             circle - never both, exactly as the prototype does it. -->
+        <i svg-icon="icon__arrowdown--" size="10" class="flex__shrink--0 tc__9CA3AF--"
+           ng-if="mitem.FindingsValues.length > 0"></i>
+
+        <!-- Findings with no sub-list keep the circle - the same selected/unselected
+             pair the Web View uses (icon__circleselected-- / icon__circle--l). -->
+        <span class="flex__shrink--0 d__f-- ai__c--" ng-if="!mitem.FindingsValues.length">
+            <i svg-icon="icon__circleselected--" size="20" class="tc__1D5558--"
+               ng-if="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1)"></i>
+            <i svg-icon="icon__circle--l" size="20" class="tc__D1D5DB--"
+               ng-if="!isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1)"></i>
+        </span>
+
+        <div class="flex__1-- minw__0px-- d__f-- fd__c--">
+            <span class="ta__l-- o__h-- ws__nowrap-- to__ellipsis-- fs__md-- lh__1-3--"
+                  ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{mitem.FindingDescription}}
+            </span>
+            <!-- Whatever is ticked in the sub-list is echoed under the finding name. -->
+            <span class="d__f-- fw__w-- gap__4-- mt__5--" ng-if="mitem.FindingsValues.length > 0">
+                <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__6-- bg__E8F2F2-- border__C8DEDE-- tc__1D5558--"
+                      ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+                      ng-if="isASSubFindingChecked(item, mitem, 1, opt)">{{opt.FindingValue}}</span>
+            </span>
+        </div>
+
+        <a class="w__24-- h__24-- bradius__5-- bg__00000000-- c__p-- d__f-- ai__c-- jc__c-- flex__shrink--0 hover__FDE68A--border hover__F0F2F5--bg"
+           title="{{mitem.IsFavoriteInd ? 'Remove from Favorites' : 'Add to Favorites'}}"
+           ng-click="AddFavoriteFindingValues(mitem, 5, 'Anterior Segment', item.InvestigationDesc); $event.stopPropagation()">
+            <i class="icons__w16--" ng-class="mitem.IsFavoriteInd ? 'star__w16--f' : 'star__w16--l'"></i>
+        </a>
+    </div>
+
+    <!-- Expanded sub-finding checklist. -->
+    <div class="d__f-- fd__c-- gap__5-- pr__12-- pb__8-- pl__42--"
+         ng-if="mitem._isExpandedOD &amp;&amp; mitem.FindingsValues.length > 0">
+        <div class="d__f-- ai__c-- gap__8-- c__p--"
+             ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+             ng-click="toggleASSubFinding(item, mitem, 1, opt); $event.stopPropagation()">
+            <span class="w__16-- h__16-- bradius__3-- flex__shrink--0 d__f-- ai__c-- jc__c--"
+                  ng-class="isASSubFindingChecked(item, mitem, 1, opt) ? 'bg__1D5558-- border__1D5558--' : 'border__D1D5DB--'">
+                <i svg-icon="icon__tick--" size="8" class="tc__FFFFFF--"
+                   ng-if="isASSubFindingChecked(item, mitem, 1, opt)"></i>
+            </span>
+            <span class="fs__md-- lh__1-3--"
+                  ng-class="isASSubFindingChecked(item, mitem, 1, opt) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{opt.FindingValue}}
+            </span>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="gvCellAOS.html">
+    <div class="d__f-- ai__c-- gap__10-- px__12-- minh__30px-- py__6-- c__p-- hover__F9FAFB--bg"
+         ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2) ? 'bg__E8F2F2--' : ''"
+         ng-click="(mitem.FindingsValues &amp;&amp; mitem.FindingsValues.length > 0) ? toggleASRowExpand(mitem, item, 2) : ToggleFindingASValue(newAnteriorObj, mitem, 5, 'OS')">
+
+        <!-- A finding that owns sub-findings shows the expand chevron INSTEAD of the
+             circle - never both, exactly as the prototype does it. -->
+        <i svg-icon="icon__arrowdown--" size="10" class="flex__shrink--0 tc__9CA3AF--"
+           ng-if="mitem.FindingsValues.length > 0"></i>
+
+        <!-- Findings with no sub-list keep the circle - the same selected/unselected
+             pair the Web View uses (icon__circleselected-- / icon__circle--l). -->
+        <span class="flex__shrink--0 d__f-- ai__c--" ng-if="!mitem.FindingsValues.length">
+            <i svg-icon="icon__circleselected--" size="20" class="tc__1D5558--"
+               ng-if="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2)"></i>
+            <i svg-icon="icon__circle--l" size="20" class="tc__D1D5DB--"
+               ng-if="!isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2)"></i>
+        </span>
+
+        <div class="flex__1-- minw__0px-- d__f-- fd__c--">
+            <span class="ta__l-- o__h-- ws__nowrap-- to__ellipsis-- fs__md-- lh__1-3--"
+                  ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{mitem.FindingDescription}}
+            </span>
+            <!-- Whatever is ticked in the sub-list is echoed under the finding name. -->
+            <span class="d__f-- fw__w-- gap__4-- mt__5--" ng-if="mitem.FindingsValues.length > 0">
+                <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__6-- bg__E8F2F2-- border__C8DEDE-- tc__1D5558--"
+                      ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+                      ng-if="isASSubFindingChecked(item, mitem, 2, opt)">{{opt.FindingValue}}</span>
+            </span>
+        </div>
+
+        <a class="w__24-- h__24-- bradius__5-- bg__00000000-- c__p-- d__f-- ai__c-- jc__c-- flex__shrink--0 hover__FDE68A--border hover__F0F2F5--bg"
+           title="{{mitem.IsFavoriteInd ? 'Remove from Favorites' : 'Add to Favorites'}}"
+           ng-click="AddFavoriteFindingValues(mitem, 5, 'Anterior Segment', item.InvestigationDesc); $event.stopPropagation()">
+            <i class="icons__w16--" ng-class="mitem.IsFavoriteInd ? 'star__w16--f' : 'star__w16--l'"></i>
+        </a>
+    </div>
+
+    <!-- Expanded sub-finding checklist. -->
+    <div class="d__f-- fd__c-- gap__5-- pr__12-- pb__8-- pl__42--"
+         ng-if="mitem._isExpandedOS &amp;&amp; mitem.FindingsValues.length > 0">
+        <div class="d__f-- ai__c-- gap__8-- c__p--"
+             ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+             ng-click="toggleASSubFinding(item, mitem, 2, opt); $event.stopPropagation()">
+            <span class="w__16-- h__16-- bradius__3-- flex__shrink--0 d__f-- ai__c-- jc__c--"
+                  ng-class="isASSubFindingChecked(item, mitem, 2, opt) ? 'bg__1D5558-- border__1D5558--' : 'border__D1D5DB--'">
+                <i svg-icon="icon__tick--" size="8" class="tc__FFFFFF--"
+                   ng-if="isASSubFindingChecked(item, mitem, 2, opt)"></i>
+            </span>
+            <span class="fs__md-- lh__1-3--"
+                  ng-class="isASSubFindingChecked(item, mitem, 2, opt) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{opt.FindingValue}}
+            </span>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="gvCellPOD.html">
+    <div class="d__f-- ai__c-- gap__10-- px__12-- minh__30px-- py__6-- c__p-- hover__F9FAFB--bg"
+         ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1) ? 'bg__E8F2F2--' : ''"
+         ng-click="(mitem.FindingsValues &amp;&amp; mitem.FindingsValues.length > 0) ? togglePSRowExpand(mitem, item, 1) : ToggleFindingPSValue(newPosteriorObj, mitem, 6, 'OD')">
+
+        <!-- A finding that owns sub-findings shows the expand chevron INSTEAD of the
+             circle - never both, exactly as the prototype does it. -->
+        <i svg-icon="icon__arrowdown--" size="10" class="flex__shrink--0 tc__9CA3AF--"
+           ng-if="mitem.FindingsValues.length > 0"></i>
+
+        <!-- Findings with no sub-list keep the circle - the same selected/unselected
+             pair the Web View uses (icon__circleselected-- / icon__circle--l). -->
+        <span class="flex__shrink--0 d__f-- ai__c--" ng-if="!mitem.FindingsValues.length">
+            <i svg-icon="icon__circleselected--" size="20" class="tc__1D5558--"
+               ng-if="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1)"></i>
+            <i svg-icon="icon__circle--l" size="20" class="tc__D1D5DB--"
+               ng-if="!isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1)"></i>
+        </span>
+
+        <div class="flex__1-- minw__0px-- d__f-- fd__c--">
+            <span class="ta__l-- o__h-- ws__nowrap-- to__ellipsis-- fs__md-- lh__1-3--"
+                  ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 1) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{mitem.FindingDescription}}
+            </span>
+            <!-- Whatever is ticked in the sub-list is echoed under the finding name. -->
+            <span class="d__f-- fw__w-- gap__4-- mt__5--" ng-if="mitem.FindingsValues.length > 0">
+                <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__6-- bg__E8F2F2-- border__C8DEDE-- tc__1D5558--"
+                      ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+                      ng-if="isPSSubFindingChecked(item, mitem, 1, opt)">{{opt.FindingValue}}</span>
+            </span>
+        </div>
+
+        <a class="w__24-- h__24-- bradius__5-- bg__00000000-- c__p-- d__f-- ai__c-- jc__c-- flex__shrink--0 hover__FDE68A--border hover__F0F2F5--bg"
+           title="{{mitem.IsFavoriteInd ? 'Remove from Favorites' : 'Add to Favorites'}}"
+           ng-click="AddFavoriteFindingValues(mitem, 6, 'Posterior Segment', item.InvestigationDesc); $event.stopPropagation()">
+            <i class="icons__w16--" ng-class="mitem.IsFavoriteInd ? 'star__w16--f' : 'star__w16--l'"></i>
+        </a>
+    </div>
+
+    <!-- Expanded sub-finding checklist. -->
+    <div class="d__f-- fd__c-- gap__5-- pr__12-- pb__8-- pl__42--"
+         ng-if="mitem._isExpandedOD &amp;&amp; mitem.FindingsValues.length > 0">
+        <div class="d__f-- ai__c-- gap__8-- c__p--"
+             ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+             ng-click="togglePSSubFinding(item, mitem, 1, opt); $event.stopPropagation()">
+            <span class="w__16-- h__16-- bradius__3-- flex__shrink--0 d__f-- ai__c-- jc__c--"
+                  ng-class="isPSSubFindingChecked(item, mitem, 1, opt) ? 'bg__1D5558-- border__1D5558--' : 'border__D1D5DB--'">
+                <i svg-icon="icon__tick--" size="8" class="tc__FFFFFF--"
+                   ng-if="isPSSubFindingChecked(item, mitem, 1, opt)"></i>
+            </span>
+            <span class="fs__md-- lh__1-3--"
+                  ng-class="isPSSubFindingChecked(item, mitem, 1, opt) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{opt.FindingValue}}
+            </span>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="gvCellPOS.html">
+    <div class="d__f-- ai__c-- gap__10-- px__12-- minh__30px-- py__6-- c__p-- hover__F9FAFB--bg"
+         ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2) ? 'bg__E8F2F2--' : ''"
+         ng-click="(mitem.FindingsValues &amp;&amp; mitem.FindingsValues.length > 0) ? togglePSRowExpand(mitem, item, 2) : ToggleFindingPSValue(newPosteriorObj, mitem, 6, 'OS')">
+
+        <!-- A finding that owns sub-findings shows the expand chevron INSTEAD of the
+             circle - never both, exactly as the prototype does it. -->
+        <i svg-icon="icon__arrowdown--" size="10" class="flex__shrink--0 tc__9CA3AF--"
+           ng-if="mitem.FindingsValues.length > 0"></i>
+
+        <!-- Findings with no sub-list keep the circle - the same selected/unselected
+             pair the Web View uses (icon__circleselected-- / icon__circle--l). -->
+        <span class="flex__shrink--0 d__f-- ai__c--" ng-if="!mitem.FindingsValues.length">
+            <i svg-icon="icon__circleselected--" size="20" class="tc__1D5558--"
+               ng-if="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2)"></i>
+            <i svg-icon="icon__circle--l" size="20" class="tc__D1D5DB--"
+               ng-if="!isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2)"></i>
+        </span>
+
+        <div class="flex__1-- minw__0px-- d__f-- fd__c--">
+            <span class="ta__l-- o__h-- ws__nowrap-- to__ellipsis-- fs__md-- lh__1-3--"
+                  ng-class="isFindingSelected(item.RemarksArray, mitem.InvFindingId, 2) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{mitem.FindingDescription}}
+            </span>
+            <!-- Whatever is ticked in the sub-list is echoed under the finding name. -->
+            <span class="d__f-- fw__w-- gap__4-- mt__5--" ng-if="mitem.FindingsValues.length > 0">
+                <span class="py__1-- px__6-- bradius__3-- fs__sm-- fw__6-- bg__E8F2F2-- border__C8DEDE-- tc__1D5558--"
+                      ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+                      ng-if="isPSSubFindingChecked(item, mitem, 2, opt)">{{opt.FindingValue}}</span>
+            </span>
+        </div>
+
+        <a class="w__24-- h__24-- bradius__5-- bg__00000000-- c__p-- d__f-- ai__c-- jc__c-- flex__shrink--0 hover__FDE68A--border hover__F0F2F5--bg"
+           title="{{mitem.IsFavoriteInd ? 'Remove from Favorites' : 'Add to Favorites'}}"
+           ng-click="AddFavoriteFindingValues(mitem, 6, 'Posterior Segment', item.InvestigationDesc); $event.stopPropagation()">
+            <i class="icons__w16--" ng-class="mitem.IsFavoriteInd ? 'star__w16--f' : 'star__w16--l'"></i>
+        </a>
+    </div>
+
+    <!-- Expanded sub-finding checklist. -->
+    <div class="d__f-- fd__c-- gap__5-- pr__12-- pb__8-- pl__42--"
+         ng-if="mitem._isExpandedOS &amp;&amp; mitem.FindingsValues.length > 0">
+        <div class="d__f-- ai__c-- gap__8-- c__p--"
+             ng-repeat="opt in mitem.FindingsValues track by opt.InvFindingLevelId"
+             ng-click="togglePSSubFinding(item, mitem, 2, opt); $event.stopPropagation()">
+            <span class="w__16-- h__16-- bradius__3-- flex__shrink--0 d__f-- ai__c-- jc__c--"
+                  ng-class="isPSSubFindingChecked(item, mitem, 2, opt) ? 'bg__1D5558-- border__1D5558--' : 'border__D1D5DB--'">
+                <i svg-icon="icon__tick--" size="8" class="tc__FFFFFF--"
+                   ng-if="isPSSubFindingChecked(item, mitem, 2, opt)"></i>
+            </span>
+            <span class="fs__md-- lh__1-3--"
+                  ng-class="isPSSubFindingChecked(item, mitem, 2, opt) ? 'fw__6-- tc__1D5558--' : 'fw__5-- tc__4B5563--'">
+                {{opt.FindingValue}}
+            </span>
+        </div>
+    </div>
+</script>

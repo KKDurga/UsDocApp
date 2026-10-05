@@ -1,0 +1,606 @@
+﻿<!-- Audit Report – NO ng-controller, runs on UsBillingReportsParent scope -->
+<div class="d__f-- fd__c-- height__100-- gap__y--8 bg__FFFFFF--">
+
+    <!-- ───────────────────── FILTER BAR ───────────────────── -->
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- mb__10--">
+        <table class="table m-0 tableno-bordered tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <!-- Billing Provider -->
+                    <td>
+                        <div class="form__group">
+                            <label>Billing Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    {{AuditReportObj.SelectBillingProviderString}}
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" ng-click="stopClosingDropDown($event)">
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" class="checkbox"
+                                                               ng-model="AuditReportObj.AllBillingProviderStatusCheck"
+                                                               ng-change="checkAuditAllBillingProviders(AuditReportObj.AllBillingProviderStatusCheck)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in AuditReportObj.BillingProviderList track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" class="checkbox"
+                                                               ng-model="item.IsChecked"
+                                                               ng-change="AuditBillingProviderToggle(item)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">{{item.BillingProviderName}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Rendering Provider -->
+                    <td>
+                        <div class="form__group">
+                            <label>Rendering Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    {{AuditReportObj.SelectRenderingStatusString}}
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" ng-click="stopClosingDropDown($event)">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon"><span class="mainsearch-App"><i class="fas fa-search"></i></span></span>
+                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="auditSearchTxt.rendering" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox"
+                                                           ng-model="AuditReportObj.AllRenderingStatusCheck"
+                                                           ng-click="checkAuditAllRendering(AuditReportObj.AllRenderingStatusCheck)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in AuditReportObj.RenderingProviderList | filter:{'FullName':auditSearchTxt.rendering} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox"
+                                                           ng-model="item.IsChecked"
+                                                           ng-click="AuditRenderingToggle(item)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.SecondUserFullName + '-' + item.NPI}}</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- DOS Date Range -->
+                    <td>
+                        <div class="form__group">
+                            <label>DOS Date Range</label>
+                            <select ng-model="AuditReportObj.ServiceDateRangeId"
+                                    ng-options="item.Id as item.Name for item in ServiceDateRangeArray"
+                                    ng-change="setAuditDOSDateRange(AuditReportObj.ServiceDateRangeId)">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="AuditReportObj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar"
+                                   ng-model="AuditReportObj.DOSFromDate"
+                                   datepickerforapplist readonly>
+                        </div>
+                    </td>
+                    <td ng-if="AuditReportObj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar"
+                                   ng-model="AuditReportObj.DOSToDate" datepickerforapplist readonly>
+                        </div>
+                    </td>
+
+                    <!-- Create Date Range -->
+                    <td>
+                        <div class="form__group">
+                            <label>Create Date Range</label>
+                            <select ng-model="AuditReportObj.ClaimCreateDateRangeId"
+                                    ng-options="item.Id as item.Name for item in ClaimCreateDateRangeArray"
+                                    ng-change="setAuditCreateDateRange(AuditReportObj.ClaimCreateDateRangeId)">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="AuditReportObj.ClaimCreateDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar"
+                                   ng-model="AuditReportObj.ClaimStartDate"
+                                   datepickerforapplist readonly>
+                        </div>
+                    </td>
+                    <td ng-if="AuditReportObj.ClaimCreateDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY" class="icons-calendar"
+                                   ng-model="AuditReportObj.ClaimEndDate" datepickerforapplist readonly>
+                        </div>
+                    </td>
+
+                    <!-- User -->
+                    <td>
+                        <div class="form__group">
+                            <label>User</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{AuditReportObj.SelectUserStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="Search" ng-model="AuditReportObj.UserFullName" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="AuditReportObj.AllUserStatusCheck"
+                                                               ng-click="checkAuditAllUsers(AuditReportObj.AllUserStatusCheck)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in AuditReportObj.AllUsersList | filter:{'FullName':AuditReportObj.UserFullName} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" ng-model="item.IsChecked" ng-click="AuditUserToggle(item)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small ng-bind="item.FullName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- More Filter Popover -->
+                    <td>
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <button popover-trigger="click"
+                                    popover-append-to-body="true"
+                                    popover-class="opfilter-popover m-0 min__w500--"
+                                    popover-placement="bottom-right"
+                                    popover-is-open="auditPopoverOpen"
+                                    ng-click="toggleAuditPopover()"
+                                    uib-popover-template="auditFilterPopover.templateUrl"
+                                    type="button" class="btn__sm-- btn__1d5558--o gap__10-- mt__20-- ws__nowrap--">
+                                More Filter <i class="icons__w16-- filter__w16--o"></i>
+                            </button>
+
+                            <script type="text/ng-template" id="auditFilterPopover.html" ng-if="auditPopoverOpen">
+                                <div class="d__f-- fd__c--">
+                                    <div class="d__f-- ai__c-- jc__sb-- bb__DDD-- px__12-- py__8--">
+                                        <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                        <a ng-click="closeAuditFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                    </div>
+                                    <div class="h__250-- over-scrol-y p__5--">
+                                        <!-- Payer -->
+                                        <div class="section__style--4 d__f-- fd__c--">
+                                            <div class="section__header--">
+                                                <h1>Payer Name</h1>
+                                                <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                    <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="AuditClearAllPayor()">Clear All</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="section__body-- border__E4E4E4--">
+                                                <div class="form__group">
+                                                    <input type="text" autocomplete="off" class="input__style--2"
+                                                           placeholder="Search Payer" ng-model="AuditReportObj.PayorObj"
+                                                           typeahead-focus-on-select="false" typeahead-min-length="0"
+                                                           typeahead-on-select="AuditChangePayor(AuditReportObj.PayorObj)"
+                                                           uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                                                </div>
+                                                <div class="overflow__auto--y slim-scroll">
+                                                    <table class="table tableno-padding table-border-bottom m-0">
+                                                        <tbody>
+                                                            <tr ng-repeat="item in AuditReportObj.AllPayorList">
+                                                                <td>{{item.PayorName}}</td>
+                                                                <td width="5%"><a href="javascript:;" ng-click="AuditDeletePayor($index,item)"><i class="icons__w16-- close__w16--o"></i></a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Procedure -->
+                                        <div class="section__style--4 d__f-- fd__c--">
+                                            <div class="section__header--">
+                                                <h1>Procedure</h1>
+                                                <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                    <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="AuditClearAllProcedure()">Clear All</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="section__body-- border__E4E4E4--">
+                                                <div class="form__group">
+                                                    <input type="text" placeholder="Enter CPT code" class="input__style--2"
+                                                           autocomplete="off" ng-model="AuditReportObj.ServiceObj"
+                                                           typeahead-min-length="0" typeahead-focus-on-select="false"
+                                                           uib-typeahead="treatitem as treatitem.ProcedureCode+'-'+treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                           typeahead-on-select="AuditOnselectServiceItem(AuditReportObj.ServiceObj)" />
+                                                </div>
+                                                <div class="overflow__auto--y slim-scroll">
+                                                    <table class="table tableno-padding table-border-bottom m-0">
+                                                        <tbody>
+                                                            <tr ng-repeat="sitem in AuditReportObj.AllProcedureList track by $index">
+                                                                <td>{{sitem.ProcedureName}}</td>
+                                                                <td width="5%"><a href="javascript:;" ng-click="AuditDeleteProcedure($index,sitem)"><i class="icons__w16-- close__w16--o"></i></a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Referral -->
+                                        <div class="section__style--4 d__f-- fd__c--">
+                                            <div class="section__header--">
+                                                <h1>Referral</h1>
+                                                <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                    <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="AuditClearAllReferal()">Clear All</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="section__body-- border__E4E4E4--">
+                                                <div class="form__group">
+                                                    <input type="text" class="input__style--2" autocomplete="off"
+                                                           placeholder="Referring" maxlength="100"
+                                                           ng-model="AuditReportObj.ReferringObj"
+                                                           typeahead-focus-on-select="false" typeahead-min-length="0"
+                                                           uib-typeahead="item as item.NPI+'-'+item.FullName for item in GetReferalPCPDoctors($viewValue,2)"
+                                                           typeahead-on-select="AuditOnSelectReferral(AuditReportObj.ReferringObj)" />
+                                                </div>
+                                                <div class="overflow__auto--y slim-scroll">
+                                                    <table class="table tableno-padding table-border-bottom m-0">
+                                                        <tbody>
+                                                            <tr ng-repeat="Pitem in AuditReportObj.AllReferalList">
+                                                                <td>{{Pitem.FullName}}</td>
+                                                                <td width="5%"><a href="javascript:;" ng-click="AuditDeleteReferal($index,Pitem)"><i class="icons__w16-- close__w16--o"></i></a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- ChkPosted Date -->
+                                        <div class="section__style--4 d__f-- fd__c--">
+                                            <div class="section__header--"><h1>ChkPosted Date</h1></div>
+                                            <div class="section__body-- border__E4E4E4--">
+                                                <div class="form__group">
+                                                    <select class="input__style--2"
+                                                            ng-model="AuditReportObj.ChkPostedDateRangeId"
+                                                            ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                                            ng-change="setAuditChkPostedDateRange(AuditReportObj.ChkPostedDateRangeId)">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                                <div class="d__f-- gap__5-- mt__5--" ng-if="AuditReportObj.ChkPostedDateRangeId == 11">
+                                                    <div class="form__group flex">
+                                                        <label>From</label>
+                                                        <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                               ng-model="AuditReportObj.ChkPostedFromDate"
+                                                               datepickerforapplist readonly>
+                                                    </div>
+                                                    <div class="form__group flex">
+                                                        <label>To</label>
+                                                        <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                               ng-model="AuditReportObj.ChkPostedToDate" datepickerforapplist readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Chk Date -->
+                                        <div class="section__style--4 d__f-- fd__c--">
+                                            <div class="section__header--"><h1>Chk Date</h1></div>
+                                            <div class="section__body-- border__E4E4E4--">
+                                                <div class="form__group">
+                                                    <select class="input__style--2"
+                                                            ng-model="AuditReportObj.ChkDateRangeId"
+                                                            ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                                            ng-change="setAuditChkDateRange(AuditReportObj.ChkDateRangeId)">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                                <div class="d__f-- gap__5-- mt__5--" ng-if="AuditReportObj.ChkDateRangeId == 11">
+                                                    <div class="form__group flex">
+                                                        <label>From</label>
+                                                        <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                               ng-model="AuditReportObj.CheckStartDate"
+                                                               datepickerforapplist readonly>
+                                                    </div>
+                                                    <div class="form__group flex">
+                                                        <label>To</label>
+                                                        <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                               ng-model="AuditReportObj.CheckEndDate" datepickerforapplist readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--<div class="section__style--4 d__f-- fd__c--">
+        <div class="section__header--"><h1>Chk Date</h1></div>
+        <div class="section__body-- border__E4E4E4--">
+            <div class="form__group flex">
+                <label>From</label>
+                <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                       ng-model="AuditReportObj.CheckDate"
+                       datepickerforapplist readonly>
+            </div>
+        </div>
+    </div>-->
+                                    </div>
+                                    <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                        <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--" ng-click="ClearAuditFilters()">
+                                            <i class="icons__w16-- restore__w16--o"></i>Reset
+                                        </a>
+                                        <button class="btn__lg-- btn__1d5558--f" ng-click="ClickForAuditFilteredData()">Apply</button>
+                                    </div>
+                                </div>
+                            </script>
+                            <button class="btn__lg-- btn__2D2D47--f mt__20--" ng-click="ClickForAuditFilteredData()">Apply</button>
+                      
+                        </div>
+                    </td>
+
+    <!-- Apply / Reset -->
+                    <td>
+                        <button class="b-0 mt__20--" ng-click="ClearAuditFilters()"><i class="reload-icon"></i></button>
+
+
+                    </td>
+    </tr>
+    </tbody>
+    </table>
+</div>
+
+    <!-- ───────────────────── BILLING PROVIDER CONTENT ───────────────────── -->
+    <div class="position__relative-- height__100--" ng-if="AuditInsSubTab == 'BillingProvider'">
+        <div class="adjustable-position slim-scroll">
+            <div class="d__f-- ai__fs-- gap__5--x" ng-if="AuditBillingProviderList.length > 0">
+                <div class="section__style--5 width__60--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Billing Provider</h1>
+                    </div>
+                    <div class="section__body-- p__0-- overflow__auto--x slim-scroll">
+                        <table class="table__style--21 b__0-- table-layout-auto">
+                            <thead>
+                                <tr>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Billing Provider</label></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">NPI</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Charges</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                </tr>
+                            </thead>
+                            <tbody class="border__none--" ng-repeat="item in AuditBillingProviderList track by $index">
+                                <tr class="hover__1D55581A--bg bb__DDD--"
+                                    ng-click="openAuditPaymentPopup(item.BillingProviderId, 'BillingProvider', item)">
+                                    <td class="py__8-- px__12-- bradius__3--bl">
+                                        <span class="fs__lg-- fw__5-- tc__656565-- ws__nowrap--" title="{{item.BillingProviderName}}">{{item.BillingProviderName}}</span>
+                                    </td>
+                                    <td><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">{{item.BillingProviderNPI}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientBalance | number:2}}</label></td>
+                                    <td><a><i class="icons__w16-- drawarrow__w16--l"></i></a></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg__F5F5F5--">
+                                    <td colspan="2" class="py__6-- px__12--"><label class="fs__lg-- fw__7-- tc__4A4A4A--">Total</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditBillingProviderTotals.TotalPatientBalance | number:2}}</label></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="section__style--5 flex">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Charges by Billing Provider</h1>
+                    </div>
+                    <div class="section__body--">
+                        <div id="AuditBillingProviderBarChart" style="height:400px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="AuditBillingProviderList.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Records Found</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Audit records will be listed here once data is available.</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ───────────────────── RENDERING PROVIDER CONTENT ───────────────────── -->
+    <div class="position__relative-- height__100--" ng-if="AuditInsSubTab == 'RenderingProvider'">
+        <div class="adjustable-position slim-scroll">
+            <div class="d__f-- ai__fs-- gap__5--x" ng-if="AuditRenderingProviderList.length > 0">
+                <div class="section__style--5 width__60--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Rendering Provider</h1>
+                    </div>
+                    <div class="section__body-- p__0-- overflow__auto--x slim-scroll">
+                        <table class="table__style--21 b__0-- table-layout-auto">
+                            <thead>
+                                <tr>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Rendering Provider</label></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">NPI</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Charges</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                </tr>
+                            </thead>
+                            <tbody class="border__none--" ng-repeat="item in AuditRenderingProviderList track by $index">
+                                <tr class="hover__1D55581A--bg bb__DDD--"
+                                    ng-click="openAuditPaymentPopup(item.RenderingProviderId, 'RenderingProvider', item)">
+                                    <td class="py__8-- px__12-- bradius__3--bl">
+                                        <span class="fs__lg-- fw__5-- tc__656565-- ws__nowrap--" title="{{item.RenderingProviderName}}">{{item.RenderingProviderName}}</span>
+                                    </td>
+                                    <td><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">{{item.RenderingProviderNPI}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientBalance | number:2}}</label></td>
+                                    <td><a><i class="icons__w16-- drawarrow__w16--l"></i></a></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg__F5F5F5--">
+                                    <td colspan="2" class="py__6-- px__12--"><label class="fs__lg-- fw__7-- tc__4A4A4A--">Total</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditRenderingProviderTotals.TotalPatientBalance | number:2}}</label></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="section__style--5 flex">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Charges by Rendering Provider</h1>
+                    </div>
+                    <div class="section__body--">
+                        <div id="AuditRenderingProviderBarChart" style="height:400px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="AuditRenderingProviderList.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Records Found</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Audit records will be listed here once data is available.</label>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- ───────────────────── PAYOR CONTENT ───────────────────── -->
+    <div class="position__relative-- height__100--" ng-if="AuditInsSubTab == 'Payor'">
+        <div class="adjustable-position slim-scroll">
+            <div class="d__f-- ai__fs-- gap__5--x" ng-if="AuditPayorList.length > 0">
+                <div class="section__style--5 width__60--">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Payor</h1>
+                    </div>
+                    <div class="section__body-- p__0-- overflow__auto--x slim-scroll">
+                        <table class="table__style--21 b__0-- table-layout-auto">
+                            <thead>
+                                <tr>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yl"><label class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Payor Name</label></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Charges</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Ins Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Payment</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Adj</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 text-right"><span class="fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Patient Bal</span></th>
+                                    <th class="bg__F5F5F5-- py__4-- px__12-- position__sticky-- top__0-- zindex-10 bradius__5--yr"><label class="fs__md-- fw__7-- tc__4A4A4A--">&nbsp;</label></th>
+                                </tr>
+                            </thead>
+                            <tbody class="border__none--" ng-repeat="item in AuditPayorList track by $index">
+                                <tr class="hover__1D55581A--bg bb__DDD--"
+                                    ng-click="openAuditPaymentPopup(item.MasterPayorId, 'Payor', item)">
+                                    <td class="py__8-- px__12-- bradius__3--bl">
+                                        <span class="fs__lg-- fw__5-- tc__656565-- ws__nowrap--" title="{{item.OrganizationPayorName}}">{{item.OrganizationPayorName}}</span>
+                                    </td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="text-right"><label class="fs__lg-- fw__4-- tc__1D1D1D-- no-wrapappt">${{item.TotalPatientBalance | number:2}}</label></td>
+                                    <td><a><i class="icons__w16-- drawarrow__w16--l"></i></a></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg__F5F5F5--">
+                                    <td class="py__6-- px__12--"><label class="fs__lg-- fw__7-- tc__4A4A4A--">Total</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalChargeAmount | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalInsurancePayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalInsuranceAdjustmentPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalInsuranceBalance | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalPatientPayment | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalPatientWriteOff | number:2}}</label></td>
+                                    <td class="py__6-- px__12-- text-right"><label class="fs__lg-- fw__7-- tc__1D1D1D--">${{AuditPayorTotals.TotalPatientBalance | number:2}}</label></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="section__style--5 flex">
+                    <div class="section__header--">
+                        <h1 class="fs__2l-- fw__7-- tc__1D1D1D-- m__0--">Charges by Payor</h1>
+                    </div>
+                    <div class="section__body--">
+                        <div id="AuditPayorBarChart" style="height:400px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--" ng-if="AuditPayorList.length == 0">
+                <a><i class="nodata__1-- c3__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Records Found</h1>
+                <label class="fs__lg-- fw__5-- tc__4A4A4A--">Audit records will be listed here once data is available.</label>
+            </div>
+        </div>
+    </div>
+</div>

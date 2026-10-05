@@ -1,0 +1,641 @@
+﻿<div class="d__f-- fd__c-- height__100-- c__d--" ng-controller="UsDenialSummuryCntrl">
+    <div class="d__f-- ai__c-- jc__sb-- px__16-- py__8-- bb__e4e4e4--">
+    <div class="d__f-- ai__c-- gap__14--">
+        <h1 class="m__0-- fs__2l-- fw__7-- tc__1D1D1D-- white-nowrap">Claims › Denial Followup</h1>
+        <div class="switch__gray-white">
+            <div class="switch__btn--"
+                 ng-class="{'active': DenialFollowupTab === 'List'}"
+                 ng-click="filtertabs(1,'Denial',4,'List')">
+                List
+            </div>
+            <div class="switch__btn--"
+                 ng-class="{'active': DenialFollowupTab === 'Summury'}"
+                 ng-click="filtertabs(1,'Denial',4,'Summury')">
+                Summary
+            </div>
+
+        </div>
+    </div>
+    <div class="d__f-- ai__c-- gap__8--">
+        <div class="input__fromTo-- c__p--"
+             popover-trigger="outsideClick"
+             popover-class="date-range-popover drp__popover--"
+             popover-placement="bottom-right"
+             popover-append-to-body="true"
+             uib-popover-template="denialFollowupFromToCalender.templateUrl"
+             from-to-date-picker
+             from-date="DenialSearchObj.FromDate"
+             to-date="DenialSearchObj.ToDate"
+             block-future>
+            <input type="text"
+                   placeholder="From Date"
+                   ng-value="DenialSearchObj.FromDate | date:'MM-dd-yyyy'"
+                   readonly
+                   style="cursor:pointer;" />
+            <span class="arrow">→</span>
+            <input type="text"
+                   placeholder="To Date"
+                   ng-value="DenialSearchObj.ToDate | date:'MM-dd-yyyy'"
+                   readonly
+                   style="cursor:pointer;" />
+            <label class="icon-box">
+                <i svg-icon="icon__calender--" size="13" style="color:#1d5558;"></i>
+            </label>
+        </div>
+        <div class="d__f-- ai__c-- gap__8--">
+            <button class="button__1D5558--o" popover-class="opfilter-popover m-0" filter-panel popover-placement="auto" popover-append-to-body="true" uib-popover-template="'claimSummaryFilter.html'"><i svg-icon="icon__filter--" size="14" style="color: #1D5558"></i>Filter</button>
+            <script type="text/ng-template" id="claimSummaryFilter.html">
+                <div class="d__f-- fd__c--">
+                    <div class="d__f-- ai__c-- jc__sb--  bb__DDD-- px__12-- py__8--">
+                        <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                        <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                    </div>
+                    <div class="two-sections">
+                        <div class="width__40-- br__DDD-- px__8-- py__3--">
+                            <ul class="nav nav-tabs bb__none-- list-unstyled d__f-- fd__c-- gap__5--" ng-init="activeTab = 'Payor'">
+                                <li data-target="#Payor" data-toggle="tab" ng-click="activeTab = 'Payor'">
+                                    <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Payor' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                        <span class="fs__normal-- fs__lg--">Payor</span>
+                                        <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                    </div>
+                                </li>
+                                <!--<li data-target="#AdjWindows" data-toggle="tab" ng-click="activeTab = 'AdjWindows'">
+                                    <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'AdjWindows' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                        <span class="fs__normal-- fs__lg--">Adj. windows</span>
+                                        <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                    </div>
+                                </li>-->
+                                <li data-target="#Status" data-toggle="tab" ng-click="activeTab = 'Status'">
+                                    <div class="cur-pointer d__f-- ai__c-- jc__sb-- px__12-- py__6--" ng-class="activeTab === 'Status' ? 'bg__1D55581A-- bradius__5-- tc__1D5558-- fw__6--' : 'tc__656565-- fw__5--'">
+                                        <span class="fs__normal-- fs__lg--">Status</span>
+                                        <i class="icons__w16-- arrowup__w16--o fa-rotate-90"></i>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content flex p__8--">
+                            <div class="tab-pane fade in active" id="Payor">
+                                <div class="h__190-- overflow__auto--y slim-scroll">
+                                    <div class="form__group" typehead-dropdown-direction>
+                                        <label>Payor Name</label>
+                                        <input type="text" id="input_payernamep" class="icons-search"
+                                               autocomplete="off"
+                                               name="InsurancePayor"
+                                               placeholder="Enter Payer Name"
+                                               ng-model="DenialSearchObj.PayorObj"
+                                               typeahead-min-length="0"
+                                               typeahead-on-select="ChangeInsurancePayor(DenialSearchObj.PayorObj)"
+                                               uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="tab-pane fade in " id="AdjWindows">
+                                <div class="d__f-- fd__c-- gap__5--">
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="h__190-- overflow__auto--y slim-scroll">
+                                                <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                                    <li>
+                                                    <div class="d__ib--">
+                                                        <input type="radio" class="radio-custom" name="currentResponsibility1" id="selectCurrentResponsibility1" ng-model="filterObj.adjWindow" ng-value=null>
+                                                        <label for="selectCurrentResponsibility1" class="radio-custom-label cur-poiter mb-0 text-label">Select</label>
+                                                    </div>
+                                                </li>
+                                                    <li>
+                                                        <div class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="radio" name="adjWindow" class="radio-custom"
+                                                                   ng-model="filterObj.adjWindow" value="60" id="ont">
+                                                            <label for="ont" class="radio-custom-label cur-poiter mb-0 text-label">60-day window</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="radio" name="adjWindow" class="radio-custom"
+                                                                   ng-model="filterObj.adjWindow" value="90" id="-">
+                                                            <label for="-" class="radio-custom-label cur-poiter mb-0 text-label">90-day window</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="radio" name="adjWindow" class="radio-custom"
+                                                                   ng-model="filterObj.adjWindow" value="120" id="120">
+                                                            <label for="120" class="radio-custom-label cur-poiter mb-0 text-label">120-day window</label>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="radio" name="adjWindow" class="radio-custom"
+                                                                   ng-model="filterObj.adjWindow" value="180" id="180">
+                                                            <label for="180" class="radio-custom-label cur-poiter mb-0 text-label">180-day window</label>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <div class="tab-pane fade" id="Status">
+                                <div class="d__f-- fd__c-- gap__5--">
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header-- px__10-- jc__sb--">
+                                            <label class="cur-poiter d__f-- ai__c-- gap__5--">
+
+                                                <span class="lbl"></span>
+                                                <span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">Status</span>
+                                            </label>
+                                            <!--<label class="d__f-- ai__c-- gap__5-- fs__sm-- fw__4-- tc__656565--"><span class="fs__sm-- fw__4-- tc__656565--">4</span>Results Found</label>-->
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="h__190-- overflow__auto--y slim-scroll">
+                                                <ul class="list-unstyled d__f-- fd__c-- gap__y--8">
+                                                    <li>
+                                                    <div class="d__ib--">
+                                                        <input type="radio" class="radio-custom" name="currentResponsibility" id="selectCurrentResponsibility" ng-model="filterObj.status"  ng-value="">
+                                                        <label for="selectCurrentResponsibility" class="radio-custom-label cur-poiter mb-0 text-label">Select</label>
+                                                    </div>
+                                                </li>
+                                                    <li>
+                                                        <div class="d__ib--">
+                                                            <input type="radio" name="denialStatus" class="radio-custom"
+                                                                   ng-model="filterObj.status" value="onTrack" id="on">
+                                                            <!--<span class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D--">On track (>30 days)</span>-->
+                                                            <label for="on" class="radio-custom-label cur-poiter mb-0 text-label">On track (>30 days)</label>
+
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="d__ib--">
+                                                            <input type="radio" name="denialStatus" class="radio-custom"
+                                                                   ng-model="filterObj.status" value="dueSoon" id="dues">
+                                                            <label for="dues" class="radio-custom-label cur-poiter mb-0 text-label">Due soon (2-30 days)</label>
+
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="d__ib--">
+                                                            <input type="radio" name="denialStatus" class="radio-custom"
+                                                                   ng-model="filterObj.status" value="dueDate" id="dued">
+                                                            <label for="dued" class="radio-custom-label cur-poiter mb-0 text-label">Due date (1 day)</label>
+
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="d__ib--">
+                                                            <input type="radio" name="denialStatus" class="radio-custom" id="overdue"
+                                                                   ng-model="filterObj.status" value="overdue">
+                                                            <label for="overdue" class="radio-custom-label cur-poiter mb-0 text-label">Overdue</label>
+
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                        <a class="d__f-- ai__c-- gap__5-- fs__normal-- fs__lg-- fw__5-- tc__1D5558--" id="a_restorepopdfu" ng-click="refreshAllClaimDetails(4,'Denial')"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                        <button class="btn__lg-- btn__1d5558--f" id="button_applypopdfu" ng-click="GetOrganizationDenialSummuryClaimlist(1,'Denial')">{{ 'APPLY' | translate}}</button>
+                    </div>-->
+                </div>
+                <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                    <a class="d__f-- ai__c-- gap__5-- fs__normal-- fs__lg-- fw__5-- tc__1D5558--" ng-click="refreshAllClaimDetails(4,'Denial')"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+                    <button class="btn__lg-- btn__1d5558--f" ng-click="GetOrganizationDenialSummuryClaimlist(1,'Denial')">{{ 'APPLY' | translate}}</button>
+                </div>
+            </div>
+        </script>
+        <button class="button__1D5558--o"><i svg-icon="icon__download--square" size="14" style="color: #1D5558"></i>Export</button>
+        <a class="d__f-- ai__c-- gap__5-- fs__normal-- fs__lg-- fw__5-- tc__1D5558--" id="a_restorepopdfu" ng-click="refreshAllClaimDetails(4,'Denial')"><i class="icons__w16-- restore__w16--o"></i>Reset</a>
+            <button class="btn__lg-- btn__1d5558--f" id="button_applypopdfu" ng-click="GetOrganizationDenialSummuryClaimlist(1,'Denial')">{{ 'APPLY' | translate}}</button>
+    </div>
+    </div>
+        </div>
+    <div class="gap__8-- d__g-- px__16-- py__12-- bb__e4e4e4-- bg__FFF-- gtc__4--1fr">
+        <div class="bradius__6-- px__16-- py__12-- d__f-- ai__c-- gap__12-- c__p-- border__none-- bg__D6ECBF-- hover__filter--097">
+            <span class="fs__20l-- fw__7-- lh__1-- tc__3B6D11--">{{TotalOntrackClaimsCount}}</span>
+            <span class="fs__md-- fw__5-- tc__3B6D11-- mt__2--">On track >30 days</span>
+        </div>
+        <div class="bradius__6-- px__16-- py__12-- d__f-- ai__c-- gap__12-- c__p-- border__none-- bg__F5E0BC-- hover__filter--097">
+            <span class="fs__20l-- fw__7-- lh__1-- tc__854F0B--">{{TotalDuesoonClaimsCount}}</span>
+            <span class="fs__md-- fw__5-- tc__854F0B-- mt__2--">Due soon 2–30 days</span>
+        </div>
+        <div class="bradius__6-- px__16-- py__12-- d__f-- ai__c-- gap__12-- c__p-- border__none-- bg__FDEACC-- hover__filter--097">
+            <span class="fs__20l-- fw__7-- lh__1-- tc__7A4400--">{{TotalDueDateclaimsCOunt}}</span>
+            <span class="fs__md-- fw__5-- tc__7A4400-- mt__2--">Due date 1 day left</span>
+        </div>
+        <div class="bradius__6-- px__16-- py__12-- d__f-- ai__c-- gap__12-- c__p-- border__none-- bg__F9DADA-- hover__filter--097">
+            <span class="fs__20l-- fw__7-- lh__1-- tc__A32D2D--">{{TotalOverdueclaimsCount}}</span>
+            <span class="fs__md-- fw__5-- tc__A32D2D-- mt__2--">Overdue</span>
+        </div>
+    </div>
+    <div class="d__f-- fd__c-- gap__6--y p__10-- bg__F7F8FA-- height__100--">
+        <div class="d__f-- fd__c-- bg__FFF-- bradius__8-- border__E4E4E4-- overflow-hidden  height__100--">
+            <!--flex__1-- -->
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <table class="table__style--31" id="table__claimSummary">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Payer Name</th>
+                                <th>Adj Window</th>
+                                <th class="text-center">Total Claims</th>
+                                <th class="text-center bg__D6ECBF-- tc__3B6011--">
+                                    <span>ON TRACK</span><br>
+                                    <span class="fw__4-- ">>30 days</span>
+                                </th>
+                                <th class="text-center bg__F5E0BC-- tc__854F0B--">
+                                    <span>DUE SOON</span><br>
+                                    <span class="fw__4-- ">2-30 days</span>
+                                </th>
+                                <th class="text-center bg__FDEACC-- tc__7A4400--">
+                                    <span>DUE DATE</span><br>
+                                    <span class="fw__4-- ">1 day left</span>
+                                </th>
+                                <th class="text-center bg__F9DADA-- tc__A32D2D--">
+                                    <span>OVERDUE</span><br>
+                                    <span class="fw__4-- ">Deadline passed</span>
+                                </th>
+                                <th>Total Billed</th>
+                                <th>Ins. Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in payerRow track by $index" ng-class="{'row-sel': isActiveRow(row.MasterPayorName)}">
+                                <!--<td>{{$index + 1}}</td>-->
+                                <td style="color:#9ca3af;font-size:11px;font-weight:600;">
+                                    {{ (DenialSearchObj.PageNumber - 1) * 100 + ($index + 1) }}
+                                </td>
+                                <td class="tc__1D1D1D-- fw__6--">{{row.MasterPayorName}}</td>
+                                <td>
+                                    <span class="d__if-- ai__c-- px__8-- py__2-- bradius__99-- fs__sm-- fw__6-- bg__F3F4F6-- tc__6B7280-- border__E4E4E4--">{{row.adjWindow}}d</span>
+                                </td>
+                                <td class="text-center">{{row.totalClaims}}</td>
+                                <td class="text-center">
+                                    <!--<span class="digit__box-- box__EAF3DE--">4</span>-->
+                                    <span class="digit__box--"
+                                          ng-class="{' box__EAF3DE-- disabled': row.onTrack === 0, ' box__EAF3DE--': isActiveDrill(row.MasterPayorName,'g')}"
+                                          ng-click="row.onTrack > 0 && drill(row, 'g')">
+                                        {{row.onTrack}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <!--<span class="digit__box-- box__FAEEDA--">2</span>-->
+                                    <span class="digit__box--"
+                                          ng-class="{' box__FAEEDA-- disabled': row.dueSoon === 0, ' box__FAEEDA--': isActiveDrill(row.MasterPayorName,'y')}"
+                                          ng-click="row.dueSoon > 0 && drill(row, 'y')">
+                                        {{row.dueSoon}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <!--<span class="digit__box-- box__FEF3E2-- disabled">0</span>-->
+                                    <span class="digit__box--"
+                                          ng-class="{'box__FEF3E2-- disabled': row.dueDate === 0, 'box__FEF3E2--': isActiveDrill(row.MasterPayorName,'o')}"
+                                          ng-click="row.dueDate > 0 && drill(row, 'o')">
+                                        {{row.dueDate}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <!--<span class="digit__box-- box__FCEBEB-- disabled">0</span>-->
+                                    <span class="digit__box--"
+                                          ng-class="{'box__FCEBEB-- disabled': row.overdue === 0, 'box__FCEBEB--': isActiveDrill(row.MasterPayorName,'r')}"
+                                          ng-click="row.overdue > 0 && drill(row, 'r')">
+                                        {{row.overdue}}
+                                    </span>
+                                </td>
+                                <td>{{fmt(row.totalBilled)}}</td>
+                                <td>{{fmt(row.insuranceBalance)}}</td>
+                            </tr>
+                            <!--<tr>
+                        <td class=" bg__E8F2F2--">{{$index + 1}}</td>
+                        <td class="tc__1D1D1D-- fw__6-- bg__E8F2F2--">Triple-S</td>
+                        <td class=" bg__E8F2F2--">
+                            <span class="d__if-- ai__c-- px__8-- py__2-- bradius__99-- fs__sm-- fw__6-- bg__F3F4F6-- tc__6B7280-- border__E4E4E4--">120d</span>
+                        </td>
+                        <td class="text-center bg__E8F2F2--">6</td>
+                        <td class="text-center bg__E8F2F2--">
+                            <span class="digit__box-- box__EAF3DE-- outline__1D5558--2half oo__2--">4</span>
+                        </td>
+                        <td class="text-center  bg__E8F2F2--">
+                            <span class="digit__box-- box__FAEEDA--">2</span>
+                        </td>
+                        <td class="text-center  bg__E8F2F2--">
+                            <span class="digit__box-- box__FEF3E2-- disabled">0</span>
+                        </td>
+                        <td class="text-center  bg__E8F2F2--">
+                            <span class="digit__box-- box__FCEBEB-- disabled">0</span>
+                        </td>
+                        <td class=" bg__E8F2F2--">$2059.94</td>
+                        <td class=" bg__E8F2F2--">$1445.09</td>
+                    </tr>
+                    <tr ng-repeat="i in [1,2,3,4,5,6,7]">
+                        <td>{{$index + 1}}</td>
+                        <td class="tc__1D1D1D-- fw__6--">Medicare</td>
+                        <td>
+                            <span class="d__if-- ai__c-- px__8-- py__2-- bradius__99-- fs__sm-- fw__6-- bg__F3F4F6-- tc__6B7280-- border__E4E4E4--">90d</span>
+                        </td>
+                        <td class="text-center">5</td>
+                        <td class="text-center">
+                            <span class="digit__box-- box__EAF3DE-- disabled">0</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="digit__box-- box__FAEEDA-- disabled">0</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="digit__box-- box__FEF3E2--">3</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="digit__box-- box__FCEBEB--">2</span>
+                        </td>
+                        <td>$1430.95</td>
+                        <td>$1088.18</td>
+                    </tr>-->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="d__f-- ai__c-- gap__20-- px__14-- py__7-- bt__E4E4E4-- bg__F9FAFB-- fs__md-- tc__9CA3AF--">
+                <div>Payers: <b class="tc__1D1D1D--"> {{payerRow.length || 0}}</b></div>
+                <div>Total Billed: <b class="tc__1D1D1D--">{{fmt(TotalBilledAmount)}}</b></div>
+                <div>
+                    Ins.Balance: <b class="tc__1D1D1D--">
+    {{fmt(TotalInsuranceBalance)}}
+</b>
+                </div>
+                <div class="d__f-- ai__c-- gap__10-- ml__auto-- flex__shrink--0" ng-if="payerRow.length > 0">
+                    <span>
+                        <b class="tc__1D1D1D--">
+                            {{(DenialSearchObj.PageNumber - 1) * DenialSearchObj.PageSize + 1}}–
+                            {{Math.min(DenialSearchObj.PageNumber * DenialSearchObj.PageSize, TotalClaimsCount)}}
+                        </b>
+                        of
+                        <b class="tc__1D1D1D--">{{TotalClaimsCount}}</b>
+                    </span>
+                    <!--<button class="btn__arrow-- " ng-click="payerPrev()" ng-class="{'disabled': !payerHasPrev()}"><i svg-icon="icon__arrow--" size="10" style="color: #4B5563; transform: scaleX(-1)"></i></button>
+            <button class="btn__arrow--" ng-class="{'disabled': !payerHasNext()}" ng-click="payerNext()"><i svg-icon="icon__arrow--" size="10" style="color: #4B5563;"></i></button>-->
+                    <button class="btn__arrow--"
+                            ng-click="payerPrev()"
+                            ng-class="{'disabled': DenialSearchObj.PageNumber == 1}"><i svg-icon="icon__arrow--" size="10" style="color: #4B5563; transform: scaleX(-1)"></i>
+                    </button>
+
+                    <button class="btn__arrow--"
+                            ng-click="payerNext()"
+                            ng-class="{'disabled': !payerHasNext()}"><i svg-icon="icon__arrow--" size="10" style="color: #4B5563;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--claim details-->
+        <div class="d__f-- fd__c-- bradius__8-- border__C8DEDE-- boxs__1D5558-- overflow-hidden bg__FFF-- height__100--" ng-show="activeDrill&&DenailClaimdetails.length>0">
+            <div class="d__f-- ai__c-- jc__sb-- px__14-- py__8-- bg__F0F7F7-- bb__C8DEDE--">
+                <div class="d__f-- ai__c-- gap__8-- fs__md-- fw__7-- tc__1D5558--">
+                    <i svg-icon="icon__leftalignlist--" size="10" style="color: #4B5563"></i>
+                    <span>{{activeDrill.label}}</span>
+                    <span class="py__2-- px__8-- bradius__99-- fs__xs-- fw__7-- tc__FFFFFF-- bg__1D5558--">{{DenailClaimdetailsCount}} claim{{DenailClaimdetailsCount !== 1 ? 's' : ''}}</span>
+                </div>
+                <div class="d__f-- ai__c-- gap__6--">
+                    <button class="button__1D5558--o">Export to Excel</button>
+                    <button class="button__1D5558--o" ng-click="ClickForPrintdData();">Print</button>
+                    <button class="button__DC2626--o" ng-click="closeDrill()"><i svg-icon="icon__cross--" size="10" style="color: #dc2626;"></i>Close</button>
+                </div>
+            </div>
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll overflow__auto--x">
+                    <table class="table__style--31" id="table__claimSummarymedicare">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Patient Name</th>
+                                <th>Patient MR No</th>
+                                <th>Claim No.</th>
+                                <th>Payer</th>
+                                <th>DOS</th>
+                                <th>Denial Date</th>
+                                <th>Denial Code</th>
+                                <th>Rendering Provider</th>
+                                <th>Billed Amt</th>
+                                <th>Ins. Payment</th>
+                                <th>Ins. Bal</th>
+                                <th>Status</th>
+                                <th class="min__w150-- position__sticky-- z-index-four right__50-- bl__E4E4E4--">Adj Due Days</th>
+                                <th class="min__w60-- position__sticky-- z-index-four bl__E4E4E4-- right__0--">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="c in DenailClaimdetails track by $index">
+                                <td>  {{ (DClaimPagination.PageNumber - 1) * 100 + ($index + 1) }}</td>
+                                <td class="tc__1D5558-- fw__6-- hover__underline-- c__p--">{{c.PatientFullName}}</td>
+                                <td class="tc__1D1D1D-- fw__6--">{{c.PatientMRNo}}</td>
+                                <td class="tc__1D5558-- fw__6-- hover__underline-- c__p--" ng-click="navtoClaimSummaryPopup(c)">{{c.PatientClaimNumber}}</td>
+                                <td>{{c.MasterPayorName}}</td>
+                                <td>{{c.DOSFrom| date:'MM-dd-yyyy'}}</td>
+                                <td>{{c.claimdenialdate | date:'MM-dd-yyyy'}}</td>
+                                <td>
+                                    <!--<div class="d__f-- ai__c-- gap__4-- fw__nw--" ng-repeat="dc in c.ClaimDenials track by $index">
+        <span class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__FEF2F2-- border__FECACA-- tc__DC2626-- ws__nowrap--">{{dc.}}</span>
+        <span class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__FEF2F2-- border__FECACA-- tc__DC2626-- ws__nowrap--">OA-23</span>
+        <span class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__F3F4F6-- border__E4E4E4-- tc__6B7280-- c__p--" uib-tooltip="Denial Codes:CO-18">+1</span>
+    </div>-->
+                                    <div class="d__f-- ai__c-- gap__4-- fw__nw--" ng-if="c._denialCodesDisplay.length > 0">
+
+                                        <span ng-repeat="code in c._denialCodesDisplay | limitTo:2 track by $index"
+                                              ng-click="openDenialCodeDescriptionPopup(c)"
+                                              class="code__box--red"
+                                              title="Click here to view all denial codes">
+                                            {{code}}
+                                        </span>
+
+                                        <span ng-if="c._denialCodesDisplay.length > 2"
+                                              class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__F3F4F6-- border__E4E4E4-- tc__6B7280-- c__p--"
+                                              uib-popover-template="'DenialpopoverContent.html'"
+                                              uib-popover-scope="{ denialCodes: c.ClaimDenials }"
+                                              popover-trigger="mouseenter"
+                                              popover-placement="auto bottom"
+                                              popover-append-to-body="false"
+                                              popover-class="denial__codes--Popover"
+                                              ng-mouseenter="denialCodes = c.ClaimDenials">
+                                            +{{c._denialCodesDisplay.length - 2}}
+                                        </span>
+
+                                    </div>
+                                </td>
+                                <td>{{c.RenderingProviderName}}</td>
+                                <td>{{c.TotalClaimAmount}}</td>
+                                <td>{{c.TotalInsurancePayment}}</td>
+                                <td>${{c.TotalInsuranceBalance}}</td>
+                                <td>
+                                    <span class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__FEF2F2-- border__FECACA-- tc__DC2626-- ws__nowrap--">{{c.ClaimStatus}}</span>
+                                </td>
+                                <!--<td class="min__w150-- position__sticky-- zindex-2 right__50-- bl__E4E4E4-- text-center">
+                            <span class="d__if-- ai__c-- gap__4-- py__2-- px__8-- bradius__99-- fs__sm-- fw__6-- tc__3B6D11-- bg__EAF3DE--">
+                                <span class="w__6-- h__6-- bradius__50--per d__ib-- bg__639922--"></span>87d left
+                            </span>
+                            <div class="progressbar__4--">
+                                <div class="progress__4-- bg__639922--" style="width:28%"></div>
+                            </div>
+                        </td>-->
+                                <td class="min__w150-- position__sticky-- zindex-2 right__50-- bl__E4E4E4-- text-center">
+
+                                    <!-- CALC -->
+                                    <!--<span ng-init="daysLeft = getAdjDays(c)"
+          class="d__if-- ai__c-- gap__4-- py__2-- px__8-- bradius__99-- fs__sm-- fw__6--"
+          ng-class="{'tc__3B6D11-- bg__EAF3DE--' : daysLeft>30,'tc__92400E-- bg__FEF3C7--': daysLeft <= 30 && daysLeft > 10,'tc__DC2626-- bg__FCEBEB--': daysLeft <= 10}">
+
+        <span class="w__6-- h__6-- bradius__50--per d__ib--"
+              ng-class="{'bg__639922--' : daysLeft>30,'bg__F59E0B--': daysLeft <= 30 && daysLeft > 10,'bg__DC2626--': daysLeft <= 10}">
+        </span>
+
+        {{daysLeft}}d left
+    </span>-->
+                                    <span class="d__if-- ai__c-- gap__4-- py__2-- px__8-- bradius__99-- fs__sm-- fw__6--"
+                                          ng-class="{ 'tc__3B6D11-- bg__EAF3DE--' : getAdjDays(c)> 30, 'tc__92400E-- bg__FEF3C7--': getAdjDays(c)<=30 && getAdjDays(c)>10,'tc__DC2626-- bg__FCEBEB--': getAdjDays(c)<=10 }">
+
+                                        <span class="w__6-- h__6-- bradius__50--per d__ib--"
+                                              ng-class="{'bg__639922--' : getAdjDays(c)> 30,'bg__F59E0B--': getAdjDays(c)<=30 && getAdjDays(c)>10, 'bg__DC2626--': getAdjDays(c)<=10}">
+                                        </span>
+
+                                        {{c.AdjustmentDays > 0 ? (c.AdjustmentDays + 'd left') : 'Overdue'}}
+                                    </span>
+
+                                    <div class="progressbar__4--">
+                                        <div class="progress__4--"
+                                             ng-style="{'width': getAdjPercent(c) + '%'}"
+                                             ng-class="{  'bg__639922--' : getAdjDays(c)>  30,  'bg__F59E0B--': getAdjDays(c)<=30 && getAdjDays(c)>10,         'bg__DC2626--': getAdjDays(c)<=10}">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="min__w60-- position__sticky-- right__0-- zindex-2 bl__E4E4E4--">
+                                    <div class="dropdown cstm-dropdown ai__c--" button-dropdown-direction append-body="true" uib-dropdown dropdown-append-to-body="true">
+                                        <button class="w__25-- h__25--px d__f-- ai__c-- jc__c-- bradius__4-- c__p-- border__E4E4E4-- bg__FFF-- hover__F3F4F6--bg hover__D1D5DB--border dropdown-button" id="appendropdownMenu{{$index+1}}" data-toggle="dropdown" aria-expanded="true" uib-dropdown-toggle><i svg-icon="icon__more--" size="14" style="color: #6b7280;"></i></button>
+                                        <div class="dropdown-menu w__200-- min__w150-- right__50-- l__auto-- slim-scroll bradius__10--" role="menu" aria-labelledby="appendropdownMenu{{$index+1}}" uib-dropdown-menu>
+                                            <ul class="d__f-- fd__c-- list__unstyled-- m__0--">
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10--  tc__374151-- hover__F9FAFB--bg hover__1D5558--txt hover__icon-opacity--1 c__p--" ng-click="navtoOpenDenialpopupmanagement(c)" ng-if="c.DenialStatusId==2">
+                                                    <i svg-icon="icon__document--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">Adjustment Request</label>
+                                                </li>
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10-- tc__374151-- hover__F9FAFB--bg hover__1D5558--txt  hover__icon-opacity--1 c__p--"  ng-click="navtoClaimSummaryPopup(c, 'ClaimlifeCycle')">
+                                                    <i svg-icon="icon__clock--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">Claim Life Cycle</label>
+                                                </li>
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10-- tc__374151-- hover__F9FAFB--bg hover__1D5558--txt hover__icon-opacity--1 c__p--" ng-click="navtoClaimSummaryPopup(c)">
+                                                    <i svg-icon="icon__desktop--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">View Claim Summary</label>
+                                                </li>
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10-- tc__374151-- hover__F9FAFB--bg hover__1D5558--txt hover__icon-opacity--1 c__p--" ng-click="navtoOpenProfilePopup(c,1,'')">
+                                                    <i svg-icon="icon__user--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">View Patient Details</label>
+                                                </li>
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10-- tc__374151-- hover__F9FAFB--bg hover__1D5558--txt hover__icon-opacity--1 c__p--" ng-click="navtoOpenProfilePopup(c,8,'',2)">
+                                                    <i svg-icon="icon__checklist--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">General Notes</label>
+                                                </li>
+                                                <li class="px__14-- py__6-- d__f-- ai__c-- gap__10-- tc__374151-- hover__F9FAFB--bg hover__1D5558--txt hover__icon-opacity--1 c__p--" ng-click="navtocreatecaim(c)">
+                                                    <i svg-icon="icon__chat--" size="14" style="color: #1d5558;" class="opacity__049--"></i>
+                                                    <label class="fs__md-- fw__5-- c__p--">Alert</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d__f-- ai__c-- gap__20-- px__14-- py__7-- bt__E4E4E4-- bg__F9FAFB-- fs__md-- tc__9CA3AF--">
+                <div>Claims: <b class="tc__1D1D1D--">{{DenailClaimdetailsCount}}</b></div>
+                <div>Total Billed: <b class="tc__1D1D1D--">{{fmt(ClaimsTotalAmount)}}</b></div>
+                <div>Ins.Balance: <b class="tc__1D1D1D--">{{fmt(ClaimsInsuranceBalance)}}</b></div>
+                <div class="d__f-- ai__c-- gap__10-- ml__auto-- flex__shrink--0">
+                    <span><b class="tc__1D1D1D--">{{claimStart}} – {{claimEnd}}</b> of <b class="tc__1D1D1D--">{{DenailClaimdetailsCount}}</b></span>
+                    <button class="btn__arrow-- " ng-click="claimPrev()"
+                            ng-class="{'disabled': !claimHasPrev()}">
+                        <i svg-icon="icon__arrow--" size="10" style="color: #4B5563; transform: scaleX(-1)"></i>
+                    </button>
+                    <button class="btn__arrow-- " ng-click="claimNext()"
+                            ng-class="{'disabled': !claimHasNext()}">
+                        <i svg-icon="icon__arrow--" size="10" style="color: #4B5563;"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="ClaimAgingReport" style="display:none;">
+                <div style="border: 1px solid #ccc; padding: 20px; width: 800px; margin: auto;background: #fff;">
+                    <!--<img src="assertus-logo.png" height="40">--><br>
+                    <img src="{{HospitalAddressArray.OrganizationBase64}}" height="40"><br>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr>
+                            <td>
+                                <div style="display:flex; justify-content:space-between;align-items:end; width:100%">
+                                    <span style="font-size:20px; font-weight:700">Denial Summury</span>
+                                    <table style="border: 1px solid #1D1D1D">
+                                        <tbody>
+                                            <tr>
+                                                <td style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 400; line-height: normal; border-bottom: 1px solid #1D1D1D; padding: 5px ">
+                                                    Total of claims: <b style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 600; line-height: normal;">{{DenailClaimdetailsCount}}</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 400; line-height: normal; padding: 5px">Total of Charge: <b style="color: #000; font-family: Inter; font-size: 13px; font-style: normal; font-weight: 600; line-height: normal;">${{ClaimsTotalAmount| number:2}}</b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+                        <tbody>
+                            <tr>
+                                <td width="50%" style="color: #000; font-family: Inter; font-size: 14px; font-style: italic; font-weight: 700; line-height: 10px; /* 111.111% */ letter-spacing: 0.211px;"><!--{{PayorName}}--> {{activeDrill.label}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:15%;">Provider</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">Claim No</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:20%">Patient Name & MRN</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:11%">Service Date</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">Charges</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal;">User</th>
+                                <th style="background: #D9D9D9; vertical-align:top; padding: 6px 4px; color: #1D1D1D; text-align:left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; width:25%;">File</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="item in PrintRejctedClaimdetails">
+                            <tr>
+                                <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.BillingProviderName}}</td>
+                                <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.PatientClaimNumber}}</td>
+                                <td style="color: #1D1D1D; vertical-align: top; font-family: Inter; text-align: left; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                                    <span style="display: block">{{item.PatientMRNo}}</span>
+                                    {{item.PatientFullName}}
+                                </td>
+                                <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                                    {{item.DOSFrom| date:'MM-dd-yyyy'}}
+                                </td>
+                                <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">
+                                    ${{item.TotalClaimAmount| number:2}}
+                                </td>
+                                <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px ">{{item.ClaimCreatedBy}}</td>
+                                <td style="color: #1D1D1D; vertical-align: top; text-align: left; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; padding: 6px 4px; word-break: break-all; ">{{item.FileName}}</td>
+                            </tr>
+                        </tbody>
+
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td colspan="3" style="color: #1D1D1D; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 600; line-height: normal; padding: 6px 4px ">{{DenailClaimdetailsCount}} Claims</td>
+                                <td colspan="3" style="color: #1D1D1D; font-family: Inter; font-size: 12px; font-style: normal; font-weight: 600; line-height: normal; padding: 6px 4px">${{ClaimsTotalAmount| number:2}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

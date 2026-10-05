@@ -1,0 +1,327 @@
+﻿<div class="d__f-- fd__c-- gap__5-- height__100--">
+    <div class="d__f-- ai__c-- jc__sb-- bb__DDD-- py__5-- px__10--">
+        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Images</h1>
+        <div class="d__f-- ai__c-- gap__10--">
+            <ul class="flex-flow-list" ng-if="selectedobjFiles.RightEyeFiles.length > 0 && selectedobjFiles.LeftEyeFiles.length > 0">
+                <li ng-if="mainViewerObj.showSyncButton">
+                    <button class="btn__lg-- btn__1d5558--o" ng-show="!syncEnabled" ng-click="syncZoom()">Sync</button>
+                </li>
+                <li ng-if="mainViewerObj.showSyncButton">
+                    <button class="btn__lg-- btn__1d5558--o" ng-show="syncEnabled" ng-click="syncZoom()">Un Sync</button>
+                </li>
+            </ul>
+            <a ng-show="mainViewerObj.isShowCompareView" ng-click="openInvOrdersDropdown()" uib-popover-template="investigationOrderspopover.templateUrl" popover-placement="bottom-right" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width m-0"><i class="icons__w16-- more__w16--o"></i></a>
+            <button class="btn__lg-- btn__C71D27--o" ng-click="uibclose()">Close</button>
+        </div>        
+    </div>
+    <div class="d__f-- fd__c-- gap__5-- height__100-- p__10--">
+        <div class="row height__100--" ng-show="mainViewerObj.isHalfScreen">
+            <div class="col-lg-{{mainViewerObj.numDivs === 2 ? '6' : '12'}} height__100--" ng-show="mainViewerObj.isODFullscreen">
+                <div class="d__f-- fd__c-- gap__5-- height__100--">
+                    <div class="two-sections height__100--">
+                        <div class="height__100--" ng-class="mainViewerObj.numDivs === 2 ? 'width-11' : 'width-6'">
+                            <div class="position__relative-- height__100--">
+                                <div class="adjustable-position slim-scroll px__5--">
+                                    <ul class="thumbnail-list d__f-- fd__c-- gap__5--">
+                                        <li ng-repeat="img in selectedobjFiles.RightEyeFiles track by $index">
+                                        
+                                            <img ng-if="(img.FileType !== 'application/pdf'&& img.FileType !== 'Pdf' && img.FileType !== 'pdf' && img.FileType !== 'image/tiff' && img.FileType !== 'tif' && img.FileType !== 'tiff') && !img.isDicomFile" ng-src="{{img.small}}" ng-click="clickonParticularImage(img,$index)" class="b-lazy img-responsive img-thumbnail cur-poiter w-80 height-80" />
+                                            <img ng-if="img.FileType !== 'application/pdf' && img.isDicomFile" class="img-responsive img-thumbnail cur-poiter w-80 height-80" src="./img/diconIcon.png" />
+                                            <a ng-click="clickonParticularImage(img, $index)" ng-if="(img.FileType === 'application/pdf' || img.FileType === 'pdf' || img.FileType === 'Pdf')">
+                                                <img src="img/pdf.png" class="b-lazy img-responsive img-thumbnail cur-poiter w-80 height-80" />
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex height__100--">
+                            <div class="d__f-- fd__c-- height__100--">
+                                <div class="position__relative-- height__100--">
+                                    <div class="adjustable-position slim-scroll">
+                                        <div class="image-management-img overflow-hidden" ng-show="!mainViewerObj.isRightDicomViewer">
+                                            <div class="height__100--" ng-show="ODImgObj.IsImage">
+                                                <div class="image-container height__100--">
+                                                    <canvas id="pODviewer" class="viewer height__100--" canvas-touch-draw="isDrawingOD" on-pinch="zoomInClick($delta)" pinch-disabled="isDrawingOD" touch-pan touch-pan-disabled="isDrawingOD" ng-mouseleave="canMove=false" ng-mousedown="mousedown($event)" ng-mouseup="mouseup($event)"
+                                                            ng-mousemove="mousedrag($event,canMove)"></canvas>
+                                                </div>
+                                            </div>
+                                            <div id="image-gallery" class="height__100--" ng-if="ODImgObj.IsPdf">
+                                                <div class="image-container height__100--">
+                                                    <iframe ng-src="{{getTrustedUrl(ODImgObj.S3URL)}}" class="height__100-- width__100--"></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="!mainViewerObj.isRightDicomViewer">
+                                    <ul class="flex-flow-list gap__4-- p__10-- jc__c--" ng-hide="ODImgObj.IsPdf">
+                                        <li>
+                                            <label ng-if="title!=null">{{title}}</label>
+                                        </li>
+                                        <li>
+                                            <ul class="flex-flow-list gap__4--" ng-if="optionsp.controls.image">
+                                                <li ng-hide="optionsp.controls.totalPage==1">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" ng-click="optionsp.controls.numPage=optionsp.controls.numPage-1"><i class="icons__w16-- minus__w16--w"></i></button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.totalPage==1">
+                                                    <button class="btn__sm-- btn__6c6c6c--f">{{optionsp.controls.numPage}}/{{optionsp.controls.totalPage}}</button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.totalPage==1">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" ng-click="optionsp.controls.numPage=optionsp.controls.numPage+1"><i class="icons__w16-- add__w16--w"></i></button>
+                                                </li>
+                                                <li>
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="reset" ng-click="resizeTo('page')"><i class="icons__w16-- restore__w16--w"></i>Reset</button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.disableRotate">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="rotate left" ng-click="rotate(-1)" ng-disabled="isDrawingOD" ng-class="isDrawingOD ? 'cursor-nodrop':''"><i class="icons__w16-- undo__w16--w"></i></button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.disableRotate">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="rotate right" ng-click="rotate(1)" ng-disabled="isDrawingOD" ng-class="isDrawingOD ? 'cursor-nodrop':''"><i class="icons__w16-- refresh__w16--w"></i></button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.disableZoom">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="zoom in" ng-click="zoomInClick(-1)" ng-disabled="isDrawingOD" ng-class="isDrawingOD ? 'cursor-nodrop':''"><i class="icons__w16-- zoomout__w16--w"></i></button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.disableZoom">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="zoom out" ng-click="zoomInClick(1)" ng-disabled="isDrawingOD" ng-class="isDrawingOD ? 'cursor-nodrop':''"><i class="icons__w16-- zoomin__w16--w"></i></button>
+                                                </li>
+                                                <li ng-hide="optionsp.controls.disableZoom">
+                                                    <button class="btn__xs-- btn__6c6c6c--f" title="draw" ng-click="enableDrawing('OD')"><i class="icons__w16-- edit__w16--w"></i></button>
+                                                </li>
+                                                <li ng-if="isDrawingOD">
+                                                    <button class="btn__sm-- btn__6c6c6c--f" title="Save" ng-click="saveCanvasDrawingDetails('OD')">save</button>
+                                                </li>
+                                                <li ng-if="isDrawingOD">
+                                                    <button class="btn__sm-- btn__6c6c6c--f" title="clear" ng-click="clearDrawing('OD')">Clear Drawing</button>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div ng-show="mainViewerObj.isRightDicomViewer">
+                                    <div id="dwvpOD"></div>
+                                    <ul class="flex-flow-list gap__4-- p__10-- jc__c--">
+                                        <li>
+                                            <button class="btn__sm-- btn__6c6c6c--f" id="resetlayoutpOD" disabled>Reset Layout</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn__sm-- btn__6c6c6c--f" ng-click="saveDrawingCanvas('OD')">Save Drawing</button>
+                                        </li>
+                                        <li>
+                                            <div class="dicom-radio-imagemng" id="toolspOD"></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>                                       
+                </div>
+            </div>
+            <div class="col-lg-{{mainViewerObj.numDivs === 2 ? '6' : '12'}} height__100--" ng-show="mainViewerObj.isOSFullscreen">
+                <div class="d__f-- fd__c-- gap__5-- height__100--">
+                    <div class="two-sections height__100--">
+                        <div class="width-6 height__100--" ng-class="mainViewerObj.numDivs === 2 ? 'width-11' : 'width-6'">
+                            <div class="position__relative-- height__100--">
+                                <div class="adjustable-position slim-scroll px__5--">
+                                    <ul class="thumbnail-list d__f-- fd__c-- gap__5--">
+                                        <li ng-repeat="img in selectedobjFiles.LeftEyeFiles track by $index">
+                                            <img ng-if="(img.FileType !== 'application/pdf'&& img.FileType !== 'Pdf' && img.FileType !== 'pdf' && img.FileType !== 'image/tiff' && img.FileType !== 'tif' && img.FileType !== 'tiff') && !img.isDicomFile" ng-src="{{img.small}}" ng-click="clickonRParticularImage(img,$index)" class="b-lazy img-responsive img-thumbnail cur-poiter w-80 height-80" />
+                                            <img ng-if="img.FileType !== 'application/pdf' && img.isDicomFile" class="img-responsive img-thumbnail cur-poiter w-80 height-80" src="./img/diconIcon.png" />
+                                            <a ng-click="clickonRParticularImage(img, $index)" ng-if="(img.FileType === 'application/pdf' || img.FileType === 'pdf' || img.FileType === 'Pdf')">
+                                                <img src="img/pdf.png" class="b-lazy img-responsive img-thumbnail cur-poiter w-80 height-80" />
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex height__100--">
+                            <div class="d__f-- fd__c-- height__100--">
+                                <div class="position__relative-- height__100--">
+                                    <div class="adjustable-position slim-scroll">
+                                        <div class="image-management-img overflow-hidden" ng-show="!mainViewerObj.isLeftDicomViewer">
+                                            <div class="height__100--" ng-show="OSImgObj.IsImage">
+                                                <div class="image-containe height__100--">
+                                                    <canvas id="pOSviewer" class="viewer height__100--" canvas-touch-draw="isDrawingOS" on-pinch="zoomInClickOS($delta)" pinch-disabled="isDrawingOS" touch-pan touch-pan-disabled="isDrawingOS" ng-mouseleave="canMoveOS=false" ng-mousedown="mousedownOS($event)" ng-mouseup="mouseupOS($event)"
+                                                            ng-mousemove="mousedragOS($event,canMoveOS)"></canvas>
+                                                </div>
+                                            </div>
+                                            <div id="image-gallery" class="height__100--" ng-if="OSImgObj.IsPdf">
+                                                <div class="image-container">
+                                                    <iframe ng-src="{{getTrustedUrl(ODImgObj.S3URL)}}" class="height__100-- width__100--"></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="flex-flow-list gap__4-- p__10-- jc__c--" ng-hide="OSImgObj.IsPdf">
+                                    <li>
+                                        <label class="title" ng-if="title!=null">{{title}}</label>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.totalPage==1">
+                                        <button class="btn__xs-- btn__6c6c6c--f" ng-click="optionsOSp.controls.numPage=optionsOSp.controls.numPage-1"><i class="icons__w16-- minus__w16--w"></i></button>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.totalPage==1">
+                                        <button class="btn__sm-- btn__6c6c6c--f">{{optionsOSp.controls.numPage}}/{{optionsOSp.controls.totalPage}}</button>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.totalPage==1">
+                                        <button class="btn__xs-- btn__6c6c6c--f" ng-click="optionsOSp.controls.numPage=optionsOSp.controls.numPage+1"><i class="icons__w16-- add__w16--w"></i></button>
+                                    </li>
+                                    <li>
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="reset" ng-click="resizeToOS('page')"><i class="icons__w16-- restore__w16--w"></i>Reset</button>
+                                    </li>
+                                    <li ng-hide="optionsp.controls.disableRotate">
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="rotate left" ng-click="rotateOS(-1)" ng-disabled="isDrawingOS" ng-class="isDrawingOS ? 'cursor-nodrop':''"><i class="icons__w16-- undo__w16--w"></i></button>
+                                    </li>
+                                    <li ng-hide="optionsp.controls.disableRotate">
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="rotate right" ng-click="rotateOS(1)" ng-disabled="isDrawingOS" ng-class="isDrawingOS ? 'cursor-nodrop':''"><i class="icons__w16-- refresh__w16--w"></i></button>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.disableZoom">
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="zoom in" ng-click="zoomInClickOS(-1)" ng-disabled="isDrawingOS" ng-class="isDrawingOS ? 'cursor-nodrop':''"><i class="icons__w16-- zoomout__w16--w"></i></button>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.disableZoom">
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="zoom out" ng-click="zoomInClickOS(1)" ng-disabled="isDrawingOS" ng-class="isDrawingOS ? 'cursor-nodrop':''"><i class="icons__w16-- zoomin__w16--w"></i></button>
+                                    </li>
+                                    <li ng-hide="optionsOSp.controls.disableZoom">
+                                        <button class="btn__xs-- btn__6c6c6c--f" title="draw" ng-click="enableDrawing('OS')"><i class="icons__w16-- edit__w16--w"></i></button>
+                                    </li>
+                                    <li ng-if="isDrawingOS">
+                                        <button class="btn__sm-- btn__6c6c6c--f" title="Save" ng-click="saveCanvasDrawingDetails('OS')">save</button>
+                                    </li>
+                                    <li ng-if="isDrawingOS">
+                                        <button class="btn__sm-- btn__6c6c6c--f" title="clear" ng-click="clearDrawing('OS')">Clear Drawing</button>
+                                    </li>
+                                </ul>
+                                <div ng-show="mainViewerObj.isLeftDicomViewer">
+                                    <div id="dwvpOS"></div>
+                                    <ul class="flex-flow-list gap__4-- p__10-- jc__c--">
+                                        <li>
+                                            <button class="btn__sm-- btn__6c6c6c--f" id="resetlayoutpOS" disabled>Reset Layout</button>
+                                        </li>
+                                        <li>
+                                            <button class="btn__sm-- btn__6c6c6c--f" ng-click="saveDrawingCanvas('OS')">Save Drawing</button>
+                                        </li>
+                                        <li>
+                                            <div class="dicom-radio-imagemng" id="toolspOS"></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>                                    
+                </div>
+            </div>
+        </div> 
+        <div class="grid-view h-100" ng-if="mainViewerObj.isGridScreen">
+            <div class="pos-relative h-100">
+                <div class="adjustable-position">
+                    <div class="row nocolpad" image-viewer isarraychanged="0">
+                        <div class="col-lg-3" ng-repeat="img in selectedobjFiles.AllFiles">
+                           
+                            <a href="javascript:;" ng-click="toggleFullscreen(img.S3URL)" ng-if="(img.FileType !== 'application/pdf'&& img.FileType !== 'Pdf' && img.FileType !== 'pdf' && img.FileType !== 'image/tiff' && img.FileType !== 'tif' && img.FileType !== 'tiff') && !img.isDicomFile">
+                                <img ng-src="{{img.S3URL}}" class="height-250 width-100 img-responsive img-thumbnail" alt="Image">
+                            </a>
+                            <a  ng-if="img.FileType !== 'application/pdf' && img.isDicomFile">
+                                <img class="img-responsive img-thumbnail cur-poiter w-80 height-80" src="./img/diconIcon.png" />
+                            </a>
+                            <a ng-if="(img.FileType === 'application/pdf' || img.FileType === 'pdf' || img.FileType === 'Pdf')">
+                                <iframe ng-src="{{getTrustedUrl(img.S3URL)}}" style="height:250px;width:100%"></iframe>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ 
+ 
+<style>
+
+
+    /* Style for half-half view */
+    .half-half-view {
+        display: flex;
+    }
+
+        .half-half-view .image-container {
+            width: 50%;
+        }
+
+    /* Style for grid view */
+    .grid-view .row {
+        margin-bottom: 20px;
+    }
+
+    .grid-view .image-container {
+        width: calc(100% / 4);
+        padding: 5px;
+    }
+
+        .grid-view .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: block;
+        }
+
+    .command {
+        z-index: 10;
+        bottom: 20px;
+        /*	right : 20px;*/
+    }
+
+        .command > .btn {
+            z-index: 100;
+            opacity: 0.8;
+            margin-left: 2px;
+        }
+
+            .command > .btn > i {
+                z-index: 100;
+            }
+
+    .prev-button,
+    .next-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px; /* Adjust according to your icon size */
+        height: 30px; /* Adjust according to your icon size */
+        background-color: rgba(255, 255, 255, 0.5); /* Adjust opacity as needed */
+        cursor: pointer;
+        z-index: 1; /* Ensure buttons appear above canvas */
+    }
+
+    .prev-button {
+        left: 0;
+    }
+
+    .next-button {
+        right: 0;
+    }
+
+        /* Style for icon */
+        .prev-button i,
+        .next-button i {
+            font-size: 20px; /* Adjust according to your icon size */
+            color: #000; /* Adjust color as needed */
+        }
+
+    /*.vertical-slider-container {
+        position: absolute;
+        top: 0;
+        left: -10%;
+        transform: rotate(-90deg);*/ /* Rotate counterclockwise to make it vertical */
+    /*transform-origin: right top;*/ /* Set transform origin to align properly */
+    /*}
+
+        .vertical-slider-container input[type=range] {
+            width: 200px;*/ /* Set width */
+    /* Adjust other styles as needed */
+    /*}*/
+</style>
+
+

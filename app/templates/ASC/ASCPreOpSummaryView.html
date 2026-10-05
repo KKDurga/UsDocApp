@@ -1,0 +1,867 @@
+﻿<script type="text/ng-template" id="UnSignRemarksPopUp.html">
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <h5>Please enter remarks to unsign</h5>
+                <textarea class="form-control" rows="5" ng-model="Obj.Remarks"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-lg-12 pull-right">
+                <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="ClosePopup();"> {{ 'CLOSE' | translate}}</button>
+                <button type="button" class="etn btn-ehnote-outline p-l-25 p-r-25" ng-click="Unsign();"> Unsign</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- Pre OP Summary- -->
+
+<div class="two-sections h-100 bg-DDDDDD p-6">
+    <div class="flex pos-relative h-100 dis-flex flex-direction-column">
+        <div class="bg-white p-6 referal-head-lb">
+            <ul class="asc-actions-scroll" du-scroll-container="summarymain1">
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpAldereteScore">
+                    <a du-smooth-scroll="Preopscroll2" du-scrollspy>Alderete Score</a>
+                </li>
+                <!--<li>
+        <a du-smooth-scroll="scroll3" du-scrollspy>H & P</a>
+    </li>-->
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpPreopcall">
+                    <a du-smooth-scroll="Preopscroll3" du-scrollspy>Pre-OP call</a>
+                </li>
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpPatientCheckList">
+                    <a du-smooth-scroll="Preopscroll4" du-scrollspy>Patient Check-in</a>
+                </li>
+                <!--<li>
+                    <a du-smooth-scroll="Preopscroll9" du-scrollspy>General</a>
+                </li>
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpClinicalCheckList">
+                    <a du-smooth-scroll="Preopscroll5" du-scrollspy>Checklist</a>
+                </li>
+                <!--<li>
+                    <a du-smooth-scroll="Preopscroll10" du-scrollspy>Medication</a>
+                </li>-->
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                    <a du-smooth-scroll="Preopscroll6" du-scrollspy>Dilation Medications</a>
+                </li>
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                    <a du-smooth-scroll="Preopscroll7" du-scrollspy> Medications</a>
+                </li>
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpNoteAccess">
+                    <a du-smooth-scroll="Preopscroll8" du-scrollspy> Notes</a>
+                </li>
+                <li ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                    <a du-smooth-scroll="Preopscroll11" du-scrollspy>Anesthesia Plan</a>
+                </li>
+                <!--<li>
+        <a du-smooth-scroll="Preopscroll12" du-scrollspy>H & P</a>
+    </li>-->             
+                <li class="flex text-right">
+                    <button class="btn btn-light-green" ng-click="PreopSummaryPrint()">Print</button>
+                    <button class="btn bg-068cb0 b-0 quick-summary-profile active" ng-if="PreOpObj.PreOpChartStatus !== 'E'&&UserAccessRights.AllAccessRights.ASCPreopEdit" ng-click="NavtoEditPreOpData()">Edit</button>
+                    <button class="btn bg-F19398 text-white" ng-if="PreOpObj.PreOpChartStatus === 'E'&&UserAccessRights.AllAccessRights.ASCPreopUnsign" ng-click="UnsignFromSumary(1)">Un-sign</button>
+                </li>
+            </ul>
+        </div>
+        <div class="pos-relative h-100">
+            <div class="adjustable-position overflow-x-hidden" id="summarymain1">
+                <div class="m-t-6 width-100 p-6 pos-relative">
+                    <div class="bg-DDDDDD bradius-6 p-6 overflow-x-hidden">
+                       
+                        <!-- / -->
+                        <div class="asc-panel" id="Preopscroll2">
+                            <div class="asc-panel-header">
+                                <h1>Pre-Op Notes <!--<i class="fa fa-chevron-down m-l-5"></i>--></h1>
+                            </div>
+                            <div class="asc-panel-body">
+                                <table class="asc-table-admission">
+                                    <tbody>
+                                        <tr id="Preopscroll2" ng-if="UserAccessRights.AllAccessRights.PreOpAldereteScore">
+                                            <th width="16%">
+                                                Aldrete Score
+                                            </th>
+                                            <td ng-if="(PreOpObj.AlderetScoreDetails | filter:{'IsChecked':true}).length == 0">
+                                                <p>No data added.</p>
+                                            </td>
+                                            <td ng-if="(PreOpObj.AlderetScoreDetails | filter:{'IsChecked':true}).length > 0">
+                                                <ul class="flex-flow-ulli width-80" ng-repeat="item in PreOpObj.AlderetScoreDetails | filter:{'IsChecked':true} track by $index">
+                                                    <li class="flex">
+                                                        <label>{{item.AldreteScoreTypeName}}:</label>
+                                                        <span class="text-s12w700c000">{{item.AldreteScoreDetailTypeName}}</span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="text-s12w700c000">{{item.Value}}</span>
+                                                    </li>
+                                                </ul>
+                                                <ul class="flex-flow-ulli width-80">
+                                                    <li class="flex"></li>
+                                                    <li class="text-267377">
+                                                        Total Score:
+                                                        <span class="text-red" ng-show="PreOpObj.TotalAlderetScore >=0 && PreOpObj.TotalAlderetScore <= 6">{{PreOpObj.TotalAlderetScore}}</span>
+                                                        <span class="text-ecc83b" ng-show="PreOpObj.TotalAlderetScore >=7 &&PreOpObj.TotalAlderetScore <=8">{{PreOpObj.TotalAlderetScore}}</span>
+                                                        <span class="" ng-show="PreOpObj.TotalAlderetScore >=9 &&PreOpObj.TotalAlderetScore <=12">{{PreOpObj.TotalAlderetScore}}</span>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+
+                                        <tr id="Preopscroll3"  ng-if="UserAccessRights.AllAccessRights.PreOpPreopcall">
+                                            <th width="16%">
+                                                Pre-Op Call
+                                            </th>
+                                            <td ng-if="(PreOpObj.PreOpCallDetails | filter:{DeleteInd: 'N'}).length === 0">
+                                                <p>No data added.</p>
+                                            </td>
+                                            <td ng-if="(PreOpObj.PreOpCallDetails | filter:{DeleteInd: 'N'}).length > 0">
+                                                <div ng-repeat="item in PreOpObj.PreOpCallDetails | filter:{DeleteInd: 'N'} track by $index">
+                                                    <ul class="referral-summary-list">
+                                                        <li>
+                                                            <span ng-show="item.ContactType !=''">Contacted:</span>
+                                                            <label>{{item.ContactType}}</label>
+                                                        </li>
+                                                        <li>
+                                                            <span ng-show="item.ContactStartDate !=''">Date:</span>
+                                                            <label>{{item.ContactStartDate | date: "MM-dd-yyyy"}}</label>
+                                                        </li>
+                                                        <li>
+                                                            <span ng-show="item.ContactStartTime !=''">Time:</span>
+                                                            <label>{{item.ContactStartTime | date: "hh:mm a"}}</label>
+                                                        </li>
+                                                    </ul>
+                                                    <p ng-if="!item.IsNoResponse" class="text-s12w400C000">
+                                                        <span ng-show="item.IsConnectedWithPatient">Connected with Patient,</span>
+                                                        <span ng-show="item.IsConnectedWithFamilyOrFriend">Connected with Family/Friend,</span>
+                                                        <span ng-show="item.IsLeftMsgWithFamilyOrFriend">Left Message With family/friends,</span>
+                                                        <span ng-show="item.IsLeftMsgWithPatient">Left Message With Patient</span>
+                                                        <span ng-show="item.IsConnectedWithPatient || item.IsConnectedWithFamilyOrFriend || item.IsLeftMsgWithFamilyOrFriend || item.IsLeftMsgWithPatient"> and shared instructions about,</span>
+                                                        <span ng-show="item.IsArrivalTimeShared"> arrival Time,</span>
+                                                        <span ng-show="item.IsAccompanyShared">accompany, </span>
+                                                        <span ng-show="item.IsDrinkPlentyWaterShared"> Drink plenty Of Water,</span>
+                                                        <span ng-show="item.IsNpoAfterMidnightShared"> Npo After Midnight,</span>
+                                                        <span ng-show="item.IsTakeBpHeartMedShared"> TakeBp/Heart Medications,</span>
+                                                        <span ng-show="item.IsDoNotTakeBpMedShared"> Do Not Take Diabetic Medications,</span>
+                                                        <span ng-show="item.IsNoMakeupJewelMoistShared"> No Makeup and Jewelry/Moysturisers,</span>
+                                                        <span ng-show="item.IsCoPay">Co-Pay</span>
+                                                    </p>
+                                                    <p ng-if="item.IsNoResponse">
+                                                        <span class="text-s12w500c313131">
+                                                            No Response
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        <span class="text-s12w500c313131" ng-if="item.DropStartDate!=''||item.DropsStartTime!=''">
+                                                            <span ng-if="item.DropStartDate!=''" class="text-s12w500c313131"><b>Start Drops Date:</b> {{item.DropStartDate| date:'MM-dd-yyyy' }}</span>
+                                                            <span ng-if="item.DropsStartTime!=''" class="text-s12w500c313131">
+                                                                <b>Start Drops Time:</b> {{item.DropsStartTime| date: "hh:mm a"}}
+                                                            </span>
+                                                        </span>
+                                                        <span class="text-s12w500c313131" ng-if="item.CoPayNotes!=''">
+                                                            <b>Eye Drop Note:</b> {{item.CoPayNotes}}
+                                                        </span>
+                                                    </p>
+                                                    <p ng-show="item.Remarks != ''">
+                                                        <span class="text-s12w500c313131">
+                                                            <b>Note:</b> {{item.Remarks}}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr id="Preopscroll4"  ng-if="UserAccessRights.AllAccessRights.PreOpPatientCheckList">
+                                            <th width="16%">
+                                                Patient CheckList
+                                            </th>
+                                            <td ng-show="Ascpatientpopupsavearray.length == 0">
+                                                <p>No data added.</p>
+                                            </td>
+                                            <td ng-show="Ascpatientpopupsavearray.length > 0">
+                                                <ul class="asc-surgery-list grid-gap-15" ng-repeat="i in Ascpatientpopupsavearray">
+                                                    <!--<li ng-if="i.RecievedForSurgery!=''">
+                    <span>Patient Recieved For :</span>
+                    <label>{{i.RecievedForSurgery}}</label>
+                </li>
+                <li ng-if="i.AccompainedBy!=''">
+                    <span>Accompanied By:</span>
+                    <label>{{i.AccompainedBy}}</label>
+                </li>
+                <li ng-if="i.AccompainedByNotes!=''">
+                    <span>Remarks :</span>
+                    <label>- {{i.AccompainedByNotes}}</label>
+                </li>-->
+                                                    <li ng-if="i.PreOperativeOrientationOffered!=''">
+                                                        <span>Pre-Operative Orientation Offered :</span>
+                                                        <label>{{i.PreOperativeOrientationOffered}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PreOperativeOrientationOfferedNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.PreOperativeOrientationOfferedNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.ObservedBehavior!=''">
+                                                        <span>Observed Behavior :</span>
+                                                        <label>{{i.ObservedBehavior}}</label>
+                                                    </li>
+                                                    <li ng-if="i.ObservedBehaviorNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.ObservedBehaviorNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.LevelOfConsciousness!=''">
+                                                        <span>Level Of Consciousness :</span>
+                                                        <label>{{i.LevelOfConsciousness}}</label>
+                                                    </li>
+                                                    <li ng-if="i.LevelOfConsciousnessNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.LevelOfConsciousnessNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PatientTransfferedIn!=''">
+                                                        <span>Patient Transferred in:</span>
+                                                        <label>{{i.PatientTransfferedIn}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PatientTransfferedNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.PatientTransfferedNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PatientDestination!=''">
+                                                        <span>Patient Destination:</span>
+                                                        <label>{{i.PatientDestination}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PatientDestinationNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.PatientDestinationNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PTERefers!=''">
+                                                        <span>PTE Refers:</span>
+                                                        <label>{{i.PTERefers}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PTEReferNotes!=''">
+                                                        <span>Remarks: </span>
+                                                        <label>{{i.PTEReferNotes}}</label>
+                                                    </li>
+                                                    <li ng-if="i.PreOpOverallNotes!=''">
+                                                        <span>Notes : </span>
+                                                        <label>{{i.PreOpOverallNotes}}</label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr id="Preopscroll9">
+                                            <td colspan="2" class="valign-top">
+                                                <div class="two-sections">
+                                                    <section class="eh-panel width-50" ng-if="UserAccessRights.AllAccessRights.PreOpGeneralCheckList">
+                                                        <div class="eh-header">
+                                                            <h1 class="text-s13w700C15898f">General Checklist</h1>
+                                                        </div>
+                                                        <div class="eh-body">
+                                                            <table class="table tableno-bordered tableno-padding m-b-0">
+                                                                <tbody ng-repeat="item in PreOpObj.OrgASCChecklist | filter: {'CheckListCategoryId':6 }:true track by $index" class="b-0">
+                                                                    <tr ng-if="item.IsChecked" ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':6,IsChecked :true}:true).length > 0">
+                                                                        <td>
+                                                                            <table class="table tableno-bordered tableno-padding m-b-0 border-bottom">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <label>{{item.CheckListName}}</label>
+                                                                                        </td>
+                                                                                        <td width="30%">
+                                                                                            <label>{{item.Value}}</label>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr ng-if="item.Remarks.length > 0">
+                                                                                        <td colspan="2">
+                                                                                            <p class="text-s12w400C000 m-b-0">
+                                                                                                <b>  Notes:</b> {{item.Remarks}}
+                                                                                            </p>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':6,'IsChecked':true}:true).length == 0">
+                                                                    <tr>
+                                                                        <td>
+                                                                            <p>No data added.</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </section>
+                                                    <section class="eh-panel flex" ng-if="UserAccessRights.AllAccessRights.PreOpMedicationCheckList">
+                                                        <div class="eh-header">
+                                                            <h1 class="text-s13w700C15898f">Medication Checklist</h1>
+                                                        </div>
+                                                        <div class="eh-body">
+                                                            <table class="table tableno-bordered tableno-padding m-b-0">
+                                                                <tbody class="b-0" ng-repeat="item in PreOpObj.OrgASCChecklist | filter: {'CheckListCategoryId':5 }:true track by $index" ng-if="item.IsChecked">
+                                                                    <tr ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':5,IsChecked :true}:true).length > 0">
+                                                                        <td>
+                                                                            <table class="table tableno-bordered tableno-padding m-b-0 border-bottom">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <label>{{item.CheckListName}}</label>
+                                                                                        </td>
+                                                                                        <td width="30%">
+                                                                                            <label>{{item.Value}}</label>
+                                                                                            <p ng-if="item.CheckListId==40">{{item.ChecklistDate | date:"MM-dd-yyyy"}}</p>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr ng-if="item.Remarks.length > 0">
+                                                                                        <td colspan="2">
+                                                                                            <p class="text-s12w400C000 m-b-0">
+                                                                                                <b>  Notes:</b> {{item.Remarks}}
+                                                                                            </p>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tbody ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':5,'IsChecked' :true}:true).length == 0">
+                                                                    <tr>
+                                                                        <td>
+                                                                            <p>No data added.</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </section>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+
+                                        <tr id="Preopscroll5" ng-if="UserAccessRights.AllAccessRights.PreOpClinicalCheckList">
+                                            <td colspan="2">
+                                                <div class="eh-panel">
+                                                    <div class="eh-header">
+                                                        <h1 class="text-s13w700C15898f"> Clinical Checklist</h1>
+                                                    </div>
+                                                    <div class="eh-body">
+                                                        <table class="referral-table b-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td colspan="2" ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':1,IsChecked :true}:true).length > 0">
+                                                                        <div class="two-sections">
+                                                                            <div class="eh-panel" ng-repeat="kitem in PreOpObj.ChunkedClinicalChecklist track by $index">
+                                                                                <div ng-repeat="item in kitem | filter: {'IsChecked': true} track by $index" class="">
+                                                                                    <table class="table tableno-bordered tableno-padding m-b-0 border-bottom">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td>
+                                                                                                    <label>{{item.CheckListName}}</label>
+                                                                                                </td>
+                                                                                                <td width="30%">
+                                                                                                    <label>{{item.Value}}</label>
+                                                                                                    <p class="m-b-0">{{item.ChecklistDate | date:"MM-dd-yyyy"}}</p>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <tr ng-if="item.Remarks.length > 0">
+                                                                                                <td colspan="2">
+                                                                                                    <p class="text-s12w400C000">
+                                                                                                        <b>Notes:</b> {{item.Remarks}}
+                                                                                                    </p>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td colspan="2" ng-show="(PreOpObj.OrgASCChecklist | filter:{'CheckListCategoryId':1 , IsChecked :true}:true).length == 0">
+                                                                        <p>No data added.</p>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+
+                                                 
+                                            </td>
+
+                                        </tr>
+
+                                        <tr id="Preopscroll6" ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                                            <th width="16%">
+                                                Dilation Medications
+                                            </th>
+                                            <td ng-if="(PreOpObj.DilationMedications | filter:{DeleteInd: 'N','IsChecked':true}).length > 0 || PreOpObj.ODPupilSize !== '' || PreOpObj.OSPupilSize !== '' || PreOpObj.DilationMedicationsNotes !==''">
+                                                <ul class="referral-summary-list dis-block" ng-repeat="item in PreOpObj.DilationMedications | filter:{DeleteInd: 'N','IsChecked':true} track by $index">
+                                                    <li>
+                                                        <span class="text-s12w700c000 text-0C8986">{{item.MedicationName}}</span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="text-s12w700c000">Dosage & Time : </span>
+                                                        <label class="text-s12w400C000" ng-repeat="ditem in item.DropTimings track by $index">
+                                                            <span class="text-transform-initial" ng-if="ditem.MedicationDosage != ''">{{ditem.MedicationDosage}} at</span>
+                                                            <span ng-if="ditem.MedicationTime != ''">{{ditem.MedicationTime}}</span>
+                                                            <span ng-hide="$last">,</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-show="PreOpObj.ODPupilSize != '' || PreOpObj.OSPupilSize != ''">
+                                                    <li>
+                                                        <span class="text-s12w700c000">Pupil Size :</span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.ODPupilSize != ''">
+                                                        <b class="text-od">OD</b>
+                                                        <span class="text-s12w400C000">{{PreOpObj.ODPupilSize}}&nbsp;<b class="text-lowercase">mm</b> </span>
+
+                                                    </li>
+                                                    <li ng-show="PreOpObj.OSPupilSize != ''">
+                                                        <b class="text-os">OS</b>
+                                                        <span class="text-s12w400C000">{{PreOpObj.OSPupilSize}}&nbsp;<b class="text-lowercase">mm</b> </span>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-show="PreOpObj.DilationReviewId !==null">
+                                                    <li>
+                                                        <span class="text-s12w700c000">Given By :</span>
+                                                    </li>
+                                                    <li>
+                                                        <label class="text-s12w400C000">{{PreOpObj.DilationReviewName}}</label>
+                                                    </li>
+                                                    <li ng-show="ModifiedDilationDate !== ''">
+                                                        <span>{{ModifiedDilationDate}}</span>
+
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-show="PreOpObj.DilationMedicationsNotes !==''">
+                                                    <li>
+                                                        <span class="text-s12w700c000">Notes :</span>
+                                                    </li>
+                                                    <li>
+                                                        <label class="pre-line text-s12w400C000" ng-bind-html="PreOpObj.DilationMedicationsNotes"></label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-if="(PreOpObj.DilationMedications | filter:{DeleteInd: 'N','IsChecked':true}).length === 0 && PreOpObj.ODPupilSize == '' && PreOpObj.OSPupilSize == '' && PreOpObj.DilationMedicationsNotes ==''">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+
+
+                                        <tr id="Preopscroll7" ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                                            <th width="16%">
+                                                Pre-Op Medications
+                                            </th>
+                                            <td ng-if="(PreOpObj.PreOpMedications | filter:{DeleteInd: 'N','IsChecked':true}).length > 0 || PreOpObj.MedicationRemarks !=='' || !PreOpObj.IsPreOpMedicationInd">
+                                                <ul class="referral-summary-list">
+                                                    <li ng-show="PreOpObj.IsVeinOpened">
+                                                        <span class="text-s12w700c000">Is Vein Opened : </span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.IsVeinOpened">
+                                                        <label class="text-s12w400C000">Yes</label>
+                                                    </li>
+
+                                                    <li ng-show="PreOpObj.IsVeinOpened == false">
+                                                        <span class="text-s12w700c000">Is Vein Opened : </span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.IsVeinOpened == false">
+                                                        <label class="text-s12w400C000">No</label>
+                                                    </li>
+
+                                                    <li ng-show="PreOpObj.IsDiabetes">
+                                                        <span class="text-s12w700c000">Diabetes :</span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.IsDiabetes">
+                                                        <label class="text-s12w400C000">Yes</label>
+                                                    </li>
+
+                                                    <li ng-show="PreOpObj.IsDiabetes==false">
+                                                        <span class="text-s12w700c000">Diabetes :</span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.IsDiabetes==false">
+                                                        <label class="text-s12w400C000">No</label>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.DiabetesResult !='' && PreOpObj.DiabetesResult !=null">
+                                                        <span class="text-s12w700c000">Diabetes Result : </span>
+                                                        <span class="text-s12w400C000">{{PreOpObj.DiabetesResult}}  <b>mg/dL</b></span>
+                                                    </li>
+                                                    <li ng-show="PreOpObj.DiabetesTime !='' && PreOpObj.DiabetesTime !=null">
+                                                        <span class="text-s12w700c000">Time : </span>
+                                                        <label class="text-s12w400C000">{{PreOpObj.DiabetesTime}}</label>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list dis-block" ng-repeat="item in PreOpObj.PreOpMedications | filter:{DeleteInd: 'N','IsChecked':true} track by $index">
+                                                    <li>
+                                                        <span class="text-s12w700c000 text-0C8986">{{item.MedicationName}}</span>
+                                                    </li>
+
+                                                    <li>
+                                                        <span class="text-s12w700c000">Dosage & Time :</span>
+                                                        <label class="text-s12w400C000" ng-repeat="ditem in item.DropTimings track by $index">
+                                                            <span class="text-transform-initial" ng-if="ditem.MedicationDosage != ''">{{ditem.MedicationDosage}} at</span>
+                                                            <span ng-if="ditem.MedicationTime != ''">{{ditem.MedicationTime}}</span>
+                                                            <span ng-hide="$last">,</span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-show="PreOpObj.MedicationReviewId !==null">
+                                                    <li>
+                                                        <span class="text-s12w700c000">Given By :</span>
+                                                    </li>
+                                                    <li>
+                                                        <label class="text-s12w400C000">{{PreOpObj.MedicationReviewName}}</label>
+                                                    </li>
+                                                    <li ng-show="ModifiedPreopMedicationDate !== ''">
+                                                        <span>{{ModifiedPreopMedicationDate}} </span>
+
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-show="PreOpObj.MedicationRemarks !==''">
+                                                    <li>
+                                                        <span class="text-s12w700c000">Notes :</span>
+                                                    </li>
+                                                    <li>
+                                                        <label class="pre-line text-s12w400C000" ng-bind-html="PreOpObj.MedicationRemarks"></label>
+                                                    </li>
+                                                </ul>
+
+                                            </td>
+
+                                            <td ng-if="(PreOpObj.PreOpMedications | filter:{DeleteInd: 'N','IsChecked':true}).length === 0 &&PreOpObj.MedicationRemarks =='' && PreOpObj.IsPreOpMedicationInd ">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr id="Preopscroll8" ng-if="UserAccessRights.AllAccessRights.PreOpNoteAccess">
+                                            <th width="10%">
+                                                Pre-Op Notes
+                                            </th>
+                                            <td ng-if="PreOpObj.PreOpMedicationRemarks!=''">
+                                                <label class="pre-line text-s12w400C000" ng-bind-html="PreOpObj.PreOpMedicationRemarks"></label>
+                                            </td>
+                                            <td ng-if="PreOpObj.PreOpMedicationRemarks==''">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="UserAccessRights.AllAccessRights.PreOpNoteAccess">
+                                            <th width="16%">
+                                                Attached and Scanned Files
+                                            </th>
+                                            <td>
+                                                <ul class="flex-flow-ulli-mb0" ng-show="(PreOpObj.DocumentDetails | filter:{'NoteFileTypeId': 18}).length>0">
+                                                    <li ng-repeat="img in PreOpObj.DocumentDetails | filter:{'NoteFileTypeId': 18} track by $index">
+                                                        <img class="w-60 height-60 img-btn-clear thumbnail" ng-if="img.FileId != 0 && img.FileExt != 'pdf' && img.FileExt !== 'application/pdf'" ng-src="{{img.S3URL}}" image-viewer>
+                                                        <a href="{{img.S3URL}}" target="_blank" ng-if="img.FileId != 0 && (img.FileExt == 'pdf' || img.FileExt == 'application/pdf')">
+                                                            <img src="img/billing/pdf-img.png" class="img-thumbnail w-60 height-60">
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>                                      
+                                    </tbody>
+                                </table>
+
+                                <div class="row">
+                                    <div class="col-lg-12" ng-show="PreOpObj.ReviewedBy != null">
+                                        <div class="dis-flex align-items-center grid-gap-15 justify-space-between">
+                                            <ul class="flex-flow-ulli-mb0">
+                                                <li>
+                                                    <span class="text-s12w700c000">Reviewed By:</span>
+                                                </li>
+                                                <li>
+                                                    <label class="text-s12w400C000">{{PreOpObj.ReviewedByName}} {{ReviewedBySuffixName}}</label>
+                                                </li>
+                                                <li ng-show="ReviewedByLicenseNo !=='' && ReviewedByLicenseNo !==null">
+                                                    <label class="text-s12w400C000">Lic: {{ReviewedByLicenseNo}},</label>
+                                                </li>
+                                                <!--<li>
+                                                    <span class="text-s12w700c000">Date:</span>
+                                                </li>-->
+                                                <li>
+                                                    <label class="text-s12w400C000">{{PreOpObj.ReviewedDate | date:"MM-dd-yyyy"}}</label>
+                                                </li>
+                                                <!--<li>
+                                                    <span class="text-s12w700c000">Time:</span>
+                                                </li>-->
+                                                <li ng-hide="PreOpObj.ReviewedTime == '' || PreOpObj.ReviewedTime== undefined || PreOpObj.ReviewedTime == null">
+                                                    <label class="text-s12w400C000">{{PreOpObj.ReviewedTime | amPm}}</label>
+                                                </li>
+                                            </ul>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="asc-panel" ng-show="PreOpObj.LastSignOffUserDetails.length>0">
+                                            <div class="asc-panel-header">
+                                                <h1>signed by</h1>
+                                            </div>
+                                            <div class="asc-panel-body">
+                                                <ul class="flex-flow-ulli-mb0" ng-repeat="item in PreOpObj.LastSignOffUserDetails track by $index">
+                                                    <li>
+                                                        <label ng-show="item.IsAnesthesia">Anesthesiologist :  </label>
+                                                        <label ng-show="item.IsNurse">Nurse :  </label>
+                                                        <label>Electronically Signed By - </label>
+                                                        <label ng-show="item.SuffixId ==10">Dr. </label>
+                                                        <label>{{item.SignOffUserName}} {{item.SuffixName}},</label>
+                                                        <label ng-show="item.LicenseNumber !==''&& item.LicenseNumber !==null">Lic: {{item.LicenseNumber}},</label>
+                                                        <label>{{item.Date | date:"MM-dd-yyyy"}}</label>
+                                                        <label>{{item.Date | date: "hh:mm a"}}</label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asc-panel" id="Preopscroll11" ng-if="UserAccessRights.AllAccessRights.PreOpAnesthesiaAccess">
+                            <div class="asc-panel-header">
+                                <h1>Anesthesia Evaluation</h1>
+                            </div>
+                            <div class="asc-panel-body">
+                                <table class="asc-table-admission">
+                                    <tbody>
+                                        <tr ng-show="PrevAnestheticsObj.PreviousAnesthetics.length>0">
+                                            <th width="16%">
+                                                Previous Anesthetics
+                                            </th>
+                                            <td>
+                                                <ul class="referral-summary-list dis-block" ng-repeat="item in PrevAnestheticsObj.PreviousAnesthetics">
+                                                    <li>
+                                                        <span>{{item.PreviousAnestheticName}}:</span>
+                                                        <label>
+                                                            <span>{{item.Value}}</span>
+                                                        </label>
+                                                    </li>
+                                                    <li ng-if="item.Remarks != ''">
+                                                        <small>
+                                                            <b>Notes:</b> {{item.Remarks}}
+                                                        </small>
+                                                    </li>
+                                                </ul>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="PreAdmAnesthetistObj.ASAObj.Value != ''">
+                                            <th width="16%">
+                                                Assessment ASA
+                                            </th>
+                                            <td>
+                                                <ul class="referral-summary-list dis-block" ng-if="PreAdmAnesthetistObj.ASAObj.Value != ''">
+                                                    <li>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 1"><b>ASA 1:</b>   A Normal Healthy Patient</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 2"><b>ASA 2:</b>   A Patient with Mild Systemic Disease</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 3"><b>ASA 3:</b>   A Patient with Severe Systemic Disease</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 4"><b>ASA 4:</b>   A Patient with Severe Systemic Disease that is a constant threat to life</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 5"><b>ASA 5:</b>   A Moribund patient who is not expected to survive without the operation</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.Value == 6"><b>ASA 6:</b>   Emergency Surgery</label>
+                                                    </li>
+                                                </ul>
+
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="PreAdmAnesthetistObj.ASAObj.EValue == ''&&PreAdmAnesthetistObj.ASAObj.Value == '' && PreAdmAnesthetistObj.ASAClassificationNotes =='' ">
+                                            <th width="16%">
+                                                ASA Classification
+                                            </th>
+
+                                            <td ng-if="PreAdmAnesthetistObj.ASAObj.EValue == ''">
+                                                <p>No Data Added</p>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="PreAdmAnesthetistObj.ASAObj.EValue != ''">
+                                            <th width="16%">
+                                                Assessment ASA "E"
+                                            </th>
+                                            <td ng-if="PreAdmAnesthetistObj.ASAObj.EValue != ''">
+                                                <ul class="referral-summary-list dis-block">
+                                                    <li ng-if="PreAdmAnesthetistObj.ASAObj.EValue != ''">
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 1"><b>ASA 1E:</b>   A Normal Healthy Patient</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 2"><b>ASA 2E:</b>   A Patient with Mild Systemic Disease.</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 3"><b>ASA 3E:</b>   A Patient with a Severe Systemic Disease that is not Life-threatening.</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 4"><b>ASA 4E:</b>   A Patient with a Severe Systemic Disease that is a Constant Threat to Life.</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 5"><b>ASA 5E:</b>   A moribund patient who is not expected to survive without the Operation.</label>
+                                                        <label ng-if="PreAdmAnesthetistObj.ASAObj.EValue == 6"><b>ASA 6E:</b>   Emergency patient</label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-if="PreAdmAnesthetistObj.ASAClassificationNotes!= ''">
+                                            <th width="16%">
+                                                ASAClassification Notes
+                                            </th>
+                                            <td>
+                                                <ul class="referral-summary-list dis-block">
+                                                    <li ng-if="PreAdmAnesthetistObj.ASAClassificationNotes!= ''">
+                                                        {{PreAdmAnesthetistObj.ASAClassificationNotes}}
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Anesthetic Plan
+                                            </th>
+                                            <td ng-show="Anesthesiaobj.Indicator == true">
+                                                <ul class="referral-summary-list dis-block" >
+                                                    <li ng-repeat="item in PreAdmAnesthetistObj.AnesthesiaTypelist | filter:{'IsSelected': true}:true">
+                                                        <label>{{item.AnesthesiaType}}</label>
+                                                    </li>
+                                                    <li>
+                                                        <span ng-show="APAnesthesiaOptionsObj.Dosage !=='' && APAnesthesiaOptionsObj.Dosage !==null">Dosage :</span>
+                                                        <label>{{APAnesthesiaOptionsObj.Dosage}}</label>
+
+                                                    </li>
+
+                                                    <li ng-show="APAnesthesiaOptionsObj.AnesthetistName !==''">
+                                                        <span ng-show="APAnesthesiaOptionsObj.AnesthetistName !==''">Anesthetist :</span>
+                                                        <label>{{APAnesthesiaOptionsObj.AnesthetistName}} {{PreAdmAnesthetistObj.ReviewedDate }}  </label>
+                                                    </li>
+
+                                                    <li ng-show="APAnesthesiaOptionsObj.AnesthesiologistName !==''">
+                                                        <span ng-show="APAnesthesiaOptionsObj.AnesthesiologistName !==''">Anesthesiologist :</span>
+                                                        <label>{{APAnesthesiaOptionsObj.AnesthesiologistName}} {{PreAdmAnesthetistObj.ReviewedDate }} </label>
+                                                    </li>
+
+
+
+                                                    <li ng-if="APAnesthesiaOptionsObj.AnesthetistNotes != ''">
+                                                        <small>
+                                                            <b>Notes:</b> {{APAnesthesiaOptionsObj.AnesthetistNotes}}
+                                                        </small>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="Anesthesiaobj.Indicator == false">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Medications
+                                            </th>
+                                            <td ng-if="PreAdmAnesthetistObj.PrescriptionDetails.length > 0">
+                                                <ul class="referral-summary-list dis-block" ng-repeat="presc in PreAdmAnesthetistObj.PrescriptionDetails track by $index">
+                                                    <li ng-repeat="item in presc.PrescriptionDetails track by $index" ng-show="item.Type == 'MedicineOrders' && item.DeleteInd == 'N'">
+                                                        <label>{{item.MedicationName}}</label>
+                                                        <label class="text-danger" ng-if="item.IsMedicationStopped">Medication Stopped</label>
+                                                        <label ng-if="item.IsMedicationStopped">-{{ item.StopDate | date:'MM/dd/yyyy'}}</label>
+                                                        <span ng-show="item.Action!=''">{{item.Action}}</span>
+                                                        <span ng-show="item.Dose!=''">{{item.Dose}}</span>
+                                                        <span ng-show="item.DoseUnit!=''">{{item.DoseUnit}}</span>
+                                                        <span ng-show="item.Route!=''">{{item.Route}}</span>
+                                                        <span ng-show="item.Frequency!=''">{{item.Frequency}}</span>
+                                                        <span ng-show="item.DoseOther!=''">{{item.DoseOther}}</span>
+                                                        <span ng-show="item.DaysSupply!=''"> for {{item.DaysSupply}} Days</span>
+
+                                                        <small class="text-s12w400C000" ng-show="item.PatientInstructions !='' && item.PatientInstructions != null"><b>Instructions:</b>{{item.PatientInstructions}}</small>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list dis-block">
+                                                    <li>
+                                                        <small class="text-s12w400C000" ng-show="PreAdmAnesthetistObj.MedicineOrdersInstructions !='' && PreAdmAnesthetistObj.MedicineOrdersInstructions != null"><b>Medications Instructions:</b>{{PreAdmAnesthetistObj.MedicineOrdersInstructions}}</small>
+                                                    </li>
+                                                </ul>
+
+                                            </td>
+                                            <td ng-if="PreAdmAnesthetistObj.PrescriptionDetails.length == 0">
+                                                <p>No data Added</p>
+                                            </td>
+                                        </tr>
+
+                                        <tr ng-if="PreAdmAnesthetistObj.Investigationslist.length > 0">
+                                            <th width="16%">
+                                                Lab / Investigations
+                                            </th>
+                                            <td ng-if="PreAdmAnesthetistObj.Investigationslist.length > 0">
+                                                <ul class="referral-summary-list dis-block" ng-repeat="Iitem in PreAdmAnesthetistObj.Investigationslist |filter:{DeleteInd: 'N'} track by $index">
+                                                    <li>
+                                                        <label class="font-weight-700">({{Iitem.LocationId === 1 ? 'OD' : (Iitem.LocationId === 2 ? 'OS': (Iitem.LocationId === 3 ? 'OU':(Iitem.LocationId === 4 ? 'General':''))) }}) {{Iitem.ProcedureCode}} |{{Iitem.InvestigationName}}</label>
+                                                        <span class="text-s12w400c7e7e7e" ng-hide="(Iitem.DurationDate == '')||(Iitem.DurationDate == null)">
+                                                            (Scheduled on {{Iitem.DurationDate | date:'MM-dd-yyyy'}})
+                                                        </span>
+                                                        <span class="text-s12w400c7e7e7e" ng-hide="(Iitem.Duration == 0)||(Iitem.Duration == null)">
+                                                            for {{Iitem.Duration}}
+                                                            <span ng-if="Iitem.DurationType === 'D'"> Days</span>
+                                                            <span ng-if="Iitem.DurationType === 'W'"> Weeks</span>
+                                                            <span ng-if="Iitem.DurationType === 'M'"> Months</span>
+                                                            <span ng-if="Iitem.DurationType === 'Y'"> Years</span>
+                                                            <span ng-if="Iitem.DurationType === 'SB'"> Since Birth</span>
+                                                        </span>
+                                                        <div ng-show="Iitem.InvestigationNotes!=''">
+                                                            <b>Notes:</b>
+                                                            <span class="text-s12w400C000">{{Iitem.InvestigationNotes}}</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-if="PreAdmAnesthetistObj.Investigationslist.length === 0">
+                                                <p>No data Added</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Files  
+                                            </th>
+                                            <td ng-show="PreAdmAnesthetistObj.DocumentDetails.length > 0">
+                                                <ul class="flex-flow-ulli-mb0 drawingpad-img-show">
+                                                    <li ng-repeat="img in PreAdmAnesthetistObj.DocumentDetails">
+                                                       
+                                                        <div>
+                                                            <img ngf-thumbnail="img.S3URL" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" ng-if="img.DocumentID != 0 && img.FileExt != 'pdf' && img.FileExt !== 'application/pdf'" width="28" height="28" ng-src="{{img.S3URL}}" image-viewer>
+                                                            <a href="{{img.S3URL}}" target="_blank">
+                                                                <img src="img/billing/pdf-img.png" ng-if="img.DocumentID != 0 && (img.FileExt == 'pdf'|| img.FileExt == 'application/pdf')" class="img-thumbnail height-50 w-50" width="50" height="50">
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="PreAdmAnesthetistObj.DocumentDetails.length == 0">
+                                                <p>No Data Added.</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th width="16%">
+                                                Anesthesia Status
+                                            </th>
+                                            <td ng-show="Anesthesiaobj.IndicatorStatus == true">
+                                                <ul class="asc-surgery-list">
+                                                    <li>
+                                                        <label class="text-068cb0">{{PreAdmAnesthetistObj.PreAdmissionStatus}}</label>
+                                                    </li>
+                                                    <li ng-show="PreAdmAnesthetistObj.AnesthesiaReviewedName != ''">
+                                                        <span>Anesthetist Reviewed By:</span>
+                                                        <label>{{PreAdmAnesthetistObj.AnesthesiaReviewedName}} {{PreAdmAnesthetistObj.AnesthesiaSuffix}} <span ng-show="PreAdmAnesthetistObj.AnesthesiaLicenseNo !==''">Lic: {{PreAdmAnesthetistObj.AnesthesiaLicenseNo}},</span></label>
+                                                    </li>
+                                                    <li ng-show="PreAdmAnesthetistObj.AnesthesiaReviewedName != ''">
+
+                                                        <label>{{PreAdmAnesthetistObj.ReviewedDate}}</label>
+                                                    </li>
+                                                    <li ng-show="PreAdmAnesthetistObj.AnesthesiologistReviewedName != ''">
+                                                        <span>Anesthesiologist Reviewed By:</span>
+                                                        <label>{{PreAdmAnesthetistObj.AnesthesiologistReviewedName}}</label>
+                                                    </li>
+                                                    <li ng-show="PreAdmAnesthetistObj.AnesthesiologistReviewedName != ''">
+
+                                                        <label>{{PreAdmAnesthetistObj.ReviewedDate}}</label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td ng-show="Anesthesiaobj.IndicatorStatus == false">
+                                                <p>No data added.</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>                         
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

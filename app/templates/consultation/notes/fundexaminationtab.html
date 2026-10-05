@@ -1,0 +1,223 @@
+<div class="tabs-header tabs_background">
+    <div class="pagecontent">
+        <div class="row">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-body">
+                        <div class="row">
+
+                            <div class="col-lg-3">
+                                <div class="InvestiSelect">
+                                    <select ng-change="changeFundInvestigation(cacheStorageItem.selectedPosteriorInv)"
+                                            ng-model="cacheStorageItem.selectedPosteriorInv"
+                                            ng-options="option as option.Investigation for option in cacheStorageItem.PosteriorArray"
+                                            class="form-control">
+                                        <option value="">Select Investigation</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-9 InvestiSelect">
+                                <ul>
+                                    <li ng-repeat="item in cacheStorageItem.PosteriorArray | filter:{'IsSelected':'Y'}">
+                                        <span ng-bind="item.Investigation"></span>
+                                        <i class="fa fa-times" ng-click="removeInvestigation(item,'Posterior')"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="row" ng-repeat="item in cacheStorageItem.PosteriorArray" ng-show="item.IsSelected == 'Y'">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-header mb-0">
+                        <h1 ng-bind="item.Investigation"></h1>
+                    </div>
+                    <div class="tile-body pt-0">
+                        <div class="row eye_lids">
+                            <div class="col-lg-6">
+                                <div class="br-1 col-lg-12 pt-15">
+                                    <label class="customLabel">OD</label>
+                                    <label class="mt-5 pull-right cursorp">
+                                        <input type="checkbox" class="checkbox" value="Recommanded For Surgary" ng-model="item.IsNormalR">
+                                        <span class="lbl"></span>
+                                        <span class="list-opt-text-new ng-binding">Normal</span>
+                                    </label>
+                                    <textarea ng-show="item.RemarksInd == 'Y'" class="form-control mt-10" rows="2" placeholder="Findings" ng-model="item.RightEyeRemarks" ng-focus="item.IsSelected == 'Y' ? FindFocusPosterior= true : ''" ng-focus-lost="LostFocusPosterior()"></textarea>
+
+                                    <div class="col-lg-12 p-0 mt-10">
+
+
+
+                                        <div class="col-lg-7 p-0">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <label class="input-group-btn">
+                                                        <span class="btn btn-primary height-30">
+                                                            Select File<input type="file"
+                                                                              class="file dis-none"
+                                                                              onchange="angular.element(this).scope().FileChange(this.files, 'Right', angular.element(this).scope().item)" />
+                                                        </span>
+                                                    </label>
+                                                    <input type="text" class="form-control hdn-input" readonly ng-model="item.RightEyefileName" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="col-lg-5 pr-0 text-right">
+                                            <button ng-show="item.SyncImageInd == 'Y'" class="btn warning-btn" ng-click="syncImages('Right',item)">Sync</button>
+                                            <button ng-show="item.GetTemplateInd == 'Y'" class="btn blue-btn" ng-click="GetTemplate('Right',item)">Get Template</button>
+                                        </div>
+
+                                        <div class="col-lg-12 mb-10 p-0" ng-show="item.CdRatioValuesInd == 'Y'">
+                                            <div class="col-lg-5 pl-0 CupInput">
+                                                <label for="Cup">CD ratio :</label>
+                                                <input type="text" id="Cup" placeholder="0" ng-model="item.RightEyeCdRatio" numbers-slash-only="" maxlength="3"  class="w-100" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 mb-10 p-0" ng-show="item.FrequencyValuesInd == 'Y'">
+                                            <div class="col-lg-2 pl-0 CupInput CupLabel">
+                                                <label for="Cup">FR+</label>
+                                                <input type="radio" ng-model="item.RightEyeFreq" id="Cup" name="PerimetryRightEye_{{$index}}" value="positive"  class="pos-relative right-0"  />
+                                            </div>
+                                            <div class="col-lg-3 CupInput CupLabel">
+                                                <label for="Disk">FR-</label>
+                                                <input type="radio" id="Disk" ng-model="item.RightEyeFreq" name="PerimetryRightEye_{{$index}}" value="negative" class="pos-relative right-0" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-12 p-0">
+                                        <div ng-show="item.RightEyediv">
+
+                                            <div pw-canvas
+                                                 version="item.RightEyeUndoCount"
+                                                 undoclicked="item.IsUndoClicked" options="{undo:true,color:selectedColor,lineWidth:selectedLineWidth,imageSrc:item.thumbnailRightEye,customCanvasId:item.RightPwCanvas}">
+                                                <div class="pwCanvasPaint"></div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div pw-color-selector="['#000', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF']" color="selectedColor" class="canvas_color col-lg-6">
+                                                </div>
+                                                <div class="col-lg-6 text-left p-0 mt-5 mb-5 undo">
+                                                    <button ng-click="undoEyeCount(item,'Right')" ng-disabled="item.RightEyeUndoCount < 1">
+                                                        Undo ( <span ng-bind="item.RightEyeUndoCount"></span>)
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0 mt-10 mb-10" ng-show="item.RightEyeArray.length  >0">
+                                        <div class="col-lg-2 p-7" ng-repeat="subitem in item.RightEyeArray">
+                                            <i class="fa fa-times" ng-click="removeImage(subitem,'Right',0,item)" role="button" tabindex="0"></i>
+                                            <img class="img-responsive br-1" ng-src="{{subitem.DocURL}}" ng-click="EditImage(item,subitem,'Right')" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12 text-right p-0 mt-5 mb-5 save_canvas">
+                                        <button class="btn primary-btn" ng-show="!item.RightEyeEdit" ng-click="savecanvas('Right',item)" ng-disabled="!item.RightEyediv">
+                                            Save Image
+                                        </button>
+                                        <button class="btn primary-btn" ng-show="item.RightEyeEdit" ng-click="updatecanvas('Right',item)">
+                                            Update Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="br-1 col-lg-12 pt-15">
+                                    <label class="customLabel">OS</label>
+
+                                    <label class="mt-5 pull-right cursorp">
+                                        <input type="checkbox" class="checkbox" value="Recommanded For Surgary" ng-model="item.IsNormalL">
+                                        <span class="lbl"></span>
+                                        <span class="list-opt-text-new ng-binding"> Normal</span>
+                                    </label>
+                                    <textarea ng-show="item.RemarksInd == 'Y'" class="form-control mt-10" rows="2" placeholder="Findings" ng-model="item.LeftEyeRemarks"></textarea>
+                                    <div class="col-lg-12 p-0 mt-10">
+
+                                        <div class="col-lg-7 p-0">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <label class="input-group-btn">
+                                                        <span class="btn btn-primary height-30">
+                                                            Select File<input type="file"
+                                                                              class="file dis-none"
+                                                                              onchange="angular.element(this).scope().FileChange(this.files, 'Left', angular.element(this).scope().item)" />
+                                                        </span>
+                                                    </label>
+                                                    <input type="text" class="form-control hdn-input" readonly ng-model="item.LeftEyefileName" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-5 pr-0 text-right">
+                                            <button ng-show="item.SyncImageInd == 'Y'" class="btn warning-btn" ng-click="syncImages('Left',item)">Sync</button>
+                                            <button ng-show="item.GetTemplateInd == 'Y'" class="btn blue-btn" ng-click="GetTemplate('Left',item)">Get Template</button>
+                                        </div>
+                                        
+                                        <div class="col-lg-12 mb-10 p-0" ng-show="item.CdRatioValuesInd == 'Y'">
+                                            <div class="col-lg-5 pl-0 CupInput">
+                                                <label for="Cup">CD ratio :</label>
+                                                <input type="text" id="Cup" placeholder="0" ng-model="item.LeftEyeCdRatio" class="w-100" numbers-slash-only="" maxlength="3" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 mb-10 p-0" ng-show="item.FrequencyValuesInd == 'Y'">
+                                            <div class="col-lg-2 pl-0 CupInput CupLabel">
+                                                <label for="Cup">FR+</label>
+                                                <input type="radio" ng-model="item.LeftEyeFreq" id="Cup" name="PerimetryLeftEye_{{$index}}" value="positive"  class="pos-relative right-0" />
+                                            </div>
+                                            <div class="col-lg-3 CupInput CupLabel">
+                                                <label for="Disk">FR-</label>
+                                                <input type="radio" id="Disk" ng-model="item.LeftEyeFreq" name="PerimetryLeftEye_{{$index}}" value="negative"  class="pos-relative right-0" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0">
+                                        <div ng-show="item.LeftEyediv">
+                                            <div pw-canvas
+                                                 version="item.LeftEyeUndoCount"
+                                                 undoclicked="item.IsUndoClicked" options="{undo:true,color:selectedColor,lineWidth:selectedLineWidth,imageSrc:item.thumbnailLeftEye,customCanvasId:item.LeftPwCanvas}">
+                                                <div class="pwCanvasPaint"></div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div pw-color-selector="['#000', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF']" color="selectedColor" class="canvas_color col-lg-6">
+                                                </div>
+                                                <div class="col-lg-6 text-left p-0 mt-5 mb-5 undo">
+                                                    <button ng-click="undoEyeCount(item,'Left')" ng-disabled="item.LeftEyeUndoCount < 1">
+                                                        Undo  (<span ng-bind="item.LeftEyeUndoCount"></span>)
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 p-0 mt-10 mb-10" ng-show="item.LeftEyeArray.length  >0">
+                                        <div class="col-lg-2 p-7" ng-repeat="subitem in item.LeftEyeArray">
+                                            <i class="fa fa-times" ng-click="removeImage(subitem,'Left',0,item)" role="button" tabindex="0"></i>
+                                            <img class="img-responsive br-1" ng-src="{{subitem.DocURL}}" ng-click="EditImage(item,subitem,'Left')" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12 text-right p-0 mt-5 mb-5 save_canvas">
+                                        <button class="btn primary-btn" ng-show="!item.LeftEyeEdit" ng-click="savecanvas('Left',item)" ng-disabled="!item.LeftEyediv">
+                                            Save Image
+                                        </button>
+                                        <button class="btn primary-btn" ng-show="item.LeftEyeEdit" ng-click="updatecanvas('Left',item)">
+                                            Update Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

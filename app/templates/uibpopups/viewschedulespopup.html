@@ -1,0 +1,1281 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <ul class="list__none-- m__0-- d__f-- ai__c-- gap__5--x">
+            <li>
+                <label class="fs__xl-- fw__6-- tc__1D1D1D--" >{{ 'NAME' | translate}} : <span class="fs__xl-- fw__5-- tc__656565--"> {{MainUserObj.BasicInfo.Prefix}}.{{MainUserObj.BasicInfo.FullName}}</span></label>
+            </li>
+            <li>
+                <label  class="fs__xl-- fw__6-- tc__1D1D1D--">{{ 'USERNAME' | translate}} : <span class="fs__xl-- fw__5-- tc__656565--">{{MainUserObj.BasicInfo.UserName}}</span></label>
+            </li>
+        </ul>
+        <ul class="list__none-- m__0-- d__f-- ai__c-- gap__10--x">
+            <li>
+                <div class="d__f-- ai__c-- gap__10--x m-b-10" >
+                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                        <input type="checkbox" class="checkbox"
+                               ng-model="UserDetailedSlotObj.IsInsuranceBasedScheduling">
+                        <span class="lbl"></span>
+                        <span class="fs__md-- fw__4-- tc__1D1D1D--">Enable Insurance-Based Scheduling</span>
+                    </label>
+                </div>
+            </li>
+            <li>
+                <div class="d__f-- ai__c-- gap__10--x m-b-10" ng-show="Obj.isAdvancedView">
+                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                        <input type="checkbox" class="checkbox"
+                               ng-model="UserDetailedSlotObj.isDurationBasedSlots" ng-change="onDurationBasedSlotsToggle()">
+                        <span class="lbl"></span>
+                        <span class="fs__md-- fw__4-- tc__1D1D1D--">Advanced Slots (Duration-Based)</span>
+                    </label>
+                </div>
+            </li>
+            <li>
+                <h1 class="fs__xl-- fw__6-- tc__656565-- m__0--">From:{{UserDetailedSlotObj.FromDate | date: "MM-dd-yyyy"}} - To:{{UserDetailedSlotObj.ToDate | date: "MM-dd-yyyy"}}</h1>
+            </li>
+            <li class="d__f--">
+                <a class="btn__close--2" ng-click="closeuib()">
+                    <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false" style=""></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll">
+                <table class="horizontal-table-eh">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <span class="ehr-input-label"> {{ 'STARTTIME' | translate}}</span>
+                            </th>
+                            <th>
+                                <span class="ehr-input-label"> {{ 'ENDTIME' | translate}}</span>
+                            </th>
+                            <th>
+                                <span class="ehr-input-label">{{ 'BRANCH' | translate}}</span>
+                            </th>
+                            <th>
+                                <span class="ehr-input-label">Max Slots</span>
+                            </th>
+                            <th width="5%"></th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="item in UserDetailedSlotObj.UserScheduleDetails track by $index">
+                        <tr>
+                            <td width="15%">
+                                <span class="text-s12w500c313131 text-center fs-12 p-5 btn-block bg-4bb8a2 bradius-6 text-white">{{item.Day}}</span>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <select ng-model="item.StartTime" ng-change="ChangeStartTimeSchedule(item);">
+                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                        <!--<option ng-repeat="time in UserDetailedSlotObj.SlotStartValues" ng-selected="{{item.StartTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>-->
+                                        <option ng-repeat="time in item.SlotStartValues" ng-selected="{{item.StartTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <select ng-model="item.EndTime">
+                                        <option value="">{{ 'SELECT' | translate}}</option>
+                                        <!--<option ng-repeat="time in UserDetailedSlotObj.SlotStartValues" ng-selected="{{item.EndTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>-->
+                                        <option ng-repeat="time in item.SlotEndValues" ng-selected="{{item.EndTime == time.time}}" value="{{time.time}}">{{time.newtime}}</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <select ng-model="item.BranchObj" ng-change="changeSlotBranch(item)" ng-options="item as item.BranchName for item in MainUserObj.BasicInfo.UserWorkingBranches">
+                                        <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group">
+                                    <input type="text" placeholder="Max Slots" numbers-only ng-model="item.MaximumOverAllSlots" maxlength="3" />
+                                </div>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-link btn-sm" ng-click="clearDayDataInEdit(item);">
+                                    <i class="eh-close eh-icon"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-info btn-ebebeb" ng-click="ShowHideAllDays(item);">
+                                    <i class="fas fa-chevron-right" ng-hide="item.IsShowAllDays"></i>
+                                    <i class="fas fa-chevron-down" ng-show="item.IsShowAllDays"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr ng-show="item.IsShowAllDays">
+                            <td colspan="7" class="">
+                                <div class="ehr-tabs">
+                                    <ul class="w-300">
+                                        <li ng-class="Obj.isAdvancedView?'active':''">
+                                            <a href="javascript:;" ng-click="(UserDetailedSlotObj.IsDetailedSchedule && !item.IsAdvancedSchedule) ? angular.noop():changetoAdvanceMode(item)">{{ 'SLOTWISE' | translate}}</a>
+                                        </li>
+                                        <li ng-class="!Obj.isAdvancedView?'active':''">
+                                            <a href="javascript:;" ng-click="(!UserDetailedSlotObj.IsDetailedSchedule && item.IsAdvancedSchedule) ? angular.noop():changetoDetailedMode(item)">{{ 'SLOTRANGE' | translate}}e</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <table class="horizontal-table-eh">
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-0">
+                                                <div class="section-eh tile-blue p-8 bg-f4f8ff b-0 overflow-visible" ng-show="!Obj.isAdvancedView">
+                                                    <div class="tile-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="cons-assessment">
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header">
+                                                                            <h1>{{ 'NEWAPPOINTMENT' | translate}}</h1>
+                                                                            <ul class="us-controls">
+                                                                                <li>
+                                                                                    <input type="text" valid-number maxlength="2" class="w-70 input__style--2 form__control"
+                                                                                           placeholder="{{ 'MAXSLOTS' | translate}}" ng-model="item.NewAppointmentMaxSlots" ng-change="OnChangeMaxSlots(item,1);" />
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Aitem in item.NewAppointmentSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header">
+                                                                            <h1>{{ 'CLINICFOLLOWUPS' | translate}}</h1>
+                                                                            <ul class="us-controls">
+                                                                                <li>
+                                                                                    <input type="text" valid-number maxlength="2" class="w-70 input__style--2 form__control"
+                                                                                           placeholder="{{ 'MAXSLOTS' | translate}}" ng-model="item.ClinicFollowUpAppointmentMaxSlots" ng-change="OnChangeMaxSlots(item,2);" />
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Aitem in item.ClinicalFollowAppointmentSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header">
+                                                                            <h1>{{ 'POSTOPFOLLOWUPS' | translate}}</h1>
+                                                                            <ul class="us-controls">
+                                                                                <li>
+                                                                                    <input type="text" valid-number maxlength="2" class="w-70 input__style--2 form__control"
+                                                                                           placeholder="{{ 'MAXSLOTS' | translate}}" ng-model="item.PostOpFollowUpAppointmentMaxSlots" ng-change="OnChangeMaxSlots(item,3);" />
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Aitem in item.PostOpFollowAppointmentSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header">
+                                                                            <h1>{{ 'ASCFOLLOWUPS' | translate}}</h1>
+                                                                            <ul class="us-controls">
+                                                                                <li>
+                                                                                    <input type="text" valid-number maxlength="2" class="w-70 input__style--2 form__control"
+                                                                                           placeholder="{{ 'MAXSLOTS' | translate}}" ng-model="item.ASCAppointmentMaxSlots" ng-change="OnChangeMaxSlots(item,4);" />
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Aitem in item.ASCFollowAppointmentSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header">
+                                                                            <h1>Investigation</h1>
+                                                                            <ul class="us-controls">
+                                                                                <li>
+                                                                                    <input type="text" valid-number maxlength="2" class="w-70 input__style--2 form__control"
+                                                                                           placeholder="{{ 'MAXSLOTS' | translate}}" ng-model="item.InvestigationMaxSlots" ng-change="OnChangeMaxSlots(item,5);" />
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Aitem in item.InvestigationSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Aitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Aitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Aitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header py__10--">
+                                                                            <h1>{{ 'ONLINESLOTS' | translate}}</h1>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="oitem in item.OnlineSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select class="p-x-0 p-y-2" ng-model="oitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{oitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in oitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="oitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{oitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in oitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                    <section class="section-eh tile-gray box-shadow">
+                                                                        <div class="section-eh-header py__10--">
+                                                                            <h1>{{ 'BREAK' | translate}}</h1>
+                                                                        </div>
+                                                                        <div class="section-eh-body">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-12">
+                                                                                    <table class="table tableno-padding tableno-bordered m-b-0">
+                                                                                        <tbody>
+                                                                                            <tr ng-repeat="Bitem in item.BreakSlots track by $index">
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'STARTTIME' | translate}}</label>
+                                                                                                        <select ng-model="Bitem.StartTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Bitem.StartTime == time.time}}"
+                                                                                                                    ng-repeat="time in Bitem.SlotStartValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <div class="form__group">
+                                                                                                        <label>{{ 'ENDTIME' | translate}}</label>
+                                                                                                        <select ng-model="Bitem.EndTime">
+                                                                                                            <option value="" disabled>{{ 'SELECT' | translate}}</option>
+                                                                                                            <option ng-selected="{{Bitem.EndTime == time.time}}"
+                                                                                                                    ng-repeat="time in Bitem.SlotEndValues" value="{{time.time}}">
+                                                                                                                {{time.newtime}}
+                                                                                                            </option>
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </section>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- / -->
+                                                        <div class="p-8" ng-if="item.DayId !== 7">
+                                                            <div class="row">
+                                                                <div class="col-lg-9">
+                                                                    <div class="dis-flex justify-space-between align-items-center">
+                                                                        <div class="dis-flex">
+                                                                            <label class="text-s10w500C818181 fs-16 m-r-20">{{ 'REPEATAVALIABILITY' | translate}}</label>
+                                                                            <ul class="flex-flow-ulli flex-flow-ulli-mb0 gap__10--x">
+                                                                                <li ng-repeat="hitem in UserDetailedSlotObj.UserScheduleDetails" ng-show="hitem.DayId > item.DayId">
+                                                                                    <div class="d__f-- ai__c-- gap__10--x ">
+                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                            <input name="checkbox-3" type="checkbox" class="checkbox"  ng-model="hitem.IsChecked">
+                                                                                            <span class="lbl"></span>
+                                                                                            <span class="fs__md-- fw__4-- tc__1D1D1D--">{{hitem.Day}}</span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <button class="btn__lg-- btn__1d5558--f" ng-click="OnSelectWeekDay(UserDetailedSlotObj.UserScheduleDetails,item);" ng-disabled="(UserDetailedSlotObj.UserScheduleDetails | filter:{'IsChecked': true}).length == 0">{{ 'SAVE' | translate}}</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="section-eh tile-blue p-8 bg-f1f1f1 overflow-visible" ng-show="Obj.isAdvancedView">
+                                                    <div class="tile-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <!-- "Advanced Slots" tab: duration-based slot arrangement -->
+                                                                <table class="horizontal-table-eh tableno-padding m-b-10" ng-show="UserDetailedSlotObj.isDurationBasedSlots">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label> Slot Type<em>*</em></label>
+                                                                                    <select ng-model="addNewAdvancedSlotReqObj.SlotType" ng-change="onSlotTypeSelect(addNewAdvancedSlotReqObj.SlotType);">
+                                                                                        <option value="1">Availability</option>
+                                                                                        <option value="2">Break Slot</option>
+                                                                                        <option value="3">Online Slot</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </td>
+                                                                            <!--<td width="10%">
+        <div class="form-group">
+            <label class="text-appt"> Time Slot <em>*</em></label>
+            <select class="form-control" ng-model="addNewAdvancedSlotReqObj.TimeSlot" ng-options="slot as slot.NewFormattedStime for slot in item.allDaySlots">
+                <option value="" ng-disabled="true">Select Timeslot</option>
+            </select>
+        </div>
+    </td>-->
+                                                                            <td>
+                                                                                <div class="form__group">
+                                                                                    <label>{{ 'VISITREASON' | translate}} <em>*</em></label>
+                                                                                    <div class="dropdown cstm-dropdown width-100" ng-hide="SlotsParamObj.IsonlineVisitreason == true">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="SlotsParamObj.IsOptionsDisabled">
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{NewselectedVisitReason ? NewselectedVisitReason:'Select'}}
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="{{ 'SEARCHVISITREASON' | translate}}" ng-model="SlotsParamObj.VisitRsnName" />
+                                                                                            </div>
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="SlotsParamObj.AllVisitReasonsCheck" ng-click="NewCheckAllVisitReasons(SlotsParamObj.AllVisitReasonsCheck)">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                    <li ng-repeat="item in GetVisitReasonArray | filter:{'Reason':SlotsParamObj.VisitRsnName}">
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="NewVisitRsnToggle(item);">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small ng-bind="item.Reason"></small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="dropdown cstm-dropdown width-100"
+                                                                                         ng-show="SlotsParamObj.IsonlineVisitreason">
+
+                                                                                        <button class="form__control text-left pr__20--"
+                                                                                                data-toggle="dropdown">
+
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{NewSelectedOnlineVisitReason ? NewSelectedOnlineVisitReason : 'Select'}}
+                                                                                        </button>
+
+                                                                                        <div class="dropdown-menu dr-drop-app"
+                                                                                             ng-click="stopClosingDropDown($event)">
+
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <input type="text"
+                                                                                                       class="form-control"
+                                                                                                       placeholder="Search Online Visit Reason"
+                                                                                                       ng-model="SlotsParamObj.OnlineVisitRsnName" />
+                                                                                            </div>
+
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+
+                                                                                                <ul>
+
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+
+                                                                                                                <input type="checkbox"
+                                                                                                                       ng-model="SlotsParamObj.AllOnlineVisitReasonsCheck"
+                                                                                                                       ng-click="CheckAllOnlineVisitReasons(SlotsParamObj.AllOnlineVisitReasonsCheck)">
+
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+
+                                                                                                                <small>All Online Visit Reasons</small>
+
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+
+                                                                                                    <li ng-repeat="item in AllOnlineApptVistReasonsArray | filter:{'OnlineVisitReason':SlotsParamObj.OnlineVisitRsnName}">
+
+                                                                                                        <div class="checkbox cn">
+
+                                                                                                            <label>
+
+                                                                                                                <input type="checkbox"
+                                                                                                                       ng-model="item.IsChecked"
+                                                                                                                       ng-click="OnlineVisitReasonToggle(item)">
+
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+
+                                                                                                                <small>{{item.OnlineVisitReason}}</small>
+
+                                                                                                            </label>
+
+                                                                                                        </div>
+
+                                                                                                    </li>
+
+                                                                                                </ul>
+
+                                                                                            </div>
+
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td ng-show="UserDetailedSlotObj.IsInsuranceBasedScheduling">
+
+                                                                                <div class="form__group">
+                                                                                    <label>{{ 'Payor' | translate}} </label>
+                                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="SlotsParamObj.IsOptionsDisabled">
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{UserDetailedSlotObj.SelectedPayorText ? 'Selected':'Select'}}
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app " role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control position__sticky-- top__0-- bg__FFFFFF-- zindex__1--">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="{{ 'SEARCHPayor' | translate}}" ng-model="SlotsParamObj.PayorTypeName" />
+                                                                                            </div>
+                                                                                            <div class="apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li ng-repeat="item in MasterPayosTypesArray | filter:{PayorName:SlotsParamObj.PayorTypeName}">
+                                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-click="TogglePayorType(item,UserDetailedSlotObj)">
+                                                                                                            <input name="checkbox-3" type="checkbox" class="checkbox" ng-model="item.IsChecked" />
+                                                                                                            <span class="lbl"></span>
+                                                                                                            <span class="fs__md-- fw__4-- tc__1D1D1D--">{{item.PayorName}}</span>
+                                                                                                        </label>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+
+                                                                                </div>
+                                                                            </td>
+                                                                            <!--<td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label>Start Time<em>*</em></label>
+                                                                                    <select ng-model="addNewAdvancedSlotReqObj.SlotStartTime"
+                                                                                            ng-change="onSlotStartTimeChange()">
+                                                                                        <option value="">Select</option>
+                                                                                        <option ng-repeat="time in SlotStartTimeValues"
+                                                                                                ng-selected="addNewAdvancedSlotReqObj.SlotStartTime == time.time"
+                                                                                                value="{{time.time}}">
+                                                                                            {{time.newtime}}
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </td>-->
+                                                                            <!-- NEW: End Time -->
+                                                                            <!--<td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label>End Time<em>*</em></label>
+                                                                                    <select ng-model="addNewAdvancedSlotReqObj.SlotEndTime">
+                                                                                        <option value="">Select</option>
+                                                                                        <option ng-repeat="time in SlotEndTimeValues"
+                                                                                                ng-selected="addNewAdvancedSlotReqObj.SlotEndTime == time.time"
+                                                                                                value="{{time.time}}">
+                                                                                            {{time.newtime}}
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </td>-->
+                                                                            <td>
+                                                                                <div class="form__group">
+                                                                                    <label>Duration </label>
+                                                                                    <select class="form-control"
+                                                                                            ng-model="addNewAdvancedSlotReqObj.DurationMinutes"
+                                                                                            ng-options="d as d + ' mins' for d in DurationOptions"
+                                                                                            ng-change="onDurationChange(item)" ng-disabled="addNewAdvancedSlotReqObj.IsEdit">
+                                                                                        <option value="">Select Duration</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label>Select Timeslot</label>
+                                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="addNewAdvancedSlotReqObj.IsEdit">
+                                                                                            {{AllDaySlotsObj.SlotsText ? AllDaySlotsObj.SlotsText:'Select'}}
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="Search slot" ng-model="AllDaySlotsObj.Slot" />
+                                                                                            </div>
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="AllDaySlotsObj.AllSlotsCheck" ng-click="CheckAllSlots(AllDaySlotsObj.AllSlotsCheck,item);">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small>All Slots</small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                    <!--<li ng-repeat="hitem in item.allDaySlots | filter:{'NewFormattedStime':AllDaySlotsObj.Slot}">
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label ng-class="{'text-muted': hitem.IsOverlapDisabled}" title="{{hitem.IsOverlapDisabled ? 'Overlaps a slot already selected' : ''}}">
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="hitem.IsChecked" ng-click="AllDaySlotToggle(hitem,item)" ng-disabled="hitem.IsOverlapDisabled">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small ng-bind="hitem.NewFormattedStime+ ' - ' + hitem.NewFormattedEtime"></small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>-->
+                                                                                                    <li ng-repeat="hitem in item.allDaySlots | filter:{'NewFormattedStime':AllDaySlotsObj.Slot}">
+                                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-class="{'text-muted': hitem.IsOverlapDisabled}" title="{{hitem.IsOverlapDisabled ? 'Overlaps a slot already selected' : ''}}">
+                                                                                                            <input type="checkbox" class="checkbox" ng-model="hitem.IsChecked" ng-click="AllDaySlotToggle(hitem,item)" ng-disabled="hitem.IsOverlapDisabled">
+                                                                                                            <span class="lbl"></span>
+                                                                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="hitem.NewFormattedStime+ ' - ' + hitem.NewFormattedEtime"></span>
+                                                                                                        </label>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <!--<td class="valign-bottom" width="8%">
+        <div class="pop-ehr-input ehr-input ehr-input-color">
+            <input type="text" placeholder="Max Slots" />
+        </div>
+    </td>-->
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label> Max Slots</label>
+                                                                                    <input type="text" ng-model="addNewAdvancedSlotReqObj.MaxNumberOfSlots" numbers-only ng-disabled="SlotsParamObj.IsOptionsDisabled" maxlength="3" />
+                                                                                </div>
+                                                                            </td>
+                                                                            <td colspan="2">
+                                                                                <div class="d__f-- ai__c-- gap__10--x m-t-20">
+                                                                                    <button class="btn__lg-- btn__1d5558--f" ng-click="addSlotForlist(item)" ng-if="!addNewAdvancedSlotReqObj.IsEdit">Add</button>
+                                                                                    <button class="btn__lg-- btn__1d5558--f" ng-click="UpdateSlotDetails(item)" ng-if="addNewAdvancedSlotReqObj.IsEdit">Update</button>
+                                                                                    <button class="btn__lg-- btn__C71D27--o" ng-click="clearSlotsForApptList(item)">Clear</button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <!--<div class="p-3 m-b-10">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <ul class="advanced-ncpa p-t-15">
+                                                                                <li ng-repeat="aitem in item.allDaySlots track by $index">
+                                                                                    <a ng-class="getFieldAdvancedClass(aitem)" ng-click="activeParticularAdvancedSlot(aitem)">{{aitem.NewFormattedStime}}</a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>-->
+
+                                                                <!-- "Slot Wise" tab: original (pre-duration-work) behavior — no Duration control;
+                                                                     Select Timeslot list is generated once at the org's default duration when this
+                                                                     tab opens (changetoAdvanceMode), same as production. -->
+                                                                <table class="horizontal-table-eh tableno-padding m-b-10" ng-show="!UserDetailedSlotObj.isDurationBasedSlots">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label> Slot Type<em>*</em></label>
+                                                                                    <select ng-model="addNewAdvancedSlotReqObj.SlotType" ng-change="onSlotTypeSelectLegacy(addNewAdvancedSlotReqObj.SlotType);">
+                                                                                        <option value="1">Availability</option>
+                                                                                        <option value="2">Break Slot</option>
+                                                                                        <option value="3">Online Slot</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="form__group">
+                                                                                    <label>{{ 'VISITREASON' | translate}} <em>*</em></label>
+                                                                                    <div class="dropdown cstm-dropdown width-100" ng-hide="SlotsParamObj.IsonlineVisitreason == true">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="SlotsParamObj.IsOptionsDisabled">
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{NewselectedVisitReason ? NewselectedVisitReason:'Select'}}
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="{{ 'SEARCHVISITREASON' | translate}}" ng-model="SlotsParamObj.VisitRsnName" />
+                                                                                            </div>
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="SlotsParamObj.AllVisitReasonsCheck" ng-click="NewCheckAllVisitReasons(SlotsParamObj.AllVisitReasonsCheck)">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                    <li ng-repeat="item in GetVisitReasonArray | filter:{'Reason':SlotsParamObj.VisitRsnName}">
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="NewVisitRsnToggle(item);">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small ng-bind="item.Reason"></small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="dropdown cstm-dropdown width-100"
+                                                                                         ng-show="SlotsParamObj.IsonlineVisitreason">
+
+                                                                                        <button class="form__control text-left pr__20--"
+                                                                                                data-toggle="dropdown">
+
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{NewSelectedOnlineVisitReason ? NewSelectedOnlineVisitReason : 'Select'}}
+                                                                                        </button>
+
+                                                                                        <div class="dropdown-menu dr-drop-app"
+                                                                                             ng-click="stopClosingDropDown($event)">
+
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <input type="text"
+                                                                                                       class="form-control"
+                                                                                                       placeholder="Search Online Visit Reason"
+                                                                                                       ng-model="SlotsParamObj.OnlineVisitRsnName" />
+                                                                                            </div>
+
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+
+                                                                                                <ul>
+
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+
+                                                                                                                <input type="checkbox"
+                                                                                                                       ng-model="SlotsParamObj.AllOnlineVisitReasonsCheck"
+                                                                                                                       ng-click="CheckAllOnlineVisitReasons(SlotsParamObj.AllOnlineVisitReasonsCheck)">
+
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+
+                                                                                                                <small>All Online Visit Reasons</small>
+
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+
+                                                                                                    <li ng-repeat="item in AllOnlineApptVistReasonsArray | filter:{'OnlineVisitReason':SlotsParamObj.OnlineVisitRsnName}">
+
+                                                                                                        <div class="checkbox cn">
+
+                                                                                                            <label>
+
+                                                                                                                <input type="checkbox"
+                                                                                                                       ng-model="item.IsChecked"
+                                                                                                                       ng-click="OnlineVisitReasonToggle(item)">
+
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+
+                                                                                                                <small>{{item.OnlineVisitReason}}</small>
+
+                                                                                                            </label>
+
+                                                                                                        </div>
+
+                                                                                                    </li>
+
+                                                                                                </ul>
+
+                                                                                            </div>
+
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td ng-show="UserDetailedSlotObj.IsInsuranceBasedScheduling">
+
+                                                                                <div class="form__group">
+                                                                                    <label>{{ 'Payor' | translate}} </label>
+                                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="SlotsParamObj.IsOptionsDisabled">
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                            {{UserDetailedSlotObj.SelectedPayorText ? 'Selected':'Select'}}
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app " role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control position__sticky-- top__0-- bg__FFFFFF-- zindex__1--">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="{{ 'SEARCHPayor' | translate}}" ng-model="SlotsParamObj.PayorTypeName" />
+                                                                                            </div>
+                                                                                            <div class="apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li ng-repeat="item in MasterPayosTypesArray | filter:{PayorName:SlotsParamObj.PayorTypeName}">
+                                                                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--" ng-click="TogglePayorType(item,UserDetailedSlotObj)">
+                                                                                                            <input name="checkbox-3" type="checkbox" class="checkbox" ng-model="item.IsChecked" />
+                                                                                                            <span class="lbl"></span>
+                                                                                                            <span class="fs__md-- fw__4-- tc__1D1D1D--">{{item.PayorName}}</span>
+                                                                                                        </label>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+
+                                                                                </div>
+                                                                            </td>
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label>Select Timeslot</label>
+                                                                                    <div class="dropdown cstm-dropdown width-100">
+                                                                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown" ng-disabled="addNewAdvancedSlotReqObj.IsEdit">
+                                                                                            {{AllDaySlotsObj.SlotsText ? AllDaySlotsObj.SlotsText:'Select'}}
+                                                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                                                                        </button>
+                                                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                                                                <span class="input-group-addon">
+                                                                                                    <span class="mainsearch-App">
+                                                                                                        <i class="fas fa-search"></i>
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <input type="text" class="form-control" placeholder="Search slot" ng-model="AllDaySlotsObj.Slot" />
+                                                                                            </div>
+                                                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                                                <ul>
+                                                                                                    <li>
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="AllDaySlotsObj.AllSlotsCheck" ng-click="CheckAllSlots(AllDaySlotsObj.AllSlotsCheck,item);">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small>All Slots</small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                    <li ng-repeat="hitem in item.allDaySlots | filter:{'NewFormattedStime':AllDaySlotsObj.Slot}">
+                                                                                                        <div class="checkbox cn">
+                                                                                                            <label>
+                                                                                                                <input name="checkbox-11" type="checkbox" ng-model="hitem.IsChecked" ng-click="AllDaySlotToggle(hitem,item)">
+                                                                                                                <span class="checkbox-material">
+                                                                                                                    <span class="check"></span>
+                                                                                                                </span>
+                                                                                                                <small ng-bind="hitem.NewFormattedStime+ ' - ' + hitem.NewFormattedEtime"></small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td width="10%">
+                                                                                <div class="form__group">
+                                                                                    <label> Max Slots</label>
+                                                                                    <input type="text" ng-model="addNewAdvancedSlotReqObj.MaxNumberOfSlots" numbers-only ng-disabled="SlotsParamObj.IsOptionsDisabled" maxlength="3" />
+                                                                                </div>
+                                                                            </td>
+                                                                            <td colspan="2">
+                                                                                <div class="d__f-- ai__c-- gap__10--x m-t-20">
+                                                                                    <button class="btn__lg-- btn__1d5558--f" ng-click="addSlotForlist(item)" ng-if="!addNewAdvancedSlotReqObj.IsEdit">Add</button>
+                                                                                    <button class="btn__lg-- btn__1d5558--f" ng-click="UpdateSlotDetails(item)" ng-if="addNewAdvancedSlotReqObj.IsEdit">Update</button>
+                                                                                    <button class="btn__lg-- btn__C71D27--o" ng-click="clearSlotsForApptList(item)">Clear</button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <table class="table-eh table-striped" ng-if="item.ScheduledSlotVisitReasonsArray.length > 0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="10%">Slot Time</th>
+                                                                    <!--<th width="10%">Slot</th>-->
+                                                                    <!--<th>Visit Type</th>-->
+                                                                    <th>Visit Reasons</th>
+                                                                    <th width="10%">Max Slots</th>
+                                                                    <th width="5%">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="kitem in item.ScheduledSlotVisitReasonsArray track by $index">
+                                                                    <td>
+                                                                        <b class="text-s12w500c000">{{kitem.TimeSlot.NewFormattedStime}}</b>
+                                                                        <small class="text-muted" ng-if="kitem.DurationMinutes"> ({{kitem.DurationMinutes}} mins)</small>
+
+                                                                        <span ng-if="kitem.SlotType == '2'"> (Break Slot)</span>
+                                                                        <span ng-if="kitem.SlotType == '3'"> (Online Slot)</span>
+                                                                    </td>
+                                                                    <!--<td>
+                                                                        Break
+                                                                    </td>-->
+                                                                    <!--<td width="30%" class="valign-top">
+                                                                        <ul class="advanced-ncpa">
+                                                                            <li>
+                                                                                <span class="text-uppercase text-s12w500C068cb0">Free Followup Post Surgery (20)</span>
+                                                                            </li>
+                                                                            <li>
+                                                                                <span class="text-uppercase text-s12w500C068cb0">Free Followup Post Surgery (50)</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </td>-->
+                                                                    <td width="30%" class="valign-top">
+                                                                        <ul class="advanced-ncpa" ng-if="kitem.SlotType == '1'">
+                                                                            <li ng-repeat="vitem in kitem.VisitReasons track by $index">
+                                                                                <span class="text-s12w500C068cb0">{{vitem.Reason}}</span><span ng-if="!$last">,</span>
+                                                                            </li>
+                                                                            <li>
+                                                                                <div class="d__f-- ai__c-- gap__4-- fw__nw--" ng-if="kitem.PayorTypes.length > 0">
+
+                                                                                    <span ng-repeat="code in kitem.PayorTypes | limitTo:2 track by $index"
+                                                                                          class="px__8-- py__4-- bradius__4-- border__E4E4E4-- bg__F2F2F2-- fs__md-- fw__5-- tc__111827--"
+                                                                                          title=" Payors">
+                                                                                        {{code.PayorName}}
+                                                                                    </span>
+
+                                                                                    <span ng-if="kitem.PayorTypes.length > 2"
+                                                                                          class="d__if-- ai__c-- py__2-- px__7-- bradius__4-- fs__xs-- fw__7-- bg__F3F4F6-- border__E4E4E4-- tc__6B7280-- c__p--"
+                                                                                          uib-popover-template="'DenialpopoverContent.html'"
+                                                                                          uib-popover-scope="{ Payor: kitem.PayorTypes }"
+                                                                                          popover-trigger="mouseenter"
+                                                                                          popover-placement="auto bottom"
+                                                                                          popover-append-to-body="false"
+                                                                                          popover-class="denial__codes--Popover"
+                                                                                          ng-mouseenter="PayorId = kitem.PayorTypes">
+                                                                                        +{{kitem.PayorTypes.length - 2}}
+                                                                                    </span>
+
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <ul class="advanced-ncpa" ng-if="kitem.SlotType == '3'">
+                                                                            <li ng-repeat="vitem in kitem.OnlineVisitReasons track by $index">
+                                                                                <span class="text-s12w500C068cb0">{{vitem.OnlineVisitReason}}</span>
+                                                                                <span ng-if="!$last">,</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <span ng-if="kitem.SlotType == '2' ">-</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="text-s12w600C000" ng-if="kitem.SlotType == '1'">{{kitem.MaxNumberOfSlots}}</span>
+                                                                        <span class="text-s12w600C000" ng-if="kitem.SlotType == '3'">{{kitem.MaxNumberOfSlots}}</span>
+                                                                        <span ng-if="kitem.SlotType == '2'"> -</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="dis-flex align-items-center grid-gap-10">
+                                                                            <a href="javascript:;" ng-click="EditSlotinSlotWise(kitem,item);">
+                                                                                <i class="ehr-edit aside-icon-ros" title="Edit" role="button"></i>
+                                                                            </a>
+                                                                            <a href="javascript:;" ng-click="removeFromSlotWiseList(kitem,item);">
+                                                                                <i class="eh-close eh-icon dis-inline-block" title="Cancel Appointment"></i>
+                                                                            </a>
+                                                                        </div>
+
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+
+                                                        <!-- / -->
+                                                        <div class="p-8" ng-if="item.DayId !== 7">
+                                                            <div class="row">
+                                                                <div class="col-lg-9">
+                                                                    <div class="dis-flex justify-space-between align-items-center">
+                                                                        <div class="dis-flex">
+                                                                            <label class="text-s10w500C818181 fs-16 m-r-20">{{ 'REPEATAVALIABILITY' | translate}}</label>
+                                                                            <ul class="list__none-- m__0-- d__f-- ai__c-- gap__10--x">
+                                                                                <li ng-repeat="hitem in UserDetailedSlotObj.UserScheduleDetails" ng-show="hitem.DayId > item.DayId">
+                                                                                    <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                                                        <input name="checkbox-3" type="checkbox" class="checkbox" ng-model="hitem.IsChecked">
+                                                                                        <span class="lbl"></span>
+                                                                                        <span class="fs__md-- fw__4-- tc__1D1D1D--">{{hitem.Day}}</span>
+                                                                                    </label>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <button class="btn__lg-- btn__1d5558--f" ng-click="OnSelectWeekDay(UserDetailedSlotObj.UserScheduleDetails,item);" ng-disabled="(UserDetailedSlotObj.UserScheduleDetails | filter:{'IsChecked': true}).length == 0">{{ 'SAVE' | translate}}</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal__footer--">
+        <div class="form__group d__f-- ai__c-- gap__5--x ">
+            <label>User Schedule Name : <em>*</em></label>
+            <input type="text" class="w-350" ng-model="UserDetailedSlotObj.UserScheduleName" quotes-restrict />
+        </div>
+        <!--<div class="w-150 border-right p-r-10 ">
+            <div class="switch-toggle well b-r-100">
+                <input id="doctempInv10" btn-radio="'N'" value="Duration" type="radio"
+                       ng-checked="UserDetailedSlotObj.Type =='Duration'"
+                       ng-click="UserDetailedSlotObj.Type='Duration'"
+                       ng-model="UserDetailedSlotObj.Type"
+                       ng-change="changeType(UserDetailedSlotObj.Type)">
+                <label for="doctempInv10" class="fs-12">  {{ 'DURATION' | translate}}</label>
+                <input id="doctempInv20" btn-radio="'Y'" value="Date" type="radio"
+                       ng-checked="UserDetailedSlotObj.Type =='Date'"
+                       ng-click="UserDetailedSlotObj.Type='Date'"
+                       ng-model="UserDetailedSlotObj.Type"
+                       ng-change="changeType(UserDetailedSlotObj.Type)">
+                <label for="doctempInv20" onclick="" class="fs-12">  {{ 'DATE' | translate}}</label>
+                <a class="btn btn-primary"></a>
+            </div>
+        </div>
+        <div class="flex m-l-10 dis-flex align-items-center" ng-show="UserDetailedSlotObj.Type =='Duration'">
+            <div class="ehr-input">
+                <label class="m-r-10 white-nowrap text-s14w500c000">  {{ 'REPEAT' | translate}} </label>
+            </div>
+            <div class="max-ehr-input">
+                <select class="p-y-2 w-200" ng-model="UserDetailedSlotObj.ScheduleEveryType" ng-change="getTimeSlotsByEveryType(UserDetailedSlotObj.ScheduleEveryType)">
+                    <option value="">{{ 'SELECT' | translate}}</option>
+                    <option value="1">{{ 'EVERYWEEK' | translate}}</option>
+                    <option value="2">{{ 'EVERYEVENWEEK' | translate}}</option>
+                    <option value="3">{{ 'EVERYODDWEEK' | translate}}</option>
+                    <option value="4">{{ 'EVERYFIRSTWEEK' | translate}}</option>
+                    <option value="5">{{ 'EVERYSECONDWEEK' | translate}}</option>
+                    <option value="6">{{ 'EVERYTHIRDWEEK' | translate}}</option>
+                    <option value="7">{{ 'EVERYFOURTHWEEK' | translate}}</option>
+                    <option value="8">{{ 'EVERYFIFTHWEEK' | translate}}</option>
+                    <option value="9">{{ 'EVERYLASTWEEK' | translate}}</option>
+                </select>
+
+            </div>
+            <ul class="flex-flow-ulli flex-flow-ulli-mb0 m-l-10">
+                {{ 'FORNEXT' | translate}}:
+                <li class="w-100 m-l-5">
+                    <div class="max-ehr-input">
+                        <input type="text" class="p-y-2 text-center" placeholder="3" ng-model="UserDetailedSlotObj.ScheduleDuration" maxlength="2" numbers-only="numbers-only" ng-change="OnChangeslot(UserDetailedSlotObj.ScheduleEveryType,UserDetailedSlotObj.ScheduleDuration)">
+                    </div>
+                </li>
+
+                <li>
+                    <button ng-class="(UserDetailedSlotObj.ScheduleDurationType == 'M')?'score-btn active':'score-btn'" ng-click="UserDetailedSlotObj.ScheduleDurationType = 'M';">{{ 'MONTHS' | translate}} </button>
+                </li>
+
+            </ul>
+        </div>
+        <div class="flex m-l-10 " ng-Show="UserDetailedSlotObj.Type =='Date'">
+            <ul class="flex-flow-ulli flex-flow-ulli-mb0">
+                <li class="m-r-10">
+                    <div class="ehr-input pop-ehr-input dis-flex align-items-center">
+                        <label class="m-r-10 white-nowrap">{{ 'FROMDATE' | translate}} :</label>
+                        <input type="text" class="icons-calendar cur-default bg-white"
+                               datepickerapnlus readonly ng-model="UserDetailedSlotObj.FromDate" placeholder="MM-DD-YYYY" />
+                    </div>
+                </li>
+                <li>
+                    <div class="ehr-input pop-ehr-input dis-flex align-items-center">
+                        <label class="m-r-10 white-nowrap">{{ 'TODATE' | translate}} :</label>
+                        <input type="text" class="icons-calendar cur-default bg-white"
+                               datepickerapnlus readonly ng-model="UserDetailedSlotObj.ToDate" placeholder="MM-DD-YYYY" />
+                    </div>
+                </li>
+            </ul>
+        </div>-->
+        <button class="btn__lg-- btn__C71D27--o" ng-click="closeuib()">{{ 'CLOSE' | translate}}</button>
+        <button class="btn__lg-- btn__1d5558--f" ng-Show="!Obj.isAdvancedView" ng-click="SaveDetailedUserSlot(UserDetailedSlotObj)">{{ 'SAVE' | translate}}</button>
+        <button class="btn__lg-- btn__1d5558--f" ng-Show="Obj.isAdvancedView" ng-click="saveAdvancedSlots(UserDetailedSlotObj)">{{ 'SAVE' | translate}}</button>
+    </div>
+</div>
+<script type="text/ng-template" id="DenialpopoverContent.html">
+    <div class="denial__popover--">
+        <div class="denial__popover__header--">
+            PAYORS
+        </div>
+        <div class="denial__popover__body--">
+            <span class="denial__popover__badge--" ng-repeat="i in kitem.PayorTypes.slice(2)">{{i.PayorName}}</span>
+        </div>
+    </div>
+    <!--<table class="table tableno-bordered border-spacing-contact-lens">
+        <tbody>
+            <tr ng-repeat="i in denialCodes">
+                <td class="bg-dark-gray text-center"><span class="bold-500">{{i.DenialCode}}</span></td>
+                <td class="bg-dark-gray"><p class="m-0">{{i.DenialCodeDescription}}</p></td>
+            </tr>
+        </tbody>
+    </table>-->
+</script>
+<style>
+    .slots-design {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    .New-Appointments-slots {
+        border-radius: 2px;
+        background-color: #6598fc;
+    }
+
+    .Clinic-Follow-Ups {
+        border-radius: 2px;
+        background-color: #fda574;
+    }
+
+    .Post-Op-Follow-Ups {
+        border-radius: 2px;
+        background-color: #5eaf8d;
+    }
+
+    .ASC-Follow-Ups {
+        border-radius: 2px;
+        background-image: linear-gradient(to bottom, #67b7c9 0%, #67b7c9 100%) !important;
+    }
+
+    .Online-slots {
+        border-radius: 2px;
+        background-color: #9296ff;
+    }
+
+    .Break-slots {
+        border-radius: 2px;
+        background-color: #ff9f9f;
+    }
+</style>

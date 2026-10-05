@@ -1,0 +1,89 @@
+﻿<div class="modal-header dis-flex justify-space-between align-items-center">
+    <div>
+        <h1 class="text-ocularhist">TreatmentPlan</h1>
+    </div>
+    <div class="dis-flex align-items-center m-l-10">
+        <button class="btn btn-discard-us m-r-5" ng-click="close()">Close</button>
+        <button class="btn btn-save-us" ng-click="SaveTreatmentPlan()">Save</button>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <ul class="flex-flow-ulli-mb0">
+                <li>
+                    <input type="radio" class="radio-custom width-0" id="LOINC" value="1" ng-model="SearchObj.SearchType" ng-value="1" ng-change="ChangeSearchType(SearchObj.SearchType);" name="LOINC">
+                    <label for="LOINC" class="radio-custom-label cur-poiter mb-0 text-black">Investigations</label>
+                    <input type="radio" class="radio-custom width-0" id="Snomed" value="2" ng-model="SearchObj.SearchType" ng-value="2" ng-change="ChangeSearchType(SearchObj.SearchType);" name="Snomed">
+                    <label for="Snomed" class="radio-custom-label cur-poiter mb-0 text-black">Procedures</label>
+                    <input type="radio" class="radio-custom width-0" id="RxNormCode" value="3" ng-model="SearchObj.SearchType" ng-value="3" ng-change="ChangeSearchType(SearchObj.SearchType);" name="RxNormCode">
+                    <label for="RxNormCode" class="radio-custom-label cur-poiter mb-0 text-black">Medications</label>
+                </li>
+                <li class="flex pos-relative">
+                    <input type="text" class="form-control icons-search input-color" maxlength="100" ng-model="SearchObj.TreatmentObj" placeholder="Select LOINC" typeahead-min-length="0" typeahead-focus-on-select="false" uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)" typeahead-on-select="OnClickAdvisedProcedureInOrders(SearchObj.TreatmentObj)" ng-model-options="{ debounce: 500 }" ng-show="SearchObj.SearchType == 1">
+                    <input type="text" class="form-control icons-search input-color" maxlength="100" ng-model="SearchObj.TreatmentObj" placeholder="Select Snomed" typeahead-min-length="0" typeahead-focus-on-select="false" uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)" typeahead-on-select="OnClickAdvisedProcedureInOrders(SearchObj.TreatmentObj)" ng-model-options="{ debounce: 500 }" ng-show="SearchObj.SearchType == 2">
+                    <input type="text" class="form-control icons-search input-color" maxlength="100" ng-model="SearchObj.TreatmentObj" placeholder="Select RxNorm Code" typeahead-min-length="0" typeahead-focus-on-select="false" uib-typeahead="item as item.CPTCode + ' - ' + item.ProcedureName for item in GetOrganizationCPTProcedure($viewValue)" typeahead-on-select="OnClickAdvisedProcedureInOrders(SearchObj.TreatmentObj)" ng-model-options="{ debounce: 500 }" ng-show="SearchObj.SearchType == 3">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <h4>Lab Investigations</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <tbody>
+                    <tr ng-repeat="item in TreatmentPlanObj.Investigations track by $index">
+                        <td>{{item.PlanName}}</td>
+                        <td>
+                            <select class="form-control" ng-model="item.OrganId">
+                                <option value="">Select Eye</option>
+                                <option value="1">OD</option>
+                                <option value="2">OS</option>
+                                <option value="3">OU</option>
+                                <option value="4">General</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="ehr-input pop-ehr-input">
+                                <div class="ehr-input-group" ng-show="!item.ShowDateFormat">
+                                    <input type="text" class="w-60" ng-disabled="item.LDurationType === 'SB'" ng-model="item.Duration" placeholder="0" numbers-only>
+                                    <select ng-model="item.DurationType">
+                                        <option value="">Select</option>
+                                        <option value="D">Days</option>
+                                        <option value="W">Weeks</option>
+                                        <option value="M">Months</option>
+                                        <option value="Y">Years</option>
+                                        <option value="SB">Since Birth</option>
+                                    </select>
+                                    <button ng-show="!item.ShowDateFormat" ng-click="ChangeItem(item)"><i class="far fa-keyboard"></i></button>
+                                    <button ng-show="item.ShowDateFormat" ng-click="ChangeItem(item)"><i class="far fa-calendar-alt"></i></button>
+                                </div>
+                                <div class="ehr-input-group" ng-show="item.ShowDateFormat">
+                                    <input type="text" placeholder="MM-DD-YYYY" ng-model="item.PlanDate" datepickeryearmonthchangeinforward readonly ng-change="ChangeFormatDate(item)" id="dp1700117320375">
+                                    <button ng-show="!item.ShowDateFormat" ng-click="ChangeItem(item)"><i class="far fa-keyboard"></i></button>
+                                    <button ng-show="item.ShowDateFormat" ng-click="ChangeItem(item)"><i class="far fa-calendar-alt"></i></button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="form-control" ng-model="item.Status" ng-options="stitem.StatusId as stitem.Status for stitem in ProcedureStatusList">
+                                <option value="">Select Status</option>
+                            </select>
+                        </td>
+                        <td>
+                            <img src="img/ros-chart/ros-close.svg" width="24" ng-click="DeleteInvestigation(item);" role="button" tabindex="0">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <h4>Follow Up</h4>
+        <p>Schedule follow on visit with Neighborhood Physicians Practice on 7/1/2015.</p>
+    </div>
+   
+    
+</div>

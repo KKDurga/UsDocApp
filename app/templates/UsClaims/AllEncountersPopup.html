@@ -1,0 +1,953 @@
+﻿<!--New Design started-->
+<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Create Claim Bill</h1>
+        <a class="btn__close--2" ng-click="uibclose()">
+            <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- fd__c-- gap__5-- height__100--">
+            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+                <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+                    <tbody>
+                        <tr>
+                            <td width="22%" ng-show="PatientSearchObj.PatientSearchInd">
+                                <div class="d__f-- fd__c-- gap__5--">
+                                    <fieldset class="d__f-- ai__c-- gap__10--">
+                                        <div>
+                                            <input type="radio" class="radio-custom w__0--" name="PatientSearchObj"
+                                                   ng-value="1" aria-invalid="false" ng-model="PatientSearchObj.SearchTypeId"
+                                                   ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId);"
+                                                   id="PatientName">
+                                            <label class="radio-custom-label radio-label" for="PatientName">Name</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" class="radio-custom w__0--" id="PatientMRNo"
+                                                   name="PatientSearchObj" ng-value="2" aria-invalid="false"
+                                                   ng-model="PatientSearchObj.SearchTypeId"
+                                                   ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId);">
+                                            <label for="PatientMRNo" class="radio-custom-label radio-label">MR No</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" class="radio-custom w__0--" id="PatientDOB"
+                                                   name="PatientSearchObj" ng-value="5" aria-invalid="false"
+                                                   ng-model="PatientSearchObj.SearchTypeId"
+                                                   ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId)">
+                                            <label for="PatientDOB" class="radio-custom-label radio-label">DOB </label>
+                                        </div>
+                                    </fieldset>
+                                    <div class="btn-group select-form-uib dropdown open">
+                                        <div class="form__group">
+                                            <input type="text" ng-class="PatientSearchObj.SearchText !='' ? '' :'icons-search'" id="SearchByName" placeholder="Search By Name"
+                                                   typeahead-min-length="3" ng-if="PatientSearchObj.SearchTypeId == 1"
+                                                   ng-model="PatientSearchObj.SearchText"
+                                                   ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                                   minlength="3">
+                                            <input type="text" ng-class="PatientSearchObj.SearchText !='' ? '' :'icons-search'" id="SearchByMRNo" placeholder="Search By Mr.No"
+                                                   typeahead-min-length="3" ng-if="PatientSearchObj.SearchTypeId == 2"
+                                                   ng-model="PatientSearchObj.SearchText"
+                                                   ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                                   minlength="3">
+                                            <input type="text" ng-class="PatientSearchObj.SearchText !='' ? '' :'icons-search'" id="SearchByDOB" placeholder="MM-DD-YYYY"
+                                                   ng-if="PatientSearchObj.SearchTypeId == 5"
+                                                   ng-model="PatientSearchObj.SearchText"
+                                                   ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                                   datepickerdobpatient dob-format minlength="10">
+                                            <a class="position__absolute-- right__5-- top__7-- cur-pointer" id="ClearPatientSearchType" ng-if="PatientSearchObj.SearchText !=''" ng-click="clearPatientListData();"><i class="icons__w16-- cancel__w16--o"></i></a>
+
+                                        </div>
+                                        <ul class="list-group dropdown-menu  py__6-- slim-scroll dropdown-list-group-item"
+                                            ng-if="ShowPatientDetailsDrop" id="PatientSearchResults">
+                                            <li class="hover__F5F5F5--bg  py__5-- cur-poiter"
+                                                ng-click="SelectedPatientData(patientitem,PatientSearchObj.SearchTypeId)"
+                                                ng-repeat="patientitem in patientDetailsList"
+                                                ng-show="AllPatientList.length >0" id="PatientInfoFromSearchResults">
+                                                <div class="d__f-- fd__c--">
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--  lh__20--">{{patientitem.FullName}}</span>
+                                                    <div class="d__f-- ai__c--">
+                                                        <span class="fs__lg-- fw__5-- tc__656565-- lh__18--">{{patientitem.patientdisplayid}}</span>
+                                                        <span class="fs__3l-- tc__E4E4E4-- px__4-- lh__18--" ng-if="patientitem.patientdisplayid && patientitem.DOB"> | </span>
+                                                        <span class="fs__lg-- fw__5-- tc__656565-- lh__18--">{{patientitem.DOB | date:'MM-dd-yyyy'}}</span>
+                                                        <span class="fs__lg-- fw__5-- tc__656565-- lh__18--"
+                                                              ng-if="!patientitem.patientdisplayid && !patientitem.DOB"> - </span>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="d__f-- fd__c--">
+                                            <h5 class="mt__0-- mb__5--" id="PatientNameFromSearchResults">
+                                                <b>{{patientitem.FullName}}</b>
+                                                <span class="new-global-patient" ng-if="patientitem.PatientId===0">
+                                                    <span></span> New
+                                                </span>
+                                            </h5>
+                                            <p class="mb__0--" id="PatientOtherInfoFromSearchResults">
+                                                <span class="fs__lg-- fw__4-- tc__1D1D1D--"
+                                                      ng-if="patientitem.AltCountryCode != '' && patientitem.AltCountryCode != null">
+                                                    {{patientitem.AltCountryCode}}
+                                                </span>
+                                                <span>&nbsp;</span>
+                                                <span class="fs__lg-- fw__4-- tc__656565--"
+                                                      ng-if="patientitem.Altareacode != '' && patientitem.Altareacode != null">
+                                                    {{patientitem.Altareacode}}
+                                                </span>
+                                                <span class="fs__lg-- fw__4-- tc__656565--"
+                                                      ng-if="patientitem.AltHomeNumber != '' && patientitem.AltHomeNumber != null">
+                                                    -{{patientitem.AltHomeNumber}}
+                                                </span>
+
+                                                <span>&nbsp;</span>
+                                                <span class="fs__lg-- fw__4-- tc__656565--">
+                                                    - {{patientitem.patientdisplayid}}
+                                                </span>
+                                            </p>
+
+                                        </div>-->
+                                            </li>
+                                            <li ng-show="AllPatientList.length == 0" class="text-center height__100--"
+                                                id="NoPatientsFound">
+                                                <div class="d__f-- jc__c-- ai__c-- height__100--">
+                                                    <label class="fs__xl-- fw__5-- tc__1D1D1D--">No Results Found</label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="13%">
+                                <div class="form__group">
+                                    <label for="FromDate">From Date</label>
+                                    <input type="text" class="icons-calendar cur-default bg-white" id="FromDate"
+                                           ng-model="Appointment.FromDate" placeholder="MM-DD-YYYY" datepickerregpatient
+                                           readonly />
+
+                                </div>
+                            </td>
+                            <td width="13%">
+                                <div class="form__group">
+                                    <label for="ToDate">To Date</label>
+                                    <input type="text" class="icons-calendar cur-default bg-white" id="ToDate"
+                                           ng-model="Appointment.ToDate" placeholder="MM-DD-YYYY" datepickerregpatient
+                                           mindate="{{Appointment.FromDate}}" readonly />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form__group select-ui-match custom-select-width ">
+                                    <label>Location</label>
+                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                        <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                            {{AppListselectedclinic.ClinicName}}
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2" ng-click="stopClosingDropDown($event)">
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                            </div>
+                                            <div class="apptsearchdroplist">
+                                                <ul>
+                                                    <li ng-repeat="item in AllHospitalData.AllBranchesList | filter:{'ClinicName':searchHospital.txt1}">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="SelectAllLocations(item)">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="15%">
+                                <div class="form__group">
+                                    <label for="VisitReason">Visit Reason</label>
+                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                        <button class="form__control text-left pr__20--" id="dropdownMenu3" data-toggle="dropdown">
+                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                            {{SelectedVisitReasonType}}
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                            <div class="p-5">
+                                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                            </div>
+                                            <div class="apptsearchdroplist">
+                                                <ul>
+                                                    <li>
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="AllEncounterObj.AllVisitReasonsCheck" ng-click="SelectVisitReasons(AllEncounterObj.AllVisitReasonsCheck)">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{ 'ALLVISITREASONS' | translate}}</span>
+                                                        </label>
+                                                    </li>
+                                                    <li ng-repeat="item in AllVisitReasonsList | filter:{'AppointmentVisitReason':searchtxtb.txt1} track by $index">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="item.isChecked" ng-click="SelectVisitReasons(item);">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.AppointmentVisitReason"></span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="15%">
+                                <div class="form__group">
+                                    <label for="RenderingProvider">Rendering Provider</label>
+                                    <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                        <button class="form__control text-left" id="RenderingProvider"
+                                                data-toggle="dropdown">
+                                            {{selectedDoctor.FullName}}
+                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                        </button>
+                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1" ng-click="stopClosingDropDown($event)">
+                                            <div class="input-group droposearch-EH input-group-sm search-control">
+                                                <span class="input-group-addon">
+                                                    <span class="mainsearch-App">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Search Doctor"
+                                                       ng-model="searchtxtb.txt1" />
+                                            </div>
+                                            <div class="apptsearchdroplist">
+                                                <ul>
+                                                    <li>
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="AllEncounterObj.AllDoctorCheck" ng-click="SelectAllProvinders(AllEncounterObj.AllDoctorCheck)">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                        </label>
+                                                    </li>
+                                                    <li ng-repeat="item in clinicDoctorList | filter:{'FullName':searchtxtb.txt1} track by $index">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="item.isChecked" ng-click="SelectAllProvinders(item);">
+                                                            <span class="lbl"></span>
+                                                            <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.SecondUserFullName + '-' + item.NPI"></span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="15%">
+                                <div class="d__f-- ai__c-- gap__5-- mt__20--">
+                                    <button class="btn__lg-- btn__2D2D47--f" id="button__claimbillapply" ng-click="SearchAppointmentList()">Apply</button>
+                                    <button class=" b-0" id="button__reload" ng-click="clearAppointmentList()">
+                                        <i class="reload-icon"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="border__E4E4E4-- bradius__5-- d__f-- fd__c-- jc__sb-- height__100--" ng-show="OPandOTAppointmentList.length>0">
+                <div class="position__relative-- height__100--">
+                    <div class="adjustable-position slim-scroll">
+                        <div class="table-responsive p-0 b-0 slim-scroll">
+                            <table class="table tableno-bordered m__0-- table-layout-fix" id="PatientAppointmentDetails">
+                                <thead>
+                                    <tr>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="4%"><label class="fs__md-- fw__7-- tc__4A4A4A--">S.No</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="14%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Patient Name & MR No</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="13%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Pat DOB & Mobile No.</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="13%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Location/Facility</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="12%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Rendering Provider</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="16%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Appt Status</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10"><label class="fs__md-- fw__7-- tc__4A4A4A--">Insurance</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="14%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Visit Reason</label></th>
+                                        <th class="bg__F5F5F5-- p__6-- position__sticky-- top__0-- zindex-10" width="5%"><label class="fs__md-- fw__7-- tc__4A4A4A--">Action</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="border__none--" ng-repeat="item in OPandOTAppointmentList track by $index">
+                                    <tr class="c__p-- hover__1D55581A--bg" ng-class="{'bb__DDD--': !$last && !item.isOpen, 'bg__FCFAF5--': item.isOpen }" ng-click="openAccordion(item)">
+                                        <td class="py__8-- px__6-- bradius__3--bl text-center">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <a><i class="icons__w16--" ng-class="item.isOpen ? 'arrowdownfill__w16--o' : 'arrowrightfill__w16--l'"></i></a>
+                                                <span class="fs__lg-- fw__5-- tc__656565--">{{ (Pagination.currentPagePatient - 1) * 100 + ($index + 1) }}.</span>
+                                            </div>
+                                        </td>
+                                        <td class="py__8-- px__6--">
+                                            <div class="d__f-- fd__c--">
+                                                <label class="fs__lg-- fw__6-- tc__4A4A4A-- no-wrapappt" title="{{item.Patient.FullName}}">{{item.Patient.FullName}}</label>
+                                                <span class="fs__lg-- fw__5-- tc__3C3C3C--">{{item.Patient.PatientDisplayId}}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py__8-- px__6--">
+                                            <div class="d__f-- fd__c--">
+                                                <label class="fs__lg-- fw__4-- tc__656565--">{{item.Patient.DOB | date:'MM-dd-yyyy'}}</label>
+                                                <span class="fs__lg-- fw__4-- tc__656565--">{{item.Patient.MobileNo}}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py__8-- px__6--">
+                                            <label class="fs__lg-- fw__4-- tc__656565--">{{item.FacilityName }}</label>
+                                        </td>
+                                        <td class="py__8-- px__6-- ">
+                                            <label class="fs__lg-- fw__4-- tc__656565--">{{item.DoctorFullName}}</label>
+                                        </td>
+                                        <td class="py__8-- px__6-- ">
+                                            <div class="d__f-- ai__c-- gap__5--">
+                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--" ng-hide="item.AppointmentStatusId==1">{{item.AppointmentStatusName}} - </label>
+                                                <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.BookingStatus}}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py__8-- px__6-- ">
+                                            <div class="d__f-- fd__c--">
+                                                <label class="fs__lg-- fw__4-- tc__656565-- no-wrapappt" title="{{item.PrimaryInsurancePayorName}}" ng-if="item.PrimaryInsurancePayorName !=''"> P - {{item.PrimaryInsurancePayorName }}</label>
+                                                <label class="fs__lg-- fw__4-- tc__656565-- no-wrapappt" title="{{item.SecondaryInsurancePayorName}}" ng-if="item.SecondaryInsurancePayorName !=''">S - {{item.SecondaryInsurancePayorName }}</label>
+                                                <span class="fs__lg-- fw__4-- tc__C71D27--" ng-if="item.PaymentTypeId==1">(Private)</span>
+                                                <span class="fs__lg-- fw__4-- tc__3BAC66--" ng-if="item.PaymentTypeId==2">(Insurance)</span>
+                                            </div>
+                                        </td>
+                                        <td class="py__8-- px__6-- ">
+                                            <div class="d__f-- ai__c-- gap__5-- fd__r--">
+                                                <p class="no-wrapappt fs__lg-- fw__5-- tc__1D1D1D-- mb__0--" title="{{item.VisitReason}}" ng-if="item.VisitReason!=''">{{item.VisitReason}}</p>
+
+                                                <label ng-if="item.VisitReason==''">-</label>
+
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a class="d__f-- jc__c-- cur-pointer" ng-show="!item.IsVisitAvailable && UserAccessRights.AllAccessRights.BillerCreateNnewVisit && item.AppointmentStatus!='C'"
+                                               ng-click="navtocreateNewVisitandEncounter(item,1)"><i class="icons__w16-- addbox__w16--o" tooltip-placement="top-right" uib-tooltip="Create New Visit & Encounter"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-class="{'bb__DDD--': item.isOpen}" ng-show="item.isOpen">
+                                        <td colspan="9" ng-class="{'bg__FCFAF5--': item.isOpen}">
+                                            <table class="table tableno-bordered tableno-padding m__0-- border__DDD-- boxs__0000001A--br10" id="PatientVisitDetails">
+                                                <thead>
+                                                    <tr class="bb__DDD--">
+                                                        <th class="bradius__3--tl" width="3%"><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">S.No</label></th>
+                                                        <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Visit Date</label></th>
+                                                        <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Location/Facility</label></th>
+                                                        <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Rendering Provider</label></th>
+                                                        <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Visit Reason</label></th>
+                                                        <th class="bradius__3--tr" width="12%"><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Action</label></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-class="!$last ? 'bb__DDD--' : ''" ng-repeat="visit in item.filterVisitArray track by $index ">
+                                                        <td class="text-center">
+                                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">{{$index+1}}.</label>
+                                                        </td>
+                                                        <td>
+                                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                                                {{visit.VisitDate | date:'MM-dd-yyyy'}}
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                                                {{visit.FacilityName }}
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <label class="fs__lg-- fw__4-- tc__1D1D1D--">
+                                                                {{visit.DoctorName}}
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d__f-- ai__c-- gap__5-- fd__r--">
+                                                                <label class="fs__lg-- fw__4-- tc__1D1D1D--">{{visit.VisitReasonName}}</label>
+                                                            </div>
+                                                        </td>
+                                                        <td ng-show="item.AppointmentStatus!='C' && item.AppointmentStatus!='R'">
+                                                            <div class="d__f-- ai__c-- gap__15-- fd__r--">
+                                                                <a class="fs__lg-- fw__4-- tc__1D5558-- bb__1D5558--" ng-if="visit.SuperbillId==0" ng ng-click="navtocreateClaim(visit,item)">Create Claim</a>
+                                                                <a ng-click="navtocreateNewVisitandEncounter(item,2,visit)" ng-if="visit.SuperbillId==0" tooltip-placement="top-left" uib-tooltip="Edit"><i class="icons__w16-- edit__w16--o"></i></a>
+                                                            </div>
+                                                            <div class="d__f-- ai__c-- gap__15-- fd__r--" ng-if="visit.SuperbillId!=0">
+                                                                <a class="fs__lg-- fw__4-- tc__1D5558-- bb__1D5558--" ng-click="navtoSuperView(visit,item)">Create Claim</a>
+                                                            </div>
+                                                        </td>
+                                                        <td ng-hide="item.AppointmentStatus!='C' && item.AppointmentStatus!='R'"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="d__f-- ai__c-- jc__c-- py__5-- bt__DDD--">
+                    <div class="EH-pagination text-center" ng-show="OPandOTAppointmentList.length > 0">
+                        <uib-pagination total-items="OPandOTAppointmentListCount" ng-model="Pagination.currentPagePatient"
+                                        id="pagination__claimbill"
+                                        ng-change="changePatientPage(Pagination.currentPagePatient)"
+                                        items-per-page="Pagination.Patientitemsperpage" class="mt-0 mb-10" boundary-link-numbers="true"
+                                        boundary-links="true" max-size="Pagination.Patientmaxsize" rotate="false"></uib-pagination>
+                    </div>
+                </div>
+            </div>
+            <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="OPandOTAppointmentList.length == 0">
+                <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Patient Document Selected</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!--New Design Ended-->
+
+<div class="dis-flex flex-direction-column grid-gap-10 h-100" ng-if="false">
+    <div class="bg-EBEEF3 border-bottom p-6">
+        <div class="dis-flex align-items-center justify-space-between">
+            <h1 class="m-0 fs-14 black-text">Add Encounter</h1>
+            <div class="dis-flex align-items-center justify-content-end grid-gap-10">
+                <button class="btn__lg-- btn__C71D27--f" ng-click="uibclose()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body h-100 p-0">
+        <div class="dis-flex flex-direction-column grid-gap-5 h-100 p-l-8">
+            <table class="table tableno-bordered m-b-10 bg-white tableno-padding">
+                <tbody>
+                    <tr>
+                        <td width="20%">
+                            <div class="dis-flex flex-direction-column grid-gap-5">
+                                <fieldset class="dis-flex align-items-center grid-gap-10">
+                                    <div>
+                                        <input type="radio" class="radio-custom width-0" name="PatientSearchObj"
+                                               ng-value="1" aria-invalid="false" ng-model="PatientSearchObj.SearchTypeId"
+                                               ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId);"
+                                               id="PatientName">
+                                        <label class="radio-custom-label radio-label" for="PatientName">Name</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" class="radio-custom width-0 " id="PatientMRNo"
+                                               name="PatientSearchObj" ng-value="2" aria-invalid="false"
+                                               ng-model="PatientSearchObj.SearchTypeId"
+                                               ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId);">
+                                        <label for="PatientMRNo" class="radio-custom-label radio-label">MR No</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" class="radio-custom width-0" id="PatientDOB"
+                                               name="PatientSearchObj" ng-value="5" aria-invalid="false"
+                                               ng-model="PatientSearchObj.SearchTypeId"
+                                               ng-click="changePatientSearchType(PatientSearchObj.SearchTypeId)">
+                                        <label for="PatientDOB" class="radio-custom-label radio-label">DOB </label>
+                                    </div>
+                                </fieldset>
+                                <div class="btn-group select-form-uib dropdown open">
+                                    <div class="form__group">
+                                        <input type="text" class="input__style--2" id="SearchByName" placeholder="Search By Name"
+                                               typeahead-min-length="3" ng-if="PatientSearchObj.SearchTypeId == 1"
+                                               ng-model="PatientSearchObj.SearchText"
+                                               ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                               minlength="3">
+                                        <input type="text" class="input__style--2" id="SearchByMRNo" placeholder="Search By Mr.No"
+                                               typeahead-min-length="3" ng-if="PatientSearchObj.SearchTypeId == 2"
+                                               ng-model="PatientSearchObj.SearchText"
+                                               ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                               minlength="3">
+                                        <input type="text" class="input__style--2" id="SearchByDOB" placeholder="MM-DD-YYYY"
+                                               ng-if="PatientSearchObj.SearchTypeId == 5"
+                                               ng-model="PatientSearchObj.SearchText"
+                                               ng-change="LoadPatientListSearch(PatientSearchObj.SearchText)"
+                                               datepickerdobpatient dob-format minlength="10">
+                                        <i class="fa fa-times new-color" id="ClearPatientSearchType"
+                                           ng-if="PatientSearchObj.SearchText !=''" ng-click="clearPatientListData();"
+                                           style="position:absolute;right:8px;top:5px;font-size:15px;cursor:pointer;"></i>
+                                    </div>
+                                    <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item"
+                                        ng-if="ShowPatientDetailsDrop" id="PatientSearchResults">
+                                        <li class="list-group-item text-dark cur-poiter"
+                                            ng-click="SelectedPatientData(patientitem,PatientSearchObj.SearchTypeId)"
+                                            ng-repeat="patientitem in patientDetailsList"
+                                            ng-show="AllPatientList.length >0" id="PatientInfoFromSearchResults">
+                                            <div class="dis-block">
+                                                <h5 class="m-t-0 mb-5" id="PatientNameFromSearchResults">
+                                                    <b>{{patientitem.FullName}}</b>
+                                                    <span class="new-global-patient" ng-if="patientitem.PatientId===0">
+                                                        <span></span> New
+                                                    </span>
+                                                </h5>
+                                                <p class="mb-0" id="PatientOtherInfoFromSearchResults">
+                                                    <span class="fs-11"
+                                                          ng-if="patientitem.AltCountryCode != '' && patientitem.AltCountryCode != null">
+                                                        {{patientitem.AltCountryCode}}
+                                                    </span>
+                                                    <span>&nbsp;</span>
+                                                    <span class="fs-11 text-gray"
+                                                          ng-if="patientitem.Altareacode != '' && patientitem.Altareacode != null">
+                                                        {{patientitem.Altareacode}}
+                                                    </span>
+                                                    <span class="fs-11 text-gray"
+                                                          ng-if="patientitem.AltHomeNumber != '' && patientitem.AltHomeNumber != null">
+                                                        -{{patientitem.AltHomeNumber}}
+                                                    </span>
+
+                                                    <span>&nbsp;</span>
+                                                    <span class="fs-11 text-gray">
+                                                        - {{patientitem.patientdisplayid}}
+                                                    </span>
+                                                </p>
+
+                                            </div>
+                                        </li>
+                                        <li ng-show="AllPatientList.length == 0" class="text-center"
+                                            id="NoPatientsFound">
+                                            <div class="billing-cominsoon">
+                                                <img src="img/no-data/no-data-icon.png">
+                                                <div class="msg">
+                                                    <p class="nodata-text">{{ 'OOPS' | translate}}</p>
+                                                    <p class="nodata-txt-line2">
+                                                        {{ 'LOOKSLIKETHEREISNOPATIENTS' | translate}}
+                                                    </p>
+                                                    <p class="goback-text">No Patients Found</p>
+                                                    <p class="no-records-txt-line2">
+                                                        Try using a different criteria to
+                                                        view better results.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </td>
+                        <td width="10%">
+                            <div class="form__group">
+                                <label for="FromDate">From Date</label>
+                                <input type="text" class="icons-calendar cur-default bg-white" id="FromDate"
+                                       ng-model="Appointment.FromDate" placeholder="MM-DD-YYYY" datepickerregpatient
+                                       readonly />
+
+                            </div>
+                        </td>
+                        <td width="10%">
+                            <div class="form__group">
+                                <label for="ToDate">To Date</label>
+                                <input type="text" class="icons-calendar cur-default bg-white" id="ToDate"
+                                       ng-model="Appointment.ToDate" placeholder="MM-DD-YYYY" datepickerregpatient
+                                       mindate="{{Appointment.FromDate}}" readonly />
+                            </div>
+                        </td>
+
+                        <!--<td>
+        <div class="form__group">
+            <label>From Date</label>
+            <input class="icons-calendar" ng-model="Appointment.Date" datepickerregpatient readonly>
+
+        </div>
+    </td>
+    <td>
+        <div class="form__group">
+            <label>To Date</label>
+            <input class="icons-calendar" ng-model="Appointment.Date" datepickerregpatient readonly>
+
+        </div>
+    </td>-->
+                        <td>
+                            <div class="form__group select-ui-match custom-select-width ">
+                                <label>Location</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                    <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                        {{AppListselectedclinic.ClinicName}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in mainBillerDataObj.AllBranchesList | filter:{'ClinicName':searchHospital.txt1}" ng-click="ChangeApptBranch(item)">
+                                                    <a href="javascript:;" ng-bind="item.ClinicName"></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                       
+
+                        <td width="15%">
+                            <div class="form__group">
+                                <label for="RenderingProvider">Rendering Provider</label>
+                                <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                    <button class="form__control text-left" id="RenderingProvider"
+                                            data-toggle="dropdown">
+                                        {{selectedDoctor.FullName}}
+                                        <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Doctor"
+                                                   ng-model="searchtxtb.txt1" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation"
+                                                    ng-repeat="item in clinicDoctorList | filter:{'FullName':searchtxtb.txt1} track by $index"
+                                                    ng-click="changeDoctorName(item)">
+                                                    <a href="javascript:;" ng-bind="item.FullName"> </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="form__group">
+                                <label for="VisitReason">Visit Reason</label>
+                                <select id="VisitReason" ng-model="AppointmentType.VisitTypeId"
+                                        ng-options="item.ReasonId as item.Reason for item in AllVisitReasonsList">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="valign-bottom">
+                            <div class="dis-flex align-items-center grid-gap-10">
+                                <button class="btn__xl-- btn__2D2D47--f" ng-click="SearchAppointmentList()"
+                                        id="SearchAppointment">
+                                    Search
+                                </button>
+                                <button class="btn__xl-- btn__C71D27--o" ng-click="clearAppointmentList()"
+                                        id="ClearAppointment">
+                                    Clear
+                                </button>
+                            </div>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pos-relative h-100 ">
+                <div class="adjustable-position p-8">
+                    <div class="dis-flex flex-direction-column grid-gap-5 h-100">
+                        <div class="h-100" ng-show="OPandOTAppointmentList.length>0">
+                            <table class="table__style--21" id="PatientAppointmentDetails">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">
+                                            <p>S.No</p>
+                                        </th>
+                                        <th width="15%">
+                                            <p class="text-left">Patient Details</p>
+                                        </th>
+                                        <th>
+                                            <p>Location/Facility</p>
+                                        </th>
+                                        <th>
+                                            <p>Rendering Provider</p>
+                                        </th>
+                                        <th width="15%">
+                                            <p>Appt Status</p>
+                                        </th>
+                                        <th>
+                                            <p class="text-left">Insurance</p>
+                                        </th>
+                                        <th width="10%">
+                                            <p>Visit Reason</p>
+                                        </th>
+                                        <th>
+                                            <p>Action</p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="item in OPandOTAppointmentList track by $index"
+                                    ng-click="item.IsShowDetails = !item.IsShowDetails">
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <p>{{$index+1}}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="dis-flex flex-direction-column">
+                                                <div class="two-sections">
+                                                    <p class="m-0 text-s12w500c000 flex">{{item.Patient.FullName}}</p>
+                                                </div>
+                                                <p ng-if="item.Patient.MobileNo != ''" class="m-0 text-s12w500c000">
+                                                    {{item.Patient.PatientDisplayId}} | {{item.Patient.MobileNo}}
+                                                </p>
+                                                <p class="mb-0">
+                                                    {{item.Patient.DOB | date:'MM-dd-yyyy'}}
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p>{{item.FacilityName }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p>{{item.DoctorFullName}}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p class="appointment-booked">
+                                                    <span ng-hide="item.AppointmentStatusId==1">{{item.AppointmentStatusName}} - </span>
+                                                    <span>{{item.BookingStatus}}</span>
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <!--<td>
+                                            <span class="appointment-booked"
+                                                ng-show="item.AppointmentStatus=='B'">{{item.AppointmentStatus =='B' ?
+                                                "Booked" :""}}</span>
+                                            <span class="appointment-cancelled"
+                                                ng-show="item.AppointmentStatus=='C'">{{item.AppointmentStatus =='C' ?
+                                                "Cancelled" :""}}</span>
+                                            <span class="appointment-completed"
+                                                ng-show="item.AppointmentStatus=='E'">{{item.AppointmentStatus =='E' ?
+                                                "Completed" :""}}</span>
+                                            <span class="appointment-started"
+                                                ng-show="item.AppointmentStatus=='S'">{{item.AppointmentStatus =='S' ?
+                                                "Started" :""}}</span>
+                                            <span class="appointment-checked"
+                                                ng-show="item.AppointmentStatus=='I'">{{item.AppointmentStatus =='I' ?
+                                                "Checked-In" :""}}</span>
+                                            <span class="appointment-paused"
+                                                ng-show="item.AppointmentStatus=='P'">{{item.AppointmentStatus =='P' ?
+                                                "Paused" :""}}</span>
+                                            <span class="appointment-paused"
+                                                ng-show="item.AppointmentStatus=='O'">{{item.AppointmentStatus =='O' ?
+                                                "Ongoing" :""}}</span>
+                                            <span class="appointment-paused"
+                                                ng-show="item.AppointmentStatus=='D'">{{item.AppointmentStatus =='D' ?
+                                                "Saved" :""}}</span>
+                                        </td>-->
+                                        <td>
+                                            <div>
+                                                <p>{{item.PrimaryInsurancePayorName }}</p>
+                                                <span ng-if="item.PaymentTypeId==1" style="color: red">(Private)</span>
+                                                <span ng-if="item.PaymentTypeId==2" style="color: #0ba428">
+                                                    (Insurance)
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p>{{item.VisitReason}}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="dis-flex align-items-center grid-gap-5">
+                                                <button class="btn__sm-- btn__2D2D47--o"
+                                                    ng-show="!item.IsVisitAvailable && UserAccessRights.AllAccessRights.BillerCreateNnewVisit"
+                                                    ng-click="navtocreateNewVisitandEncounter(item,1)">Create New Visit
+                                                    & Encounter</button>
+                                                <button class="b-0 bg-none">
+                                                    <i class="billing-icons close-dropdown-icon" id="CloseVisitDetails"
+                                                        ng-show="item.IsShowDetails && item.filterVisitArray.length > 0"></i>
+                                                </button>
+                                                <button class="b-0 bg-none">
+                                                    <i class="billing-icons open-dropdown-icon" id="OpenVisitDetails"
+                                                        ng-show="!item.IsShowDetails && item.filterVisitArray.length > 0"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat-end ng-show="item.IsShowDetails && item.filterVisitArray.length > 0">
+                                        <td colspan="8">
+                                            <table class="table__style--5" id="PatientVisitDetails">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center" width="5%">S.No</th>
+                                                        <th class="text-center" width="12%">Visit Date</th>
+                                                        <th class="text-center">Location/Facility</th>
+                                                        <th class="text-center">Rendering Provider</th>
+                                                        <th class="text-center" width="8%">Visit Reason</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="visit in item.filterVisitArray track by $index ">
+                                                        <td>
+                                                            <p class="m-0 text-s12w500c000 text-center">{{$index+1}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="m-0 text-s12w500c000 text-center">
+                                                                {{visit.VisitDate | date:'MM-dd-yyyy'}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="m-0 text-s12w500c000 text-center">
+                                                                {{visit.FacilityName }}</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="m-0 text-s12w500c000 text-center">
+                                                                {{visit.DoctorName}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <div class="dis-flex align-items-center grid-gap-5">
+                                                                <p class="m-0 text-s12w500c000 text-center">
+                                                                    {{visit.VisitReasonName}}</p>
+                                                                <a
+                                                                    ng-click="navtocreateNewVisitandEncounter(item,2,visit)">
+                                                                    <i class="eh-edit eh-icon" title="Edit"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                        <td
+                                                            ng-show="item.AppointmentStatus!='C' && item.AppointmentStatus!='R'">
+                                                            <div class="text-center" ng-if="false">
+                                                                Visit : <button class="btn btn-link"
+                                                                    ng-click="navtocreateEncounterforVisit(visit,item)">Create
+                                                                    Encounter</button>
+                                                            </div>
+                                                            <p class="text-center"
+                                                                ng-if="item.filterVisitArray.length > 0 ">
+                                                                Visit : <button class="btn btn-link"
+                                                                    ng-click="navtocreateClaim(visit,item)">Create
+                                                                    Claim</button>
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row" ng-show="OPandOTAppointmentList.length == 0">
+                            <div class="billing-cominsoon text-center fs-15" style="height:350px !important">
+                                <img src="img/no-data/no-results.png" style="margin-top:45px;">
+                                <div class="msg">
+                                    <p class="goback-text">No Records Found</p>
+                                    <br />
+                                    <label>Search With Different Criteria..!</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="EH-pagination text-center" ng-show="OPandOTAppointmentList.length > 0">
+                <uib-pagination total-items="OPandOTAppointmentListCount" ng-model="Pagination.currentPagePatient"
+                    ng-change="changePatientPage(Pagination.currentPagePatient)"
+                    items-per-page="Pagination.Patientitemsperpage" class="mt-0 mb-10" boundary-link-numbers="true"
+                    boundary-links="true" max-size="Pagination.Patientmaxsize" rotate="false"></uib-pagination>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- new Design added on 12/11/2025  -->
+
+
+
+<!-- new Design end  -->
+
+
+<!-- Add Visit Popup -->
+
+<script type="text/ng-template" id="AddVisitPopup.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1 >Add Visit</h1>
+            <ul class="flex-flow-list">
+                <li ng-show="cache.typeId==1">
+                    <button class="btn__lg-- btn__1d5558--f" id="button__saveaddvisit" ng-click="AddVisit(1)">Save</button>
+                </li>
+                <li ng-show="cache.typeId==2">
+                    <button class="btn__lg-- btn__1d5558--f" id="button__updateaddvisit" ng-click="AddVisit(2)">Update</button>
+                </li>
+                <li>
+                    <a class="btn__close--" ng-click="uibclose()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="modal__body--">
+            <div class="d__f-- fd__c-- gap__5--">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form__group">
+                            <label>Doctor</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="false">
+                                    {{ AddVisitObj.DocObj.SecondUserFullName || 'Select Doctor' }}
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu1">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" id="input__searchdoctor" class="form-control" placeholder="Search Doctor" ng-model="AddVisitObj.doctorSearch">
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in clinicDoctorList | filter: AddVisitObj.doctorSearch" role="presentation">
+                                                <a href="javascript:;" ng-click="selectDoctor(item)">{{item.SecondUserFullName}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form__group">
+                            <label>Exam Type</label>
+                            <select ng-options="Sitem.ExamTypeId as Sitem.ExamTypeName for Sitem in ExamTypeList"
+                                    ng-model="AddVisitObj.ExamTypeId" id="select__examtype">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form__group">
+                            <label>{{ 'VISITREASON' | translate}} <em>*</em></label>
+                            <ui-select ng-model="AddVisitObj.VisitReasonObj" id="select__visitreason" theme="bootstrap" on-select="onSelectVisitReason(AddVisitObj.VisitReasonObj, AddVisitObj)" class="uiselect-custom dis-flex flex-direction-column">
+                                <ui-select-match placeholder="{{ 'SELECT' | translate}}">{{AddVisitObj.VisitReasonObj.VisitReason != "" ? AddVisitObj.VisitReasonObj.VisitReason : 'Select Visit Reason'}}</ui-select-match>
+                                <ui-select-choices repeat="item in AllVisitReasons | filter: $select.search" null-option="EmptySelect" loose-null>
+                                    <span ng-bind-html="item.VisitReason | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row" ng-if="false">
+                    <div class="col-lg-6">
+                        <div class="form__group">
+                            <label>Visit Linking</label>
+                            <select ng-options="Sitem.VisitId as Sitem.VisitDate for Sitem in PatientAllVisits"
+                                    ng-model="AddVisitObj.VisitId">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,766 @@
+﻿<div class="d__f-- fd__c-- gap__5-- bg__FFFFFF-- p__5-- height__100--" ng-controller="UsAuditAppointmentListCtrl">
+    <div class="p__10-- d__f-- ai__c-- gap__10--">
+        <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Audit Management<span class="fs__lg-- fw__5-- tc__FFFFFF-- bg__1D5558-- bradius__15-- p__5--">{{AscAppointmentsListCount}}</span></h1>
+        <div class="d__f-- ai__c-- gap__x--5">
+            <div class="d__f-- ai__c-- gap__10--">
+                <div class="dis-inline-block">
+                    <input type="radio" class="radio-custom w__0--" id="Name" name="patSearchType" ng-value="1" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="1">
+                    <label for="Name" class="radio-custom-label cur-poiter mb__0--">Name</label>
+                </div>
+                <div class="dis-inline-block">
+                    <input type="radio" class="radio-custom w__0--" id="MrNo" name="patSearchType" ng-value="2" ng-model="patSearchType" ng-click="changeradiobtn(SearchObj,patSearchType)" value="2">
+                    <label for="MrNo" class="radio-custom-label cur-poiter mb__0--">MR No</label>
+                </div>
+                <div class="dis-inline-block">
+                    <input type="radio" class="radio-custom w__0--" id="dob" name="patSearchType" ng-value="4" ng-click="changeradiobtn(SearchObj,patSearchType)" value="4">
+                    <label for="dob" class="radio-custom-label cur-poiter mb__0--">DOB</label>
+                </div>
+            </div>
+            <div class="form__group">
+                <!--<input type="text" class="icons-search" placeholder="Search by Patient Name" />-->
+                <input type="text" id="SearchByName" class="icons-search" placeholder="Search by Name" ng-show="patSearchType === 1" ng-model="SearchObj.searchPatientTxt" ng-change="onChangeSearchAppt(SearchObj.searchPatientTxt,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientTxt,patSearchType)">
+                <input type="text" id="SearchByMRNo" class="icons-search" placeholder="Search by MR No" ng-show="patSearchType === 2" ng-model="SearchObj.searchPatientIdTxt" ng-change="onChangeSearchAppt(SearchObj.searchPatientIdTxt,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientIdTxt,patSearchType)">
+                <input type="text" class="icons-search" placeholder="Search by Old MR No" ng-show="patSearchType === 3" ng-model="SearchObj.searchPatientOldMR" ng-change="onChangeSearchAppt(SearchObj.searchPatientOldMR,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientOldMR,patSearchType)">
+                <input type="text" id="SearchByDOB" class="icons-search" ng-model="SearchObj.searchPatientTxt" autocomplete="off" ng-show="patSearchType === 4" dob-format placeholder="MM-DD-YYYY" maxlength="10" ng-change="onChangeSearchAppt(SearchObj.searchPatientOldMR,patSearchType)" ng-enter="changePatientApptSearchText(SearchObj.searchPatientTxt,patSearchType)" />
+                <a class="position__absolute-- top-6 right-5 b__0--" id="ClearPatientSearchType" ng-hide="SearchObj.searchPatientTxt =='' && SearchObj.searchPatientIdTxt =='' && SearchObj.searchPatientOldMR ==''" ng-click="newclearPatientApptSearch()" role="button" tabindex="0"><i class="icons__w16-- cancel__w16--o"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="10%">
+                        <div class="form__group">
+                            <label class="text-appt">From Date</label>
+                            <input type="text" class="form__control icons-calendar" ng-model="SearchObj.FromDate" datepickerforapplist ng-change="getAscListingDetailsonDateChange(SearchObj.FromDate)" readonly date-format-input>
+                        </div>
+                    </td>
+                    <td width="10%">
+                        <div class="form__group">
+                            <label class="text-appt">To Date</label>
+                            <input type="text" class="form__control icons-calendar" ng-model="SearchObj.ToDate" datepickerforapplist ng-change="getAscListingDetailsonDateChange(SearchObj.ToDate)" readonly date-format-input>
+                        </div>
+                    </td>
+                    <td>
+                        <!--<div class="form__group">
+                            <label>Location</label>
+                            <select>
+                                <option selected>Select</option>
+                                <option>option2</option>
+                            </select>
+                        </div>-->
+                        <div class="form__group">
+                            <label for="apptList__bookType">Location</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{LocationTypeObj.SelectLocationString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+
+                                            <li ng-repeat="item in ApptBranchLocations | filter:{'BranchName':LocationTypeObj.Name} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <!--<input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="changeAppointmentBranch(item,true,'list')">-->
+                                                        <!--<span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>-->
+                                                        <small ng-bind="item.BranchName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <!--<td>
+                        <div class="form__group">
+                            <label>Facility</label>
+                            <select>
+                                <option selected>Select</option>
+                                <option>option2</option>
+                            </select>
+                        </div>
+                    </td>-->
+                    <td>
+                        <!--<div class="form__group">
+                            <label>Doctor</label>
+                            <select>
+                                <option selected>Select</option>
+                                <option>option2</option>
+                            </select>
+                        </div>-->
+
+                        <div class="form__group ">
+                            <label>{{ 'DOCTORS' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <!--ng-disabled="userLoginDetails.RoleID === 1 && userLoginDetails.SuffixId != 13 && !connectedUserObj.Available"-->
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedDoctors}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{selectedDoctors}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllDoctorCheck" ng-click="checkAllDoctor(AllDoctorsObj.AllDoctorCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All Doctors</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MultiselectDoctorlist | filter:{'DoctorfullNamewithNPI':searchtxtb.txt1}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="DoctorToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.SecondUserFullName + '-' + item.NPI"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <!--<div class="form__group">
+                            <label>Visit Type</label>
+                            <select>
+                                <option selected>Select</option>
+                                <option>option2</option>
+                            </select>
+                        </div>-->
+
+                        <div class="form__group">
+                            <label class="text-appt" for="apptCal__visitReason">{{ 'VISITREASON' | translate}}</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="apptCal__visitReason" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{selectedVisitReason}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchHospital.visitRsnName" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="AllDoctorsObj.AllVisitReasonsCheck" ng-click="checkAllVisitReasons(AllDoctorsObj.AllVisitReasonsCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>{{ 'ALLVISITREASONS' | translate}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in Visitreasons | filter:{'Reason':searchHospital.visitRsnName}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="VisitRsnToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.Reason"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form__group">
+                            <label>Audit Status</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu3" data-toggle="dropdown" title="{{selectedAuditStatus}}">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                    {{selectedAuditStatus}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app right-0 overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                    <div class="p-5">
+                                        <input type="text" class="form__control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="searchtxtb.txt12" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in GetStatusList | filter:{'Name':searchtxtb.txt12}">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="AuditStatusToggle(item);">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.Name"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--<div class="form__group">
+                            <label>Audit Status</label>
+                            <select>
+                                <option selected>Select</option>
+                                <option>option2</option>
+                            </select>
+                        </div>-->
+                    </td>
+                    <td>
+                        <div class="d__f-- ai__c-- gap__10-- mt__20--">
+                            <button class="btn__lg-- btn__1d5558--f" ng-click="GetAuditAscAppointmentsList()">Apply</button>
+                            <!--<a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--">Reset Filter<i class="icons__w16-- restore__w16--o"></i></a>-->
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="position__relative-- height__100--">
+        <div class="adjustable-position">
+            <div class="d__f-- fd__c-- height__100--">
+                <table class="table__style--5" ng-show="AscAppointmentsList.length>0">
+                    <thead>
+                        <tr>
+                            <th width="18%">Patient Details</th>
+                            <th>Doctor Name</th>
+                            <th width="8%">DOB</th>
+                            <th>Visit Reason & Date</th>
+                            <th width="18%">Signing Status</th>
+                            <th>Internal Audit</th>
+                            <!--<th>External Audit</th>-->
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="item in AscAppointmentsList track by $index">
+                        <tr>
+                            <td ng-click="navtoPreOpAscCharting(item)">
+                                <div class="d__f-- fd__c-- gap__y--2">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.Patient.FullName}}</label>
+                                    <span class="fs__lg-- fw__5-- tc__656565--">{{item.Patient.PatientDisplayId}}</span>
+                                </div>
+                            </td>
+                            <td ng-click="navtoPreOpAscCharting(item)">
+                                <div>
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--" title="{{item.SecondUserFullName}}">{{item.SecondUserFullName}}</label>
+                                    <div class="d__f-- fd__c-- gap__5-- min-w-0">
+                                        <p class="fs__lg-- fw__5-- tc__1D1D1D-- m-0 no-wrapappt">
+                                            <span class="fw__5-- tc__1D5558-- fs__lg--">Surgery : </span><span ng-repeat="sitem in item.SurgeryList"><span ng-if="sitem.CPTCode !=''">{{sitem.CPTCode}}-</span>{{sitem.SurgeryName}}<span ng-hide="$last">,</span> </span>
+                                        </p>
+                                        <!--  <p class="fs__lg-- fw__5-- tc__1D1D1D-- m-0 no-wrapappt" ng-if="item.SurgeryList[0].AdditionalSurgery.length > 0">
+                                <span class="fw__5-- tc__1D5558-- fs__lg--">Other Surgery name :  <span ng-repeat="aitem in item.SurgeryList[0].AdditionalSurgery">{{aitem.Description}}</span></span>
+                            </p>-->
+                                        <div class="d__f-- ai__c-- gap__5-- fw__w--" ng-if="item.SurgeryList.length > 0">
+                                            <div class="vs__list--">
+                                                <div class="d__f-- gap__5-- ai__c--">
+                                                    <span class="od-bg px-4 text-white bradius-3 text-center" ng-repeat="sitem in item.SurgeryList" ng-if="sitem.OrganId ==1">OD<span ng-hide="$last"> ,</span></span>
+                                                    <span class="os-bg px-4 text-white bradius-3 text-center" ng-repeat="sitem in item.SurgeryList" ng-if="sitem.OrganId ==2">OS<span ng-hide="$last"> ,</span></span>
+                                                    <span class="ou-bg px-4 text-white bradius-3 text-center" ng-repeat="sitem in item.SurgeryList" ng-if="sitem.OrganId ==3">OU<span ng-hide="$last"> ,</span></span>
+                                                    <span ng-hide="sitem.SurgeryEyeStatusName =='' || sitem.SurgeryEyeStatusName ==null">-</span>
+                                                    <span class="d__f--" ng-repeat="sitem in item.SurgeryList" ng-hide="sitem.SurgeryEyeStatusName =='' || sitem.SurgeryEyeStatusName ==null">
+                                                        {{sitem.SurgeryEyeStatusName}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="hs__list--">
+                                                <label>Surgery Date:</label>
+                                                <span ng-repeat="sitem in item.SurgeryList">{{sitem.SurgeryDate | date:'MM-dd-yyyy'}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td ng-click="navtoPreOpAscCharting(item)"><label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.Patient.DOB | date:'MM-dd-yyyy'}}</label></td>
+                            <td ng-click="navtoPreOpAscCharting(item)">
+                                <div>
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.VisitReason}}</label>
+                                    <p class="fs__lg-- fw__5-- tc__656565--">({{item.ConsultationDt| date:'MM-dd-yyyy'}})</p>
+                                </div>
+                            </td>
+                            <td ng-click="navtoPreOpAscCharting(item)">
+                                <!--<label class="status__red--dot fs__lg-- fw__5-- tc__C71D27--">Unsigned</label>-->
+                                <!--<ul class="flex-flow-list fd__r-- gap__10--">
+    <li>-->
+                                <!--<label class="status__green--dot fs__lg-- fw__5-- tc__3BAC66--">Pre op</label>-->
+                                <!--<label class="tc__606060-- fs__normal-- fw__4-- mb__0-- not__admited-- d__f-- ai__c-- gap__5--x" ng-if="item.PreOpStatusID==1">Pre op</label>
+        <label class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.PreOpStatusID==2">Pre op</label>
+        <label class="tc__F37123-- mb__0--  fs__normal-- fw__4-- mb__0-- Partially__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.PreOpStatusID==3">Pre op</label>
+        <label class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="item.PreOpStatusID==4">Pre op</label>
+    </li>
+    <li>-->
+                                <!--<label class="status__red--dot fs__lg-- fw__5-- tc__C71D27--">Intra op</label>-->
+                                <!--<label class="tc__606060-- fs__normal-- fw__4-- mb__0-- not__admited-- d__f-- ai__c-- gap__5--x" ng-if="item.IntraOpStatusID==1">Intra op</label>
+        <label class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.IntraOpStatusID==2">Intra op</label>
+        <label class="tc__F37123-- mb__0--  fs__normal-- fw__4-- mb__0-- Partially__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.IntraOpStatusID==3">Intra op</label>
+        <label class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="item.IntraOpStatusID==4">Intra op</label>
+    </li>
+    <li>-->
+                                <!--<label class="status__red--dot fs__lg-- fw__5-- tc__C71D27--">Post op</label>-->
+                                <!--<label class="tc__606060-- fs__normal-- fw__4-- mb__0-- not__admited-- d__f-- ai__c-- gap__5--x" ng-if="item.PostOpStatusID==1">Post op</label>
+        <label class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.PostOpStatusID==2">Post op</label>
+        <label class="tc__F37123-- mb__0--  fs__normal-- fw__4-- mb__0-- Partially__signed-- d__f-- ai__c-- gap__5--x" ng-if="item.PostOpStatusID==3">Post op</label>
+        <label class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="item.PostOpStatusID==4">Post op</label>
+    </li>
+    <li>
+        <a popover-template="'auditReportSingningStatus.html'" popover-data="item" popover-class="audit__signedstatus--hover" dynamic-click-popover-placement-op><i class="icons__w16-- info__w16--o"></i></a>-->
+                                <!-- <a popover-template="'auditReportStatus.html'" popover-data="item" popover-class="audit__status--hover" dynamic-popover-placement><i class="icons__w16-- info__w16--o"></i></a>-->
+                                <!--</li>
+    </ul>-->
+                                <!--<ul class="flex-flow-list fd__r-- gap__10--" ng-if="RoleId != 43 && RoleId != 26 && RoleId != 4">
+        <li>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==8||RoleId==10||RoleId==38" ng-class="{'status__green--dot status__green--': item.PreOpNurseChartStatus=='E','status__red--dot status__red--': item.PreOpNurseChartStatus!='E'}">Pre</label>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==30||RoleId==25" ng-class="{'status__green--dot status__green--': item.PreOpAnesthesiaChartStatus=='E','status__red--dot status__red--': item.PreOpAnesthesiaChartStatus!='E'}">Pre</label>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==1||RoleId==43" ng-class="{'status__green--dot status__green--': item.FaceSheetChartStatus=='E','status__red--dot status__red--': item.FaceSheetChartStatus!='E'}">Pre</label>
+        </li>
+        <li>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==8||RoleId==10||RoleId==38" ng-class="{'status__green--dot status__green--': item.IntraOpNurseChartStatus=='E','status__red--dot status__red--': item.IntraOpNurseChartStatus!='E'}">Intra</label>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==30||RoleId==25" ng-class="{'status__green--dot status__green--': item.IntraOpAnesthesiaChartStatus=='E','status__red--dot status__red--': item.IntraOpAnesthesiaChartStatus!='E'}">Intra</label>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==1||RoleId==43" ng-class="{'status__green--dot status__green--': item.OperativeChartStatus=='E','status__red--dot status__red--': item.OperativeChartStatus!='E'}">Intra</label>
+        </li>
+        <li>-->
+                                <!--<label class="fs__md-- fw__5--" ng-show="RoleId==8||RoleId==10||RoleId==38" ng-class="{'status__green--dot status__green--': item.PostOpNurseChartStatus=='E' && item.R2PostOpNurseChartStatus == 'E','status__red--dot status__red--': item.PostOpNurseChartStatus!='E' || item.R2PostOpNurseChartStatus !== 'E'}">Post</label>-->
+                                <!--<label class="fs__md-- fw__5--" ng-show="RoleId==8||RoleId==10||RoleId==38" ng-class="(item.PostOpNurseChartStatus == 'E' && item.R2PostOpNurseChartStatus == 'E')? 'status__green--dot status__green--': (item.PostOpNurseChartStatus == 'E' || item.R2PostOpNurseChartStatus == 'E')? 'status__yellow--dot status__yellow--': 'status__red--dot status__red--'">Post</label>-->
+                                <!--<label class="fs__md-- fw__5--" ng-show="RoleId==30||RoleId==25" ng-class="{'status__green--dot status__green--': item.PostOpAnesthesiaChartStatus=='E' && item.R2PostOpAnesthesiaChartStatus == 'E','status__red--dot status__red--': item.PostOpAnesthesiaChartStatus!='E' || item.R2PostOpAnesthesiaChartStatus !== 'E'}">Post</label>-->
+                                <!--<label class="fs__md-- fw__5--" ng-show="RoleId==30||RoleId==25" ng-class="(item.PostOpAnesthesiaChartStatus == 'E' && item.R2PostOpAnesthesiaChartStatus == 'E')? 'status__green--dot status__green--': (item.PostOpAnesthesiaChartStatus == 'E' || item.R2PostOpAnesthesiaChartStatus == 'E')? 'status__yellow--dot status__yellow--': 'status__red--dot status__red--'">Post</label>
+            <label class="fs__md-- fw__5--" ng-show="RoleId==1||RoleId==43" ng-class="{'status__green--dot status__green--': item.DischargeChartStatus=='E','status__red--dot status__red--': item.DischargeChartStatus!='E'}">Post</label>
+        </li>
+        <li>
+            <a popover-template="'auditReportSingningStatus.html'" popover-data="item" popover-class="audit__signedstatus--hover" dynamic-click-popover-placement-op><i class="icons__w16-- info__w16--o"></i></a>
+        </li>
+    </ul>
+    <ul class="flex-flow-list fd__r-- gap__10--" ng-if="RoleId == 43  || RoleId == 26 || RoleId == 4">
+        <li>
+            <label class="fs__md-- fw__5--" ng-class="(item.PreOpNurseChartStatus == 'E' && item.PreOpAnesthesiaChartStatus == 'E' && (item.FaceSheetChartStatus == 'E' && item.IsDoctorDoctroNotesSignOff))? 'status__green--dot status__green--': ((item.PreOpNurseChartStatus == 'E' || item.PreOpAnesthesiaChartStatus == 'E' || (item.FaceSheetChartStatus == 'E' && item.IsDoctorDoctroNotesSignOff))? 'status__yellow--dot status__yellow--': 'status__red--dot status__red--')">Pre</label>
+        </li>
+        <li>
+            <label class="fs__md-- fw__5--" ng-class="(item.IntraOpNurseChartStatus == 'E' && item.IntraOpAnesthesiaChartStatus == 'E' && (item.OperativeChartStatus == 'E' && item.IsDoctorOperativeNotesSignOff))? 'status__green--dot status__green--': ((item.IntraOpNurseChartStatus == 'E' || item.IntraOpAnesthesiaChartStatus == 'E' || (item.OperativeChartStatus == 'E' && item.IsDoctorOperativeNotesSignOff))? 'status__yellow--dot status__yellow--': 'status__red--dot status__red--')">Intra</label>
+        </li>
+        <li>
+            <label class="fs__md-- fw__5--" ng-class="(item.PostOpNurseChartStatus == 'E' && item.PostOpAnesthesiaChartStatus == 'E'&& item.R2PostOpNurseChartStatus == 'E' && item.R2PostOpAnesthesiaChartStatus == 'E' && (item.DischargeChartStatus == 'E' && item.IsDoctorDisChargeSignOff))? 'status__green--dot status__green--': ((item.PostOpNurseChartStatus == 'E' || item.PostOpAnesthesiaChartStatus == 'E' || item.R2PostOpNurseChartStatus == 'E' || item.R2PostOpAnesthesiaChartStatus == 'E' || (item.DischargeChartStatus == 'E' && item.IsDoctorDisChargeSignOff))? 'status__yellow--dot status__yellow--': 'status__red--dot status__red--')">Post</label>
+        </li>
+        <li>
+            <a popover-template="'auditReportSingningStatus.html'" popover-data="item" popover-class="audit__signedstatus--hover" dynamic-click-popover-placement-op><i class="icons__w16-- info__w16--o"></i></a>
+        </li>
+    </ul>-->
+                                <ul class="flex-flow-list fd__r-- gap__10--">
+                                    <!-- Pre-Operative Status -->
+                                    <li>
+                                        <label class="fs__md-- fw__5--" ng-class="item.PreOpStatusClass">
+                                            Pre
+                                        </label>
+                                    </li>
+
+                                    <!-- Intra-Operative Status -->
+                                    <li>
+                                        <label class="fs__md-- fw__5--" ng-class="item.IntraOpStatusClass">
+                                            Intra
+                                        </label>
+                                    </li>
+
+                                    <!-- Post-Operative Status -->
+                                    <li>
+                                        <label class="fs__md-- fw__5--" ng-class="item.PostOpStatusClass">
+                                            Post
+                                        </label>
+                                    </li>
+
+                                    <!-- Info Icon -->
+                                    <li>
+                                        <a popover-template="'auditReportSingningStatus.html'"
+                                           popover-data="item"
+                                           popover-class="audit__signedstatus--hover"
+                                           dynamic-click-popover-placement-op>
+                                            <i class="icons__w16-- info__w16--o"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td ng-click="navtoPreOpAscCharting(item)">
+                                <label class="tc__606060-- fs__normal-- fw__4-- mb__0-- not__admited-- d__f-- ai__c-- gap__5--x" ng-if="item.AddReportStatusId==0">Not Signed</label>
+                                <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D-- cur-pointer bg__h--C71D271A px__3-- py__2--" ng-if="item.AddReportStatusId==1" popover-template="'auditReportStatus.html'" popover-data="item" popover-class="internal__audit--hover" dynamic-popover-placement><i class="icons__w16-- cancel__w16--f"></i>Failed</label>
+                                <!--<label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--" ng-if="item.AddReportStatusId==1"><i class="icons__w16-- pending__w16--f"></i>Failed</label>-->
+                                <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--" ng-if="item.AddReportStatusId==2"><i class="icons__w16-- completed__w16--f"></i>Completed</label>
+
+                                <!--<label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--" ng-if="item.AddReportStatusId==1"><i class="icons__w16-- cancel__w16--f"></i>Failed</label>
+                    <label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--" ng-if="item.AddReportStatusId==2"><i class="icons__w16-- completed__w16--f"></i>Completed</label>-->
+                                <!--<label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--"><i class="icons__w16-- pending__w16--f"></i>Pending</label>-->
+                            </td>
+                            <!--<td><label class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D1D1D--"><i class="icons__w16-- completed__w16--f"></i>Completed</label></td>-->
+                            <td class="text-center">
+                                <a href="javascript:;" popover-append-to-body="true" ng-click="SelectedAppointmentData(item)"
+                                   uib-popover-template="ASCAuditManagementInfo.templateUrl" popover-placement="left" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width m-l-0 m-t-0 info-history-popover">
+                                    <i class=" icons__w16--   info__w16--o"></i>
+                                </a>
+                                <!--    <a href="javascript:;" popover-append-to-body="true" uib-popover-template="ASCAuditManagementInfo.templateUrl" popover-placement="left" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width m-l-0 m-t-0 info-history-popover" ng-click="SelectedAppointmentLogData(item)">
+                    <i class=" icons__w16--   info__w16--o"></i></a>-->
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table__style--5 height__100--" ng-show="AscAppointmentsList.length == 0">
+                    <thead>
+                        <tr>
+                            <th width="18%">Patient Details</th>
+                            <th>Doctor Name</th>
+                            <th width="8%">DOB</th>
+                            <th>Visit Reason & Date</th>
+                            <th width="18%">Signing Status</th>
+                            <th>Internal Audit</th>
+                            <!--<th>External Audit</th>-->
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="height__100--">
+                        <tr class="height__100--">
+                            <td class="height__100-- bg__none--" colspan="7">
+                                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--">
+                                    <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- text-center m__0--">No Patients Found</h1>
+                                    <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="d__f-- jc__c-- ai__c--">
+        <div class="EH-pagination text-center">
+            <uib-pagination total-items="AscAppointmentsListCount"
+                            ng-model="currentPage"
+                            ng-change="pageChangedEvent(currentPage)"
+                            force-ellipses="false"
+                            boundary-links="false"
+                            max-size="10"
+                            items-per-page="itemsperpage"
+                            ng-show="AscAppointmentsList.length > 0">
+            </uib-pagination>
+        </div>
+    </div>
+</div>
+<script type="text/ng-template" id="auditReportSingningStatus.html">
+    <table class="table__style--21">
+        <thead>
+            <tr>
+                <th width="10%"></th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Pre-Op</label>
+                </th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Intra-Op</label>
+                </th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Post-Op(Recovery I)</label>
+                </th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Post-Op(Recovery II)</label>
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fw__4-- fs__normal--">Nurse</p>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOpNurseChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOpNurseChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PreOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="popoverData.PreOpNurseChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PreOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="popoverData.PreOpNurseChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOpNurseChartStatus=='E'">Signed{{item}}</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOpNurseChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.IntraOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="popoverData.IntraOpNurseChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.IntraOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="popoverData.IntraOpNurseChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOpNurseChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOpNurseChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R1'||sitem.ScreenType=='PostOp')&&popoverData.PostOpNurseChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="popoverData.PostOpNurseChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.R2PostOpNurseChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.R2PostOpNurseChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R2')&&popoverData.R2PostOpNurseChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails|filter:{'UserType':'Nurse'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R2')&&popoverData.R2PostOpNurseChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fw__4-- fs__normal--">Anesthesia</p>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOpAnesthesiaChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOpAnesthesiaChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PreOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="popoverData.PreOpAnesthesiaChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PreOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="popoverData.PreOpAnesthesiaChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOpAnesthesiaChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOpAnesthesiaChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.IntraOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="popoverData.IntraOpAnesthesiaChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.IntraOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="popoverData.IntraOpAnesthesiaChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOpAnesthesiaChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOpAnesthesiaChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R1'||sitem.ScreenType=='PostOp')&&popoverData.PostOpAnesthesiaChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="popoverData.PostOpAnesthesiaChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.R2PostOpAnesthesiaChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.R2PostOpAnesthesiaChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R2')&&popoverData.R2PostOpAnesthesiaChartStatus=='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.PostOpLastSignOffUserDetails |filter:{'UserType':'Anesthesia'} track by $index" ng-if="(sitem.ScreenType=='PostOp-R2')&&popoverData.R2PostOpAnesthesiaChartStatus=='E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fw__4-- fs__normal--">Doctor</p>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="(popoverData.FaceSheetLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}).length > 0">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="(popoverData.FaceSheetLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}).length == 0">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in (popoverData.FaceSheetLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}) track by $index">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in (popoverData.FaceSheetLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}) track by $index">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.OperativeChartStatus=='E'">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.OperativeChartStatus!='E'">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in popoverData.OperativeLastSignOffUserDetails  track by $index" ng-if="popoverData.OperativeChartStatus =='E'">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in popoverData.OperativeLastSignOffUserDetails track by $index" ng-if="popoverData.OperativeChartStatus == 'E'">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div class="d__f-- fd__c-- gap__5--">
+                        <div class="d__f-- ai__c-- gap__5--">
+                            <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="(popoverData.DischargeLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}).length > 0">Signed</p>
+                            <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="(popoverData.DischargeLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}).length == 0">Not Signed</p>
+                            <ul class="d__f-- ai__c-- gap__5-- fw__w-- list__unstyled-- m__0--" ng-repeat="sitem in (popoverData.DischargeLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}) track by $index">
+                                <li>
+                                    <label class="m__0-- tc__1D1D1D-- fs__lg-- fs__normal-- fw__6--">- {{sitem.Date | date:"MM-dd-yyyy"}} -</label>
+                                </li>
+                                <li>
+                                    <label class="tc__4A4A4A-- fs__lg-- fs__normal-- fw__6--">{{sitem.Date | date: "hh:mm a"}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="fs__lg-- fw__6-- fs__normal-- tc__1D1D1D--" ng-repeat="sitem in (popoverData.DischargeLastSignOffUserDetails | filter:{UserType: 'Surgeon', LatestStatus: 'SignOff'}) track by $index">{{sitem.SignOffUserName}} {{sitem.SuffixName}}</p>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/ng-template" id="auditReportStatus.html">
+    <table class="table__style--21">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Pre-Op</label>
+                </th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Intra-Op</label>
+                </th>
+                <th>
+                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Post-Op</label>
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fw__4-- fs__normal--">Nurse</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOPNurseStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOPNurseStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOPNurseStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOPNurseStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOPNurseStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOPNurseStatusId==1">Failed</p>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fw__4-- fs__normal--">Anesthesia</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOPAnesthesiaStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PreOPAnesthesiaStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOPAnesthesiaStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.IntraOPAnesthesiaStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__normal-- fw__4-- mb__0--  signed--  d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOPAnesthesiaStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__normal-- fw__4-- mb__0--  not__signed-- d__f-- ai__c-- gap__5--x" ng-if="popoverData.PostOPAnesthesiaStatusId==1">Failed</p>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <p class="m__0-- tc__1D1D1D-- fs__lg-- fw__6--">Doctor</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.DoctorNotesStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.DoctorNotesStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.OperativeNotesStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.OperativeNotesStatusId==1">Failed</p>
+                </td>
+                <td>
+                    <p class="tc__2DAA2D-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.PostOPDischargeStatusId==2">Completed</p>
+                    <p class="tc__C71D27-- mb__0-- fs__lg-- fw__6--" ng-if="popoverData.PostOPDischargeStatusId==1">Failed</p>
+                </td>
+
+
+            </tr>
+        </tbody>
+    </table>
+</script>

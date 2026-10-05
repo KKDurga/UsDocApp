@@ -1,0 +1,809 @@
+﻿<!--New Design 03/02/2025-->
+
+<div class="d__f-- fd__c-- height__100-- gap__y--8">
+    <div class="d__f-- ai__c-- gap__x--3 px__10-- py__4--">
+        <h1 class="fw__6-- fs__xl-- tc__1D1D1D-- m__0--">Patient Statement</h1>
+        <span class="ml__10--  fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558-- ">{{PatientStatementsQueueListCount}}</span>
+    </div>
+
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+        <table class="table tableno-bordered tableno-padding m__0--">
+            <tbody>
+                <tr>
+                    <td width="25%">
+                        <fieldset class="pos-relative">
+                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0" id="NameId" name="PatientSearchdata" ng-value="1" aria-invalid="false" ng-model="PatientSearchdata.SearchTypeId" ng-click="changeSearchType(PatientSearchdata.SearchTypeId);">
+                                <label for="NameId" class="radio-custom-label cur-poiter mb-0">Patient Name</label>
+                            </div>
+                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0 " id="mrMobileId" name="PatientSearchdata" ng-value="2" aria-invalid="false" ng-model="PatientSearchdata.SearchTypeId" ng-click="changeSearchType(PatientSearchdata.SearchTypeId);">
+                                <label for="mrMobileId" class="radio-custom-label cur-poiter mb-0">MR No</label>
+                            </div>
+                            <div class="dis-inline-block">
+                                <input type="radio" class="radio-custom width-0 " id="ClaimNoId" name="PatientSearchdata" ng-value="3" aria-invalid="false" ng-model="PatientSearchdata.SearchTypeId" ng-click="changeSearchType(PatientSearchdata.SearchTypeId);">
+                                <label for="ClaimNoId" class="radio-custom-label cur-poiter mb-0">Claim No</label>
+                            </div>
+
+                        </fieldset>
+                        <div class="btn-group select-form-uib dropdown open">
+                            <div class="form__group flex">
+                                <input ng-class="PatientSearchdata.SearchText =='' ? 'icons-search' : ''" type="text" placeholder="Search By Name" id="input_pname" typeahead-min-length="3" ng-if="PatientSearchdata.SearchTypeId == 1" ng-model="PatientSearchdata.SearchText" ng-change="LoadPatientSearch(PatientSearchdata.SearchText)" minlength="3">
+                                <input ng-class="PatientSearchdata.SearchText =='' ? 'icons-search' : ''" type="text" placeholder="Search By Mr.No" id="input_mrno" typeahead-min-length="3" ng-if="PatientSearchdata.SearchTypeId == 2" ng-model="PatientSearchdata.SearchText" ng-change="LoadPatientSearch(PatientSearchdata.SearchText)" minlength="3">
+                                <input ng-class="PatientQueueObj.PatientClaimNumber =='' ? 'icons-search' : ''" type="text" placeholder="Search By Claim.No" id="input_claimno" typeahead-min-length="3" ng-if="PatientSearchdata.SearchTypeId == 3" ng-model="PatientQueueObj.PatientClaimNumber" minlength="3">
+                                <a class="position__absolute-- top-6 right-5 b__0--" ng-hide="PatientSearchdata.SearchText =='' && PatientQueueObj.PatientClaimNumber ==''" ng-click="clearPatientSearchData()" role="button" tabindex="0"><i class="icons__w16-- cancel__w16--o"></i></a>
+                            </div>
+
+                            <ul class="list-group dropdown-menu  py__6-- slim-scroll dropdown-list-group-item" ng-if="ShowPatientListDrop">
+                                <li class="hover__F5F5F5--bg  py__5-- cur-poiter" ng-click="SelectedPatient(patientitem,PatientSearchdata.SearchTypeId)" ng-show="AllPatientList.length >0" ng-repeat="patientitem in AllPatientList">
+                                    <div class="d__f-- fd__c--">
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--  lh__20--">{{patientitem.FullName}}</span>
+                                        <div class="d__f-- ai__c--">
+                                            <span class="fs__lg-- fw__5-- tc__656565-- lh__18--">{{patientitem.patientdisplayid}}</span>
+                                            <span class="fs__3l-- tc__E4E4E4-- px__4-- lh__18--" ng-if="patientitem.patientdisplayid && patientitem.DOB"> | </span>
+                                            <span class="fs__lg-- fw__5-- tc__656565-- lh__18--">{{patientitem.DOB | date:'MM-dd-yyyy'}}</span>
+                                            <span class="fs__lg-- fw__5-- tc__656565-- lh__18--"
+                                                  ng-if="!patientitem.patientdisplayid && !patientitem.DOB"> - </span>
+                                        </div>
+                                    </div>
+                                    <!--<div class="dis-block">
+                                        <h5 class="m-t-0 mb-5">
+                                            <b>{{patientitem.FullName}}</b>
+                                            <span class="new-global-patient" ng-if="patientitem.PatientId===0"> <span></span> New </span>
+                                        </h5>
+
+                                        <p class="mb-0">
+                                            <span class="fs-11" ng-if="patientitem.MobileNo != '' && patientitem.MobileNo != null">
+                                                {{patientitem.MobileNo}}
+                                            </span>
+                                            <span>&nbsp;</span>
+                                            <span class="fs-11 text-gray">
+                                                - {{patientitem.patientdisplayid}}
+                                            </span>
+                                        </p><br />
+                                        <p>
+                                            <span class="fs-11 text-gray" ng-hide="patientitem.DOB == 0 || patientitem.DOB == null">
+                                                DOB : {{patientitem.DOB | date:'MM-dd-yyyy'}}
+                                            </span>
+                                            <span>&nbsp;</span>
+                                            <span class="fs-11 text-gray">
+                                                | {{patientitem.Gender}}
+                                            </span>
+                                        </p>
+                                    </div>-->
+                                </li>
+                                <li class="height__100--" ng-show="AllPatientList.length===0">
+                                    <div class="d__f-- jc__c-- ai__c-- height__100--">
+                                        <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">No Results Found</h1>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input type="text" class="icons-calendar"
+                                   ng-model="PatientQueueObj.FromDate"
+                                   ng-change="ChangeFrom(PatientQueueObj.FromDate)"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input type="text" class="icons-calendar"
+                                   ng-model="PatientQueueObj.ToDate"
+                                   ng-change="ChangeTo(PatientQueueObj.ToDate)"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient
+                                   mindate="{{PatientQueueObj.ToDate}}"  readonly/>
+                        </div>
+                    </td>
+
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>Location</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{LocationTypeObj.SelectLocationString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2" ng-click="stopClosingDropDown($event)">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchHospital.txt1}">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="ChangeApptBranch(item)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--" ng-bind="item.BranchName"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label for="apptList__bookType">Billing Provider</label>
+                            <div class="dropdown cstm-dropdown width-100 " button-dropdown-direction>
+                                <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{BillingProviderTypeObj.SelectStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="BillingProviderTypeObj.Name" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="BillingProviderTypeObj.AllStatusCheck" ng-click="CheckAllBillingType(BillingProviderTypeObj.AllStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in BillingProviderList | filter:{'BillingProviderName':BillingProviderTypeObj.Name} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="BillingTypeToggle()">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.BillingProviderName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td width="12%">
+                        <div class="form__group">
+                            <label for="apptList__bookType">Payors</label>
+                            <div class="dropdown cstm-dropdown width-100 " button-dropdown-direction>
+                                <button class="form__control text-left" id="apptList__bookType" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{PayorsObj.SelectStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="PayorsObj.Name" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="PayorsObj.AllStatusCheck" ng-click="CheckAllPayors(PayorsObj.AllStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in PayorsList | filter:{'PayorName':PayorsObj.Name} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="PayorsToggle()">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.PayorName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="17%" ng-if="false">
+                        <div class="form__group">
+                            <label>Claim Conditions</label>
+                            <select ng-model="PatientQueueObj.PatientConditionId" id="select_cconditions"
+                                    ng-change="SelectClaimCondition(PatientQueueObj.PatientConditionId)"
+                                    ng-options="item.ConditionId as item.ConditionName for item in PatientBalanceConditions">
+                                <option id="0" value="">All</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td width="12%" ng-if="false">
+                        <div class="form__group">
+                            <label>Patient Aging</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control  text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                    {{PatientAgingObj.SelectStatusString}}
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app left-auto right-0" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="PatientAgingObj.AllStatusCheck" ng-click="checkPatientAging(PatientAgingObj.AllStatusCheck)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MasterPatientAginglist | filter:{'PatientAgingData':PatientAgingObj.PAtientAgingName} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="ClaimStatusToggle(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small ng-bind="item.PatientAgingData"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td class="valign-bottom">
+                        <div class="dis-flex align-items-center justify-flex-start grid-gap-10 jc__e--">
+                            <button class="btn__xl-- btn__2D2D47--f" ng-click="ApplyPatientQueue()" id="btn_apply">
+                                Apply
+                            </button>
+                            <button class="bg-none b-0" ng-click="ClearPatientQueue()" id="btn_clear">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--" ng-if="false">
+        <table class="table tableno-bordered tableno-padding m__0--">
+            <tbody>
+                <tr>
+
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>Posting From Date</label>
+                            <input type="text" class="icons-calendar"
+                                   ng-model="GetPatientManualJobObj.FromDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient readonly />
+                        </div>
+                    </td>
+                    <td width="12%">
+                        <div class="form__group">
+                            <label>Posting To Date</label>
+                            <input type="text" class="icons-calendar"
+                                   ng-model="GetPatientManualJobObj.ToDate"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickerregpatient
+                                   mindate="{{GetPatientManualJobObj.ToDate}}" readonly />
+                        </div>
+                    </td>
+
+                 
+                    <td class="valign-bottom">
+                        <div class="dis-flex align-items-center justify-flex-start grid-gap-10 jc__e--">
+                            <button class="btn__xl-- btn__2D2D47--f" ng-click="ApplyPatientJob()" id="btn_apply">
+                                Apply Job
+                            </button>
+                          
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="d__f-- fd__c-- border__E4E4E4-- bradius__5-- height__100--">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll">
+                <div class="height__100-- d__f-- fd__c--">
+                    <table class="table__style--21 border__none--" ng-class="{'height__100--': PatientStatementsQueueList.length == 0}" id="table_psqueuelist">
+                        <thead>
+                            <tr>
+                                <th width="6%">
+                                    <!--<label class="text-right">
+                                        <span class="checkbox m__0--">
+                                            <label>
+                                                <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="PatientQueueObj.IsChecked" ng-click="SelectAllStatements()">
+                                                <span class="checkbox-material">
+                                                    <span class="check"></span>
+                                                </span>
+
+                                            </label>
+                                        </span>
+                                    </label>-->
+                                    <small class="fs__lg-- fs__normal-- fw__4-- tc__1D1D1D--">S.No</small>
+                                </th>
+                                <th width="15%">
+                                    <label>Patient Name & MR No</label>
+                                </th>
+                                <th width="13%">
+                                    <label>Patient Email & Mobile No</label>
+                                </th>
+
+
+                                <th>
+                                    <label>Billed</label>
+                                </th>
+                                <th>
+                                    <label>Ins. Pay</label>
+                                </th>
+                                <th>
+                                    <label>Dedut</label>
+                                </th>
+                                <th>
+                                    <label>Coins</label>
+                                </th>
+                                <th>
+                                    <label>Pat. Bal</label>
+                                </th>
+                                <th>
+                                    <label>Total Bal</label>
+                                </th>
+                                <th width="9%">
+                                    <label>Process Status</label>
+                                </th>
+                                <th width="8%">
+                                    <label></label>
+                                </th>
+                                <!--<th width="9%">
+                                    <label>Processed Via</label>
+                                </th>
+                                <th width="8%">
+                                    <label></label>
+                                </th>-->
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="item in PatientStatementsQueueList track by $index" ng-show="PatientStatementsQueueList.length > 0">
+                            <tr>
+                                <td class="px__7--" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="checkbox d__f-- ai__c-- gap__x--2 m__0--">
+                                        <div>
+                                            <a ng-click="openAccordianItem(item)"> <i class="icons__w16-- arrowrightfill__w16--l" ng-class="item.isOpen ? 'arrowdownfill__w16--o' : 'arrowrightfill__w16--l'"></i></a>
+                                        </div>
+                                        <!--<label>
+                                            <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="item.IsChecked">
+                                            <span class="checkbox-material">
+                                                <span class="check"></span>
+                                            </span>
+                                            <small class="fs__lg-- fs__normal-- fw__4-- tc__1D1D1D--">{{$index + 1}}.</small>
+                                        </label>-->
+                                        <small class="fs__lg-- fs__normal-- fw__4-- tc__1D1D1D--">{{ (PatientQueueObj.PageNumber - 1) * 100 + ($index + 1) }}.</small>
+                                    </div>
+
+                                </td>
+                                <td ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="d__f-- fd__c-- gap__y--3">
+                                        <a class="fs__md-- fs__normal-- fw__5-- tc__1D5558-- tx__h--a tx__underline-- no-wrapappt" title="{{item.PatientFullName}}" ng-click="navtoOpenProfilePopup(item,1)">{{item.PatientFullName}}</a>
+                                        <a class="fs__md-- fs__normal-- fw__5-- tc__1D5558-- tx__h--a tx__underline--">{{item.PatientMrNo}}</a>
+
+                                    </div>
+                                </td>
+                                <td ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="d__f-- fd__c-- gap__y--3">
+                                        <a class="fs__md-- fs__normal-- fw__5-- tc__1D5558-- tx__h--a tx__underline--" title="{{item.PatientEmail}}">{{item.PatientEmail}}</a>
+                                        <p title="{{item.PatientMobile}}">{{item.PatientMobile}}</p>
+                                    </div>
+                                </td>
+
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalClaimAmount || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalInsurancePayment || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalDeductibleAmount || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalCoInsuranceAmount || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalPatientBalance || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="valign-middle" ng-click="openAccordianItem(item)" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div>
+                                        <p class="fw__6--">${{(item.TotalBalance || 0) | number:2}}</p>
+                                    </div>
+                                </td>
+                                <td class="text-center" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="form__group">
+                                        <a class="fs__normal-- tc__1D5558-- fs__md-- fw__5-- tx__underline--" ng-click="openHoldStatusPopup(item)">
+                                            {{item.ProcessStatus}}
+                                        </a>
+                                        <!--<select ng-model="item.ProcessStatusId"
+                                                ng-options="Sitem.StatusId as Sitem.StatusName for Sitem in MasterPatientStatementProcessStatus"
+                                                ng-change="ChangeProcessStatus(item.ProcessStatusId,item)">
+                                            <option id="0" value="" disabled>select</option>
+                                        </select>-->
+                                    </div>
+                                </td>
+                                <td class="py__8-- px__6-- ">
+                                    <div class="d__f-- ai__c-- gap__5--">
+                                        <a ng-click="PatientStatementAlert(item)" tooltip-placement="top" uib-tooltip="Alert">
+                                            <i class="icons__w16-- notify__w16--o"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                                <!--<td class="text-center" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="form__group">
+                                        <select ng-model="item.ProcessedViaId"
+                                                ng-options="aitem.ProcessedViaId as aitem.ProcessedVia for aitem in MasterPatientStatementProcessedVia"
+                                                ng-change="ChangeProcessVia(item.ProcessedViaId,item)">
+                                            <option id="0" value="" disabled>select</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="vl__middle--" ng-class="{'bg__FCFAF5-- boxs__none--': item.isOpen}">
+                                    <div class="d__f-- ai__c-- jc__c-- gap__5-- ">
+                                        <button class="btn__sm-- btn__1d5558--o" ng-click="UpdateGeneratedStatement(item)">Update</button>
+                                        <a ng-click="PatientStatementAlert(item)" tooltip-placement="top-right" uib-tooltip="Alert">
+                                            <i class="icons__w16-- notify__w16--o"></i>
+                                        </a>
+                                    </div>
+                                </td>-->
+                            </tr>
+                            <tr ng-repeat-end ng-show="item.isOpen" ng-class="{'bb__DDD--': item.isOpen}">
+                                <td colspan="11" ng-class="{'bg__FCFAF5--': item.isOpen}">
+                                    <table class="table tableno-bordered tableno-padding m__0-- border__DDD-- boxs__0000001A--br10" id="table_statementeligiblepatients">
+                                        <thead>
+                                            <tr class="bb__DDD--">
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">S.No</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Claim Date</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Claim Number</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Primary</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Secondary</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Billed</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Ins.Bal</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Pat.Bal</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Total.Bal</label></th>
+                                                <th><label class="fs__lg-- fw__5-- tc__1D1D1D-- bg__F9F9F9-- p__5-- lh__15--">Doctor Name</label></th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg__FFFFFF--" ng-repeat="pitem in item.PatientClaim track by $index">
+                                            <tr>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{$index+1}}</label></td>
+                                                <td> <label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{pitem.DOSFrom | date:'MM-dd-yyyy'}}</label></td>
+                                                <td> <label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{pitem.PatientClaimNumber}}</label></td>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{pitem.PrimaryInsurancePayorName}}</label></td>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{pitem.SecondaryInsurancePayorName}}</label></td>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">${{(pitem.TotalClaimAmount || 0) | number:2}}</label></td>
+                                                <td> <label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">${{(pitem.TotalInsuranceBalance || 0) | number:2}}</label></td>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">${{(pitem.TotalPatientBalance || 0) | number:2}}</label></td>
+                                                <td> <label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">${{(pitem.TotalBalance || 0) | number:2}}</label></td>
+                                                <td><label class="fs__lg-- fw__5-- tc__1D1D1D-- p__5--">{{pitem.DoctorName}}</label></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="PatientStatementsQueueList.length == 0">
+                            <tr>
+                                <td class="bg__none--" colspan="13">
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                        <a><i class="nodata__1-- d3__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Statements Found</h1>
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">Once statements are generated for patients, they will appear here.</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="d__f-- ai__c-- jc__c-- bt__DDD-- p__6--" ng-show="PatientStatementsQueueListCount > 100">
+            <div class="EH-pagination text-center">
+                <uib-pagination total-items="PatientStatementsQueueListCount"
+                                ng-model="PatientQueueObj.PageNumber"
+                                ng-change="ApplyPatientQueue(PatientQueueObj.PageNumber,'All')"
+                                max-size="10"
+                                class="mt-0 mb-10"
+                                boundary-link-numbers="true"
+                                items-per-page="100"
+                                rotate="false">
+                </uib-pagination>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-5 " style="display:none;" id="MultiplePatientSatement_print">
+        <div class="page-break-end" style="page-break-after: always; break-after: page; width: 800px; margin: auto; padding-bottom: 12px; background-color: #fff; display: flex; flex-direction: column; grid-column-gap: 8px;" ng-repeat="item in PatientStatementsListData track by $index">
+
+            <table style="width: 800px;">
+                <tbody>
+                    <tr>
+                        <td style="vertical-align:top; width:40%">
+                            <div>
+                                <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{HospitalAddressArray.ClinicName}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{HospitalAddressArray.Address1}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{HospitalAddressArray.Address2}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{HospitalAddressArray.CityName}}, {{HospitalAddressArray.StateName}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{HospitalAddressArray.CountryName}}, {{HospitalAddressArray.PinCode}}</div>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <div style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{item.PatientClaim[0].ClaimLineItems[0].BillingProviderName}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaim[0].PatientPostalAddress[0].PostalAddress1}},{{item.PatientClaim[0].PatientPostalAddress[0].PostalAddress2}}</div>
+                                <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaim[0].PatientPostalAddress[0].PostalCityName}},{{item.PatientClaim[0].PatientPostalAddress[0].PostalStateName}} -{{item.PatientClaim[0].PatientPostalAddress[0].PostalZipCode}}</div>
+                            </div>
+                        </td>
+                        <td style="vertical-align:top;">
+                            <table style="width: 100%; border: 1px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:0px;">
+                                <tbody>
+                                    <tr style="border-bottom: 0.6px solid #B3B3B3; ">
+                                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align:middle; ">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Statement Date</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaim[0].ClaimDate | date:'MM-dd-yyyy'}}</p>
+                                        </td>
+                                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; background: #F2F2F2; padding: 2px 8px; vertical-align: middle; ">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Pay This Amount</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(item.TotalPatientBalance || 0) | number:2}}</p>
+                                        </td>
+                                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align: middle; ">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Account No.</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaim[0].PatientClaimNumber}}</p>
+                                        </td>
+                                        <td style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Amount Paid</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(item.TotalPatientPayment || 0) | number:2}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Patient Name</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientFullName}}</p>
+                                        </td>
+                                        <td colspan="2" style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Address</label>
+                                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaim[0].PatientAddress.HNo}} {{item.PatientClaim[0].PatientAddress.AddressLine1}} {{item.PatientClaim[0].PatientAddress.AddressLine2}}, {{item.PatientClaim[0].PatientAddress.CityName}}, {{item.PatientClaim[0].PatientAddress.StateName}}, {{item.PatientClaim[0].PatientAddress.CountryName}} - {{item.PatientClaim[0].PatientAddress.Pin}}</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table style="width: 100%; border-radius: 4px; padding:6px; background: #F2F2F2; border-collapse: collapse; border-spacing: 0; margin-top: 6px;">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2" style="padding: 2px 8px; vertical-align:middle; ">
+                                            <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Any concerns about your invoice?</label>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 8px; vertical-align:middle; width:30%;">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Call: </label>
+                                            <span style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{HospitalAddressArray.ContactNo}}</span>
+                                        </td>
+                                        <td style="padding: 2px 8px; vertical-align:middle; ">
+                                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Visit:</label>
+                                            <span style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; "> friedelllc.com</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div style="color: #000;  font-size: 14px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:15px;">
+                Patient Statement
+            </div>
+            <table style="width: 800px; border: 0.6px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:30px;">
+                <thead>
+                    <tr>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:10%;">DOS </th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:15%">Provider</th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px;">Description</th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Charges</th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Payment</th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Ins. Pending</th>
+                        <th style="font-size: 10px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Adj.</th>
+                        <th style="font-size: 10px; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Balance</th>
+                    </tr>
+                </thead>
+                <tbody style="border-bottom: 0.5px solid #A3A3A3;" ng-repeat="Citem in item.PatientClaim[0].ClaimLineItems">
+                    <tr>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px; ">{{Citem.DOSfrom | date:'MM-dd-yyyy'}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;">
+                            {{Citem.BillingProviderName}}
+                        </td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #000; padding: 5px;">{{Citem.ServiceCode}} {{Citem.ServiceName}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.TotalChargeAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.PatientPaymentAmount + Citem.InsurancePaymentAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.InsuranceBalance || 0) | number:2}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.AdjustmentAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; "></td>
+                    </tr>
+                    <tr style="background-color: #f2f2f2;" ng-repeat="titem in Citem.ClaimLineItemTransactions" ng-if="Citem.ClaimLineItemTransactions.length > 0">
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;">{{titem.TransactionDate | date:'MM-dd-yyyy'}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style:italic;">{{titem.TransactionType}}</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 3">${{(titem.TransactionAmount || 0) | number:2}}</span></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"> <span ng-if="titem.TransactionTypeId === 24 ||titem.TransactionTypeId === 25 ||titem.TransactionTypeId === 26 ||titem.TransactionTypeId === 27 ||titem.TransactionTypeId === 32 || titem.TransactionTypeId === 36 || titem.TransactionTypeId===40 || titem.TransactionTypeId === 98|| titem.TransactionTypeId === 99 || titem.TransactionTypeId === 100">${{(titem.TransactionAmount || 0) | number:2}}</span> </td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 2 || titem.TransactionTypeId === 53 || titem.TransactionTypeId === 45 ">${{(titem.TransactionAmount || 0) | number:2}}</span></td>
+                        <td style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 30 || titem.TransactionTypeId === 95 || titem.TransactionTypeId === 96 || titem.TransactionTypeId === 97 ">${{(titem.PatientAmount || 0) | number:2}}</span></td>
+                    </tr>
+
+                    <tr style="background-color: #f2f2f2;">
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;">
+                        </td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;">Deductible</td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"> ${{(Citem.DeductibleAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                    </tr>
+
+                    <tr style="background-color: #f2f2f2;">
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;"> CoInsurance </td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.CoInsuranceAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                    </tr>
+                    <tr style="background-color: #f2f2f2;">
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;"> Copay  </td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                        <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{(Citem.CoPaymentAmount || 0) | number:2}}</td>
+                        <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                    </tr>
+
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td colspan="8" style="padding: 5px; text-align:right;">
+                            <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; ">Total Due From Patient:</label>
+                            <span style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; ">${{(item.TotalPatientBalance || 0) | number:2}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="color: #000;  font-size: 14px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:15px;">
+                Patient Aging
+            </div>
+            <table style="width: 100%; border: 0.6px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px;" ng-show="item.PatientClaim[0].PatientBlanceSummary.length > 0">
+                <tbody>
+                    <tr style="border-bottom: 0.6px solid #B3B3B3; " ng-repeat="pitem in item.PatientClaim[0].PatientBlanceSummary track by $index">
+                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align:middle; ">
+                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">0-30 Days</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(pitem.Between0to30Days || 0) | number:2}}</p>
+                        </td>
+                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3;  padding: 2px 8px; vertical-align: middle; ">
+                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">31-60 Days</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(pitem.Between30to60Days || 0) | number:2}}</p>
+                        </td>
+                        <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align: middle; ">
+                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">61-90 Days</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(pitem.Between60to90Days || 0) | number:2}}</p>
+                        </td>
+                        <td style="padding: 2px 8px; border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">91-120 Days</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(pitem.Between90to120Days || 0) | number:2}}</p>
+                        </td>
+                        <td style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                            <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">120+ Days</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{(pitem.Morethan120days || 0) | number:2}}</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 400; line-height: normal;  text-align: left; font-style:italic; margin-top:5px;">
+                You are receiving the third statement for a past due
+                balance on account. Please contact the billing office
+                immediately in order to avoid your account being sent to a
+                collection agency.
+            </div>
+
+            <table style="width: 100%; border-radius: 4px; padding:6px; background: #F2F2F2; border-collapse: collapse; border-spacing: 0; margin-top: 6px;">
+                <tbody>
+                    <tr>
+                        <td colspan="2" style="padding: 2px 8px; vertical-align:middle; ">
+                            <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Office Updates</label>
+                            <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">Payments and scheduling are available 24/7 through friedelle.com</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/ng-template" id="HoldStatusPopup.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1 class="fs__xl-- fw__6-- tc__1D1D1D-- m__0--">Process Status</h1>
+            <div class="d__f-- ai__c-- gap__10--">
+                <button class="btn__lg-- btn__1d5558--f" ng-click="UpdateHoldStatus()" id="btn_save">Save</button>
+                <a class="btn__close--2" ng-click="uibclose()" id="a_uibclose">
+                    <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false" style=""></i>
+                </a>
+            </div>
+        </div>
+        <div class="modal__body-- height__100--">
+            <div class="d__f-- fd__c-- gap__5-- p__10-- height__100--">
+                <div class="row nocolpad">
+                    <div class="col-lg-4">
+                        <div class="form__group">
+                            <label>Status</label>
+
+                            <select ng-model="Holdobj.ProcessStatusId" id="select_status"
+                                    ng-options="Sitem.StatusId as Sitem.StatusName for Sitem in MasterProcessStatus"
+                                    ng-change="ChangeProcessStatus(Holdobj.ProcessStatusId,Holdobj)">
+                                <option id="0" value="" disabled>select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form__group">
+                            <label> Reason </label>
+                            <textarea rows="1" ng-model="Holdobj.Reason" id="textarea_reason" class="msd-elastic: \n" placeholder="Notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</script>

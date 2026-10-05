@@ -1,0 +1,378 @@
+    <div class="modal-header">
+        <h4 class="modal-title">Upload Files</h4>
+        <button type="button" class="btn btn-link" ng-click="closeUploadFilesnewquickconslt()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <fieldset class="text-left m-l-15 m-b-5">
+                <span>
+                    <input type="radio" class="radio-custom" id="gfile" name="SelectedFile" value=1 ng-model="SelectedFile" required />
+                    <label for="gfile" class="radio-custom-label cur-poiter mb-0">General</label>
+                </span>
+                <span>
+                    <input type="radio" class="radio-custom" id="prefile" name="SelectedFile" value=2 ng-model="SelectedFile" required />
+                    <label for="prefile" class="radio-custom-label cur-poiter mb-0">Pre Treatment</label>
+                </span>
+                <span>
+                    <input type="radio" class="radio-custom" id="postfile" name="SelectedFile" value=3 ng-model="SelectedFile" required />
+                    <label for="postfile" class="radio-custom-label cur-poiter mb-0">Post Treatment</label>
+                </span>
+                <!--<span>
+                    <input type="radio" class="radio-custom" id="postfile" name="SelectedFile" value=4 />
+                    <label for="postfile" class="radio-custom-label cur-poiter mb-0">Investigations</label>
+                </span>-->
+            </fieldset>
+        </div>
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="file-upload">
+                    <div class="file-select">
+                        <div class="file-select-button" id="fileName">Choose File</div>
+                        <div class="file-select-name" id="noFile">No file chosen...</div>
+                        <!--<input type="file" name="chooseFile" id="chooseFile">-->
+                        <input type="file" name="upload" class="upload"
+                               ngf-select="onSelectFilesUpload($files)"
+                               ngf-pattern="'image/*,application/pdf'"
+                               ngf-accept="'image/*,application/pdf'"
+                               id="chooseFile"
+                               multiple="multiple"
+                               title="Choose a file to upload">
+                    </div>
+                </div>
+                <span style="display: block;">Upload only .png, .jpg, .jpeg, .pdf files &amp; Max individual file size : 5 mb</span>
+            </div>
+            <div class="col-lg-3">
+                <button type="button" class="btn btn-primary-green btn-block" style="height: 26px; border-radius:0;" ng-click="fileUploadMain(SelectedFile)">Upload</button>
+            </div>
+        </div>
+        <!-- /row -->
+        <div class="panel m-t-10 panel-ehnote" ng-if="generalPdfUploads.length > 0 || generalImgUploads.length > 0 ">
+            <div class="panel-heading">
+                General
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-consultation" image-viewer isarraychanged="PreTreatmentArrayChangedCount">
+                                <tbody ng-repeat="genimgitem in generalImgUploads">
+                                    <tr>
+                                        <td class="cover-fileimg">
+                                            <img ng-src="{{genimgitem.DocURL}}" class="img-thumbnail" width="50" height="50" />
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="genimgitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="genimgitem.IsRemarksinEdit" ng-bind="genimgitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="javascript:void(0);" ng-click="genimgitem.IsRemarksinEdit = !genimgitem.IsRemarksinEdit;focusFileUpload('genimgitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" ng-click="PreDeleteUploadFile(genimgitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="genimgitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" ng-model="genimgitem.Remarks" id="preimgitem_{{$index}}" ng-show="genimgitem.IsRemarksinEdit" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button ng-click="genimgitem.IsRemarksinEdit = ! genimgitem.IsRemarksinEdit;saveEditedFileUpload(genimgitem)" class="btn btn-sm btn-block text-success btn-link h-100 m-l-10">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                                <tbody ng-repeat="genpdfitem in generalPdfUploads">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <i class="far fa-file-pdf error fs-40 img-thumbnail" ng-click="openPdfFileUploads(genpdfitem.DocURL)"></i>
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="genpdfitem.docNameDisplay">
+
+                                            </label>
+                                            <p class="mb-0" ng-hide="genpdfitem.IsRemarksinEdit" ng-bind="genpdfitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="javascript:void(0);" ng-hide="genpdfitem.IsRemarksinEdit" ng-click="genpdfitem.IsRemarksinEdit = !genpdfitem.IsRemarksinEdit;focusFileUpload('genpdfitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="javascript:void(0);" ng-click="PreDeleteUploadFile(genpdfitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="genpdfitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" id="genpdfitem_{{$index}}" ng-model="genpdfitem.Remarks" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-show="genpdfitem.IsRemarksinEdit" ng-click="genpdfitem.IsRemarksinEdit = !genpdfitem.IsRemarksinEdit;saveEditedFileUpload(genpdfitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /panel -->
+        <div class="panel panel-ehnote" ng-show="PreTreatmentImgUploads.length > 0 || PreTreatmentPdfUploads.length > 0 ">
+            <div class="panel-heading">Pre Treatment</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-consultation">
+                                <tbody ng-repeat="preimgitem in PreTreatmentImgUploads">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <img class="img-thumbnail" ng-src="{{preimgitem.DocURL}}" width="50" height="50" />
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="preimgitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="preimgitem.IsRemarksinEdit" ng-bind="preimgitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="" ng-hide="preimgitem.IsRemarksinEdit" ng-click="preimgitem.IsRemarksinEdit = ! preimgitem.IsRemarksinEdit;focusFileUpload('preimgitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(preimgitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="preimgitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" ng-model="preimgitem.Remarks" id="preimgitem_{{$index}}" ng-show="preimgitem.IsRemarksinEdit" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button ng-click="preimgitem.IsRemarksinEdit = ! preimgitem.IsRemarksinEdit;saveEditedFileUpload(preimgitem)" class="btn btn-sm btn-block text-success btn-link h-100 m-l-10">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody ng-repeat="prepdfitem in PreTreatmentPdfUploads">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <i class="far fa-file-pdf error fs-40 img-thumbnail" ng-click="openPdfFileUploads(prepdfitem.DocURL)">
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="prepdfitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="prepdfitem.IsRemarksinEdit" ng-bind="prepdfitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="" ng-hide="prepdfitem.IsRemarksinEdit" ng-click="prepdfitem.IsRemarksinEdit = !prepdfitem.IsRemarksinEdit;focusFileUpload('prepdfitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(prepdfitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="prepdfitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea id="prepdfitem_{{$index}}" class="form-control" ng-model="prepdfitem.Remarks" ng-show="prepdfitem.IsRemarksinEdit" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-click="prepdfitem.IsRemarksinEdit = !prepdfitem.IsRemarksinEdit;saveEditedFileUpload(prepdfitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /panel -->
+        <div class="panel panel-ehnote" ng-show="PostTreatmentImgUploads.length > 0 || PostTreatmentPdfUploads.length > 0">
+            <div class="panel-heading">Post Treatment</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-consultation">
+                                <tbody ng-repeat="postimgitem in PostTreatmentImgUploads">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <img ng-src="{{postimgitem.DocURL}}" class="img-thumbnail" width="50" height="50" />
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="postimgitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="postimgitem.IsRemarksinEdit" ng-bind="postimgitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="" ng-hide="postimgitem.IsRemarksinEdit" ng-click="postimgitem.IsRemarksinEdit = !postimgitem.IsRemarksinEdit;focusFileUpload('postimgitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(postimgitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="postimgitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" id="postimgitem_{{$index}}" ng-model="postimgitem.Remarks" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-click="postimgitem.IsRemarksinEdit = !postimgitem.IsRemarksinEdit;saveEditedFileUpload(postimgitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody ng-repeat="postpdfitem in PostTreatmentPdfUploads" ">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <i class="far fa-file-pdf error fs-40 img-thumbnail" ng-click="openPdfFileUploads(postpdfitem.DocURL)">
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="postpdfitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="postpdfitem.IsRemarksinEdit" ng-bind="postpdfitem.Remarks"></p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <a href="" ng-hide="postpdfitem.IsRemarksinEdit" ng-click="postpdfitem.IsRemarksinEdit = !postpdfitem.IsRemarksinEdit;focusFileUpload('postpdfitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(postpdfitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="postpdfitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" id="postpdfitem_{{$index}}" ng-model="postpdfitem.Remarks" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-click="postpdfitem.IsRemarksinEdit = !postpdfitem.IsRemarksinEdit;saveEditedFileUpload(postpdfitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-ehnote" ng-show="ForumUploadImageArray.length > 0 || ForumUploadPDfArray.length > 0">
+            <div class="panel-heading">Investigations</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-consultation" image-viewer isarraychanged="0">
+                                <tbody ng-repeat="forumimgitem in ForumUploadImageArray">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <img ng-src="{{forumimgitem.DocURL}}" class="img-thumbnail" width="50" height="50" />
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="forumimgitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="forumimgitem.IsRemarksinEdit" ng-bind="forumimgitem.Remarks">
+
+                                            </p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <!--<a href="" ng-hide="forumimgitem.IsRemarksinEdit" ng-click="forumimgitem.IsRemarksinEdit = !forumimgitem.IsRemarksinEdit;focusFileUpload('forumimgitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(forumimgitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>-->
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="forumimgitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" id="postimgitem_{{$index}}" ng-model="forumimgitem.Remarks" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-click="forumimgitem.IsRemarksinEdit = !forumimgitem.IsRemarksinEdit;saveEditedFileUpload(forumimgitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody ng-repeat="forumpdfitem in ForumUploadPDfArray" ">
+                                    <tr>
+                                        <td width="10%" class="cover-fileimg">
+                                            <i class="far fa-file-pdf error fs-40 img-thumbnail" ng-click="openPdfFileUploads(forumpdfitem.DocURL)">
+                                        </td>
+                                        <td width="80%">
+                                            <label ng-bind="forumpdfitem.docNameDisplay"></label>
+                                            <p class="mb-0" ng-hide="forumpdfitem.IsRemarksinEdit" ng-bind="forumpdfitem.Remarks"></p>
+                                        </td>
+                                        <td width="10%" class="text-right p-t-0 p-b-0 action-icons">
+                                            <!--<a href="" ng-hide="forumpdfitem.IsRemarksinEdit" ng-click="forumpdfitem.IsRemarksinEdit = !forumpdfitem.IsRemarksinEdit;focusFileUpload('forumpdfitem',$index)">
+                                                <i class="edit-action"></i>
+                                            </a>
+                                            <a href="" ng-click="PreDeleteUploadFile(forumpdfitem,2)">
+                                                <i class="delete-action"></i>
+                                            </a>-->
+                                        </td>
+                                    </tr>
+                                    <tr ng-show="forumpdfitem.IsRemarksinEdit">
+                                        <td colspan="3">
+                                            <div class="dis-flex">
+                                                <div class="width-80">
+                                                    <textarea class="form-control" id="postpdfitem_{{$index}}" ng-model="forumpdfitem.Remarks" enter-directive></textarea>
+                                                </div>
+                                                <div class="width-20">
+                                                    <button class="btn btn-sm btn-block text-success btn-link h-100 m-l-10" ng-click="forumpdfitem.IsRemarksinEdit = !forumpdfitem.IsRemarksinEdit;saveEditedFileUpload(forumpdfitem)">Update</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /panel -->
+        
+    </div>
+    <div class="modal-footer">
+        <div class="modal-footer">
+            <button class="btn btn-danger p-l-50 p-r-50" ng-click="closeUploadFilesnewquickconslt()">Close</button>
+        </div>
+    </div>

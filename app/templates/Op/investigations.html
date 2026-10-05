@@ -1,0 +1,514 @@
+﻿<div class="row">
+    <div class="col-lg-12">
+        <div class="table-responsive bg-white">
+            <table class="table tableno-bordered m-b-0 apptFilterTable">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input class="form-control icons-calendar cur-default bg-white" ng-model="InvestigationSearchObj.FromDate" datepickerforapplist readonly ng-change="ChangeInvDate()">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group select-ui-match custom-select-width">
+                             
+                                <label>Hospital/Clinic</label>
+                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                    {{InvestigationSearchObj.HospitalObj.ClinicName}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchInvestigationHospital.txt1" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li role="presentation" ng-repeat="item in AllUserBranchesList | filter:{'ClinicName':searchInvestigationHospital.txt1}" ng-click="ChangeHospital(item)">
+                                                <a href="javascript:;" ng-bind="item.ClinicName"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group select-ui-match custom-select-width">
+                               
+                                <label>Doctors</label>
+                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">{{InvestigationSearchObj.DoctorObj.FullName}}</button>
+                                <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu1">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon">
+                                            <span class="mainsearch-App">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="searchInvestigationHospital.txt2" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li role="presentation" ng-repeat="item in BranchDoctorsList | filter:{'FullName':searchInvestigationHospital.txt2}" ng-click="ChangeDoctor(item)">
+                                                <a href="javascript:;" ng-bind="item.FullName"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" ng-model="InvestigationSearchObj.StatusId" ng-change="GetAllPatientInvestigationList()">
+                                    <option value="">All</option>
+                                    <option value="1">Advised</option>
+                                    <option value="2">Accepted</option>
+                                    <option value="4">Billing</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>        
+    </div>
+</div>
+<div class="row m-t-10">
+    <div class="col-lg-3 p-r-0">
+        <section class="tile tile-shadow m-b-0">
+            <div class="tile-header">
+                <h1>Investigations Patients List</h1>
+               
+            </div>
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12 p-0">
+                        <ul class="list-unstyled m-b-0 p-r-15" ng-if="PatientAppointmentInvestigationList.length > 0">
+                            <li class="pl-15">
+                                <input type="text" class="form-control input-sm" placeholder="Search Patient" ng-model="PatientSearchText" />
+                            </li>
+                        </ul>
+                        <ul class="audit-screen headermainscroll m-b-0 m-t-10" ng-style="heightCBD()" resize ng-if="PatientAppointmentInvestigationList.length > 0">
+                            <li ng-repeat="row in PatientAppointmentInvestigationList | filter:{PatientName:PatientSearchText}" ng-show="PatientAppointmentInvestigationList.length !==0" ng-click="GetListOfPatientInvestigation(row.PatientId,row.HospitalId,$index)" ng-class="Selectedpatient == row.PatientId ?'active':''">
+                                <div class="profile-show">
+                                    <div class="profile-avatar-image pos-relative top-5">
+                                        <span ng-show="row.S3URL ==''" style="background:{{row.colors}}">{{row.PatientName | limitTo:2}}</span>
+                                        <div ng-show="row.S3URL !==''" image-viewer isarraychanged="0">
+                                            <img ngf-thumbnail="row.S3URL" class="img-responsive" width="50" height="50" />
+                                        </div>
+                                    </div>
+                                    <div class="dis-inline-table">
+                                        <label>
+                                            <span>
+                                                {{(row.Title.length > 0)? (row.Title + '. '):"Mr"}}
+                                                {{row.PatientName}}
+                                            </span>
+                                        </label>
+                                        <p class="mb-0">
+                                            <span>
+                                                <span>{{row.Gender}}</span> <span ng-if="row.AgeInYears !==0">
+                                                    <span>
+                                                        <span> - {{row.AgeInYears}}</span><span>Y | &nbsp;</span>
+                                                    </span>
+                                                    <span> <span>{{row.AgeInMonths}}</span><span>M </span> </span>
+                                                </span>
+                                                <span ng-show="row.AgeInYears == 0 && row.AgeInMonths == 0">
+                                                    <span><span> | &nbsp;{{row.AgeInDays }}</span> <span>&nbsp; D &nbsp;</span> </span>
+                                                </span>
+                                            </span>
+                                        </p>
+                                       
+                                        <p>
+                                            <span>
+                                                {{row.SubSpecializationName}}
+                                            </span>
+                                        </p>
+                                            <!--<p>
+            <span ng-if="row.PatientMobile !==null"> &nbsp; | &nbsp;</span>
+            <span ng-if="row.PatientMobile !==null">+91 {{row.PatientMobile}}</span>
+        </p>
+        <p>
+            <span>{{row.PatientType}}</span>
+        </p>-->
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="row" ng-show="PatientAppointmentInvestigationList.length ==0">
+                            <div class="col-lg-12 text-center" >
+                                <div class="billing-cominsoon headermainscroll" ng-style="heightCBD()" resize>
+                                    <img src="img/no-data/no-results-appointment.png">
+                                    <div class="msg">
+                                        <p class="goback-text">No Patients Found</p>
+                                        <p class="no-records-txt-line2">
+                                            Try using a different criteria to view better results.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / -->
+                <div class="row pos-relative top-5">
+                    <div class="col-lg-12 EH-pagination text-center">
+                        <uib-pagination total-items="TotalPatientsCount"
+                                        ng-model="InvestigationSearchObj.PageNumber"
+                                        ng-change="changeAuditPatientPage(InvestigationSearchObj.PageNumber)"
+                                        items-per-page="InvestigationSearchObj.PageSize"
+                                        class="pagination-sm mt-0 mb-10"
+                                        boundary-link-numbers="false"
+                                        boundary-links="true"
+                                        max-size="3"
+                                        rotate="true"
+                                        previous-text="<"
+                                        next-text=">"
+                                        direction-links="true"></uib-pagination>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-9 p-r-0" ng-show="PatientInvestigationData.length !==0">
+        <section class="tile tile-shadow headermainscroll bdr-invst m-b-0" ng-style="heightBOO()" resize ng-show="!(isObjectEmpty(SelectedInvestiagtionPatient))">
+            <div class="tile-body">
+                <div class="row">
+                    <div class="col-lg-12 p-r-0">
+                        <div class="table-responsive">
+                            <table class="tableno-bordered table m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td width="50%" class="valign-middle">
+                                            <div class="profile-show">
+                                                <div class="profile-avatar-image">
+                                                    <span style="background:{{SelectedInvestiagtionPatient.colors}}">{{SelectedInvestiagtionPatient.FullName | limitTo:2}}</span>
+                                                </div>
+                                                <div class="dis-inline-table">
+                                                    <label>
+                                                        <span>
+                                                            {{(SelectedInvestiagtionPatient.Title.length > 0)? (SelectedInvestiagtionPatient.Title + '. '):"Mr"}}
+                                                            {{SelectedInvestiagtionPatient.FullName}}
+                                                        </span>
+                                                    </label>
+                                                    <p class="mb-0">
+                                                        <span>
+                                                            <span>{{SelectedInvestiagtionPatient.Gender}} -</span>  <span ng-hide="SelectedInvestiagtionPatient.AgeInYears == 0 && SelectedInvestiagtionPatient.AgeInMonths == 0">
+                                                                <span>
+                                                                    <span>{{SelectedInvestiagtionPatient.AgeInYears}}</span><span>Y | &nbsp;</span>
+                                                                </span>
+                                                                <span> <span>{{SelectedInvestiagtionPatient.AgeInMonths}}</span><span>M </span> </span>
+                                                            </span>
+                                                            <span ng-show="SelectedInvestiagtionPatient.AgeInYears == 0 && SelectedInvestiagtionPatient.AgeInMonths == 0">
+                                                                <span><span>{{SelectedInvestiagtionPatient.AgeInDays }}</span> <span>&nbsp; Days &nbsp;</span> </span>
+                                                            </span>
+                                                        </span><span ng-if="SelectedInvestiagtionPatient.PatientMobile !==null"> &nbsp; | &nbsp;</span>
+                                                        <span ng-if="SelectedInvestiagtionPatient.PatientMobile !==null">+91 {{SelectedInvestiagtionPatient.PatientMobile}}</span>
+                                                    </p>
+                                                    <p>
+                                                        <span>{{SelectedInvestiagtionPatient.PatientType}}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td width="30%">
+                                        </td>
+                                        
+                                        <td width="10%" class="p-r-0 valign-middle">
+                                            <button class="btn btn-orange btn-fill-horz-o btn-block" ng-show="UserAccessRights.AllAccessRights.OpBilling" ng-click="navToBilling()">Redirect Billing</button>
+                                        </td>
+                                        <td width="10%" class="valign-middle">
+                                            <button class="btn btn-navy btn-fill-horz-o btn-block" ng-show="UserAccessRights.AllAccessRights.InvListStartInvestigation" ng-click="NavToStartInvestigation()">Start Investigation</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /row -->
+                
+                <!-- /row -->
+                <div class="row m-t-10" ng-show="PatientInvestigationData.length !== 0">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default m-b-0">
+                            <div class="panel-heading">Investigations List</div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered m-b-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="15%" class="text-dark">Adviced Date</th>
+                                                        <th width="35%" class="text-dark">
+                                                            Investigation Name
+                                                        </th>
+                                                        <th width="10%" class="text-dark">Eye</th>
+                                                        <th width="10%" class="text-dark">Status</th>
+                                                        <th width="10%" class="text-dark">Billing</th>
+                                                        <th width="20%" class="text-dark">Doctors</th>
+
+                                                        <!--<th width="10%" class="text-center text-dark">Action</th>-->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!--<pre>{{InvestigationSearchObj.FromDate}}</pre>
+                                                    <pre>{{InvestigationAdvicedDate}}</pre>
+                                                    <pre>{{selecteddate}}</pre>-->
+
+                                                    <tr ng-repeat="item in PatientInvestigationData | filter:{InvestigationAdvicedDate:selecteddate}">
+                                                        <td class="valign-middle">
+                                                            {{item.InvestigationAdvicedDate | date:'dd-MMM-yyyy'}}
+                                                        </td>
+                                                        <td class="valign-middle">
+                                                            <b ng-bind="item.InvestigationName" ng-if="item.PatientInvestigationId!=0"></b>
+                                                            <b ng-bind="item.ContactLensTypeName" ng-if="item.PatientInvestigationId===0"></b>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{item.OrganName}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span ng-show="item.StatusId=='1'" class="appointment-adviced">Advised <span ng-show="item.RedoInd===1" class="m-t-5 appointment-cancelled dis-block">(Repeat)</span></span>
+                                                            <span ng-show="item.StatusId=='3'" class="appointment-started">InProgress</span>
+                                                            <span ng-show="item.StatusId=='4'" class="appointment-completed">Completed</span>
+                                                            <span ng-show="item.StatusId=='2'" class="appointment-checked">Accepted</span>
+                                                        </td>
+                                                        <td>
+                                                            <span ng-if="!item.IsTreatmentInvoiced">Pending</span>
+                                                            <span ng-if="item.IsTreatmentInvoiced">Completed</span>
+                                                            <br /><span ng-if="item.IsTreatmentBillingCancelled" style="color:red;font-size: smaller;">Bill Cancelled</span>
+                                                        </td>
+
+
+                                                        <td class="valign-middle">
+                                                            <label>Appointment Doctor.</label>
+                                                            <p class="no-wrapappt mb-0 text-info">
+                                                                <i class="fas fa-user-md"></i> 
+                                                                <span>{{item.AppointmentDoctorName}}</span>
+                                                                <!--<span ng-if="item.PatientInvestigationId===0">{{item.OptomName}}</span>-->
+                                                            </p>
+                                                            <p class="m-0 divider" style="border: 0.5px solid #efefef !important"></p>
+                                                            <label>Investigation Doctor.</label>
+                                                            <p class="no-wrapappt mb-0 text-info">
+                                                                <!--<i class="fas fa-user-md"></i>  <span>Doctor Name</span>-->
+                                                                <i class="fas fa-user-md"></i>  <span ng-if="item.PatientInvestigationId!=0">{{item.InvestigationCreatedBy}}</span>
+                                                                <span ng-if="item.PatientInvestigationId===0">{{item.OptomName}}</span>
+                                                            </p>
+                                                        </td>
+
+
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /row -->
+                
+            </div>
+        </section>
+    </div>
+</div>
+<script type="text/ng-template" id="AddNewInvestigationPatient.html">
+    <div class="grid-Iheading m-b-0">
+        <h1>Search Patient</h1>
+    </div>
+    <div class="admission-body p-0">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table tableno-bordered m-b-0 table-admission-head">
+                    <tbody>
+                        <tr>
+                            <td [ng-class]="{(bookApptType =='FollowUp') ? 'width-95' : 'width-40'}">
+                                <fieldset>
+                                    <div class="dis-inline-block">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" ng-value="1">
+                                        <label for="" class="radio-custom-label text-white cur-poiter mb-0">Patient MR No.</label>
+                                    </div>
+                                    <div class="dis-inline-block m-l-15">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" ng-value="1">
+                                        <label for="" class="radio-custom-label text-white cur-poiter mb-0">Mobile</label>
+                                    </div>
+                                    <div class="dis-inline-block m-l-15">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" ng-value="1">
+                                        <label for="" class="radio-custom-label text-white cur-poiter mb-0">Old MR No.</label>
+                                    </div>
+                                    <div class="dis-inline-block m-l-15">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" ng-value="1">
+                                        <label for="" class="radio-custom-label text-white cur-poiter mb-0">First Name</label>
+                                    </div>
+                                    <div class="dis-inline-block m-l-15">
+                                        <input type="radio" class="radio-custom width-0" id="" name="" ng-value="1">
+                                        <label for="" class="radio-custom-label text-white cur-poiter mb-0">Last Name</label>
+                                    </div>
+                                </fieldset>
+                                <div class="btn-group select-form-uib dropdown open">
+                                    <input id="single-button" type="text" class="form-control dropdown-toggle b-0 m-t-5">
+                                    <input id="single-button" type="text" class="form-control dropdown-toggle b-0" uib-dropdown-toggle="" ng-if="selectedPatientObj.FollwuppatSearchType==1" ng-model="selectedPatientObj.PatientDisplayId" ng-change="SearchByText(selectedPatientObj.PatientDisplayId,'DisplayId')" ng-disabled="DisbledPatient" placeholder="Search Mr.No" enter-directive autocomplete="off">
+                                    <input id="single-button" type="text" class="form-control dropdown-toggle b-0" uib-dropdown-toggle="" ng-if="selectedPatientObj.FollwuppatSearchType==2" ng-model="selectedPatientObj.PatientName" ng-change="SearchByText(selectedPatientObj.PatientName,'Name')" ng-disabled="DisbledPatient" placeholder="Search Patient /Mobile" enter-directive autocomplete="off">
+                                    <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="patients.length > 0 && (selectedPatientObj.PatientName.length > 2 || selectedPatientObj.PatientDisplayId.length > 9)">
+                                        <li class="list-group-item text-dark cur-poiter" ng-repeat="patientitem in patients" ng-click="selectedPatient(patientitem)">
+                                            <span class="badge badge-primary w-125" ng-hide="patientitem.PhoneNumber == 0">
+                                                {{
+patientitem.PhoneNumber
+                                                }}
+                                            </span>
+                                            <div>
+                                                <p class="m-0">{{patientitem.FullName}}</p>
+                                                <p class="m-0" ng-if="patientitem.DisplayID != ''">MR No: {{patientitem.DisplayID}}</p>
+                                                <p class="m-0" ng-if="patientitem.DisplayID === ''">MR No: - </p>
+
+                                            </div>
+                                            <div class="searchbar-vipresearch">
+                                                <span class="vip-patient" ng-if="patientitem.IsVIPInd"></span>
+                                                <span class="research-patient" ng-if="patientitem.IsResearchInd"></span>
+                                                <span class="highrisk-patient" ng-if="patientitem.IsHighRiskInd"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item hide">
+                                        <div class="billing-cominsoon">
+                                            <img src="img/no-data/no-patient-found.png">
+                                            <div class="msg">
+                                                <p class="goback-text">No Patient Found</p>
+                                                <p class="no-records-txt-line2">
+                                                    Please search patient
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="admission-body p-15">
+        <!-- /row -->
+        <div class="row m-t-5">
+            <div class="col-lg-12">
+                <div class="patients-profile clearfix">
+                    <ul>
+                        <li>
+                            <h3><i class="fas fa-user"></i> Patient Name</h3>
+                            <p><span>{{selectedPatientObj.PatientTitle}}.</span> <span ng-bind="selectedPatientObj.PatientName"></span></p>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-barcode"></i> M.R.No.</h3>
+                            <p ng-if="!(selectedPatientObj.DisplayID == '' || selectedPatientObj.DisplayID == undefined || selectedPatientObj.DisplayID == null)"><span ng-bind="selectedPatientObj.DisplayID"></span></p>
+                            <span ng-if="selectedPatientObj.DisplayID == '' || selectedPatientObj.DisplayID == undefined || selectedPatientObj.DisplayID == null">N/A</span>
+                        </li>
+                        <li>
+                            <h3><i class="fas fa-phone"></i> Contact No.</h3>
+                            <p><span ng-hide="selectedPatientObj.PatientMobile == 0" ng-bind="selectedPatientObj.PatientMobile"></span></p>
+                            <p ng-show="selectedPatientObj.PatientMobile == 0"><span>N/A</span></p>
+                        </li>
+                        <li ng-hide="selectedPatientObj.AgeInYears == 0 && selectedPatientObj.AgeInMonths == 0">
+                            <h3><i class="fas fa-venus-mars"></i> Age&amp;Sex</h3>
+                            <p>
+                                <span>{{selectedPatientObj.AgeInYears}}<span>Y</span></span>
+                                <span>{{selectedPatientObj.AgeInMonths}}<span>M</span></span>
+                                <span>{{selectedPatientObj.AgeInDays}}<span>D</span></span>
+                                | <span ng-bind="selectedPatientObj.PatientGender"></span>
+                            </p>
+                        </li>
+                        <li>
+                            <div class="vip-research-patient-stat">
+                                <div class="vip-patient m-b-5" ng-if="selectedPatientObj.IsVIPInd">
+                                    VIP
+                                </div>
+                                <!--<div class="research-patient" ng-if="selectedPatientObj.IsResearchInd">
+                                    Research
+                                </div>-->
+                                <div class="highrisk-patient" ng-if="selectedPatientObj.IsHighRiskInd">
+                                    High Risk
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+        <div class="row m-t-10">
+            <div class="col-lg-12">
+                <div class="panel panel-default m-b-0">
+                    <div class="panel-heading">Investigations List</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered m-b-0">
+                                        <thead>
+                                            <tr>
+                                                <th width="70%" class="text-dark">
+                                                    Investigation Name
+                                                </th>
+                                                <th width="20%" class="text-dark">Status</th>
+                                                <th width="10%" class="text-center text-dark">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="valign-middle">
+                                                    <b>Optical and anatomical assessment of the cornea</b>
+                                                </td>
+                                                <td>
+                                                    <span class="appointment-booked hide">Accepted</span>
+                                                    <span class="appointment-cancelled hide">Cancelled</span>
+                                                    <span class="appointment-started">Adviced</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="cur-poiter" alt="delete" data-tooltip="Delete">
+                                                        <img width="17" src="img/ico-delete-red.svg">
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="valign-middle">
+                                                    <b>Optical and anatomical assessment of the cornea</b>
+                                                </td>
+                                                <td>
+                                                    <span class="appointment-booked">Accepted</span>
+                                                    <span class="appointment-cancelled hide">Cancelled</span>
+                                                    <span class="appointment-started hide">Adviced</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="cur-poiter" alt="delete" data-tooltip="Delete">
+                                                        <img width="17" src="img/ico-delete-red.svg">
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+        <div class="row m-t-15">
+            <div class="col-lg-12 text-right">
+                <button class="btn btn-warning p-l-50 p-r-50">Clear</button>
+                <button class="btn btn-success p-l-50 p-r-50">Select Patient</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="appointMentPopupId.html">
+    <appointment-directive date-val="calenderDate" is-patient-exist="ispatientExistsval" app-condate="AppDate" pagename="PageName" is-show-entry-form="true"></appointment-directive>
+</script>

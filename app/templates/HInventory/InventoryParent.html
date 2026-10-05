@@ -1,0 +1,687 @@
+﻿<div class="container-fluid height__100--" ng-controller="UsInventoryParentCtrl">
+    <div class="row height__100--">
+        <div class="col-lg-12 height__100-- p__0--">
+            <div class="height__100-- d__f-- fd__c-- gap__5--y">
+                <ul class="tab__style--3 m-0">
+                    <li class="active">
+                        <a href="#">IOL Inventory</a>
+                    </li>
+                </ul>
+                <div class="tab-content height__100--">
+                    <div class="tab-pane active fade in height__100--">
+                        <div class="d__f-- fd__c-- bg__FFF-- br__10-- p__5-- height__100-- gap__5--y">
+                            <div class="d__f-- jc__sb-- ai__c--">
+                                <h1 class="fs__normal-- fs__xl-- fw__6-- tc__1D1D1D-- m__0--">
+                                    IOL Inventory
+                                    <span class="fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--" id="iol__count">{{IOLInventoryArrayCount}}</span>
+                                </h1>
+                                <ul class="flex-flow-list gap__10--">
+                                    <li ng-if="UserAccessRights.AllAccessRights.InventoryUploadIOL">
+                                        <button class="btn__lg-- btn__1d5558--o" ng-click="UploadIolUibPopup()" id="button__UploadIOL">Upload IOL</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn__lg-- btn__1d5558--o" id="button__DownloadTemplate" ng-click="GetIOLDataTemplate();">Download Template</button>
+                                    </li>
+                                    <li class="valign-bottom text-right">
+                                        <button id="button__exportexcel" type="button" class="btn__lg-- btn__008087--f" ng-click="ExportIOLInventoryData();"><i class="fas fa-cloud-download-alt"></i> Export To Excel</button>
+                                    </li>
+                                    <li ng-if="UserAccessRights.AllAccessRights.InventoryAddIOL">
+                                        <button class="btn__lg-- btn__1d5558--f" ng-click="AddIolUibPopup()" id="button__AddIOL">Add IOL</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- / -->
+                            <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4--">
+                                <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+                                    <tbody>
+                                        <tr>
+                                            <td width="19%">
+                                                <div class="form__group position__relative--">
+                                                    <label>Search</label>
+                                                    <div class="form__group inner-addon left-addon flex">
+                                                        <input type="text"
+                                                               ng-class="!NewIOLInventory.SerialNumberSearch?'icons-search':''"
+                                                               placeholder="Search By SerialNumber"
+                                                               id="input__searchpatientname"
+                                                               ng-model="NewIOLInventory.SerialNumberSearch">
+                                                        <!-- Cancel icon -->
+                                                        <a class="position__absolute-- top-6 right-5 b__0--"
+                                                           ng-show="NewIOLInventory.SerialNumberSearch">
+                                                            <i class="icons__w16-- cancel__w16--o"
+                                                               ng-click="ClearSerialNumbersearch()"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+
+                                            <td width="14%">
+                                                <div class="form__group position__relative--">
+                                                    <label>Manufacturer</label>
+                                                    <select ng-model="NewIOLInventory.Manufacturer" id="select__Manufacturer"
+                                                            ng-options="item.Manufacturer as item.Manufacturer for item in GetIolManufacturers">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td width="14%">
+                                                <div class="form__group">
+                                                    <label>Location</label>
+                                                    <div class="dropdown cstm-dropdown width-100" id="dropdown__location">
+                                                        <button class="form__control pr__20-- text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+                                                            {{IOLLocationObj.SelectString}}
+                                                        </button>
+                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                            <div class="p-5">
+                                                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="IOLLocationObj.Name" />
+                                                            </div>
+                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                <ul>
+                                                                    <li>
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-11" type="checkbox" ng-model="IOLLocationObj.AllCheck" ng-click="checkAllLocations(IOLLocationObj.AllCheck)">
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small>All</small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li ng-repeat="item in BranchesListArray | filter:{'BranchName':IOLLocationObj.Name}">
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="IOLLocationToggle()">
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small ng-bind="item.BranchName"></small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td width="14%" ng-if="false">
+                                                <div class="form__group">
+                                                    <label>Power Range</label>
+                                                    <select ng-model="NewIOLInventory.PowerRange"
+                                                            ng-options="item.DipoterId as item.Power for item in DiopterArray">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td width="14%">
+                                                <div class="form__group">
+                                                    <label>Status</label>
+                                                    <div class="dropdown cstm-dropdown width-100" id="dropdown__location">
+                                                        <button class="form__control pr__20-- text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                            <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-8"></i>
+
+                                                            {{IOLStatusObj.SelectStatusString}}
+                                                        </button>
+                                                        <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                            <div class="p-5">
+                                                                <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="IOLStatusObj.Name" />
+                                                            </div>
+                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                <ul>
+                                                                    <li>
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-11" type="checkbox" ng-model="IOLStatusObj.AllStatusCheck" ng-click="checkAllIOLType(IOLStatusObj.AllStatusCheck)">
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small>All</small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li ng-repeat="item in IOLStatusArray | filter:{'Name':IOLStatusObj.Name} track by $index">
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsChecked" ng-click="IOLTypeToggle(item)">
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small ng-bind="item.Name"></small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="valign-bottom">
+                                                <div class="d__f-- ai__c-- gap__x--8">
+                                                    <div class="form__group" ng-if="false">
+                                                        <button popover-trigger="outsideClick" id="button__morefilter" popover-class="opfilter-popover m-0" popover-placement="bottom-right" type="button" class="btn__sm-- btn__1d5558--o gap__10--">More Filter <i class="icons__w16--  filter__w16--o"></i></button>
+
+                                                    </div>
+                                                    <button id="button__apply" class="btn__lg-- btn__2D2D47--f" ng-click="getIOLInventoryData();">
+                                                        Apply
+                                                    </button>
+                                                    <button class=" b-0" id="button__reloadp" ng-click="ReLoadIOLInventory();">
+                                                        <i class="reload-icon"></i>
+                                                    </button>
+                                                </div>
+                                            </td>                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- gap__10--x" ng-if="false">
+                                <div class="section__shadow-- p__5--">
+                                    <div class="d__f-- jc__sb-- ai__c--">
+                                        <h3 class="m-0 fs__5l-- tc__000-- fw__7-- fs__normal--">5</h3>
+                                        <div class="w__30-- h__30--">
+
+                                        </div>
+                                    </div>
+                                    <p class="m-0">Total Available Items</p>
+                                </div>
+                                <div class="section__shadow-- p__5--">
+                                    <div class="d__f-- jc__sb-- ai__c--">
+                                        <h3 class="m-0 fs__5l-- tc__000-- fw__7-- fs__normal--">5</h3>
+                                        <div class="w__30-- h__30--">
+
+                                        </div>
+                                    </div>
+                                    <p class="m-0">Total Consumed</p>
+                                </div>
+                                <div class="section__shadow-- p__5--">
+                                    <div class="d__f-- jc__sb-- ai__c--">
+                                        <h3 class="m-0 fs__5l-- tc__000-- fw__7-- fs__normal--">5</h3>
+                                        <div class="w__30-- h__30--">
+
+                                        </div>
+                                    </div>
+                                    <p class="m-0">Total Returned</p>
+                                </div>
+                                <div class="section__shadow-- p__5--">
+                                    <div class="d__f-- jc__sb-- ai__c--">
+                                        <h3 class="m-0 fs__5l-- tc__000-- fw__7-- fs__normal--">5</h3>
+                                        <div class="w__30-- h__30--">
+
+                                        </div>
+                                    </div>
+                                    <p class="m-0">Total Damaged</p>
+                                </div>
+                                <div class="section__shadow-- p__5--">
+                                    <div class="d__f-- jc__sb-- ai__c--">
+                                        <h3 class="m-0 fs__5l-- tc__000-- fw__7-- fs__normal--">5</h3>
+                                        <div class="w__30-- h__30--">
+
+                                        </div>
+                                    </div>
+                                    <p class="m-0">Total Contaminated</p>
+                                </div>
+                            </div>
+                            <div class="height__100-- position__relative--">
+                                <div class="adjustable-position slim-scroll overflow__auto--x c__p--">
+                                    <table class="table__style--21 border__none-- bradius__0-- table-layout-auto" id="table_claimsallmain">
+                                        <thead>
+                                            <tr>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-10 bradius__3--tl position__sticky-- top__0-- left__0-- zindex-10 text-center borderright__E4E4E4--" width="4%"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">S.No.</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Model No</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Location</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Status</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Lens</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Manufacturer</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Power</label></th>
+                                                <!--<th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Power Unit</label></th>-->
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">Implant</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6-- position__sticky-- top__0-- zindex-1"><label class="fs__normal-- fs__md-- fw__7-- tc__4A4A4A-- ws__nowrap--">MFG Date</label></th>
+                                                <th class="bg__F5F5F5-- py__8-- px__6--  text-center position__sticky-- top__0-- right__0-- zindex-10 bradius__3--tr borderleft__E4E4E4--">Actions </th>
+                                            </tr>
+                                        </thead>
+                                        
+                                        <tbody class="border__none--" ng-if="getIOLInventoryArray.length > 0">
+
+                                            <tr class="hover__1D55581A--bg bg__FFFFFF--" ng-repeat="item in getIOLInventoryArray">
+                                                <td class="py__8-- px__6-- zindex-1 position__sticky-- left__0-- borderright__E4E4E4-- bg__FFF-- vl__middle-- hover__E8EEEE-- text-left">
+                                                    
+                                                    <span class="fs__normal-- fs__lg-- fw__5-- tc__656565--">{{item.SerialNo}}</span>
+                                                </td>
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__656565--">{{item.ModelName}}</label>
+                                                </td>
+
+                                                <td class="py__8-- px__6-- vl__middle--" title="{{item.OrganizationName}}">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__250-- no-wrapappt">{{item.OrganizationName}}</label>
+                                                </td>
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__md-- fw__6-- tc__6A39C8-- fs__normal--" ng-if="item.StatusName == 'Return'">Returned</label>
+                                                    <label class="fs__md-- fw__6-- tc__C71D27-- fs__normal--" ng-if="item.StatusName == 'Damaged'">Damaged</label>
+                                                    <label class="fs__md-- fw__6-- tc__C71D27-- fs__normal--" ng-if="item.StatusName == 'Delete'">Deleted</label>
+                                                    <label class="fs__md-- fw__6-- tc__A5884F-- fs__normal--" ng-if="item.StatusName == 'Contaminated'">Contaminated</label>
+                                                    <label class="fs__md-- fw__6-- tc__475B7C-- fs__normal--" ng-if="item.StatusName == 'Consumed'">Consumed</label>
+                                                    <label class="fs__md-- fw__6-- tc__2DAA2D-- fs__normal--" ng-if="item.StatusName == 'Available'">Available</label>
+
+                                                    <!--<label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.StatusName}}</label>-->
+                                                    
+
+                                                </td>
+                                                
+
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.LensType}}</label>
+                                                </td>
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.Manufacturer}}</label>
+                                                </td>
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.Power}}</label>
+                                                </td>
+                                                <!--<td class="py__8-- px__6-- vl__middle--">
+                <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">+12.5</label>
+            </td>-->
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.ImplantName}}</label>
+                                                </td>
+                                                <td class="py__8-- px__6-- vl__middle--">
+                                                    <label class="fs__normal-- fs__lg-- fw__5-- tc__1D1D1D-- ws__nowrap-- w__100--">{{item.ManufacturingDate| date :'MM-dd-yyyy'}}</label>
+                                                </td>
+                                                <td class="py__8-- px__12--  hover__E8EEEE-- bg__FFF--  vl__middle-- position__sticky-- top__0-- right__0-- zindex-1 bradius__3--tr borderleft__E4E4E4--">
+                                                    <div class="d__f-- fd__r-- ai__c-- gap__10--x jc__e--" ng-if="item.StatusName == 'Available'">
+                                                        <a class="p__8--" id="claimsallmain__return" tooltip-placement="left" uib-tooltip="Return" tooltip-append-to-body="true" ng-click="returnIOLPopup(item, 'Return')" ng-if="UserAccessRights.AllAccessRights.InventoryReturnIOL">
+                                                            <i class="icons__w16-- back__w16--b"></i>
+                                                        </a>
+
+                                                        <!--<a tooltip-placement="left" uib-tooltip="Edit" tooltip-append-to-body="true" ng-click="editIOLInventoryProducts(item);" ng-if="UserAccessRights.AllAccessRights.InventoryEditIOL">
+                        <i class="icons__w16-- edit__w16--o"></i>
+                    </a>-->
+                                                        <!--ng-click="deleteIOLInventoryProduct(item);"-->
+                                                        <a class="p__8--" id="claimsallmain__delete" tooltip-placement="left" uib-tooltip="Delete" tooltip-append-to-body="true" ng-click="returnIOLPopup(item, 'Delete');" ng-if="UserAccessRights.AllAccessRights.InventoryDeleteIOL">
+                                                            <i class="icons__w16-- delete__w16--o"></i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="d__f-- jc__e-- ai__c--" ng-hide="item.StatusName == 'Available'">
+                                                        <a class="p__8-- hover__F5F5F5--bg br__5--" id="claimsallmain__more" popover-template="'patientConsumed.html'"
+                                                           ng-mouseenter="setConsumedItem(item)"
+                                                           popover-class="inventory__info--hover" dynamic-popover-placement>
+                                                            <i class="icons__w16-- info__w16--o"></i>
+                                                        </a>
+                                                    </div>
+                                                    <script type="text/ng-template" id="patientConsumed.html">
+                                                        <div class="d__f-- fd__c-- gap__5--y" ng-if="false">
+                                                            <h1 class="fs__lg-- fw__5-- tc__1D1D1D-- fs__normal-- m__0--">{{$root.Item.PatientName}} </h1>
+                                                            <div class="d__f-- ai__c-- gap__10--x">
+                                                                <label class="fs__lg-- fw__5-- tc__656565-- fs__normal--">{{$root.Item.OldMrno}}</label>
+                                                                <label class="status__gray-- fs__lg-- fw__5-- tc__656565-- fs__normal--">{{$root.Item.DOB | date:'MM-dd-yyyy'}}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d__f-- fd__c-- gap__10--y" ng-if="$root.Item.StatusName == 'Consumed'">
+                                                            <label class="fs__md-- fw__6-- tc__475B7C-- fs__normal--" ng-if="$root.Item.StatusName == 'Consumed'">Consumed by</label>
+                                                            <div class="d__f-- ai__c-- gap__x--10">
+                                                                <!--<img ng-src="{{$root.Item.S3URL}}" class="w__40-- h__40-- bradius__6-- border__DDD--" />-->
+                                                                <img ng-src="{{ $root.Item.S3URL ? $root.Item.S3URL : 'img/sprite-sheet/user-square.svg' }}" class="w__40-- h__40-- bradius__6-- border__DDD--" />
+                                                                <div class="d__f-- fd__c-- gap__y--3">
+                                                                    <label class="fs__xl-- fw__6-- tc__1D1D1D-- fs__normal-- ">{{$root.Item.PatientName}}</label>
+                                                                    <label class="fs__lg-- fw__4-- tc__656565-- fs__normal-- ">MR No: <span class="tc__3C3C3C--">{{$root.Item.OldMrno}}</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d__f-- gap__10--x ai__c--">
+                                                                <label class="fs__md-- fw__6-- tc__FFFFFF-- fs__normal-- px__5-- lh__18-- bg__537ACF-- bradius__4--" ng-if="$root.Item.OrganName == 'OD'">OD</label>
+                                                                <label class="fs__md-- fw__6-- tc__FFFFFF-- fs__normal-- px__5-- lh__18-- bg__3BAC66-- bradius__4--" ng-if="$root.Item.OrganName == 'OS'">OS</label>
+                                                                <label class="fs__md-- fw__6-- tc__FFFFFF-- fs__normal-- px__5-- lh__18-- bg__A5884F-- bradius__4--" ng-if="$root.Item.OrganName == 'OU'">OU</label>
+                                                                <span class="fs__lg-- fw__6-- tc__1D1D1D-- fs__normal--">{{$root.Item.ProcedureCode}} | {{$root.Item.ProcedureName}}</span>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <label class="fs__lg-- fw__4-- tc__656565-- fs__normal-- ">Surgeon : <span class="tc__3C3C3C--"> {{$root.Item.DoctorName}}</span></label>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label class="fs__lg-- fw__4-- tc__656565-- fs__normal-- ">Surgery Date : <span class="tc__3C3C3C--"> {{$root.Item.ConsumedDate| date :'MM-dd-yyyy'}}</span></label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- gap__y--3" ng-hide="$root.Item.Remarks == '' || $root.Item.Remarks == undefined">
+                                                                <label class="fs__md-- fw__5-- tc__656565-- fs__normal-- ">Remarks : </label>
+                                                                <span class="fs__md-- fw__5-- tc__1D1D1D-- fs__normal-- ">{{$root.Item.Remarks}}.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d__f-- fd__c-- gap__10--y" ng-if="$root.Item.StatusName == 'Contaminated' || $root.Item.StatusName == 'Damaged' || $root.Item.StatusName == 'Return' || $root.Item.StatusName == 'Delete'">
+                                                            <label class="fs__md-- fw__6-- tc__537ACF-- fs__normal--" ng-if="$root.Item.StatusName == 'Return'">Returned</label>
+                                                            <label class="fs__md-- fw__6-- tc__C71D27-- fs__normal--" ng-if="$root.Item.StatusName == 'Damaged'">Damaged</label>
+                                                            <label class="fs__md-- fw__6-- tc__C71D27-- fs__normal--" ng-if="$root.Item.StatusName == 'Delete'">Deleted</label>
+                                                            <label class="fs__md-- fw__6-- tc__A5884F-- fs__normal--" ng-if="$root.Item.StatusName == 'Contaminated'">Contaminated</label>
+
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="d__f-- fd__c-- gap__y--3">
+                                                                        <label class="fs__md-- fw__5-- tc__656565-- fs__normal-- ">Added By</label>
+                                                                        <span class="fs__md-- fw__5-- tc__1D1D1D-- fs__normal-- ">{{$root.Item.UpdatedUser}}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="d__f-- fd__c-- gap__y--3">
+                                                                        <label class="fs__md-- fw__5-- tc__656565-- fs__normal-- ">Date & Time</label>
+                                                                        <span class="fs__md-- fw__5-- tc__1D1D1D-- fs__normal-- ">{{$root.Item.Modifieddate | date:'MM-dd-yyyy - hh:mm a'}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- gap__y--3">
+                                                                <label class="fs__md-- fw__5-- tc__656565-- fs__normal-- ">Remarks : </label>
+                                                                <span class="fs__md-- fw__5-- tc__1D1D1D-- fs__normal-- ">{{$root.Item.Remarks}}.</span>
+                                                            </div>
+                                                        </div>
+                                                    </script>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody class="border__none--" ng-if="getIOLInventoryArray.length == 0">
+                                            <tr class="height__100--">
+                                                <td class="height__100-- bg__none--" colspan="8">
+                                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                                        <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Records Found</h1>
+                                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently No Records. Please modify the filters to see Results.</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="d__f-- ai__c-- jc__c-- py__5-- bt__DDD--">
+                                <div class="EH-pagination text-center">
+
+                                    <uib-pagination id="pagination__IOL" total-items="IOLInventoryArrayCount"
+                                                    ng-model="NewIOLInventory.PageNumber"
+                                                    items-per-page="NewIOLInventory.PageSize"
+                                                    ng-change="ChangeIOLPagination(NewIOLInventory.PageNumber)"
+                                                    max-size="10"
+                                                    ng-show="getIOLInventoryArray.length > 0"
+                                                    boundary-links="true">
+
+                                    </uib-pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="returnIOLPopup.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1 ng-if="returnIOLObj.type == 'Return'">Return IOL</h1>
+            <h1 ng-if="returnIOLObj.type == 'Delete'">Delete IOL</h1>
+            <ul class="list__none-- d__f-- gap__10--x ai__c-- m__0--">
+                <li>
+                    <button class="btn__lg-- btn__1d5558--f" ng-click="SaveIolReturn();">Save</button>
+                </li>
+                <li class="d__f--">
+                    <a class="btn__close--2" ng-click="uibIolPopupclose();">
+                        <i class="icons__w16-- close__w16--s" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="modal__body--">
+            <div class="row">
+                <div class="col-lg-6">
+                    <!--<div class="form__group mb__6--">
+                        <label>Status <em>*</em></label>
+                        <select ng-model="returnIOLObj.StatusId" id="RIOL__Status"
+                                ng-change="onStatusChange(returnIOLObj.StatusId)"
+                                ng-options="item.Id as item.Name for item in returnStatusArray"
+                                ng-disabled="returnIOLObj.type == 'Delete'">
+                            <option value="">Select</option>
+                        </select>
+                    </div>-->
+                    <div class="form__group">
+                        <label>Status <em>*</em></label>
+                        <div class="dropdown cstm-dropdown width-100"
+                             ng-class="{ 'disabled': returnIOLObj.type == 'Delete' }">
+                            <button class="form__control text-left"
+                                    ng-disabled="returnIOLObj.type == 'Delete'"
+                                      id="IOL_Status"
+                                    data-toggle="dropdown">
+                                {{ getSelectedStatusName() || 'Select' }}
+                                <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                            </button>
+                            <div class="dropdown-menu width-100">
+                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                    <ul>
+                                        <li ng-repeat="item in returnStatusArray">
+                                            <a href="javascript:void(0)"
+                                               ng-click="selectStatus(item)">
+                                                {{ item.Name }}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form__group">
+                        <label>Remarks <em>*</em></label>
+                        <textarea class="msd-elastic:" maxlength="1000" id="RIOL__Remarks" rows="2" ng-model="returnIOLObj.Remarks" placeholder="Enter Remarks"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="AddIolUibPopup.html">
+    <div class="section__style--5 d__f-- fd__c-- height__100--">
+        <div class="section__header--">
+            <h1>Add New IOL Item</h1>
+
+            <div class="d__f-- ai__c-- gap__10--x">
+                <a class="btn__close--2" ng-click="uibclose()" id="uibclose">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </div>
+        </div>
+        <div class="section__body-- height__100--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5--y">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Serial Number <em>*</em></label>
+                                    <input id="RIOL__SerialNumber" placeholder="Enter serial number" ng-model="addNewInvenetoryObj.SerialNo" maxlength="20">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Model Number <em>*</em></label>
+                                    <input id="RIOL__ModelNumber" placeholder="Enter model number" ng-model="addNewInvenetoryObj.ModelNumber" ng-disabled="addNewInvenetoryObj.IsEdit">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Lens Type<em>*</em></label>
+                                    <select id="RIOL__LensType" ng-model="addNewInvenetoryObj.TypeOfLens"
+                                            ng-options="item.LensId as item.LensType for item in GetIolTypeOfLens">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Manufacturer<em>*</em></label>
+                                    <select id="RIOL__Manufacture" ng-model="addNewInvenetoryObj.ManufacturerId"
+                                            ng-options="item.ManufacturerId as item.Manufacturer for item in GetIolManufacturers">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Power<em>*</em></label>
+                                    <select id="RIOL__Power" ng-model="addNewInvenetoryObj.DipoterId"
+                                            ng-options="item.Id as item.Power for item in DiopterArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Implant Name<em>*</em></label>
+                                    <input id="RIOL__ImplantName" placeholder="Enter model number" ng-model="addNewInvenetoryObj.ImplantName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Manufacturing Date</label>
+                                    <input type="text" class="icons-calendar" id="input_ManufacturingDate"
+                                           ng-model="addNewInvenetoryObj.ManufacturingDate"
+                                           placeholder="MM-DD-YYYY"
+                                           datepickerregpatient
+                                           mindate="{{addNewInvenetoryObj.ManufacturingDate}}" readonly />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Shipping Date</label>
+                                    <input type="text" class="icons-calendar" id="input_ShippingDate"
+                                           ng-model="addNewInvenetoryObj.ShippingDate"
+                                           placeholder="MM-DD-YYYY"
+                                           datepickerforapplist
+                                           mindate="{{addNewInvenetoryObj.ShippingDate}}" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Location</label>
+                                    <select id="RIOL__Location" ng-model="addNewInvenetoryObj.Location"
+                                            ng-options="item.BranchId as item.BranchName for item in BranchesListArray">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6" ng-if="false">
+                                <div class="form__group">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">Status</label>
+                                    <select id="RIOL__Status" ng-model="addNewInvenetoryObj.StatusId"
+                                            ng-options="item.Id as item.Name for item in IOLStatusArray" ng-disabled="true">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg__F8F8F8-- border-top d__f-- ai__c-- py__7-- px__10-- gap__10--x">
+            <div class="flex" ng-click="uibclose();">
+                <button class="btn__xl-- btn__1d5558--o width__100--" id="RIOL__Cancel">Cancel</button>
+            </div>
+            <div class="flex">
+                <button class="btn__xl-- btn__1d5558--f width__100--" id="RIOL__SaveItem" ng-click="AddNewIOLOrganizationItem();">Save Item</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- / -->
+
+<script type="text/ng-template" id="UploadIolUibPopup.html">
+    <div class="section__style--5 d__f-- fd__c-- height__100--">
+        <div class="section__header--">
+            <h1>Upload IOL</h1>
+
+            <div class="d__f-- ai__c-- gap__10--x">
+
+                <a class="btn__close--2" ng-click="uibclose()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </div>
+        </div>
+        <div class="section__body-- height__100--">
+            <div class="position__relative-- height__100--">
+                <div class="adjustable-position slim-scroll">
+                    <div class="d__f-- fd__c-- gap__5--y">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form__group">
+                                    <label>Organization <em>*</em></label>
+                                    <select ng-model="IOLOrganizationId" id="RIOL__OrganizationID"
+                                            ng-options="item.BranchId as item.ClinicName for item in BranchesListArray" ng-change="selectBranch(IOLOrganizationId)">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="d__f-- ai__c-- gap__10--">
+                                    <div class="form__group width-100">
+                                        <label>File Upload</label>
+                                        <div class="input__style--4">
+                                            <input type="file" id="file__choose--" ngf-select="onFileSelectConsent($files)" accept=".xlsx" style="display:none;">
+                                            <label for="file__choose--">
+                                                Upload IOL Info
+                                            </label>
+                                            <span>
+                                                <i class="upload__w16--w icons__w16--"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg__F8F8F8-- border-top d__f-- ai__c-- py__7-- px__10-- gap__10--x" ng-if="false">
+            <div class="flex">
+                <button class="btn__xl-- btn__1d5558--o width__100--">Cancel</button>
+            </div>
+            <div class="flex">
+                <button class="btn__xl-- btn__1d5558--f width__100--">Save Item</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

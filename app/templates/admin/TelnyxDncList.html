@@ -1,0 +1,228 @@
+<div class="p-15">
+
+    <!-- ===== Header ===== -->
+    <div class="dis-flex align-items-center justify-content-between m-b-15">
+        <div>
+            <h4 class="m-b-0">Do Not Call List</h4>
+            <span class="font-12 color-grey">
+                Numbers the practice must not dial. A number is added from the Call Center,
+                and removing one is recorded for the audit trail.
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== Filter bar (EHRUS cream band) ===== -->
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- m-b-15">
+        <table class="table tableno-bordered m-b-0 tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+                    <td width="40%">
+                        <div class="form__group">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" placeholder="Search number"
+                                   ng-model="dncList.Search"
+                                   ng-keyup="$event.keyCode === 13 && applyDncFilter()" />
+                        </div>
+                    </td>
+
+                    <td width="24%">
+                        <div class="form__group">
+                            <label>Status</label>
+                            <select class="form-control"
+                                    ng-model="dncList.IncludeRemoved"
+                                    ng-change="applyDncFilter()">
+                                <option ng-value="false">On the list</option>
+                                <option ng-value="true">Include removed</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <td class="valign-bottom">
+                        <div class="dis-flex align-items-center grid-gap-10 m-b-2">
+                            <button class="btn__xl-- btn__2D2D47--f" ng-click="applyDncFilter()">Apply</button>
+                            <button class="btn__xl-- btn__C71D27--o" ng-click="clearDncFilter()">Clear</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== List ===== -->
+    <div class="table-responsive border__E4E4E4-- br__4--">
+        <table class="table table-hover m-b-0">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Patient</th>
+                    <th>Reason</th>
+                    <th>Notes</th>
+                    <th>Added By</th>
+                    <th>Added On</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="d in dncRows">
+                    <td class="font-mono">{{ fmtPhone(d.PhoneNumber) }}</td>
+                    <td>
+                        <span ng-if="d.PatientName">{{ d.PatientName }}</span>
+                        <span ng-if="d.PatientName && d.PatientMRN" class="font-12 color-grey"> · MR No: {{ d.PatientMRN }}</span>
+                        <span ng-if="!d.PatientName" class="font-12 color-grey">Not linked</span>
+                    </td>
+                    <td>{{ d.ReasonName || '—' }}</td>
+                    <td class="font-12 color-grey word-break-all">{{ d.Notes || '—' }}</td>
+                    <td class="font-12">{{ d.AddedByName || '—' }}</td>
+                    <td class="font-12">{{ d.AddedOn | date:'MMM d, y' }}</td>
+                    <td class="text-center">
+                        <div class="dis-flex align-items-center justify-content-center">
+                            <span ng-class="d.IsActive ? 'status__red--dot status__red--' : 'status__green--dot status__green--'"
+                                  title="{{ !d.IsActive && d.RemovedOn ? 'Removed ' + (d.RemovedOn | date:'MMM d, y') + ' by ' + d.RemovedByName + (d.RemovalReason ? ' — ' + d.RemovalReason : '') : '' }}">
+                                {{ d.IsActive ? 'Blocked' : 'Removed' }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:;" ng-if="d.IsActive"
+                           ng-click="openDncRemove(d)" title="Remove from Do Not Call">
+                            <i class="fa fa-undo"></i>
+                        </a>
+                        <span ng-if="!d.IsActive" class="color-grey font-12">—</span>
+                    </td>
+                </tr>
+                <tr ng-if="!dncRows.length">
+                    <td colspan="8" class="text-center color-grey p-20">
+                        No numbers on the Do Not Call list.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row m-t-10" ng-show="dncTotalCount > dncList.PageSize">
+        <div class="col-lg-12 text-center EH-pagination">
+            <uib-pagination total-items="dncTotalCount"
+                            ng-model="dncList.PageNumber"
+                            ng-change="loadDncList()"
+                            items-per-page="dncList.PageSize"
+                            max-size="5"
+                            boundary-link-numbers="true"
+                            rotate="false"></uib-pagination>
+        </div>
+    </div>
+
+    <!-- ===== Remove confirmation ===== -->
+    <div class="ehnote-admindnc-overlay" ng-if="dncRemove.show" ng-click="closeDncRemove()">
+        <div class="ehnote-admindnc-modal" ng-click="$event.stopPropagation()">
+            <div class="ehnote-admindnc-head">
+                <span><i class="fa fa-undo"></i> Remove from Do Not Call</span>
+                <a ng-click="closeDncRemove()" role="button">&times;</a>
+            </div>
+
+            <div class="ehnote-admindnc-body">
+                <div class="ehnote-admindnc-num">{{ fmtPhone(dncRemove.number) }}</div>
+
+                <p class="ehnote-admindnc-warn">
+                    This number will become callable again. The removal is recorded against
+                    your user, and the period it spent on the list is kept.
+                </p>
+
+                <label>Reason for removal <span class="text-danger">*</span></label>
+                <textarea ng-model="dncRemove.removalReason" rows="3" maxlength="500"
+                          class="form-control"
+                          placeholder="e.g. Patient called back and asked to be contacted again"></textarea>
+            </div>
+
+            <div class="ehnote-admindnc-foot">
+                <button class="btn__lg-- btn__2D2D47--o" ng-click="closeDncRemove()">Cancel</button>
+                <button class="btn__lg-- btn__2D2D47--f" ng-click="confirmDncRemove()"
+                        ng-disabled="!dncRemove.removalReason.trim() || dncRemove.saving">
+                    <i class="fa fa-undo"></i> {{ dncRemove.saving ? 'Removing…' : 'Remove from Do Not Call' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .ehnote-admindnc-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 4000;
+        background: rgba(0,0,0,.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ehnote-admindnc-modal {
+        width: 420px;
+        max-width: 92vw;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.25);
+        overflow: hidden;
+    }
+
+    .ehnote-admindnc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111;
+    }
+
+        .ehnote-admindnc-head a {
+            font-size: 20px;
+            line-height: 1;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+    .ehnote-admindnc-body {
+        padding: 18px;
+    }
+
+    .ehnote-admindnc-num {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111;
+        background: #f9fafb;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 14px;
+    }
+
+    .ehnote-admindnc-body label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin: 12px 0 6px;
+    }
+
+    .ehnote-admindnc-warn {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #92400E;
+        background: #FFF8E6;
+        border: 1px solid #FCE3A8;
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin: 0;
+    }
+
+    .ehnote-admindnc-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid #e5e7eb;
+        background: #fafafa;
+    }
+</style>

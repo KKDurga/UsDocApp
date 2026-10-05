@@ -1,0 +1,380 @@
+<!-- ============================================================
+     AmbientStartConsultationPopup.html
+     ============================================================ -->
+
+<div class="ambient-modal-wrapper" ng-class="{'ambient-minimized': IsAmbientMinimized}">
+    <div class="ambient-modal-header">
+        <div class="ambient-header-left">
+            <span class="ambient-header-title">EHNOTE Ambient AI</span>
+            <span class="ambient-header-divider">|</span>
+            <span class="ambient-header-sub">Voice Charting</span>
+        </div>
+        <div class="ambient-header-actions">
+            <button type="button" class="ambient-btn-minimize"
+                    ng-click="ToggleAmbientMinimize()" title="{{IsAmbientMinimized ? 'Maximize' : 'Minimize'}}">
+                <i class="fa" ng-class="IsAmbientMinimized ? 'fa-window-maximize' : 'fa-window-minimize'"></i>
+            </button>
+            <button type="button" class="ambient-btn-close"
+                    ng-click="closeuibpopup()" title="Close">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="ambient-loading-overlay" ng-show="isLoading">
+        <div class="ambient-spinner-ring"></div>
+        <p class="ambient-loading-text">Loading Ambient AI...</p>
+        <p class="ambient-loading-sub">Connecting to voice charting session</p>
+    </div>
+
+    <!-- ERROR -->
+    <div class="ambient-error-state" ng-show="loadError">
+        <div class="ambient-error-icon"><i class="fa fa-exclamation-triangle"></i></div>
+        <p class="ambient-error-title">Unable to Load Session</p>
+        <p class="ambient-error-msg">{{ errorMessage }}</p>
+        <button type="button" class="ambient-btn-retry" ng-click="closeuibpopup()">
+            <i class="fa fa-times"></i> Close
+        </button>
+    </div>
+
+    <!-- IFRAME -->
+    <div class="ambient-iframe-wrap" ng-show="!isLoading && !loadError">
+        <iframe id="ambientFrame"
+                ng-src="{{ SafeIframeUrl }}"
+                class="ambient-iframe"
+                allow="microphone; camera; autoplay"
+                allowfullscreen>
+        </iframe>
+    </div>
+
+</div><!-- /.ambient-modal-wrapper -->
+
+<style>
+
+    .ambient-modal-wrapper * {
+        box-sizing: border-box;
+    }
+
+    .ambient-modal-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        background: transparent;
+        overflow: hidden;
+        position: relative;
+    }
+
+
+    .ambient-iframe-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+
+    /* fills its wrap, so the iframe height always equals the panel's content height and the
+       ambient app's own footer can never be clipped by .ambient-iframe-wrap's overflow:hidden */
+    .ambient-iframe {
+        width: 100%;
+        height: 100%;
+        transform-origin: top left;
+        border: none;
+        display: block;
+        background: transparent;
+    }
+
+    /* HEADER */
+
+    /* the panel's own title bar - same teal as the ambient app below it, so the two read as one panel */
+    .ambient-modal-header {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 40px;
+        padding: 0 10px 0 14px;
+        background: #1D5558;
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        border-radius: 0;
+    }
+
+    .ambient-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    /* minimised: only the header bar is left, the iframe stays loaded and recording */
+    .ambient-modal-wrapper.ambient-minimized {
+        height: 40px;
+    }
+
+    .ambient-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ambient-logo-icon {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+    }
+
+    .ambient-header-title {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        color: #ffffff;
+    }
+
+    .ambient-header-divider {
+        color: rgba(255,255,255,.4);
+        font-size: 13px;
+    }
+
+    .ambient-header-sub {
+        font-size: 11px;
+        color: rgba(255,255,255,.75);
+    }
+
+    /* plain title bar controls - no boxes, so they read as part of the header and not as floating buttons */
+    .ambient-btn-close,
+    .ambient-btn-minimize {
+        width: 26px;
+        height: 26px;
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s;
+    }
+
+        .ambient-btn-minimize:hover {
+            background: rgba(255,255,255,.18);
+        }
+
+        .ambient-btn-close:hover {
+            background: rgba(220,38,38,.85);
+        }
+
+    /* LOADING */
+
+    .ambient-loading-overlay {
+        position: absolute;
+        inset: 40px 0 0 0;
+        background: #0d1117;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        z-index: 10;
+    }
+
+    .ambient-spinner-ring {
+        width: 48px;
+        height: 48px;
+        border: 3px solid #30363d;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: ambientSpin 0.9s linear infinite;
+    }
+
+    @keyframes ambientSpin {
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .ambient-loading-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #e6edf3;
+        margin: 0;
+    }
+
+    .ambient-loading-sub {
+        font-size: 11px;
+        color: #8b949e;
+        margin: 0;
+    }
+
+    /* ERROR */
+
+    .ambient-error-state {
+        position: absolute;
+        inset: 40px 0 0 0;
+        background: #0d1117;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        z-index: 10;
+        text-align: center;
+        padding: 24px;
+    }
+
+    .ambient-error-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(248,113,113,.1);
+        border: 1px solid rgba(248,113,113,.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #f87171;
+    }
+
+    .ambient-error-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #e6edf3;
+        margin: 0;
+    }
+
+    .ambient-error-msg {
+        font-size: 12px;
+        color: #8b949e;
+        margin: 0;
+        max-width: 320px;
+        line-height: 1.6;
+    }
+
+    .ambient-btn-retry {
+        margin-top: 4px;
+        padding: 7px 18px;
+        background: rgba(220,38,38,.15);
+        border: 1px solid rgba(220,38,38,.4);
+        border-radius: 7px;
+        color: #f87171;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+        .ambient-btn-retry:hover {
+            background: rgba(220,38,38,.3);
+        }
+
+
+    /* full page: the panel covers the viewport, so there is no scale to tune and no width
+       breakpoints - the ambient app lays itself out inside whatever height it is given */
+    .ambient-modal-window .modal-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        max-width: none;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .ambient-modal-wrapper {
+        height: 100vh;
+    }
+
+    .ambient-iframe {
+        transform: none;
+    }
+
+
+    .modal.ambient-modal-window {
+        overflow: hidden !important;
+        /* the window covers the screen but must not swallow clicks - only the panel itself is clickable,
+           so the panel can stay open (or minimised) while the rest of the screen is used */
+        pointer-events: none;
+    }
+
+        /* the dialog now fills the viewport, so it must not capture clicks itself - only the visible
+           panel does. Minimised that is just the 40px header, leaving the rest of the screen usable */
+        .modal.ambient-modal-window .modal-dialog {
+            pointer-events: none;
+        }
+
+        .modal.ambient-modal-window .ambient-modal-wrapper {
+            pointer-events: auto;
+        }
+
+    /* one integrated panel: rounded card, clipped so the header and the ambient app share the same edges */
+    /* full-bleed: no card edges to show against the screen edges */
+    .ambient-modal-window .modal-content {
+        border: none !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+        height: auto !important;
+    }
+
+    .ambient-modal-window .modal-body {
+        padding: 0 !important;
+        height: auto !important;
+    }
+
+    .ambient-status-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 32px;
+        text-align: center;
+        background: #0d1117;
+    }
+
+    .ambient-status-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(37,99,235,.12);
+        border: 1px solid rgba(37,99,235,.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        color: #60a5fa;
+    }
+
+    .ambient-success-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(34,197,94,.12);
+        border: 1px solid rgba(34,197,94,.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        color: #4ade80;
+    }
+
+    .ambient-btn-done {
+        margin-top: 8px;
+        padding: 8px 28px;
+        background: rgba(37,99,235,.15);
+        border: 1px solid rgba(37,99,235,.4);
+        border-radius: 7px;
+        color: #93c5fd;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+        .ambient-btn-done:hover {
+            background: rgba(37,99,235,.3);
+        }
+</style>

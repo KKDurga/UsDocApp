@@ -1,0 +1,348 @@
+﻿<div class="row bg__FFFFFF-- height__100--" ng-controller="UsAppointmentRequestCtrl">
+    <div class="col-lg-12 p__0-- d__f-- fd__c-- height__100--">
+        <div class="px__8-- pb__3-- bb__DDD--">
+            <table class="table tableno-bordered tableno-padding m-0">
+                <tbody>
+                    <tr>
+                        <td width="14%">
+                            <div class="form__group">
+                                <label>{{ 'FROMDATE' | translate}}</label>
+                                <input type="text" class="icons-calendar" ng-model="AppointmentRequest.FromDate" datepickerforinventoryus ng-change="" readonly />
+                            </div>
+                        </td>
+                        <td width="14%">
+                            <div class="form__group">
+                                <label>{{ 'TODATE' | translate}}</label>
+                                <input type="text" class="icons-calendar" ng-model="AppointmentRequest.ToDate" datepickerforinventoryus ng-change="" readonly />
+                            </div>
+                        </td>
+
+                        <td width="16%">
+                            <div class="form__group">
+                                <label>{{ 'APPOINTMENTSTATUS' | translate}}</label>
+                                <select ng-model="AppointmentRequest.AppointmentStatus"
+                                        ng-options="item.Id as item.Name for item in AppointmentstatusArray">
+                                </select>
+                            </div>
+                        </td>
+                        <td width="16%">
+                            <div class="form__group">
+                                <label>{{ 'REQUESTTYPE' | translate}}</label>
+                                <select ng-model="AppointmentRequest.RequestTypeId"
+                                        ng-options="item.Id as item.Name for item in RequestTypeArray">
+                                </select>
+                            </div>
+                        </td>
+                        <td width="16%">
+                            <div class="form__group">
+                                <label>{{ 'CONFIRMAPPOINTMENT' | translate}}</label>
+                                <select ng-model="AppointmentRequest.ConfirmedAppointment"
+                                        ng-options="item.Id as item.Name for item in ConfirmStatusArray">
+                                </select>
+                            </div>
+                        </td>
+
+                        <td width="16%">
+                            <div class="form__group">
+                                <label>Location</label>
+                                <div class="dropdown" button-dropdown-direction>
+                                    <button class="form__control text-left" id="dropdownMenu2" data-toggle="dropdown">
+                                        {{AppListselectedclinic.ClinicName}}
+                                    </button>
+                                    <div class="dropdown-menu dr-drop-app" role="menu" aria-labelledby="dropdownMenu2">
+                                        <div class="input-group droposearch-EH input-group-sm search-control">
+                                            <span class="input-group-addon">
+                                                <span class="mainsearch-App">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Search Branch" ng-model="searchHospital.txt1" />
+                                        </div>
+                                        <div class="drop-menu-Scroll apptsearchdroplist">
+                                            <ul>
+                                                <li role="presentation" ng-repeat="item in AppListdoctoraddress | filter:{'ClinicName':searchHospital.txt1}" ng-click="ChangeApptBranch(item)">
+                                                    <a href="javascript:;" ng-bind="item.ClinicName"></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td width="5%">
+                            <div class="form__group m-t-20">
+                                <button class="btn__xl-- btn__1d5558--f" ng-click="GetAppointmentRequestsList();">{{ 'SEARCH' | translate}}</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="px__8-- py__4-- height__100--">
+            <!--<div class="col-lg-12 dis-flex justify-content-end">
+            <div class="form-group">
+                <select class="form-control" ng-model="StatusFilter">
+                    <option disabled>Select</option>
+                    <option value="">All</option>
+                    <option value="1">Request Raised</option>
+                    <option value="2">Appointment Booked</option>
+                </select>
+            </div>
+        </div>-->
+            <div class="position__relative-- height__100-- px__8--">
+                <div class="adjustable-position slim-scroll">
+                    <table class="table__style--20 bc__c--" ng-if="AppointmentRequestsList.length > 0">
+                        <thead ng-if="AppointmentRequestsList.length > 0">
+                            <tr>
+                                <th width="3%" class="text-center position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'SNO' | translate}}</label>
+                                </th>
+                                <th width="13%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'PATIENTNAME' | translate}}</label>
+                                </th>
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'INSURANCEDETAILS' | translate}}</label>
+                                </th>
+                                <th width="9%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'APPTREASON' | translate}}</label>
+                                </th>
+                                <th width="12%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'DOCTOR' | translate}}/{{ 'STATUS' | translate}}</label>
+                                </th>
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">Appt Date &amp; Time</label>
+                                </th>
+                                <!--<th width="12%">{{ 'STATUS' | translate}}</th>-->
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">Visit Reason &amp; Type &amp; Status</label>
+                                </th>
+                                <th width="15%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'REMARKS' | translate}}</label>
+                                </th>
+                                <th width="8%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'REQSTATUS' | translate}}</label>
+                                </th>
+                                <th width="7%" class="text-center position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'ACTION' | translate}}</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover__f2f2f2--f" ng-repeat="item in AppointmentRequestsList track by $index" ng-if="AppointmentRequestsList.length > 0" ng-class="!$last ? 'bb__DDD--' : ''">
+                                <td class="text-center">
+                                    <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{$index+1}}</label>
+                                </td>
+                                <td>
+                                    <div class="d__f-- fd__c--">
+
+                                        <div class="d__f-- ai__c-- gap__x--4 mw__0--  show__popover--">
+                                            <label class="fs__xl-- fw__6-- tc__1D1D1D-- white-nowrap overflow-hidden text-overflow-ellipsis" title="{{item.Patient.FullName}}">{{item.Patient.FullName | textUpperCase}}</label>
+                                            <div popover-template="'templates/UIBPopovers/UspatientProfileBasicPopover.html'" popover-data="item.Patient" popover-class="opprofile__popover w-300" dynamic-us-patient-profile-basic-popover>
+                                                <a>
+                                                    <i class="icons__w16-- drawarrow__w16--o"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <span class="fs__lg-- fw__5-- tc__F37123--">{{item.Patient.PatientDisplayId}}</span>
+                                        <label class="tc__4A4A4A-- cur-poiter fs__lg-- fw__4-- mb__0--">{{item.Patient.UsFormateMobile}}</label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d__f-- fd__c-- ai__fs-- gap__y--4">
+                                        <div ng-repeat="kitem in item.InsuranceDetails track by $index">
+                                            <span class="fs__lg-- fw__5-- tc__4A4A4A--" ng-if="kitem.StatusId==1">{{kitem.OrganizationPayorName}}</span>
+                                        </div>
+                                        <span class="fs__lg-- fw__5-- tc__4A4A4A--" ng-if="item.IsVoiceAIRequest && item.InsuranceName">{{item.InsuranceName}}</span>
+                                        <span class="apptreq__chip-- apptreq__chip--unverified" ng-if="item.IsVoiceAIRequest && item.InsuranceName"
+                                              title="Insurance stated by the caller. Collect the card at check-in.">Unverified</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <label class="fs__lg-- fw__4-- tc__4A4A4A--" ng-if="!item.IsVoiceAIRequest">{{item.AppointmentReason}}</label>
+                                    <label class="fs__lg-- fw__4-- tc__4A4A4A--" ng-if="item.IsVoiceAIRequest">{{item.OnlineAppointmentVisitReason}}</label>
+                                </td>
+                                <td>
+                                    <div class="d__f-- fd__c-- ai__fs-- gap__y--4">
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A-- mb__0--" ng-if="item.DoctorName !==''">{{item.DoctorName}}</label>
+                                        <label class="status-raised fs__lg-- fw__4-- mb__0--" ng-if="item.AppointmentDetails[0].IsConfirmedAppointment && item.AppointmentId !==0">Confirmed</label>
+                                        <label class="text-red fs__lg-- fw__4-- mb__0--" ng-if="!item.AppointmentDetails[0].IsConfirmedAppointment && item.AppointmentId !==0">Not Confirmed</label>
+                                        <span class="apptreq__chip-- apptreq__chip--voiceai" ng-if="item.IsVoiceAIRequest">Voice AI</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="d__f-- fd__c-- ai__fs-- gap__y--4">
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D-- mb__0--" ng-if="item.ScheduleDate">{{item.ScheduleDate}}</label>
+                                        <span class="fs__lg-- fw__4-- tc__4A4A4A--" ng-if="item.ScheduleTime">{{item.ScheduleTime}}</span>
+                                        <span class="apptreq__chip-- apptreq__chip--preferred" ng-if="item.ScheduleLabel === 'Preferred'">Preferred</span>
+                                        <label class="fs__lg-- fw__4-- tc__4A4A4A-- mb__0--" ng-if="!item.ScheduleDate">--</label>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="d__f-- fd__c--">
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--" ng-if="item.VisitReason !==''">{{item.VisitReason}}</label>
+                                        <span class="fs__lg-- fw__4-- tc__4A4A4A--">{{item.AppointmentType}}</span>
+                                        <label class="fs__lg-- fw__5-- lh__normal--" ng-class="{'tc__C71D27--': item.AppointmentStatusName === 'Same Day Cancelled' || item.AppointmentStatusName === 'Planned Cancel' || item.AppointmentStatusName === 'No Show' || item.AppointmentStatusName === 'Check-In Cancelled', 'tc__FF9F2D--': item.AppointmentStatusName === 'Same day Reschedule', 'tc__3BAC66--': item.AppointmentStatusName === 'Express Check Out' || item.AppointmentStatusName === 'Check In'}">{{item.AppointmentStatusName}}</label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <!--<div class="d__f-- ai__fs-- gap__x--4 mw__0--" ng-if="item.Remarks">
+                                        <label class="fs__lg-- fw__4-- tc__4A4A4A-- apptreq__remarks--"
+                                               us-clamp-overflow="item.IsRemarksClamped"
+                                               us-clamp-text="{{item.Remarks}}">{{item.Remarks}}</label>
+                                        <a href="javascript:;" class="d__f-- apptreq__remarks-info--" ng-if="item.IsRemarksClamped"
+                                           uib-popover="{{item.Remarks}}"
+                                           popover-trigger="mouseenter"
+                                           popover-placement="auto left"
+                                           popover-append-to-body="true"
+                                           popover-class="apptreq__remarks-pop--"
+                                           popover-title="{{ 'REMARKS' | translate}}">
+                                            <i class="icons__w16-- info__w16--o"></i>
+                                        </a>                                        
+                                    </div>-->
+                                    <div class="d__f-- ai__c-- gap__x--4 mw__0--" ng-if="item.OnlineAppointmentVisitReason">
+                                        <label class="fs__lg-- fw__4-- tc__4A4A4A--"
+                                               us-clamp-overflow="item.IsRemarksClamped"
+                                               us-clamp-text="{{item.OnlineAppointmentVisitReason}}">{{item.OnlineAppointmentVisitReason}}</label>
+                                        <a href="javascript:;"
+                                           class="d__f-- apptreq__remarks-info--"
+                                           ng-if="item.Remarks !== ''"
+                                           uib-popover="{{item.Remarks}}"
+                                           popover-trigger="mouseenter"
+                                           popover-placement="left"
+                                           popover-append-to-body="true"
+                                           popover-class="apptreq__remarks-pop--"
+                                           popover-title="Notes to provider">
+                                            <i class="icons__w16-- notes__w16--o"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-raised fs__lg-- fw__5--" ng-if="item.ReviewStatusId === 1" title="{{item.DateandTime}}">{{ 'PENDING' | translate}}</span>
+                                    <span class="status-booked fs__lg-- fw__5--" ng-if="item.ReviewStatusId === 2" title="{{item.DateandTime}}">{{ 'REVIEWED' | translate}}</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d__f--  jc__c-- ai__c-- gap__x--10">
+                                        <a href="javascript:;" tooltip-placement="top-right" uib-tooltip="Appointment Info" uib-popover-template="ClickToAppinfo.templateUrl" popover-placement="left" popover-trigger="outsideClick" popover-class="popover-auto ros-popover-width m-l-0 m-t-0" ng-click="Getapptinfo(item);">
+                                            <i class=" icons__w16--   info__w16--o"></i>
+                                        </a>
+                                        <a ng-click="BookApptfromRequest(item, 2);" ng-show="item.RequestStatus == 'Need Assistance'" tooltip-placement="top-right" uib-tooltip="Book Appointment">
+                                            <i class="icons__w16-- bookappointment__w16--o"></i>
+                                        </a>
+                                        <a ng-click="EditAppointmentPopup(item, 2);" ng-if="item.showEditAppointment && item.StatusId == 5 && item.ReviewStatusId === 1" tooltip-placement="top-right" uib-tooltip="Reschedule Appointment">
+                                            <i class="icons__w16-- caledit__w16--o"></i>
+                                        </a>
+                                        <a tooltip-placement="top-right" uib-tooltip="Book Appointment" ng-click="BookApptfromRequest(item, 2);" ng-hide="item.AppointmentId != 0" ng-disabled="item.ApptStatus == 'C'">
+                                            <i class="icons__w16-- bookappointment__w16--o"></i>
+                                        </a>
+                                        <a tooltip-placement="top-right" uib-tooltip="Update Status" ng-show="item.showEditAppointment && item.StatusId !=4" ng-click="OpenNewPopUp(item);">
+                                            <i class="icons__w16-- restore__w16--o"></i>
+                                        </a>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table__style--20 height__100--" ng-if="AppointmentRequestsList.length === 0">
+                        <thead >
+                            <tr>
+                                <th width="3%" class="text-center position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'SNO' | translate}}</label>
+                                </th>
+                                <th width="13%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'PATIENTNAME' | translate}}</label>
+                                </th>
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'INSURANCEDETAILS' | translate}}</label>
+                                </th>
+                                <th width="9%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'APPTREASON' | translate}}</label>
+                                </th>
+                                <th width="12%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'DOCTOR' | translate}}/{{ 'STATUS' | translate}}</label>
+                                </th>
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">Appt Date &amp; Time</label>
+                                </th>
+                                <!--<th width="12%">{{ 'STATUS' | translate}}</th>-->
+                                <th width="11%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">Visit Reason &amp; Type</label>
+                                </th>
+                                <th width="15%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'REMARKS' | translate}}</label>
+                                </th>
+                                <th width="8%" class="position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'REQSTATUS' | translate}}</label>
+                                </th>
+                                <th width="7%" class="text-center position__sticky-- top__0--">
+                                    <label class="fs__md-- fw__5-- tc__1D1D1D--">{{ 'ACTION' | translate}}</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--">
+                                        <a><i class="nodata__1-- a1__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Patients Found</h1>
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">There are currently no patients. Please modify the filters to see results.</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="EH-pagination text-center m-t-10" ng-show="AppointmentRequestsList.length > 0">
+            <uib-pagination total-items="AppointmentRequest.TotalCount"
+                            ng-model="AppointmentRequest.PageNumber"
+                            ng-change="GetAppointmentRequestsList(AppointmentRequest.PageNumber)"
+                            max-size="AppointmentRequest.PageSize"
+                            class=""
+                            boundary-link-numbers="true"
+                            rotate="false"></uib-pagination>
+        </div>
+    </div>
+   
+</div>
+
+<script type="text/ng-template" id="appointMentPopupId.html">
+    <appointment-directive date-val="calenderDate" is-patient-exist="true" app-condate="AppDate" pagename="PageName" is-show-entry-form="true"></appointment-directive>
+</script>
+
+<script type="text/ng-template" id="Appinfo.html">
+    <div class="col-lg-12">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <h4 ng-if="ClickToAppinfo.CreatedBy!=''">
+                    <small>Created By</small><span class="list-group-item-heading text-s12w500c3f5fb0">{{ClickToAppinfo.CreatedBy}} - <small class="text-s10w500c767575">{{ClickToAppinfo.CreatedDt | date:'MM-dd-yyyy,hh:mm a'}}</small></span>
+                </h4>
+                <h4 ng-if="ClickToAppinfo.ModifiedBy!=''">
+                    <small>Modified By</small><span class="list-group-item-heading text-s12w500c3f5fb0">{{ClickToAppinfo.ModifiedBy}} - <small class="text-s10w500c767575">{{ClickToAppinfo.ModifiedDt | date:'MM-dd-yyyy,hh:mm a'}}</small></span>
+                </h4>
+                <!--<p class="list-group-item-text text-s12w500c000">{{item.OtherNotes }}</p>-->
+            </li>
+        </ul>
+
+
+    </div>
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

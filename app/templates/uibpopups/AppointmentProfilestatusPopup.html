@@ -1,0 +1,203 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1 ng-if="!IsShowTransferRoom"> {{ 'PROFILESTATUS' | translate}}</h1>
+        <h1 ng-if="IsShowTransferRoom"> {{ 'TRANSFERROOM' | translate}}</h1>
+
+        <div style="position:absolute; right:50px; top:10px; font-weight:600;">
+            Patient Balance:
+            <span style="color:red;">
+                {{PatientTotalbalanceObj.TotalPatientClaimBalance || 0}}
+            </span>  
+        </div>
+        <div class="" ng-if="IsShowTransferRoom">
+            <table class="table tableno-bordered m-b-0">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <img src="img/consultation/book-appt-profile.svg">
+                                <span class="text-s12w500c313131 p-l-2 p-r-2">
+                                    {{PatientObj.PatientName}}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <img src="img/consultation/book-appt-phone.svg">
+                                <span class="text-s12w500c313131 p-l-2 p-r-2">
+                                    {{PatientObj.MobileNo}}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <img src="img/consultation/book-appt-dob.svg">
+                                <span class="text-s12w500c313131 p-l-2 p-r-2">
+                                    {{PatientObj.DOB}}
+                                </span>
+                            </div>
+                        </td>
+                        <td ng-show="PatientObj.PatientDisplayId != ''">
+                            <div class="form-group">
+                                <img src="img/consultation/book-appt-mrno.svg" />
+                                <span class="text-s12w500c313131 p-l-2 p-r-2">
+                                    {{PatientObj.PatientDisplayId}} <span ng-show="PatientObj.OldMRNo != ''"> | {{PatientObj.OldMRNo}}</span>
+                                </span>
+                            </div>
+                        </td>
+                        <td ng-show="PatientObj.CheckInBy != ''">
+                            <div class="form-group">
+                                <img src="img/consultation/book-appt-checkin.svg" />
+                                <span class="text-s12w500c313131 p-l-2 p-r-2">
+                                    {{PatientObj.CheckInBy}}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <a class="btn__close--" ng-click="uibclose()">
+            <i class="close__w32--"></i>
+        </a>
+    </div>  
+    <div class="modal__body--">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="bg-f6f6f6 p-5 m-t-5">                   
+                    <div class="dis-inline-block m-l-15" ng-repeat="list in Statuslist track by $index">
+                        <input type="radio"
+                               class="radio-custom"
+                               id="Status1_{{list.Id}}"
+                               ng-value="list.Id"
+                               ng-model="StatusObj.ProfileStatusMasterId"
+                               ng-disabled="list.Name && list.Name.toLowerCase() === 'complete' && PatientTotalbalanceObj.TotalPatientClaimBalance > 0"
+                               ng-change="ChangeProfilestatus(StatusObj);">
+                        <label for="Status1_{{list.Id}}"
+                               class="radio-custom-label text-black font-weight-500 cur-poiter mb-0"
+                               ng-class="{'blur-label': list.Name && list.Name.toLowerCase() === 'complete' && PatientTotalbalanceObj.TotalPatientClaimBalance > 0}">
+                            {{list.Name}}
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-show="StatusObj.ProfileStatusMasterId == 2">
+            <div class="col-lg-12">
+                <div class="modal-body p-9 bb-1">
+                    <div class="dis-flex">
+                        <div class="flex m-r-10">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+                                        <ul class="flex-flow-ulli m-l-15">
+                                            <li ng-repeat="initem in InCompleteDetailsList">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input name="checkbox-1" type="checkbox" ng-model="initem.isChecked">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-s14w500c000 m-l-5">
+                                                            {{initem.IncompleteStatusName}}
+                                                        </small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="ehr-input max-ehr-input m-l-15 m-r-15">
+                                        <label>{{ 'REMARKS' | translate}}</label>
+                                        <textarea rows="2" ng-model="StatusObj.Remarks" quotes-restrict maxlength="200"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="width-40 p-10 bg-f1f1f1 h-115 overflow-y-scroll" ng-show="ProfileStatusRemarksArray.length > 0">
+                            <div class="appointment-group">
+                                <div class="form-group text-clear-cons">
+                                    <ul class="notesyellowshow m-t-5">
+                                        <li class="bookapt-textarea p-10" ng-repeat="i in ProfileStatusRemarksArray">
+                                            <p class="m-0">
+                                                <label class="text-s12w600c079aca">
+                                                    <span class="text-s12w500c3f5fb0 ng-binding">{{i.ModifiedDt | date:'MM-dd-yyyy'}} | </span>{{i.ModifiedBy}}<span class="text-s12w500c3f5fb0 ng-binding"> | {{i.ProfileStatusName}}</span>
+                                                </label>
+                                                <span class="text-s12w500c000 dis-block fs-11">{{i.ProfileStatusRemarks}}</span>
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row" ng-show="StatusObj.ProfileStatusMasterId !== 2">
+            <div class="col-lg-12">
+                <div class="modal-body p-9 bb-1">
+                    <div class="dis-flex">
+                        <div class="flex m-r-10">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="ehr-input max-ehr-input m-l-15 m-r-15">
+                                        <label>{{ 'REMARKS' | translate}}</label>
+                                        <textarea rows="2" ng-model="StatusObj.Remarks" quotes-restrict maxlength="200"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="width-40 p-10 bg-f1f1f1 height-100 overflow-y-scroll" ng-show="ProfileStatusRemarksArray.length > 0">
+                            <div class="appointment-group">
+                                <div class="form-group text-clear-cons">
+                                    <ul class="notesyellowshow m-t-5">
+                                        <li class="bookapt-textarea p-10" ng-repeat="i in ProfileStatusRemarksArray">
+                                            <p class="m-0">
+                                                <label class="text-s12w600c079aca">
+                                                    <span class="text-s12w500c3f5fb0 ng-binding">{{i.ModifiedDt | date:'MM-dd-yyyy'}} | </span>{{i.ModifiedBy}}<span class="text-s12w500c3f5fb0 ng-binding"> | {{i.ProfileStatusName}}</span>
+                                                </label>
+                                                <span class="text-s12w500c000 dis-block fs-11">{{i.ProfileStatusRemarks}}</span>
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal__footer--">
+        <div class="checkbox cn" ng-if="!IsShowApplytodaysAppt&&StatusObj.ProfileStatusMasterId !== 2">
+            <label>
+                <input name="checkbox-1" type="checkbox" ng-model="StatusObj.IsApplyForAllToDaysAppointments">
+                <span class="checkbox-material">
+                    <span class="check"></span>
+                </span>
+                <small class="text-s14w500c000 m-l-5">
+                    Apply todays Appointments
+                </small>
+            </label>
+        </div>
+        <!--<button type="button" class="btn__lg-- btn__C71D27--o" ng-click="closeuibpopup();"> {{ 'CLOSE' | translate}}</button>-->
+        <button type="button" class="btn__lg-- btn__1d5558--f" ng-click="SaveProfiledetails();"> {{ 'SAVE' | translate}}</button>
+
+    </div>
+</div>
+<style>
+    .blur-label {
+        opacity: 0.4 !important;
+        pointer-events: none;
+        filter: blur(1px);
+    }
+</style>
+ 
+     
+     

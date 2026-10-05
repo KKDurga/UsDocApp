@@ -1,0 +1,461 @@
+﻿<!-- Audit Grid Container Modal | User Story 55023 -->
+<!-- Controller: UsAuditGridContainerCtrl -->
+<div class="modal__style--1">
+
+    <!-- ───────────────────── MODAL HEADER ───────────────────── -->
+    <div class="modal__header--">
+        <h1>
+            Claim Audit Detail
+            <span class="ml__10-- fs__normal-- fs__lg-- fw__5-- tc__FFFFFF-- br__10-- px__5-- bg__1D5558--">
+                {{AuditPopupCount}}
+            </span>
+        </h1>
+        <div class="d__f-- ai__c-- gap__10--x">
+            <div class="position__relative-- p__2--">
+                <a class="border__1D5558-- p__7-- bradius__4-- bg__F5F5F5-- d__b--" ng-click="excelExports()"><i svg-icon="icon__download--" size="14" style="color: #6A7282"></i></a>
+                <span class="p__3-- top_ bg__C71D27-- bradius__10-- position__absolute-- top__0-- right__0--"></span>
+            </div>
+            <button class="btn__lg-- btn__1d5558--f" ng-click="ClickForAuditPopupExcel()">Export Excel</button>
+            <a class="btn__close--2" ng-click="close()">
+                <i class="icons__w16-- close__w16--s"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- ───────────────────── FILTER BAR ───────────────────── -->
+    <div class="p__3-- bg__F7981C1A-- border__E4E4E4-- br__4-- mb__10--">
+        <table class="table m-0 tableno-bordered tableno-padding table-layout-fix">
+            <tbody>
+                <tr>
+
+                    <!-- Billing Provider -->
+                    <td width="15%">
+                        <div class="form__group">
+                            <label>Billing Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    {{MainPobj.SelectBillingProviderString}}
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" ng-click="$event.stopPropagation()">
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" class="checkbox"
+                                                               ng-model="MainPobj.AllBillingProviderStatusCheck"
+                                                               ng-change="checkInsuranceAllBillingProviders(MainPobj.AllBillingProviderStatusCheck)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MainPobj.BillingProviderList track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox" class="checkbox"
+                                                               ng-model="item.IsChecked"
+                                                               ng-change="InsuranceProviderToggle(item)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">{{item.BillingProviderName}}</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Rendering Provider -->
+                    <td width="15%">
+                        <div class="form__group">
+                            <label>Rendering Provider</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    {{MainPobj.SelectRenderingStatusString}}
+                                    <i class="icons__w16-- arrowdown__w16--l pos-absolute right__6-- fs-11 top-9"></i>
+                                </button>
+                                <div class="dropdown-menu dr-drop-app" ng-click="$event.stopPropagation()">
+                                    <div class="input-group droposearch-EH input-group-sm search-control">
+                                        <span class="input-group-addon"><span class="mainsearch-App"><i class="fas fa-search"></i></span></span>
+                                        <input type="text" class="form-control" placeholder="Search Doctor" ng-model="auditPopupSearchTxt.rendering" />
+                                    </div>
+                                    <div class="apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox"
+                                                           ng-model="MainPobj.AllRenderingStatusCheck"
+                                                           ng-click="checkAllRendering(MainPobj.AllRenderingStatusCheck)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">All Doctors</span>
+                                                </label>
+                                            </li>
+                                            <li ng-repeat="item in MainPobj.RenderingProviderList | filter:{'SecondUserFullName': auditPopupSearchTxt.rendering} track by $index">
+                                                <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                    <input type="checkbox" class="checkbox"
+                                                           ng-model="item.IsChecked"
+                                                           ng-click="InsuranceRenderingToggle(item)">
+                                                    <span class="lbl"></span>
+                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.SecondUserFullName + '-' + item.NPI}}</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+
+
+                    <!-- DOS Date Range -->
+                    <td width="10%">
+                        <div class="form__group">
+                            <label>DOS Date Range</label>
+                            <select ng-model="MainPobj.ServiceDateRangeId"
+                                    ng-options="item.Id as item.Name for item in ServiceDateRangeArray"
+                                    ng-change="setDOSDateRange(MainPobj.ServiceDateRangeId)">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="MainPobj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.DOSFromDate"
+                                   datepickerforapplist
+                                   readonly>
+                        </div>
+                    </td>
+                    <td ng-if="MainPobj.ServiceDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.DOSToDate"
+                                   datepickerforapplist
+                                   readonly>
+                        </div>
+                    </td>
+
+                    <!-- Check / Payment Date Range -->
+                    <td width="10%">
+                        <div class="form__group">
+                            <label>Check Range</label>
+                            <select ng-model="MainPobj.PaymentDateRangeId"
+                                    ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                    ng-change="setInsuranceCheckDateRange(MainPobj.PaymentDateRangeId)">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td ng-if="MainPobj.PaymentDateRangeId == 11">
+                        <div class="form__group">
+                            <label>From Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.PaymentFromDate"
+                                   datepickerforapplist
+                                   readonly>
+                        </div>
+                    </td>
+                    <td ng-if="MainPobj.PaymentDateRangeId == 11">
+                        <div class="form__group">
+                            <label>To Date</label>
+                            <input placeholder="MM/DD/YYYY"
+                                   class="icons-calendar"
+                                   ng-model="MainPobj.PaymentToDate"
+                                   datepickerforapplist
+                                   readonly>
+                        </div>
+                    </td>
+
+
+                    <!-- User -->
+                    <td width="15%">
+                        <div class="form__group">
+                            <label>User</label>
+                            <div class="dropdown cstm-dropdown width-100" button-dropdown-direction>
+                                <button class="form__control text-left" data-toggle="dropdown">
+                                    <i class="fas fa-chevron-down pos-absolute right-10 fs-11 top-12"></i>
+                                    {{MainPobj.SelectUserStatusString}}
+                                </button>
+                                <div class="dropdown-menu dr-drop-app overflow__hidden--y" ng-click="$event.stopPropagation()">
+                                    <div class="p-5">
+                                        <input type="text" class="form-control input-sm bg-inputy"
+                                               placeholder="Search" ng-model="MainPobj.UserFullName" />
+                                    </div>
+                                    <div class="drop-menu-Scroll apptsearchdroplist">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox"
+                                                               ng-model="MainPobj.AllUserStatusCheck"
+                                                               ng-click="checkAllInsuranceUser(MainPobj.AllUserStatusCheck)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small>All</small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                            <li ng-repeat="item in MainPobj.AllUsersList | filter:{'FullName': MainPobj.UserFullName} track by $index">
+                                                <div class="checkbox cn">
+                                                    <label>
+                                                        <input type="checkbox"
+                                                               ng-model="item.IsChecked"
+                                                               ng-click="InsuranceUserToggle(item)">
+                                                        <span class="checkbox-material"><span class="check"></span></span>
+                                                        <small ng-bind="item.FullName"></small>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- More Filter Popover -->
+                    <td width="9%">
+                        <button popover-trigger="click"
+                                popover-append-to-body="true"
+                                popover-class="opfilter-popover m-0 min__w500--"
+                                popover-placement="bottom-right"
+                                popover-is-open="isPopoverOpen"
+                                ng-click="togglePopover()"
+                                uib-popover-template="payerFilterPopover.templateUrl"
+                                type="button"
+                                class="btn__sm-- btn__1d5558--o gap__10-- mt__20--">
+                            More Filter <i class="icons__w16-- filter__w16--o"></i>
+                        </button>
+
+                        <script type="text/ng-template" id="InspayerFilterPopover.html" ng-if="isPopoverOpen">
+                            <div class="d__f-- fd__c--">
+                                <div class="d__f-- ai__c-- jc__sb-- bb__DDD-- px__12-- py__8--">
+                                    <h1 class="fs__xl-- fw__5-- tc__1D1D1D-- m__0--">Filter</h1>
+                                    <a ng-click="closeFilterPopover()"><i class="icons__w16-- close__w16--l"></i></a>
+                                </div>
+                                <div class="h__250-- over-scrol-y p__5--">
+
+                                    <!-- Payer Name -->
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Payer Name</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="ClearAllPayor()">Clear All</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text"
+                                                       id="audit_popup_input_payerdata"
+                                                       autocomplete="off"
+                                                       class="input__style--2"
+                                                       placeholder="Search Payer"
+                                                       ng-model="MainPobj.PayorObj"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       typeahead-on-select="ChangeInsurancePayor(MainPobj.PayorObj)"
+                                                       uib-typeahead="item as item.OrganizationPayorName for item in GetOrganizationNewPayorAllList($viewValue)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="item in MainPobj.AllPayorList">
+                                                            <td>{{item.PayorName}}</td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeletePayor($index, item)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Procedure -->
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Procedure</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="ClearAllProcedure()">Clear All</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text"
+                                                       id="audit_popup_input_serviceobj"
+                                                       autocomplete="off"
+                                                       class="input__style--2"
+                                                       placeholder="Enter CPT code"
+                                                       ng-model="MainPobj.ServiceObj"
+                                                       typeahead-min-length="0"
+                                                       typeahead-focus-on-select="false"
+                                                       uib-typeahead="treatitem as treatitem.ProcedureCode + '-' + treatitem.ProcedureName for treatitem in GetOrganizationProcedure($viewValue)"
+                                                       typeahead-on-select="onselectServiceItem(MainPobj.ServiceObj)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="sitem in MainPobj.AllProcedureList track by $index">
+                                                            <td>{{sitem.ProcedureName}}</td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteProcedure($index, sitem)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Referral -->
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--">
+                                            <h1>Referral</h1>
+                                            <ul class="d__f-- ai__c-- gap__10--x list__unstyled-- m-0">
+                                                <li><a href="javascript:;" class="fs__lg-- fw__5-- tc__006080--" ng-click="ClearAllReferal()">Clear All</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <input type="text"
+                                                       id="audit_popup_input_refprovider"
+                                                       autocomplete="off"
+                                                       class="input__style--2"
+                                                       placeholder="Referring"
+                                                       maxlength="100"
+                                                       ng-model="MainPobj.ReferringObj"
+                                                       typeahead-focus-on-select="false"
+                                                       typeahead-min-length="0"
+                                                       uib-typeahead="item as item.NPI + '-' + item.FullName for item in GetReferalPCPDoctors($viewValue, 2)"
+                                                       typeahead-on-select="onSelectReferral(MainPobj.ReferringObj)" />
+                                            </div>
+                                            <div class="overflow__auto--y slim-scroll">
+                                                <table class="table tableno-padding table-border-bottom m-0">
+                                                    <tbody>
+                                                        <tr ng-repeat="Pitem in MainPobj.AllReferalList">
+                                                            <td>{{Pitem.FullName}}</td>
+                                                            <td width="5%">
+                                                                <a href="javascript:;" ng-click="DeleteReferal($index, Pitem)">
+                                                                    <i class="icons__w16-- close__w16--o"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ChkPosted Date -->
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--"><h1>ChkPosted Date</h1></div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <select class="input__style--2"
+                                                        ng-model="MainPobj.ChkPostedDateRangeId"
+                                                        ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                                        ng-change="setAuditChkPostedDateRange(MainPobj.ChkPostedDateRangeId)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="d__f-- gap__5-- mt__5--" ng-if="MainPobj.ChkPostedDateRangeId == 11">
+                                                <div class="form__group flex">
+                                                    <label>From</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="MainPobj.ChkPostedFromDate"
+                                                           datepickerforapplist readonly>
+                                                </div>
+                                                <div class="form__group flex">
+                                                    <label>To</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="MainPobj.ChkPostedToDate" datepickerforapplist readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Chk Date -->
+                                    <div class="section__style--4 d__f-- fd__c--">
+                                        <div class="section__header--"><h1>Chk Date</h1></div>
+                                        <div class="section__body-- border__E4E4E4--">
+                                            <div class="form__group">
+                                                <select class="input__style--2"
+                                                        ng-model="MainPobj.ChkDateRangeId"
+                                                        ng-options="item.Id as item.Name for item in PaymentDateRangeArray"
+                                                        ng-change="setAuditChkDateRange(MainPobj.ChkDateRangeId)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="d__f-- gap__5-- mt__5--" ng-if="MainPobj.ChkDateRangeId == 11">
+                                                <div class="form__group flex">
+                                                    <label>From</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="MainPobj.CheckStartDate"
+                                                           datepickerforapplist readonly>
+                                                </div>
+                                                <div class="form__group flex">
+                                                    <label>To</label>
+                                                    <input placeholder="MM/DD/YYYY" class="icons-calendar input__style--2"
+                                                           ng-model="MainPobj.CheckEndDate" datepickerforapplist readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d__f-- ai__c-- gap__10-- jc__e-- bt__DDD-- p__5--">
+                                    <a class="d__f-- ai__c-- gap__5-- fs__lg-- fw__5-- tc__1D5558--"
+                                       ng-click="ClearInsuranceFilters()">
+                                        <i class="icons__w16-- restore__w16--o"></i>Reset
+                                    </a>
+                                    <button class="btn__lg-- btn__1d5558--f"
+                                            ng-click="ClickForInsuranceFilteredData()">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </script>
+                    </td>
+
+                    <!-- Apply / Reset -->
+                    <td>
+                        <div class="d__f-- ai__c-- gap__5-- mt__20--">
+                            <button class="btn__lg-- btn__2D2D47--f" ng-click="ClickForInsuranceFilteredData()">Apply</button>
+                            <button class="b-0" ng-click="ClearInsuranceFilters()">
+                                <i class="reload-icon"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ───────────────────── GRID BODY ───────────────────── -->
+    <div class="modal__body--">
+        <div class="p__10-- adjustable-position" id="auditPopupGridContainer">
+
+            <!-- BillingProvider Tab -->
+            <div 
+                 id="InspopupAgGrid"
+                 dragScroll
+                 class="ag-theme-alpine"
+                 style="height:100%; width:100%">
+            </div>
+
+          
+
+        </div>
+    </div>
+
+</div>

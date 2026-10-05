@@ -1,0 +1,217 @@
+﻿<div class="modal-header">
+    <button class="close" ng-click="cancel()">&times;</button>
+    <h4 class="modal-title fs-15" ng-bind="Investigation.InvestigationDesc"></h4>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-5">
+            <fieldset class="text-left pos-relative top-5">
+                <div class="dis-inline-block">
+                    <input type="radio" ng-model="Investigation.SelectedEye" class="radio-custom" id="RightEye" name="Eye" value="1">
+                    <label for="RightEye" class="radio-custom-label cur-poiter mb-0">OD</label>
+                </div>
+                <div class="ml-15 dis-inline-block">
+                    <input type="radio" ng-model="Investigation.SelectedEye" class="radio-custom" id="LeftEye" name="Eye" value="2">
+                    <label for="LeftEye" class="radio-custom-label cur-poiter mb-0">OS</label>
+                </div>
+            </fieldset>
+        </div>
+
+
+        <div class="col-lg-7 pl-0">
+            <div class="row" ng-show="Investigation.SelectedEye == '1'">
+
+
+                <div class="col-lg-5">
+                    <div class="input-group width-100">
+                        <label class="width-100">
+                            <span class="btn btn-primary btn-block">
+                                Select File
+                                <input type="file"
+                                       class="file dis-none"
+                                       onchange="angular.element(this).scope().FileChange(this.files, 'Right', angular.element(this).scope().Investigation)" />
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-show="Investigation.SelectedEye == '2'">
+                <div class="col-lg-4 pl-0" ng-show="Investigation.GetTemplateInd == 'Y'">
+                    <button class="btn btn-info btn-block" ng-click="GetTemplate('Left',Investigation)">Get Template</button>
+                </div>
+                <div class="col-lg-3 pr-0 pl-0" ng-show="Investigation.SyncImageInd == 'Y'">
+                    <button class="btn btn-warning btn-block" ng-click="syncImages('Left',Investigation)">Sync</button>
+                </div>
+                <div class="col-lg-5">
+                    <div class="input-group width-100">
+                        <label class="width-100">
+                            <span class="btn btn-primary btn-block">
+                                Select File<input type="file"
+                                                  class="file dis-none"
+                                                  onchange="angular.element(this).scope().FileChange(this.files, 'Left', angular.element(this).scope().Investigation)" />
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-10" ng-show="Investigation.SelectedEye == '1'">
+        <div class="col-lg-10">
+            <div ng-show="Investigation.RightEyediv">
+                <div pw-canvas
+                     version="Investigation.RightEyeUndoCount"
+                     options="{undo:true,color:selectedColor,lineWidth:selectedLineWidth,imageSrc:Investigation.thumbnailRightEye,customCanvasId:Investigation.RightPwCanvas,
+                         width:470,height:300}">
+                    <div class="pwCanvasPaint"></div>
+                </div>
+            </div>
+            <div class="panel panel-default" ng-show="!Investigation.RightEyediv">
+                <div class="billing-cominsoon norecords-found-patients text-center mt-20 mb-30">
+                    <img src="img/no-data/no-investigation.png" class="w-150" />
+                    <div class="msg">
+                        <p class="goback-text-line1 mb-0">No Template found</p>
+                        <p class="goback-text-line1">Please select image or Sync Image</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+        <div class="col-lg-2" ng-show="Investigation.RightEyeImagesArray.length != 0">
+            <div class="segthumb-img">
+                <a class="thumbnail" ng-repeat="img in Investigation.RightEyeImagesArray">
+                    <i class="fa fa-times" ng-click="removeImage(img,'Right',0,Investigation)"></i>
+                    <img ng-src="{{img.DocURL}}" width="50" ng-click="EditImage(Investigation,img,'Right')" />
+                </a>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="row mt-10" ng-show="Investigation.SelectedEye == '2'">
+        <div class="col-lg-10">
+            <div ng-show="Investigation.LeftEyediv">
+                <div pw-canvas
+                     version="Investigation.LeftEyeUndoCount"
+                     options="{undo:true,color:selectedColor,lineWidth:selectedLineWidth,imageSrc:Investigation.thumbnailLeftEye,customCanvasId:Investigation.LeftPwCanvas,width:470,height:300}">
+                    <div class="pwCanvasPaint"></div>
+                </div>
+            </div>
+            <div class="panel panel-default" ng-show="!Investigation.LeftEyediv">
+                <div class="billing-cominsoon norecords-found-patients text-center mt-20 mb-30">
+                    <img src="img/no-data/no-investigation.png" class="w-150" />
+                    <div class="msg">
+                        <p class="goback-text-line1 mb-0">No Template found</p>
+                        <p class="goback-text-line1">Please select image or Sync Image</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-2" ng-show="Investigation.LeftEyeImagesArray.length != 0">
+            <div class="segthumb-img">
+                <a class="thumbnail" ng-repeat="img in Investigation.LeftEyeImagesArray">
+                    <i class="fa fa-times" ng-click="removeImage(img,'Left',0,Investigation)"></i>
+                    <img ng-src="{{img.DocURL}}" width="50" ng-click="EditImage(Investigation,img,'Left')" />
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <!-- /Row -->
+    <div class="row" ng-show="Investigation.SelectedEye == '1'">
+        <div class="col-lg-10">
+            <div pw-color-selector="['#000', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF']" color="selectedColor" class="canvas_color">
+            </div>
+        </div>
+        <div class="col-lg-2 undo">
+            <button class="btn btn-sm" ng-click="undoEyeCount(Investigation,'Right')" ng-disabled="Investigation.RightEyeUndoCount < 1">
+                Undo  (<span ng-bind="Investigation.RightEyeUndoCount"></span>)
+            </button>
+        </div>
+    </div>
+    <div class="row" ng-show="Investigation.SelectedEye == '2'">
+        <div class="col-lg-10">
+            <div pw-color-selector="['#000', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF']" color="selectedColor" class="canvas_color">
+            </div>
+        </div>
+        <div class="col-lg-2 undo">
+            <button class="btn btn-sm" ng-click="undoEyeCount(Investigation,'Left')" ng-disabled="Investigation.LeftEyeUndoCount < 1">
+                Undo  (<span ng-bind="Investigation.LeftEyeUndoCount"></span>)
+            </button>
+        </div>
+    </div>
+
+
+
+    <div class="row" ng-show="Investigation.SelectedEye == '1'">
+        <div class="col-lg-2 CupInput CupLabel" ng-show="Investigation.FrequencyValuesInd == 'Y'">
+            <label>FR+</label>
+            <input type="radio" ng-model="Investigation.RightEyeFreq" name="PerimetryRightEye_1" value="positive" />
+        </div>
+        <div class="col-lg-2 CupInput CupLabel" ng-show="Investigation.FrequencyValuesInd == 'Y'">
+            <label>FR-</label>
+            <input type="radio" ng-model="Investigation.RightEyeFreq" name="PerimetryRightEye_1" value="negative" />
+        </div>
+        <div class="col-lg-5 CupInput" ng-show="Investigation.CdRatioValuesInd == 'Y'">
+            <label>CD ratio:</label>
+            <input type="text" placeholder="0" ng-model="Investigation.RightEyeCdRatio" numbers-slash-only maxlength="3" class="w-100" />
+        </div>
+    </div>
+
+
+
+    <div class="row" ng-show="Investigation.SelectedEye == '2'">
+        <div class="col-lg-2 CupInput CupLabel" ng-show="Investigation.FrequencyValuesInd == 'Y'">
+            <label>FR+</label>
+            <input type="radio" ng-model="Investigation.LeftEyeFreq" name="PerimetryLeftEye_1" value="positive" />
+        </div>
+        <div class="col-lg-2 CupInput CupLabel" ng-show="Investigation.FrequencyValuesInd == 'Y'">
+            <label>FR-</label>
+            <input type="radio" ng-model="Investigation.LeftEyeFreq" name="PerimetryLeftEye_1" value="negative" />
+        </div>
+        <div class="col-lg-5 CupInput" ng-show="Investigation.CdRatioValuesInd == 'Y'">
+            <label>CD ratio:</label>
+            <input type="text" placeholder="0" ng-model="Investigation.LeftEyeCdRatio" numbers-slash-only maxlength="3" class="w-100" />
+        </div>
+    </div>
+
+
+
+
+
+    <div class="row mt-10">
+        <div class="col-lg-12" ng-show="Investigation.SelectedEye == '1'">
+            <input type="text" ng-show="Investigation.RemarksInd == 'Y'" ng-model="Investigation.RightEyeRemarks" placeholder="Type Remarks"
+                   ng-disabled="true" class="form-control testnamesearchbox" />
+
+
+
+        </div>
+        <div class="col-lg-12" ng-show="Investigation.SelectedEye == '2'">
+            <input type="text" ng-show="Investigation.RemarksInd == 'Y'" ng-model="Investigation.LeftEyeRemarks" placeholder="Type Remarks"
+                   ng-disabled="true" class="form-control testnamesearchbox" />
+        </div>
+    </div>
+    <div class="row mt-10">
+        <div class="col-lg-12 text-right" ng-show="Investigation.SelectedEye == '1'">
+            <button class="btn btn-green btn-fill-horz-o" ng-show="!Investigation.RightEyeEdit" ng-click="savecanvas('Right',Investigation)" ng-disabled="!Investigation.RightEyediv">
+                Save Image
+            </button>
+            <button class="btn btn-green btn-fill-horz-o" ng-show="Investigation.RightEyeEdit" ng-disabled="!Investigation.RightEyediv" ng-click="updatecanvas('Right',Investigation)">
+                Update Image
+            </button>
+            <button class="btn danger-btn Btn-success_Add" ng-click="ClearCanvas('Right',Investigation)">Clear</button>
+        </div>
+        <div class="col-lg-12 text-right" ng-show="Investigation.SelectedEye == '2'">
+            <button class="btn btn-green btn-fill-horz-o" ng-show="!Investigation.LeftEyeEdit" ng-click="savecanvas('Left',Investigation)" ng-disabled="!Investigation.LeftEyediv">
+                Save Image
+            </button>
+            <button class="btn btn-green btn-fill-horz-o" ng-show="Investigation.LeftEyeEdit" ng-disabled="!Investigation.LeftEyediv" ng-click="updatecanvas('Left',Investigation)">
+                Update Image
+            </button>
+            <button class="btn danger-btn Btn-success_Add" ng-click="ClearCanvas('Left',Investigation)">Clear</button>
+        </div>
+    </div>
+</div>

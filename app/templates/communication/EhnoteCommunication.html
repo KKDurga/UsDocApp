@@ -1,0 +1,986 @@
+﻿<div class="container-fluid" ng-controller="EhnoteCommunicationCtrl">
+
+    <div class="mainDevDiagnosis">
+        <ul class="" role="tablist">
+            <li role="presentation" ng-click="switchTab(1)" ng-class="Tab == 1?'active':''">
+                <a> SMS</a>
+            </li>
+            <li role="presentation" ng-click="switchTab(2)" ng-class="Tab == 2?'active':''">
+                <a> SMS History</a>
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+
+    <div ng-show="Tab == 2">
+        <div class="row m-t-10">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-body">
+                        <div class="class=" col-lg-3"">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>From Date</label>
+                                        <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                            <input class="form-control icons-calendar bg-white cur-default" ng-model="SMSHistorySearch.FromDate" datepickerforinventory readonly>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>To Date</label>
+                                        <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                            <input class="form-control icons-calendar bg-white cur-default" ng-model="SMSHistorySearch.ToDate" datepickerforinventory readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 p-r-0">
+                                    <fieldset class="pos-relative bottom-2 w-250">
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom width-0" id="NameId" name="patientsearch" ng-value="1" aria-invalid="false" ng-model="searchRadio.PatientsearchType" ng-click="changesearchType(searchRadio.PatientsearchType);">
+                                            <label for="NameId" class="radio-custom-label cur-poiter mb-0">Name</label>
+                                        </div>
+                                        <div class="dis-inline-block ml-15">
+                                            <input type="radio" class="radio-custom width-0 " id="mrMobileId" name="patientSearch" ng-value="2" aria-invalid="false" ng-model="searchRadio.PatientsearchType" ng-click="changesearchType(searchRadio.PatientsearchType);">
+                                            <label for="mrMobileId" class="radio-custom-label cur-poiter mb-0">MR No</label>
+                                        </div>
+                                    </fieldset>
+                                    <div class="btn-group select-form-uib dropdown open">
+                                        <div class="inner-addon left-addon flex">
+                                            <input type="text" class="form-control pl-15 btr-radius bbr-radius" placeholder="Search By Name" typeahead-min-length="3" ng-if="searchRadio.PatientsearchType == 1" ng-model="patientSearch.SearchText" ng-change="LoadPatientsearch(patientSearch.SearchText)" minlength="3">
+                                            <input type="text" class="form-control pl-15 btr-radius bbr-radius" placeholder="Search By Mr.No" typeahead-min-length="10" ng-if="searchRadio.PatientsearchType == 2" ng-model="patientSearch.SearchText" ng-change="LoadPatientsearch(patientSearch.SearchText)" minlength="10" maxlength="10">
+                                        </div>
+                                        <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="AllPatientList.length >0">
+
+                                            <li class="list-group-item text-dark cur-poiter" ng-repeat="pitem in AllPatientList" ng-click="Selectedpatient(pitem)">
+
+                                                <div class="dis-block">
+                                                    <h5 class="m-t-0 mb-5">
+                                                        <b>{{pitem.FullName}}</b>
+                                                        <span class="new-global-patient" ng-if="pitem.PatientId===0"> <span></span> New </span>
+                                                    </h5>
+
+                                                    <div ng-hide="pitem.PatientHomeNumber == 0">{{pitem.PatientHomeNumber}}</div>
+                                                    <div class="m-0" ng-if="pitem.PatientDisPlayID!=''">{{pitem.PatientDisPlayID}}</div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+
+
+
+
+
+
+                                </div>
+
+
+                                <div class="col-lg-1">
+                                    <button class="btn btn-success btn-block m-t-25" ng-click="ChangeSms()">Search</button>
+
+                                </div>
+                                <div class="col-lg-1">
+
+                                    <button class="btn btn-warning btn-block m-t-25" ng-click="ClearList()">Clear</button>
+                                </div>
+
+                                <br /><br /><br />
+
+
+                                <section class="eh-panel b-0 m-t-10">
+                                    <div class="eh-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered ">
+                                                        <thead>
+                                                            <tr class="table-bg-header">
+                                                                <th>Date</th>
+
+                                                                <th>AppointmentId</th>
+                                                                <th>Mobile Number</th>
+                                                                <th>SMS Content</th>
+
+                                                                <th>Status</th>
+
+                                                            </tr>
+
+                                                        </thead>
+                                                        <tbody ng-repeat="item in SMSHistoryListArray">
+                                                            <tr>
+                                                                <td>{{item.DateCreated}}</td>
+                                                                <td>{{item.AppointmentId}}</td>
+                                                                <td>{{item.MobileNumber}}</td>
+                                                                <td>{{item.Body}}</td>
+
+                                                                <td>{{item.Status}}</td>
+
+                                                            </tr>
+                                                        </tbody>
+
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </section>
+
+                                <div class="row mb-10">
+                                    <div class="col-lg-12 text-center EH-pagination">
+                                        <!--<uib-pagination total-items="SMSHistoryListArrayCount"
+                                                        PageSize="SMSHistorySearch.PageSize"
+                                                        PageNumber="PageNumber"
+                                                        class="pagination-sm" boundary-link-numbers="true"
+                                                        ng-model="currentPage" ng-change="Changepage(currentPage)">
+                                        </uib-pagination>-->
+                                        <uib-pagination total-items="SMSHistoryListArrayCount"
+                                                        ng-model="currentPage"
+                                                        ng-change="Changepage(currentPage)"
+                                                        force-ellipses="true"
+                                                        boundary-links="true"
+                                                        max-size="maxSize"
+                                                        ng-show="SMSHistoryListArray.length > 0">
+                                        </uib-pagination>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div ng-show="Tab == 1">
+        <div class="row m-t-10">
+            <div class="col-lg-12">
+                <section class="tile tile-shadow">
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="row">
+                                    <div class="col-lg-6 p-r-0">
+                                        <div class="form-group">
+                                            <label>From Date</label>
+                                            <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                                <input class="form-control icons-calendar bg-white cur-default" ng-model="Search.FromDate" datepickerformonth>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 p-r-0">
+                                        <label>To Date</label>
+                                        <div class="form-group">
+                                            <div class="list list-inset docDateTextBox" aria-hidden="false">
+                                                <input class="form-control icons-calendar cur-default bg-white" ng-model="Search.ToDate" datepickerformonth>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <label>Branch</label>
+                                <select class="form-control select-dropdown"
+                                        name="docAddress"
+                                        ng-model="Search.HospitalId"
+                                        ng-options="item.OrganizationId as item.OrganizationName for item in Branches"
+                                        ng-change="changehospital(Search.HospitalId)">
+                                    <!--<option value="">All</option>-->
+                                </select>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="col-lg-6 p-r-0">
+                                    <div class="form-group">
+                                        <!--<label>Communication Screen</label>-->
+                                        <label>Module</label>
+                                        <select class="form-control select-dropdown"
+                                                name="docAddress"
+                                                ng-model="Search.ScreenTypeId"
+                                                ng-options="item.ScreenTypeId as item.ScreenTypeName for item in Communicationsarray"
+                                                ng-change="getCommunicationScreen(Search.ScreenTypeId)">
+                                            <option value="">Select</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group p-r-0">
+                                        <!--<label>Communication Sub Screen Type</label>-->
+                                        <label>Sub Module</label>
+                                        <select class="form-control select-dropdown"
+                                                name="docAddress"
+                                                ng-model="Search.SubScreenTypeId"
+                                                ng-options="item.SubScreenTypeId as item.SubScreenTypeName for item in CommunicationSubScreenType">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>SMS/Email</label>
+                                    <select class="form-control select-dropdown" ng-model="Search.HeaderCommunicationType" ng-change="changeToComunicationBody(Search.HeaderCommunicationType)">
+                                        <option value="">Select</option>
+                                        <option value="SMS">SMS</option>
+                                        <option value="Email">Email</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!--<div class="col-lg-3">
+                            <div class="col-lg-6 p-r-0">
+                                <div class="form-group">
+                                    <label>Type</label>
+                                    <select class="form-control">
+                                        <option>All</option>
+                                        <option>Sale</option>
+                                        <option>Order</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 p-r-0">
+                                <div class="form-group">
+                                    <label>Type</label>
+                                    <select class="form-control">
+                                        <option>All Employees</option>
+                                        <option>Doctors</option>
+                                        <option>Non Technicals</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>-->
+
+                            <div class="col-lg-1">
+                                <button class="btn btn-success btn-block m-t-25" ng-click="Communicationlist()">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!--<div class="col-lg-12 text-right">
+            <div class="col-lg-10">
+
+            </div>
+            <div class="col-lg-2 p-l-0">
+                <button type="button" class="btn btn-orange btn-fill-horz-o btn-block" ng-click="GetAllGroups()">Groups List</button>
+            </div>
+        </div>-->
+        </div>
+        <div class="">
+            <div class="col-lg-4 pl-0" ng-if="UserAccessRights.AllAccessRights.SMSPatientsList">
+                <section class="tile tile-shadow headermainscroll" ng-style="heightAFO()" resize>
+                    <div class="tile-header">
+                        <h1>{{Screentype}}</h1>
+
+                        <ul class="controls">
+
+                            <li class="search-comm">
+                                <input type="text" placeholder="Search" class="form-control comm-search" name="" ng-model="PatientSearchText">
+                                <span><i class="fa fa-search"></i></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-4" ng-hide="communicationpatientlist.length==0">
+                                <label class="control control--checkbox">
+                                    <span>Select all</span>
+                                    <input type="checkbox" ng-model="selecteAllPatients" ng-click="checkAllPatients1(selecteAllPatients)">
+                                    <div class="control__indicator top-0"></div>
+                                </label>
+                            </div>
+                            <div class="col-lg-5 p-l-0">
+                                <button type="button" class="btn btn-orange btn-fill-horz-o btn-block" ng-click="GetAllGroups()">Groups List</button>
+                            </div>
+                            <div class="col-lg-3 text-right">
+                                <button type="button" class="btn btn-navy btn-fill-horz-o" ng-click="addPatientsToGrpPopup(Patient_final_data)" ng-disabled="NumOfPatientSelected <= 0" ng-class="{'not-access atgbtn':NumOfPatientSelected <= 0}">Groups</button>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="c-search-result clearfix" id="main-patient-listing">
+                                    <ul infinite-scroll="getcommunicationPatient('FRMSCRL')" infinite-scroll-disabled="scrollBusy" infinite-scroll-distance='0' infinite-scroll-parent="true"
+                                        infinite-scroll-immediate-check="false" infinite-scroll-use-document-bottom="reachedBottom">
+                                        <li ng-repeat="Patient in communicationpatientlist| filter:{PatientName:PatientSearchText}" ng-if="communicationpatientlist.length > 0" class="clearfix">
+                                            <label class="control control--checkbox">
+                                                <span class="phonelilinehgt">
+                                                    <div class="c-pat-list">
+
+                                                        <h3 ng-show="Patient.ScreenType !=5"><span ng-bind="(Patient.PatientName).trim()"></span></h3>
+                                                        <h3 ng-show="Patient.ScreenType ==5"><span ng-bind="(Patient.DoctorName).trim()"></span></h3>
+                                                        <p ng-hide="Patient.MobileNo==0">
+                                                            <span>{{Patient.MobileNo}} </span>
+                                                            <span ng-if="Patient.Email"> |</span>
+                                                            <span> {{Patient.Email}}</span>
+                                                        </p>
+                                                    </div>
+                                                </span>
+                                                <input type="checkbox" ng-click="addPatientMobile1(Patient)" ng-model="Patient.Selected" />
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        </li>
+                                        <li ng-show="communicationpatientlist.length == 0">
+                                            <div class="row">
+                                                <div class="col-lg-12 text-center">
+                                                    <div class="billing-cominsoon text-center">
+                                                        <img src="img/no-data/no-results.png" />
+                                                        <div class="msg">
+                                                            <p class="goback-text-communication"> Sorry, no Patients found!</p>
+                                                            <p class="no-records-txt-line2">
+                                                                No Patients availble with selected dates !! Please try with other Search Criteria
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="col-lg-12">
+                    <div class="c-chbox-select">
+                        <span>{{NumOfPatientSelected}}</span> Patient(s) selected
+                    </div>
+                    <div class="LPGD-commu" ng-show="showpagination">
+                        <uib-pagination total-items="Totalpatientlist"
+                                        ng-model="currentPage"
+                                        ng-change="pagepatientChanged(currentPage)"
+                                        ng-show="Totalpatientlist > 0"
+                                        max-size="maxsize"
+                                        class="pull-right pagination-sm"
+                                        boundary-link-numbers="true"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        items-per-page="PatientPerPage"></uib-pagination>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="col-lg-4 pl-0">
+                <div class="col-lg-12 p-0">
+                    <section class="tile tile-shadow">
+                        <div class="tile-header sms-controls">
+                            <h1>{{headerComunication}}</h1>
+                            <!--<ul class="controls">
+                            <li>
+                                <span>120/3000</span>
+                            </li>
+                        </ul>-->
+                            <!--<ul class="controls">
+                            <li><button type="button" class="btn btn-navy btn-fill-horz-o btn-sm" ng-click="changeToComunicationBody(changebuttoncommunication)">{{changebuttoncommunication}}</button></li>
+                        </ul>-->
+                        </div>
+                        <div class="tile-body" ng-show="headerComunication == 'SMS'">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" ng-model="PatientPhoneNumber" placeholder="9876543210" numbers-only valid-number maxlength="10" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" disabled ng-model="SelectedTemplateName" placeholder="Template Name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <textarea rows="10" ng-trim="true" class="form-control" name="sendMessageTextForSMS1" ng-model="Search.sendMessageTextForSMS" placeholder="Enter your text message here" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row pos-absolute">
+                                <div class="col-lg-12 text-right">
+                                    Characters Left : {{1000-Search.sendMessageTextForSMS.length}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button class="btn danger-btn" ng-click="clearAllMessage(headerComunication)">Clear Message</button>
+                                    <button class="btn primary-btn" ng-click="SendMessage(PatientPhoneNumber,Search.sendMessageTextForSMS)" ng-disabled="!doctorinfo.doctordata.UserAddress[0].IsSMSInd">Send Sms</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tile-body" ng-show="headerComunication == 'Email'">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" ng-model="PatientEmailNumber" placeholder="Info@ehnote.com" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" disabled ng-model="SelectedTemplateName" placeholder="Template Name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" ng-model="SubjectDescription" placeholder="Subject" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <textarea rows="10" ng-trim="true" class="form-control" name="sendMessageTextForSMS2" ng-model="Search.sendMessageTextForSMS" placeholder="Enter your text message here" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pos-absolute">
+                                <div class="col-lg-12 text-right">
+                                    Characters Left : {{1000-Search.sendMessageTextForSMS.length}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button class="btn danger-btn" ng-click="clearAllMessage(headerComunication)">Clear Message</button>
+                                    <button class="btn primary-btn" ng-click="SendEmailMessage(PatientEmailNumber,Search.sendMessageTextForSMS)">Send Email</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                     
+                </div>
+
+            </div>
+            <div class="col-lg-4 p-0">
+                <section class="tile tile-shadow" ng-if="UserAccessRights.AllAccessRights.SMSTemplateList">
+                    <div class="tile-header sms-controls">
+                        <h1 ng-bind="templateHeader"></h1>
+                        <ul class="controls" ng-if="UserAccessRights.AllAccessRights.SMSAddUpdateTemplate">
+                            <li><button type="button" class="btn btn-navy btn-fill-horz-o btn-sm" ng-click="templateBranchClick(btnName==='Template'?'Template':'Template');">{{btnName}}</button></li>
+                            <li ng-click=onClickCreateTemplate()><a href="">Add New Template</a></li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="sms-templates">
+                            <ul class="clearfix" ng-show="btnName==='Template'?true:false" aria-hidden="false">
+                                <li ng-repeat="template in availableSMSTemplates" class="ng-scope">
+                                    <div ng-click="onClickMsgTemplete(template)" role="button" tabindex="0">
+                                        <h5><span ng-bind="template.TemplateTitle" class="ng-binding"></span></h5>
+                                    </div>
+                                    <div class="cgroup-action">
+                                        <a class="cedit-btn" ng-click="onClickUpdtCommTemplate(template)">
+                                            <img src="img/communication/edit-pencil.png">
+                                        </a>
+                                        <a class="cdel-btn" ng-click="onClickDelCommTemplate(template)">
+                                            <img src="img/communication/del-trash.png">
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <!--<ul class="clearfix" ng-show="btnName==='Template'?true:false" aria-hidden="false">
+                            <li ng-repeat="br in AllBranches" class="ng-scope" ng-click="bindBranchAddr(br);">
+                                <div role="button" tabindex="0">
+                                    <h5><span ng-bind="br.HospitalName"></span></h5>
+                                </div>
+                            </li>
+                        </ul>-->
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+
+
+        <div class="p-l-0" ng-if="activeTabCommunication == 9">
+
+            <div class="col-lg-4 p-l-0 animated bounceInLeft" ng-hide="Groupslist">
+                <div class="">
+                    <div class="marmistop">
+                        <a href="javascript:;" class="back-list mb-0" ng-click="ShowDashBoard()">Back to Dashboard</a>
+                    </div>
+                </div>
+                <section class="tile tile-shadow headermainscroll" ng-style="heightAFO()" resize>
+                    <div class="tile-header">
+                        <h1>Groups</h1>
+                        <!--<ul class="controls">
+                        <li class="search-comm">
+                            <input type="text" placeholder="Search" class="form-control comm-search" name="" ng-model="GroupSearchText">
+                            <span><i class="fa fa-search"></i></span>
+                        </li>
+                    </ul>-->
+                        <ul class="controls">
+                            <!--<li>
+                            <div class="switch-toggle well b-r-100">
+                                <input id="radSMS" btn-radio="'N'" value="SMS" name="group" type="radio" ng-checked="Search.HeaderCommunicationType =='SMS'" ng-click="HeaderCommunicationType='SMS'" ng-model="Search.HeaderCommunicationType" ng-change="changeToComunicationBody(Search.HeaderCommunicationType)">
+                                <label for="radSMS" onclick="" class="fs-11 p-l-10 p-r-10">SMS</label>
+                                <input id="radEmail" btn-radio="'Y'" value="Email" name="group" type="radio" class="" ng-checked="Search.HeaderCommunicationType =='Email'" ng-model="Search.HeaderCommunicationType" checked="checked" aria-invalid="false" ng-click="HeaderCommunicationType='Email'" ng-change="changeToComunicationBody(Search.HeaderCommunicationType)">
+                                <label for="radEmail" onclick="" class="fs-11 p-l-10 p-r-10">Email</label>
+                                <a class="btn btn-primary"></a>
+                            </div>
+                        </li>-->
+                            <li class="search-comm">
+                                <input type="text" placeholder="Search" class="form-control comm-search" name="" ng-model="GroupSearchText">
+                                <span><i class="fa fa-search"></i></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-6" ng-hide="GroupsList.length==0">
+                                <label class="control control--checkbox">
+                                    <span>Select all</span>
+                                    <input type="checkbox" ng-model="selecteAllGroups" ng-click="checkAllGroups(selecteAllGroups)">
+                                    <div class="control__indicator top-0"></div>
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="c-search-result clearfix" id="main-patient-listing">
+                                    <ul infinite-scroll="getcommunicationDoctor('FRMSCRL')" infinite-scroll-disabled="scrollBusy" infinite-scroll-distance='0' infinite-scroll-parent="true"
+                                        infinite-scroll-immediate-check="false" infinite-scroll-use-document-bottom="reachedBottom">
+
+                                        <li ng-repeat="Groups in GroupsList |  filter:{GroupName:GroupSearchText}" class="clearfix">
+                                            <div class="dis-flex">
+                                                <div class="width-90">
+                                                    <label class="control control--checkbox">
+                                                        <span class="phonelilinehgt">
+                                                            <div class="c-pat-list">
+                                                                <h3>
+                                                                    <span ng-bind="(Groups.GroupName).trim()"></span>
+                                                                    <!--<span>{{(Groups.GroupName).trim()}}({{Groups.GroupType.trim()}})</span>-->
+                                                                </h3>
+
+                                                            </div>
+                                                        </span>
+                                                        <input type="checkbox" ng-click="addGroupsMobile(Groups)" ng-model="Groups.Selected" />
+
+                                                        <div class="control__indicator"></div>
+
+                                                    </label>
+                                                </div>
+                                                <div class="width-10 text-right">
+
+
+
+                                                    <span class="cur-poiter text-ehnote" ng-click="GroupDetailslist(Groups)"
+                                                          title="View Members">
+                                                        <i class="fas fa-users"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </li>
+                                        <li ng-show="GroupsList.length==0">
+                                            <div class="row">
+                                                <div class="col-lg-12 text-center">
+                                                    <div class="billing-cominsoon">
+                                                        <img src="img/no-data/no-results.png" />
+                                                        <div class="msg">
+                                                            <p class="goback-text"> Sorry, no Groups found!</p>
+                                                            <p class="no-records-txt-line2">
+                                                                No Groups availble with selected dates !! Please try with other Search Criteria
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="col-lg-12">
+                    <div class="dis-flex">
+                        <div class="width-90">
+                            <div class="c-chbox-select">
+                                <span>{{NumOfGroupsSelected}}</span> Group(s) selected
+                            </div>
+                        </div>
+                        <div class="width-10 text-right">
+                            <button class="controls btn-link" ng-click="Deletegroup(deletegroup)" ng-hide="NumOfGroupsSelected >1 ||NumOfGroupsSelected ==null ||NumOfGroupsSelected ==0">
+                                <img width="17" src="img/ico-delete-red.svg" alt="delete" data-tooltip="Delete" role="button" tabindex="0" data-original-title="" title="">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 animated bounceInRight" ng-hide="Groupinpatientlist">
+                <section class="tile tile-shadow headermainscroll">
+                    <div class="tile-header">
+                        <h1>
+                            <b>Group Name : </b>{{GroupDetails.GroupName}}
+                            <span class="controls" ng-click="Deletegrouppatient(GroupDetails)">
+                                <img class="m-r-50 m-t-10" width="17" src="img/ico-delete-red.svg" alt="delete" data-tooltip="Delete" role="button" tabindex="0" data-original-title="" title="">
+                            </span>
+                        </h1>
+
+                        <ul class="controls">
+                            <li>
+                                <a ng-click="groupcancel()">
+                                    <i class="fas fa-times text-danger"></i>
+
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="row">
+                            <div class="col-lg-12 p-0">
+                                <div class="c-search-result clearfix" id="main-patient-listing">
+                                    <ul class="audit-screen headermainscroll" ng-style="heightAFO()" resize>
+                                        <li ng-repeat="item in GroupDetails.GroupDetails">
+                                            <div class="dis-flex">
+                                                <div class="width-90">
+                                                    <div class="profile-show">
+                                                        <div class="profile-avatar-image pos-relative top-5" style="background-color: #e3e3e3;color:#9b9494;">
+                                                            <span>
+                                                                <i class="fas fa-user"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="dis-inline-table">
+                                                            <p class="mb-0" ng-bind="item.Name"></p>
+                                                            <p class="mb-0" ng-bind="item.Phone"> </p>
+                                                            <p class="mb-0" ng-bind="item.Email"> </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="width-10 text-right">
+                                                    <label class="control control--checkbox">
+                                                        <input type="checkbox" ng-click="addGroupsMobilelist(item)" ng-model="dcxfcsdc" />
+                                                        <div class="control__indicator"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+
+
+            <div class="col-lg-4 pl-0">
+                <div class="col-lg-12 p-0">
+                    <section class="tile tile-shadow">
+                        <div class="tile-header sms-controls">
+                            <h1>{{headerComunication}}</h1>
+                            <!--<ul class="controls">
+                            <li><button type="button" class="btn btn-navy btn-fill-horz-o btn-sm" ng-click="changeToComunicationBody(changebuttoncommunication)">{{changebuttoncommunication}}</button></li>
+                        </ul>-->
+
+                        </div>
+                        <div class="tile-body" ng-show="headerComunication == 'SMS'">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" ng-model="GroupPhoneNumber" placeholder="9876543210" numbers-only valid-number maxlength="10" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" disabled ng-model="SelectedTemplateName" placeholder="Template Name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <textarea rows="10" ng-trim="true" class="form-control" name="sendMessageTextForSMS3" ng-model="Search.sendMessageTextForSMS" placeholder="Enter your text message here" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pos-absolute">
+                                <div class="col-lg-12 text-right">
+                                    Characters Left : {{1000-Search.sendMessageTextForSMS.length}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button class="btn danger-btn" ng-click="clearAllMessage(sendOption)">Clear Message</button>
+                                    <button class="btn primary-btn" ng-click="SendMessage(GroupPhoneNumber,Search.sendMessageTextForSMS)" ng-disabled="!doctorinfo.doctordata.UserAddress[0].IsSMSInd">Send Sms</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tile-body" ng-show="headerComunication == 'Email'">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" ng-model="PatientEmailNumber" placeholder="Info@ehnote.com" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" disabled ng-model="SelectedTemplateName" placeholder="Template Name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" ng-model="SubjectDescription" placeholder="Subject" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <textarea rows="10" ng-trim="true" class="form-control" name="sendMessageTextForSMS4" ng-model="Search.sendMessageTextForSMS" placeholder="Enter your text message here" maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pos-absolute">
+                                <div class="col-lg-12 text-right">
+                                    Characters Left : {{1000-Search.sendMessageTextForSMS.length}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 text-right">
+                                    <button class="btn danger-btn" ng-click="clearAllMessage(sendOption)">Clear Message</button>
+                                    <button class="btn primary-btn" ng-click="SendEmailMessage(PatientEmailNumber)">Send Email</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+            <div class="col-lg-4 p-0">
+                <section class="tile tile-shadow">
+                    <div class="tile-header sms-controls">
+                        <h1 ng-bind="templateHeader"></h1>
+                        <ul class="controls">
+                            <li><button type="button" class="btn btn-navy btn-fill-horz-o btn-sm" ng-click="templateBranchClick(btnName==='Template'?'Template':'Template');">{{btnName}}</button></li>
+                            <li ng-click="onClickCreateTemplate()">
+                                <a href="">
+                                    Add New Template
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tile-body">
+                        <div class="sms-templates">
+                            <ul class="clearfix" ng-show="btnName==='Template'?true:false" aria-hidden="false">
+                                <li ng-repeat="template in availableSMSTemplates" class="ng-scope">
+                                    <div ng-click="onClickMsgTemplete(template)" role="button" tabindex="0">
+                                        <h5><span ng-bind="template.TemplateTitle" class="ng-binding"></span></h5>
+                                    </div>
+                                    <div class="cgroup-action">
+                                        <a class="cedit-btn" ng-click="onClickUpdtCommTemplate(template)">
+                                            <img src="img/communication/edit-pencil.png">
+                                        </a>
+                                        <a class="cdel-btn" ng-click="onClickDelCommTemplate(template)">
+                                            <img src="img/communication/del-trash.png">
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <!--<ul class="clearfix" ng-show="btnName==='Template'?true:false" aria-hidden="false">
+                            <li ng-repeat="br in AllBranches" class="ng-scope" ng-click="bindBranchAddr(br);">
+                                <div role="button" tabindex="0">
+                                    <h5><span ng-bind="br.HospitalName"></span></h5>
+                                </div>
+                            </li>
+                        </ul>-->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="modal-overlay" ng-show="AddGroupspopup"></div>
+        <div class="modal-common" ng-show="AddGroupspopup">
+            <div class="modal-dialog w-400">
+                <div class="model-header header-status p-10">
+                    <h4 class="modal-title m-l-21">Add Group</h4>
+                    <a href="javascript:;" title="close" class="calender-popop-close" ng-click="CloseAddGroup()">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="pl-popup col-lg-12 bg-white">
+                    <div class="col-lg-12 p-0 mt-10">
+                        <div class="col-lg-12">
+                            <label class="uppercase required field-label light-label">Select Group Name</label>
+                            <div class="form-group">
+                                <select class="form-control select-dropdown"
+                                        name="docID"
+                                        ng-change="changeGroup(GroupName)"
+                                        ng-model="GroupName"
+                                        ng-options="s.GroupName for s in GroupsList">
+                                    <option value="">Select</option>
+                                </select>
+
+                                <div class="text-right">
+                                    <button class="btn-link" ng-disabled="GroupName != ''" ng-click="showaddnew()">Add New</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12 p-0 mt-10" ng-show="newgroupname">
+                        <div class="col-lg-12">
+                            <label class="uppercase required field-label light-label">Enter Group Name</label>
+                            <div class="form-group">
+                                <input type="text" ng-model="CommunicationGropuname" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white text-right col-lg-12">
+                    <button class="btn primary-btn p-0-8" ng-click="AddNewGroup(CommunicationGropuname,GroupName)">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" ng-show="createTemplatePopup"></div>
+        <div class="modal-common" ng-show="createTemplatePopup">
+            <div class="modal-dialog w-400">
+                <div class="model-header header-status p-10">
+                    <h4 class="modal-title m-l-21">Create Template</h4>
+                    <a href="javascript:;" title="close" class="calender-popop-close" ng-click="closeCreateTemplatePopup()">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="pl-popup col-lg-12 bg-white">
+                    <div class="col-lg-12 p-0 mt-10">
+                        <div class="col-lg-12">
+                            <label>Template name</label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Enter template name (Max: 200 characters)" ng-model="templateName" maxlength="200" aria-invalid="false">
+                            </div>
+                            <label>Message</label>
+                            <div class="form-group">
+                                <textarea class="form-control msd-elastic: \n;" placeholder="Enter text for template (Max: 1000 characters)" ng-model="messageTextForTemp" maxlength="1000" aria-invalid="false"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white text-right col-lg-12">
+                    <button class="btn primary-btn p-0-8" ng-click="addCommTemplate()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" ng-show="updtTemplatePopup"></div>
+        <div class="modal-common" ng-show="updtTemplatePopup">
+            <div class="modal-dialog w-400">
+                <div class="modal-content">
+                    <div class="modal-header dis-flex justify-space-between align-items-center">
+                        <h4 class="modal-title">Edit Template</h4>
+                        <a href="javascript:;" title="close" class="calender-popop-close" ng-click="closeUpdtTemplatePopup()">
+                            <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label>Template name</label>
+                                    <input type="text" class="form-control" placeholder="Enter template name (Max: 200 characters)" ng-model="templateName" maxlength="200" aria-invalid="false" ng-keypress="keypressevt()">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Message</label>
+                                    <textarea class="form-control msd-elastic: \n;" placeholder="Enter text for template (Max: 1000 characters)" ng-model="messageTextForTemp" maxlength="1000" aria-invalid="false" ng-keypress="keypressevt()"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-right m-t-0">
+                        <button class="btn primary-btn p-0-8" ng-click="updtCommTemplate('UPDT')" ng-disabled="showUpdateButton==false">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-overlay" ng-show="delTemplatePopup"></div>
+        <div class="modal-common ng-scope" ng-show="delTemplatePopup" aria-hidden="false">
+            <div class="modal-dialog w-400">
+                <div class="modal-content">
+                    <div class="modal-header dis-flex justify-space-between align-items-center">
+                        <h4 class="modal-title m-l-21">Delete Message Template</h4>
+                        <a href="javascript:;" title="close" class="calender-popop-close" ng-click="closeUpdtTemplatePopup()">
+                            <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12 p-0 mt-10">
+                                <div class="col-lg-12">
+                                    <p>Are you sure you want to delete <strong><span ng-bind="templateName" class="ng-binding">Patient Message</span></strong> templete ?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                
+                <div class="modal-footer text-right m-t-0">
+                    <button class="btn danger-btn" ng-click="closeUpdtTemplatePopup()">No</button>
+                    <button class="btn primary-btn" ng-click="DeleteTemplate()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+
+
+
+
+
+    
+
+
+
+
+</div>
+ 

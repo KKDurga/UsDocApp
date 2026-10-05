@@ -1,0 +1,1507 @@
+﻿<!--New Design Started-->
+<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Documents</h1>
+        <div class="d__f-- ai__c-- gap__10--">
+            <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                <div class="vs__list-- gap__0--">
+                    <span>{{cacheStorageItem.PatientName}}</span>
+                    <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                </div>
+                <a><i class="icons__w16-- info__w16--f"></i></a>
+            </div>
+            <button class="btn__lg-- btn__C71D27--o" ng-click="closeuibdoc()">Close</button>
+        </div>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- fd__c-- gap__5-- height__100--">
+            <div class="px__10--">
+                <ul class="tab__style--7">
+                    <li ng-class="Documentobj.SubType=='Patient'?'active':''">
+                        <a href="javascript:;" ng-click="switchDocTabMain('Patient')">Patient</a>
+                    </li>
+                    <li ng-class="Documentobj.SubType=='Templates'?'active':''">
+                        <a href="javascript:;" ng-click="switchDocTabMain('Templates')">Templates</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="two-sections height__100-- p__5--" ng-if="Documentobj.SubType=='Patient'">
+                <div class="width-25 height__100--">
+                    <div class="d__f-- fd__c-- gap__5-- height__100--">
+                        <div class="d__f-- fd__c-- gap__5-- border__DDD-- bradius__5-- height__100--">
+                            <div class="bb__DDD--">
+                                <ul class="tab__style--5">
+                                    <li ng-class="(PatientConsentTab == 1)?'active':''">
+                                        <a href="javascript:;" ng-click="switchToPatientConsent(1)">Signed Consents</a>
+                                    </li>
+                                    <li ng-class="(PatientConsentTab == 2)?'active':''">
+                                        <a href="javascript:;" ng-click="switchToPatientConsent(2)">Patient Consents</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="p__5-- height__100--">
+                                <div class="position__relative-- height__100--">
+                                    <div class="adjustable-position slim-scroll">
+                                        <table class="table__style--5" ng-if="PatientConsentTab==1">
+                                            <thead>
+                                                <tr>
+                                                    <th><label>Documents</label></th>
+                                                    <th><label class="text-center">Type</label></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat="item in patientAllConsentDocuments">
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{item.AppointmentDate | date: "MM-dd-yyyy"}}</label>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-repeat="sitem in item.PatientDocuments" ng-click="onSelectPatientConsentDocument(sitem)" class="cur-pointer">
+                                                    <td>
+                                                        <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{sitem.ConsentFormName}}</label>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <label class="fs__lg-- fw__4-- tc__656565--">{{sitem.ConsentFormTypeName}}</label>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table__style--5" ng-if="PatientConsentTab==2">
+                                            <thead ng-show="PatientAppointmentConsentForms.length > 0">
+                                                <tr>
+                                                    <th width="55%"><label>Documents</label></th>
+                                                    <th width="30%"></th>
+                                                    <th><label class="text-center">Type</label></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                              
+                                                <tr ng-repeat="istem in PatientAppointmentConsentForms" class="cur-poiter" ng-class="(istem.IsActive)?'active':''">
+                                                    <td ng-click="onSelectApptConsentForm(istem)">
+                                                        <label class="fs__lg-- fw__4-- tc__1D1D1D--">{{istem.ConsentFormName}}</label>
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <ul class="flex-flow-ulli-mb0">
+
+                                                                    <li ng-if="istem.IsPatientSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.PatientClass" title="Patient Sign">P</button>
+                                                                    </li>
+                                                                    <li ng-if="istem.IsDoctorSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.ProviderClass" title="Doctor Sign">D</button>
+                                                                    </li>
+                                                                    <li ng-if="istem.IsStaffSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.StaffClass" title="Staff Sign">S</button>
+                                                                    </li>
+                                                                    <li ng-if="istem.IsAnesthesistSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.AnesthesistClass" title="Anesthesist Sign">A</button>
+                                                                    </li>
+                                                                    <li ng-if="istem.IsCounselorSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.CounselorClass" title="Counselor Sign">C</button>
+                                                                    </li>
+                                                                    <li ng-if="istem.IsGuardianSignRequired">
+                                                                        <button class="custom-button" ng-class="istem.GaurdianClass" title="Guardian Sign">G</button>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-if="istem.IsConsentFormExpired && OldPatientConsentFormId == 0">
+                                                        <label class="status__red fs__lg-- fw__5-- tc__C71D27--">Expired</label>
+                                                        <button class="btn__xl-- btn__1d5558--f" ng-hide="istem.IsExpiredtoNewConsent" ng-click="AddExpiredTOnewConsent(istem)">New</button>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a ng-show="istem.CanShowPrintButton" class="d__f-- jc__c--" ng-click="navtoprintsignedConsent(istem)"><i class="icons__w16-- print__w16--o"></i></a>
+                                                        <label class="fs__lg-- fw__4-- tc__656565--">{{istem.ConsentTypeName}}</label>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex height__100--" ng-if="PatientConsentTab==1">
+                    <div class="section__style--4 d__f-- fd__c-- height__100--">
+                        <div class="section__header--">
+                            <h1>Consent Form</h1>
+                        </div>
+                        <!--<div class="section__body-- height__100--">
+        <div class="position__relative-- height__100--">
+            <div class="adjustable-position slim-scroll">
+                <iframe ng-show="selectedPatientConsentObj.pdfDocument!=''" ng-src="{{getTrustedUrl(selectedPatientConsentObj.pdfDocument)}}" style="width:100%; height:99%;" frameborder="0"></iframe>
+
+                <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--" ng-show="selectedPatientConsentObj.pdfDocument==''">
+                    <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                    <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Document Selected</h1>
+                    <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a document to view or manage consents.</label>
+                </div>
+            </div>
+        </div>
+    </div>-->
+                    <div class="section__body-- height__100--">
+                        <!-- TOOLBAR (Only shows for HTML content) -->
+                        <div class="d__f-- fd__c-- height__100--">
+                            <div ng-show="isHTMLContentActive"
+                                 style="background:#424242; color:white; padding:8px 15px; display:flex; align-items:center; justify-content:space-between;">
+
+                                <!-- Document name -->
+                                <div style="flex:1; font-size:14px; font-weight:500;">
+                                    {{selectedConsentFormName}}
+                                </div>
+
+                                <!-- Zoom controls -->
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <button ng-click="zoomOut()"
+                                            style="background:#555; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:3px;">
+                                        −
+                                    </button>
+                                    <span style="min-width:60px; text-align:center;">{{htmlContentZoom}}%</span>
+                                    <button ng-click="zoomIn()"
+                                            style="background:#555; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:3px;">
+                                        +
+                                    </button>
+                                    <button ng-click="resetZoom()"
+                                            style="background:#555; color:white; border:none; padding:6px 10px; cursor:pointer; border-radius:3px;">
+                                        100%
+                                    </button>
+                                </div>
+
+                                <!-- Action buttons -->
+                                <div style="display:flex; gap:10px;">
+                                    <!--<button ng-click="printHTMLContent()"
+                                            style="background:#4CAF50; color:white; border:none; padding:6px 15px; cursor:pointer; border-radius:3px;">
+                                        🖨️ Print
+                                    </button>-->
+                                    <button ng-click="downloadHTMLAsPDF()"
+                                            style="background:#2196F3; color:white; border:none; padding:6px 15px; cursor:pointer; border-radius:3px;">
+                                        📥 Download
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="position__relative-- height__100--">
+
+
+
+                                <!-- CONTENT AREA -->
+                                <div class="adjustable-position slim-scroll"
+                                     ng-style="{'height': selectedPatientConsentObj.HtmlContent!='' ? 'calc(100% - 45px)' : '100%'}">
+
+                                    <!-- PDF iframe (original) -->
+                                    <iframe ng-show="selectedPatientConsentObj.pdfDocument!='' && selectedPatientConsentObj.HtmlContent==''"
+                                            ng-src="{{getTrustedUrl(selectedPatientConsentObj.pdfDocument)}}"
+                                            style="width:100%; height:99%;"
+                                            frameborder="0"></iframe>
+
+                                    <!-- HTML content with zoom -->
+                                    <div ng-show="selectedPatientConsentObj.HtmlContent!=''"
+                                         id="html-consent-content"
+                                         ng-bind-html="selectedPatientConsentObj.HtmlContent"
+                                         ng-style="{'transform': 'scale(' + (htmlContentZoom/100) + ')', 'transform-origin': 'top center', 'width': (100 * (100/htmlContentZoom)) + '%'}"
+                                         style="padding:40px 20px; background:white; min-height:100%; transition: transform 0.2s;">
+                                    </div>
+
+                                    <!-- No document selected -->
+                                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y height__100--"
+                                         ng-show="selectedPatientConsentObj.pdfDocument=='' && selectedPatientConsentObj.HtmlContent==''">
+                                        <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Document Selected</h1>
+                                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a document to view or manage consents.</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="flex height__100--" ng-if="PatientConsentTab==2">
+                    <div class="d__f-- ai__c-- gap__5-- height__100--" ng-show="PatientAppointmentConsentForms.length > 0">
+                        <div class="position__relative-- height__100-- width__100--">
+                            <div class="adjustable-position overflow-x-auto">
+                                <text-angular class="a4wh" name="htmlPatientTemplateconsent" ng-show="MainPatientSignedObj.ConsentFormId!==0" ta-toolbar="editorToolbarPatientTemplateConfig" id="htmlPatientTemplateconsent" ng-model="selectedPatientTempConsentObj.HtmlContent" />
+                                <div class="row height__100-- d__f-- jc__c-- ai__c--" ng-show="MainPatientSignedObj.ConsentFormId===0">
+                                    <div class="col-lg-12">
+                                        <div class="m__auto--">
+                                            <p class="fs__lg-- fw__4-- tc__656565-- m__0-- d__f-- ai__c-- gap__5-- jc__c--">No Document Selected</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="width-35 height__100--">
+                            <div class="d__f-- fd__c-- gap__5-- border__DDD-- bradius__5-- height__100--">
+                                <div class="bb__DDD-- p__5--">
+                                    <ul class="tab__style--7">
+                                        <li ng-class="!Documentobj.IsActiveMoreFieldsTab?'active':''">
+                                            <a href="javascript:;" ng-click="Documentobj.IsActiveMoreFieldsTab = false">Signatures</a>
+                                        </li>
+                                        <li ng-class="Documentobj.IsActiveMoreFieldsTab?'active':''" ng-if="fillObject.SurgeryAnesthesiaType == '' && MainPatientSignedObj.PatientConsentDocumentId == 0">
+                                            <a href="javascript:;" ng-click="Documentobj.IsActiveMoreFieldsTab = true">More Fields</a>
+                                        </li>
+                                        <!--<li>
+                                                <div class="form__group position__relative--">
+                                                    <label>From Date</label>
+                                                    <input type="text" class="icons-calendar cur-default bg-white"
+                                                           id="input__fromdate"
+                                                           ng-model="OldappointmentConsent.FromDate"
+                                                           placeholder="MM-DD-YYYY"
+                                                           datepickerregpatient readonly ng-change="changeCurrentDate(OldappointmentConsent.FromDate,1)" />
+
+                                                </div>
+                                       
+                                                <div class="form__group">
+                                                    <label>To Date</label>
+                                                    <input type="text" class="icons-calendar cur-default bg-white"
+                                                           id="input__todate"
+                                                           ng-model="OldappointmentConsent.ToDate"
+                                                           placeholder="MM-DD-YYYY"
+                                                           datepickerregpatient
+                                                           mindate="{{OldappointmentConsent.FromDate}}"
+                                                           readonly ng-change="changeCurrentDate(OldappointmentConsent.ToDate,2)" />
+                                                </div>
+                                        </li>-->
+                                        <li ng-class="Documentobj.IsActiveMoreFieldsTab?'active':''"  ng-if="(Isbulksignofdone||IsAnesthesiabulksignofdone)&&(IsshowBulkSignrefreshButton)">
+                                            <button type="button"
+                                                    class="btn btn-success btn-sm"
+                                                    ng-click="bulkSignAllConsents()"
+                                                    ng-disabled="bulkSignState.inProgress"
+                                                    ng-show="Documentobj.SubType === 'Patient'"
+                                                    title="Apply doctor signature to all unsigned consents">
+
+                                                <!-- Idle state -->
+                                                <span ng-if="!bulkSignState.inProgress">
+                                                    <i class="fa fa-pencil-square-o"></i>&nbsp; Sign All Consents
+                                                </span>
+
+                                                <!-- In-progress state: shows "Signing 2/6..." -->
+                                                <span ng-if="bulkSignState.inProgress">
+                                                    <i class="fa fa-spinner fa-spin"></i>&nbsp;
+                                                    Signing {{ bulkSignState.done }}/{{ bulkSignState.total }}...
+                                                </span>
+
+                                            </button>                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="p__5-- height__100--">
+                                    <div class="tab-pane in show height__100--" ng-if="!Documentobj.IsActiveMoreFieldsTab">
+                                        <div class="section__style--4 d__f-- fd__c-- height__100--">
+                                            <div class="section__header--">
+                                                <h1>Signatures</h1>
+                                            </div>
+                                            <div class="section__body-- p__0-- height__100--">
+                                                <div class="position__relative-- height__100--">
+                                                    <div class="adjustable-position slim-scroll">
+                                                        <div class="d__f-- fd__c-- gap__5--">
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsPatientSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Patient: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.PatientName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.PatientSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="patientSigantureImg"></canvas>
+                                                                    <a ng-click="clearSignDetails('PatientSignature','patientSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.PatientSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsPatientInitialSignatureDone">
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">Patient Initial Signature</label>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.PatientIntialSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="patientIntSigantureImg"></canvas>
+                                                                    <a ng-click="clearSignDetails('patientIntSigantureImg','patientIntSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.PatientSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsStaffSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Staff / Counsellor: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.StaffUserName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.StaffSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="staffSigantureImg"></canvas>
+                                                                    <a ng-show="!SignMainObj.StaffClearbutton" ng-click="clearSignDetails('StaffSignature','staffSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.StaffSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsProviderSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Provider: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.ProviderUserName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.ProviderSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="doctorSigantureImg"></canvas>
+                                                                    <a ng-show="!SignMainObj.ProviderClearbutton" ng-click="clearSignDetails('ProviderSignature','doctorSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.ProviderSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsCounselorSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Counsellor: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.CounselorUserName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.CounselorSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="counselorSigantureImg"></canvas>
+                                                                    <a ng-show="!SignMainObj.CounselorClearbutton" ng-click="clearSignDetails('CounselorSignature','counselorSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.CounselorSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsAnesthesistSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Anesthesiologist: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.AnesthesistUserName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.AnesthesistSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="anesthesistSigantureImg"></canvas>
+                                                                    <a ng-show="!SignMainObj.AnesthesistClearbutton" ng-click="clearSignDetails('AnesthesistSignature','anesthesistSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.AnesthesistSignedDateTime}}</label>
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- bb__DDD-- p__5--" ng-show="MainPatientSignedObj.IsGaurdianSignatureDone">
+                                                                <div class="d__f-- ai__c-- gap__5--">
+                                                                    <label class="fs__lg-- fw__5-- tc__656565--">Gaurdian: </label>
+                                                                    <span class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.GaurdianFirstName}} {{MainPatientSignedObj.GaurdianLastName}}</span>
+                                                                </div>
+                                                                <div class="d__f-- ai__c-- gap__5--" ng-show="GetSignatureDeleteObj.GaurdianSignature">
+                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="gaurdianSigantureImg"></canvas>
+                                                                    <a ng-click="clearSignDetails('GaurdianSignature','gaurdianSigantureImg')"><i class="icons__w16-- delete__w16--o"></i></a>
+                                                                </div>
+                                                                <label class="fs__lg-- fw__5-- tc__1D1D1D--">{{MainPatientSignedObj.GaurdianSignedDateTime}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane in show height__100--" ng-if="Documentobj.IsActiveMoreFieldsTab">
+                                        <div class="position__relative-- height__100--">
+                                            <div class="adjustable-position slim-scroll">
+                                                <ul class="d__f-- fd__c-- gap__6--y p__0-- m__0-- list__unstyled--">
+                                                    <li class="br__5-- px__10--" ng-class="item.IsSelected ? ' border__1D5558-- bg__E8EEEE--' : 'border__E4E4E4--'" ng-repeat="item in AnesthesiaList">
+                                                        <label class="cur-poiter d__f-- ai__c-- gap__5--">
+                                                            <input type="checkbox" class="checkbox" ng-model="item.IsSelected" ng-click="item.IsSelected != item.IsSelected;">
+                                                            <span class="lbl"></span>
+                                                            <span class="p__8-- d__b-- fs__lg-- fw__5-- fs__normal--" ng-class="item.IsSelected ? 'tc__1D5558-- tx__h--a' : 'tc__1D1D1D--'" ng-bind="item.AnesthesiaType"></span>
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d__f-- ai__c-- gap__5-- p__5--" ng-if="Documentobj.IsActiveMoreFieldsTab">
+                                    <button class="btn__lg-- btn__C71D27--o width__50--" ng-click="ClearAnesthesiaCheck();">{{ 'CLEAR' | translate}}</button>
+                                    <button class="btn__lg-- btn__1d5558--f width__50--" ng-click="SaveAnesthesiaType();">Save</button>
+                                </div>
+                                <div class="d__f-- ai__c-- gap__5-- p__5--" ng-if="!Documentobj.IsActiveMoreFieldsTab">
+                                    <button class="btn__lg-- btn__1d5558--f width__50--" ng-click="addSigatureoftheUser()">Add signature</button>
+                                    <button class="btn__lg-- btn__1d5558--o width__50--" ng-if="UserAccessRights.AllAccessRights.AscAddUpdateConsentAccess" ng-click="addUpdatePatientSignedDocument()" ng-disabled="IsContentSaveBtnHide == true">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--"  ng-show="PatientAppointmentConsentForms.length == 0">
+                        <a><i class="nodata__1-- d1__nodata--1"></i></a>
+                        <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Document Selected</h1>
+                        <label class="fs__lg-- fw__5-- tc__4A4A4A--">Please select a document to view or manage consents.</label>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="Documentobj.SubType=='Templates'" ng-include="'templates/UsNewConsultation/ConsentChild.html'" class="height__100--"></div>
+        </div>
+    </div>
+</div>
+ 
+<!--New design ended-->
+
+<div class="modal__style--1 h-100" ng-if="false">
+    <div class="modal__header--">
+        <h1>Documents</h1>
+        <div class="asc-patient-profile">
+            <ul>
+                <li>
+                    <img image-viewer ng-if="PatientDetailsObj.S3URL != ''" src="{{PatientDetailsObj.S3URL}}" />
+                    <img ng-if="PatientDetailsObj.S3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                    <p title="{{PatientDetailsObj.FullName}}">{{PatientDetailsObj.FullName}}</p>
+                    <span ng-repeat="item in cacheStorageItem.PatientTagList track by $index">
+                        <span class="btn__C71D2733-- btn__sm-- m-0 font-weight-700" ng-if="item.HospitalEquipmentId===17" title="{{item.HospitalEquipmentName}}">HIV</span>
+                        <span class="btn__C71D2733-- btn__sm-- m-0 font-weight-700" ng-if="item.HospitalEquipmentId===18" title="{{item.HospitalEquipmentName}}">Hep</span>
+                    </span>
+                </li>
+                <li>
+                    <span>MR No.:</span>
+                    <label>{{PatientDetailsObj.PatientDisplayId}}</label>
+                </li>
+                <li>
+                    <span>Sex:</span>
+                    <label>{{PatientDetailsObj.Gender}}</label>
+                </li>
+                <li>
+                    <span>Age:</span>
+                    <label>{{PatientDetailsObj.Age}}</label>
+                </li>
+                <li>
+                    <span>DOB:</span>
+                    <label>{{PatientDetailsObj.DOB | date:"MM-dd-yyyy"}}</label>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <ul class="autofill-list m-b-0">
+
+                <li ng-class="Documentobj.SubType=='Patient'?'active':''">
+                    <a href="javascript:;" ng-click="switchDocTabMain('Patient')">Patient</a>
+                </li>
+                <li ng-class="Documentobj.SubType=='Templates'?'active':''">
+                    <a href="javascript:;" ng-click="switchDocTabMain('Templates')">Templates</a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="dis-flex align-items-center m-l-10">
+            <button class="btn__lg-- btn__C71D27--o" ng-click="closeuibdoc()">Close</button>
+            <!--<button class="btn btn-save-us">Save</button>-->
+        </div>
+    </div>
+    <div class="modal__body-- h-100">
+        <div class="row" ng-if="Documentobj.SubType=='Patient'">
+            <div class="col-lg-12">
+                <div class="two-sections">
+                    <div class="width-25 bg-white p-5">
+                        <ul class="tabs-fill-outline">
+                            <li ng-class="(PatientConsentTab == 1)?'active':''">
+                                <!--<a href="javascript:;" ng-click="switchToPatientConsent(1)">Patient Consents</a>-->
+                                <a href="javascript:;" ng-click="switchToPatientConsent(1)">Signed Consents</a>
+                            </li>
+                            <li ng-class="(PatientConsentTab == 2)?'active':''">
+                                <!--<a href="javascript:;" ng-click="switchToPatientConsent(2)">All Consents</a>-->
+                                <a href="javascript:;" ng-click="switchToPatientConsent(2)">Patient Consents</a>
+                            </li>
+                            <!--<li ng-class="(PatientConsentTab == 3)?'active':''">
+                                <a href="javascript:;" ng-click="switchToPatientConsent(3)">Appointment Consents</a>
+                            </li>-->
+                        </ul>
+                        <table class="table table-bordered m-b-0 m-t-5" ng-if="PatientConsentTab==1">
+                            <thead>
+                                <tr>
+                                    <!--<th>
+                                        Date-->
+                                    <!--<i class="fas fa-filter pull-right text-info pos-relative top-5"></i>-->
+                                    <!--</th>-->
+                                    <th>Documents</th>
+                                    <th>Type <!--<i class="fas fa-filter pull-right text-info pos-relative top-5"></i>--></th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="item in patientAllConsentDocuments">
+                                <tr>
+                                    <td colspan="2">
+                                        <span class="text-s14w500c000">{{item.AppointmentDate | date: "MM-dd-yyyy"}}</span>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="sitem in item.PatientDocuments" ng-click="onSelectPatientConsentDocument(sitem)" style="cursor:pointer">
+                                    <td>
+                                        <span class="text-s12w500C068cb0">{{sitem.ConsentFormName}}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-s12wnormlc000">{{sitem.ConsentFormTypeName}}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-bordered m-b-0 m-t-5" ng-if="PatientConsentTab==2">
+                            <thead ng-show="PatientAppointmentConsentForms.length > 0">
+                                <tr>
+                                    <th>Documents</th>
+                                    <th>Type <!--<i class="fas fa-filter pull-right text-info pos-relative top-5"></i>--></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="istem in PatientAppointmentConsentForms" class="cur-poiter" ng-class="(istem.IsActive)?'tractive':''">
+                                    <td ng-click="onSelectApptConsentForm(istem)">
+
+                                        <span class="text-s14wnormlc000">{{istem.ConsentFormName}}</span>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="flex-flow-ulli-mb0">
+                                                    <li ng-if="istem.IsPatientSignRequired">
+                                                        <button class="custom-button" ng-class="istem.PatientClass" title="Patient Sign">P</button>
+                                                    </li>
+                                                    <li ng-if="istem.IsDoctorSignRequired">
+                                                        <button class="custom-button" ng-class="istem.ProviderClass" title="Doctor Sign">D</button>
+                                                    </li>
+                                                    <li ng-if="istem.IsStaffSignRequired">
+                                                        <button class="custom-button" ng-class="istem.StaffClass" title="Staff Sign">S</button>
+                                                    </li>
+                                                    <li ng-if="istem.IsAnesthesistSignRequired">
+                                                        <button class="custom-button" ng-class="istem.AnesthesistClass" title="Anesthesist Sign">A</button>
+                                                    </li>
+                                                    <li ng-if="istem.IsCounselorSignRequired">
+                                                        <button class="custom-button" ng-class="istem.CounselorClass" title="Counselor Sign">C</button>
+                                                    </li>
+                                                    <li ng-if="istem.IsGuardianSignRequired">
+                                                        <button class="custom-button" ng-class="istem.GaurdianClass" title="Guardian Sign">G</button>
+                                                        <!--<button class="custom-button" ng-class="{'disabled': buttons.P.color === 'disabled', 'incomplete': buttons.P.color === 'incomplete', 'complete': buttons.P.color === 'complete'}" ng-click="changeColor('P')">P</button>
+    <button class="custom-button" ng-class="{'disabled': buttons.D.color === 'disabled', 'incomplete': buttons.D.color === 'incomplete', 'complete': buttons.D.color === 'complete'}" ng-click="changeColor('D')">D</button>
+    <button class="custom-button" ng-class="{'disabled': buttons.G.color === 'disabled', 'incomplete': buttons.G.color === 'incomplete', 'complete': buttons.G.color === 'complete'}" ng-click="changeColor('G')">G</button>
+    <button class="custom-button" ng-class="{'disabled': buttons.S.color === 'disabled', 'incomplete': buttons.S.color === 'incomplete', 'complete': buttons.S.color === 'complete'}" ng-click="changeColor('S')">S</button>
+    <button class="custom-button" ng-class="{'disabled': buttons.A.color === 'disabled', 'incomplete': buttons.A.color === 'incomplete', 'complete': buttons.A.color === 'complete'}" ng-click="changeColor('A')">A</button>
+    <button class="custom-button" ng-class="{'disabled': buttons.C.color === 'disabled', 'incomplete': buttons.C.color === 'incomplete', 'complete': buttons.C.color === 'complete'}" ng-click="changeColor('C')">C</button>-->
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn" ng-if="istem.PatientConsentFormId!==0" ng-click="navtoprintsignedConsent(istem)"><i class='fas fa-print' style='font-size:20px;color:red'></i></button>
+                                        <span class="text-s12w500C068cb0">{{istem.ConsentTypeName}}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+
+                    </div>
+                    <div ng-if="PatientConsentTab==1">
+                        <div class="row" ng-show="selectedPatientConsentObj.pdfDocument!=''">
+                            <div class="col-lg-12">
+                                <iframe ng-src="{{getTrustedUrl(selectedPatientConsentObj.pdfDocument)}}" style="width:100%; height:700px;" frameborder="0"></iframe>
+
+                            </div>
+                        </div>
+
+                        <div class="row" ng-show="selectedPatientConsentObj.pdfDocument==''">
+                            <div class="col-lg-12">
+                                <div class="billing-cominsoon norecords-found-patients text-center">
+                                    <img src="img/no-data/no-settings.png">
+                                    <div class="msg">
+                                        <p class="goback-text">No Patient Document Selected</p>
+                                        <p class="">Please Select Document to view.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="PatientConsentTab==2" class="flex">
+                        <div class="dis-flex grid-gap-15" ng-show="PatientAppointmentConsentForms.length > 0">
+                            <div class="flex paper-consultation overflow__auto--y overflow-x-scroll" ng-show="MainPatientSignedObj.ConsentFormId!==0" style="height: calc(100vh - 60px)">
+                                <text-angular class="a4wh" name="htmlPatientTemplateconsent" ta-toolbar="editorToolbarPatientTemplateConfig" id="htmlPatientTemplateconsent" ng-model="selectedPatientTempConsentObj.HtmlContent" />
+                            </div>
+                            <!--ng-show="MainPatientSignedObj.ConsentFormId!==0"-->
+                            <!--ng-show="MainPatientSignedObj.IsPatientSignatureDone || MainPatientSignedObj.IsStaffSignatureDone || MainPatientSignedObj.IsProviderSignatureDone || MainPatientSignedObj.IsCounselorSignatureDone || MainPatientSignedObj.IsAnesthesistSignatureDone || MainPatientSignedObj.IsGaurdianSignatureDone"-->
+                            <div class="width-25">
+                                <div class="panel-tabs">
+                                    <ul>
+                                        <li ng-class="!Documentobj.IsActiveMoreFieldsTab?'active':''">
+                                            <a href="javascript:;" ng-click="Documentobj.IsActiveMoreFieldsTab = false">
+                                                Signatures
+                                            </a>
+                                        </li>
+                                        <li ng-class="Documentobj.IsActiveMoreFieldsTab?'active':''" ng-if="fillObject.SurgeryAnesthesiaType == '' && MainPatientSignedObj.PatientConsentDocumentId == 0">
+                                            <a href="javascript:;" ng-click="Documentobj.IsActiveMoreFieldsTab = true">
+                                                More Fields
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane in show" ng-if="!Documentobj.IsActiveMoreFieldsTab">
+                                            <div class="dis-flex flex-direction-column">
+                                                <section class="section-eh tile-blue overflow-visible">
+                                                    <div class="section-eh-header">
+                                                        <h1>Signatures</h1>
+                                                    </div>
+                                                    <div class="section-eh-body p-l-5 p-r-5 p-0 overflow__auto--y overflow-x-hidden" style="height: calc(100vh - 220px)">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <table class="table-consents m-t-5 b-0">
+                                                                    <tbody>
+                                                                        <tr ng-show="MainPatientSignedObj.IsPatientSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Patient</span>
+                                                                                        <label>{{MainPatientSignedObj.PatientName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative border-bottom" ng-show="GetSignatureDeleteObj.PatientSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="patientSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-click="clearSignDetails('PatientSignature','patientSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.PatientSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsPatientInitialSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Patient Initial Signature</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.PatientIntialSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="patientIntSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-click="clearSignDetails('patientIntSigantureImg','patientIntSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.PatientSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsStaffSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Staff</span>
+                                                                                        <label>{{MainPatientSignedObj.StaffUserName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.StaffSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="staffSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-show="!SignMainObj.StaffClearbutton" ng-click="clearSignDetails('StaffSignature','staffSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.StaffSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsProviderSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Provider</span>
+                                                                                        <label>{{MainPatientSignedObj.ProviderUserName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.ProviderSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="doctorSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-show="!SignMainObj.ProviderClearbutton" ng-click="clearSignDetails('ProviderSignature','doctorSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.ProviderSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsCounselorSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Counselor</span>
+                                                                                        <label>{{MainPatientSignedObj.CounselorUserName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.CounselorSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="counselorSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-show="!SignMainObj.CounselorClearbutton" ng-click="clearSignDetails('CounselorSignature','counselorSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.CounselorSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsAnesthesistSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Anesthesiologist</span>
+                                                                                        <label>{{MainPatientSignedObj.AnesthesistUserName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.AnesthesistSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="anesthesistSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-show="!SignMainObj.AnesthesistClearbutton" ng-click="clearSignDetails('AnesthesistSignature','anesthesistSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.AnesthesistSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr ng-show="MainPatientSignedObj.IsGaurdianSignatureDone">
+                                                                            <td>
+                                                                                <ul class="asc-surgery-list">
+                                                                                    <li>
+                                                                                        <span>Gaurdian</span>
+                                                                                        <label>{{MainPatientSignedObj.GaurdianFirstName}} {{MainPatientSignedObj.GaurdianLastName}}</label>
+                                                                                    </li>
+                                                                                </ul>
+                                                                                <div class="pos-relative" ng-show="GetSignatureDeleteObj.GaurdianSignature">
+                                                                                    <canvas class="width-75 height-100 dis-block m-auto" id="gaurdianSigantureImg"></canvas>
+                                                                                    <button class="btn btn-danger pos-absolute right-0 bottom-0" alt="Clear" ng-click="clearSignDetails('GaurdianSignature','gaurdianSigantureImg')">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <ul class="appointment-vsts-list">
+                                                                                    <li class="b-0 m-0 p-0">
+                                                                                        <span class="date-bg-visits">{{MainPatientSignedObj.GaurdianSignedDateTime}}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <div>
+                                                    <div class="m-y-10 pos-relative">
+                                                        <!--<button class="btn btn-save-us btn-block" ng-click="FillPatientConsentDetails()">New Fill Details</button>
+
+                                                        <button class="btn btn-save-us btn-block" ng-click="FillPatientValues()">Fill Details</button>-->
+                                                        <!--<button class="btn btn-save-us btn-block" popover-placement="auto"   popover-append-body="true"   ng-click="addsignatuurepopover.open()" popover-is-open="addsignatuurepopover.isOpen"  popover-class="addsignatuurepopover" uib-popover-template="addsignatuurepopover.templateUrl">Add signature</button>-->
+                                                        <button class="btn btn-save-us btn-block" ng-click="addSigatureoftheUser()">Add signature</button>
+                                                        <!--<button class="btn btn-save-us btn-block" popover-placement="auto" outside-click="true" popover-trigger="outsideClick" popover-append-body="true" popover-class="addsignatuurepopover" uib-popover-template="addsignatuurepopover.templateUrl">Add signature</button>-->
+                                                    </div>
+                                                    <div class="dis-flex align-items-center m-t-10">
+
+                                                        <div class="flex m-r-3" ng-if="UserAccessRights.AllAccessRights.AscAddUpdateConsentAccess">
+                                                            <!--<button class="btn btn-save-us-outline btn-block" ng-click="addUpdatePatientSignedDocument(true)">Save</button>-->
+                                                            <button class="btn btn-save-us-outline btn-block" ng-click="addUpdatePatientSignedDocument()">Save</button>
+                                                        </div>
+                                                        <!--<div class="flex m-r-3">
+                                                            <button class="btn btn-save-us-outline btn-block" ng-click="addUpdatePatientSignedDocument(false)">Save & Complete</button>
+                                                        </div>-->
+                                                        <!--<div class="flex m-l-3">
+                                                            <button class="btn btn-save-us-outline btn-block">Save as New Doc</button>
+                                                        </div>-->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane in show" ng-if="Documentobj.IsActiveMoreFieldsTab">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label>Anesthesia Type</label>
+                                                        <div class="form-group">
+                                                            <div class="drop-menu-Scroll apptsearchdroplist">
+                                                                <ul>
+                                                                    <li ng-repeat="item in AnesthesiaList">
+                                                                        <div class="checkbox cn">
+                                                                            <label>
+                                                                                <input name="checkbox-11" type="checkbox" ng-model="item.IsSelected" ng-click="item.IsSelected != item.IsSelected;">
+                                                                                <span class="checkbox-material">
+                                                                                    <span class="check"></span>
+                                                                                </span>
+                                                                                <small ng-bind="item.AnesthesiaType"></small>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="dis-flex align-items-center">
+                                                            <button type="submit" class="btn m-r-3 flex btn-primary" ng-click="SaveAnesthesiaType();">Save</button>
+                                                            <button class="btn warning-btn m-l-3 flex" ng-click="ClearAnesthesiaCheck();">{{ 'CLEAR' | translate}}</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-12" ng-show="MainPatientSignedObj.ConsentFormId===0">
+                                <div class="billing-cominsoon norecords-found-patients text-center">
+                                    <img src="img/no-data/no-settings.png">
+                                    <div class="msg">
+                                        <p class="goback-text">No Documents Selected</p>
+                                        <p class="">Please Select Document to Use.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-show="PatientAppointmentConsentForms.length == 0">
+                            <div class="col-lg-12">
+                                <div class="billing-cominsoon norecords-found-patients text-center">
+                                    <img src="img/no-data/no-settings.png">
+                                    <div class="msg">
+                                        <p class="goback-text">No Documents Selected</p>
+                                        <p class="">Please Select Document to Use.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-if="Documentobj.SubType=='Templates'" ng-include="'templates/UsNewConsultation/ConsentChild.html'" class="h-100"></div>
+
+    </div>
+</div>
+
+<script type="text/ng-template" id="addsignatuurepopovertemplatenew.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1>Signature</h1>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==1">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--o" ng-click="saveandnextSignatures('Patient')">Save & Next</button>
+                </li>
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Patient')">Save & Completes</button>                    
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==2">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--o" ng-click="saveandnextSignatures('Staff')">Save & Next</button>
+                </li>
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Staff')">Save & Complete</button>
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==3">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--o" ng-click="saveandnextSignatures('Provider')">Save & Next</button>
+                </li>
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Provider')">Save & Complete</button>
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==4">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--o" ng-click="saveandnextSignatures('Counselor')">Save & Next</button>
+                </li>
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Counselor')">Save & Complete</button>
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==5">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--o" ng-click="saveandnextSignatures('Anesthesist')">Save & Next</button>
+                </li>
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Anesthesist')">Save & Complete</button>
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="us-controls" ng-show="signaturesTab.activeSigatureTab==6">
+                <li>
+                    <button class="btn__xl-- btn__1d5558--f" ng-click="saveandcompleteSignatures('Gaurdian')">Save & Complete</button>
+                </li>
+                <li class="btn__close--">
+                    <a ng-click="closeuib()">
+                        <i class="close__w32--"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="modal__body--">
+            <div class="row">
+                <div class="col-lg-4">
+                    <ul class="tab__style--10">
+                        <li ng-class="(signaturesTab.activeSigatureTab == 1)?'active':''" ng-show="signaturesTab.Patient">
+                            <a ng-click="switchSignatureTab(1)">Patient</a>
+                        </li>
+                        <li ng-class="(signaturesTab.activeSigatureTab == 2)?'active':''" ng-show="signaturesTab.Staff">
+                            <a ng-click="switchSignatureTab(2)">Staff</a>
+                            <!--<i class="fas fa-bookmark pos-absolute top-2 right-5 text-15898f"></i>-->
+                        </li>
+                        <li ng-class="(signaturesTab.activeSigatureTab == 3)?'active':''" ng-show="signaturesTab.Provider">
+                            <a ng-click="switchSignatureTab(3)">Provider</a>
+                        </li>
+                        <li ng-class="(signaturesTab.activeSigatureTab == 4)?'active':''" ng-show="signaturesTab.Counselor">
+                            <a ng-click="switchSignatureTab(4)">Counsellor</a>
+                        </li>
+                        <li ng-class="(signaturesTab.activeSigatureTab == 5)?'active':''" ng-show="signaturesTab.Anesthesist">
+                            <a ng-click="switchSignatureTab(5)">Anesthesiologist</a>
+                        </li>
+                        <li ng-class="(signaturesTab.activeSigatureTab == 6)?'active':''" ng-show="signaturesTab.Gaurdian">
+                            <a ng-click="switchSignatureTab(6)">Gaurdian</a>    <!--Witness-->
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-8">
+                    <div class="tab-content">
+                        <div id="patientSignatureid" class="tab-pane fade in active" ng-show="signaturesTab.activeSigatureTab==1">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <span class="fs__lg-- fw__5-- fs__normal-- tc__5E6366--"> Patient Name: <span class="fs__lg-- fw__5-- fs__normal-- tc__1D1D1D--">{{PatientName}}</span></span>
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="radio" class="radio-custom width-0" id="PatientName_1" name="PatientName"
+                                           ng-value="'PatientName'" ng-model="signPlusObj.SelectedPatientType"
+                                           ng-click="SavePatientSignacture('PatientName');">
+                                    <label for="PatientName_1" class="radio-custom-label cur-pointer mb-0">Patient Sign</label>
+
+                                    <input type="radio" class="radio-custom width-0" id="PatientName_2" name="PatientName"
+                                           ng-value="'PatientInitialName'" ng-model="signPlusObj.SelectedPatientType"
+                                           ng-click="SavePatientSignacture('PatientInitialName');">
+                                    <label for="PatientName_2" class="radio-custom-label cur-pointer mb-0">Patient Initial's</label>
+                                </div>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Patient')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Patient')"
+                                          title="{{canEditSignatureDateTimeFor('Patient') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.PatientDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Patient')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Patient')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10" ng-show="signPlusObj.ShowPatientCanvas">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signPatientPadUD" name="signPatientPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.PatientSignCanvasDisable}"></canvas>
+
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--" ng-hide="signPlusObj.PatientSignCanvasDisable == true">
+                                        <!--<div class="form-group">
+                    <span><b>Patient Sign</b></span>
+                </div>-->
+                                        <button ng-show="OrgDigitalSignType=='Topaz'" class="btn__xl-- btn__1d5558--f" ng-click="OnSignPatientSignature()">Using Sign Pad</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-if="!signPlusObj.IsPatientDigitalSignTaken" ng-show="signPlusObj.patientreadyToSign" ng-click="savePatientSignatureDraw()">Save Sign</button>-->
+                                        <!--<button class="btn btn-save-us btn-block" ng-if="!signPlusObj.IsPatientDigitalSignTaken" ng-show="signPlusObj.patientreadyToSign" ng-click="savePatientSignatureDrawtoDB()">Save Sign</button>-->
+                                        <button class="btn__xl-- btn__C71D27--" ng-click="OnClearPatientSignature()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-y-10" ng-show="signPlusObj.ShowPatientInitialCanvas">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signPatientIntialPadUD" name="signPatientIntialPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.PatientSignCanvasDisable}"></canvas>
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--" ng-hide="signPlusObj.PatientSignCanvasDisable == true">
+                                        <!--<div class="form-group">
+                    <span>  <b>Patient Intial's</b></span>
+                </div>-->
+                                        <button ng-show="OrgDigitalSignType=='Topaz'" class="btn__xl-- btn__1d5558--f" ng-click="OnSignPatientInitialSignature()">Using Sign Pad</button>
+                                        <button class="btn__xl-- btn__C71D27--" ng-click="OnClearPatientIntialSignature()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="staffSignatureid" class="tab-pane fade in active" ng-show="signaturesTab.activeSigatureTab==2">
+                            <form autocomplete="off">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form__group">
+                                            <input type="text" class=""
+                                                   autocomplete="off"
+                                                   ng-model="signPlusObj.StaffUserObj"
+                                                   placeholder="Select Staff or Counsellor "
+                                                   typeahead-min-length="0"
+                                                   typeahead-focus-on-select="false"
+                                                   typeahead-on-select="onSelectUser('Staff',signPlusObj.StaffUserObj)"
+                                                   uib-typeahead="item as item.FullName for item in SearchStaffList($viewValue)"
+                                                   ng-change="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form__group">
+                                            <input type="password" autocomplete="new-password" ng-show="signPlusObj.StaffUserId !=0 && signPlusObj.StaffValidate == false" ng-model="signPlusObj.ValidatePassword" placeholder="Enter Password" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form__group">
+                                            <!--<button class="btn__xl-- btn__1d5558--f" ng-show="signPlusObj.StaffUserId !=0 && signPlusObj.StaffValidate == true" ng-click="OnLoadUserSignature(signPlusObj.StaffUserObj,'Staff','signStaffPadUD')">Validate & Load Sign</button>-->
+                                            <button class="btn__xl-- btn__1d5558--o" ng-show="signPlusObj.StaffUserId !=0 && signPlusObj.StaffValidate == false" ng-click="PatientValidateLoadSignOff(signPlusObj.StaffUserObj,'Staff','signStaffPadUD')">Validate & Load Sign</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Staff')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Staff')"
+                                          title="{{canEditSignatureDateTimeFor('Staff') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.StaffDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Staff')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Staff')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signStaffPadUD" name="signStaffPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.StaffCanvasDisable}"></canvas>
+                                        <!--<canvas id="signStaffPadUD" name="signStaffPadUD" drawing touch-drawing ng-class="{'disabled': !signPlusObj.StaffValidate || !isUserRoleAllowed(signPlusObj.StaffUserObj)}"></canvas>-->
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--">
+                                        <button ng-show="OrgDigitalSignType=='Topaz'" ng-hide="signPlusObj.StaffCanvasDisable == true" class="btn__xl-- btn__1d5558--f" ng-click="OnSignStaffSignature()">Using Sign Pad</button>
+                                        <button class="btn__xl-- btn__C71D27--" ng-show="!SignMainObj.StaffClearbutton" ng-click="OnClearStaffSignature()">Clear</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.staffreadyToSign" ng-click="saveStaffSignatureDraw()">Save Sign</button>-->
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.staffreadyToSign" ng-click="saveUserSignatureDrawtoDB(signPlusObj.StaffUserObj,'Staff')">Save Sign</button>-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="row">
+        <div class="col-lg-6 text-left">
+            <button class="btn btn-info" ng-click="saveandpreviousSignatures('Staff')">Previous</button>
+        </div>
+
+
+    </div>-->
+                        </div>
+
+                        <div id="providerSignatureid" class="tab-pane fade in active" ng-show="signaturesTab.activeSigatureTab==3">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <input type="text"
+                                               autocomplete="off"
+                                               ng-model="signPlusObj.ProviderUserObj"
+                                               placeholder="Select Provider"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               typeahead-on-select="onSelectUser('Provider',signPlusObj.ProviderUserObj)"
+                                               uib-typeahead="item as item.FullName for item in SearchProviderList($viewValue)"
+                                               ng-change="" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" ng-show="signPlusObj.ProviderUserId !=0 && signPlusObj.ProviderValidate == false">
+                                    <div class="form__group">
+                                        <input type="password" autocomplete="new-password" ng-model="signPlusObj.ValidatePassword" placeholder="Enter Password" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <!--<button class="btn__xl-- btn__2D2D47--f hide" ng-show="signPlusObj.ProviderUserId !=0 && signPlusObj.ProviderValidate== true" ng-click="OnLoadUserSignature(signPlusObj.ProviderUserObj,'Provider','signProviderPadUD')">Load Sign</button>-->
+                                    <button class="btn__xl-- btn__2D2D47--o" ng-show="signPlusObj.ProviderUserId !=0 && signPlusObj.ProviderValidate == false" ng-click="PatientValidateLoadSignOff(signPlusObj.ProviderUserObj,'Provider','signProviderPadUD')">Validate &Load Sign</button>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Provider')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Provider')"
+                                          title="{{canEditSignatureDateTimeFor('Provider') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.ProviderDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Provider')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Provider')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signProviderPadUD" name="signProviderPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.ProviderCanvasDisable}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="row">
+                                <div class="col-lg-12 text-center">
+                                    <div class="d__f-- ai__c-- jc__c--">
+                                        <button class="btn__xl-- btn__C71D27--" ng-show="!SignMainObj.ProviderClearbutton" ng-click="OnClearProviderSignature()">Clear</button>
+                                        <button class="btn__xl-- btn__1d5558--f" ng-show="OrgDigitalSignType=='Topaz'" ng-hide="signPlusObj.ProviderCanvasDisable == true" ng-click="OnSignProviderSignature()">Using Sign Pad</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.providerreadyToSign" ng-click="saveProviderSignatureDraw()">Save Sign</button>-->
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.providerreadyToSign" ng-click="saveUserSignatureDrawtoDB(signPlusObj.ProviderUserObj,'Provider')">Save Sign</button>-->
+                                        <!--<button class="btn btn-info" ng-click="saveandpreviousSignatures('Provider')">Previous</button>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="counselorSignatureid" class="tab-pane fade in active" ng-show="signaturesTab.activeSigatureTab==4">
+
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <input type="text" class=""
+                                               ng-model="signPlusObj.CounselorUserObj"
+                                               placeholder="Select Counsellor"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               typeahead-on-select="onSelectUser('Counselor',signPlusObj.CounselorUserObj)"
+                                               uib-typeahead="item as item.FullName for item in SearchCounsellorList($viewValue)"
+                                               ng-change="" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" ng-show="signPlusObj.CounselorUserId !=0 && signPlusObj.CounselorValidate == false">
+                                    <div class="form__group">
+                                        <input type="password" ng-model="signPlusObj.ValidatePassword" placeholder="Enter Password" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <!--<button class="btn__xl-- btn__1d5558--o hide" ng-show="signPlusObj.CounselorUserId !=0 && signPlusObj.CounselorValidate == true " ng-click="OnLoadUserSignature(signPlusObj.CounselorUserObj,'Counselor','signCounsellorPadUD')">Load Sign</button>-->
+                                    <button class="btn__xl-- btn__1d5558--f" ng-show="signPlusObj.CounselorUserId !=0 && signPlusObj.CounselorValidate == false" ng-click="PatientValidateLoadSignOff(signPlusObj.CounselorUserObj,'Counselor','signCounsellorPadUD')">Validate &Load Sign</button>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Counselor')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Counselor')"
+                                          title="{{canEditSignatureDateTimeFor('Counselor') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.CounselorDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Counselor')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Counselor')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signCounsellorPadUD" name="signCounsellorPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.CounselorCanvasDisable}"></canvas>
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--">
+                                        <button class="btn__xl-- btn__1d5558--f" ng-show="OrgDigitalSignType=='Topaz'" ng-hide="signPlusObj.CounselorCanvasDisable == true" ng-click="OnSignCounsellorSignature()">Using Sign Pad</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.counselorreadyToSign" ng-click="saveCounsellorSignatureDraw()">Save Sign</button>-->
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.counselorreadyToSign" ng-click="saveUserSignatureDrawtoDB(signPlusObj.CounselorUserObj,'Counselor')">Save Sign</button>-->
+                                        <button class="btn__xl-- btn__C71D27--" ng-show="!SignMainObj.CounselorClearbutton" ng-click="OnClearCounsellorSignature()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <!--<div class="row">
+        <div class="col-lg-6 text-left">
+            <button class="btn btn-info" ng-click="saveandpreviousSignatures('Counselor')">Previous</button>
+        </div>
+    </div>-->
+                        </div>
+
+                        <div id="anesthetistSignatureid" class="tab-pane fade in active" ng-show="signaturesTab.activeSigatureTab==5">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <input type="text" class=""
+                                               autocomplete="off"
+                                               ng-model="signPlusObj.AnesthesistUserObj"
+                                               placeholder="Select Anesthesiologist"
+                                               typeahead-min-length="0"
+                                               typeahead-focus-on-select="false"
+                                               typeahead-on-select="onSelectUser('Anesthesist',signPlusObj.AnesthesistUserObj)"
+                                               uib-typeahead="item as item.FullName for item in SearchAnesthesistList($viewValue)"
+                                               ng-change="" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" ng-show="signPlusObj.AnesthesistUserId !=0 && signPlusObj.AnesthesistValidate == false">
+                                    <div class="form__group">
+                                        <input type="password" ng-model="signPlusObj.ValidatePassword" placeholder="Enter Password" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <!--<button class="btn__xl-- btn__2D2D47--f hide" ng-show="signPlusObj.AnesthesistUserId !=0 && signPlusObj.AnesthesistValidate == true" ng-click="OnLoadUserSignature(signPlusObj.AnesthesistUserObj,'Anesthesist','signAnesthesistPadUD')">Load Sign</button>-->
+                                    <button class="btn__xl-- btn__2D2D47--o" ng-show="signPlusObj.AnesthesistUserId !=0 && signPlusObj.AnesthesistValidate == false" ng-click="PatientValidateLoadSignOff(signPlusObj.AnesthesistUserObj,'Anesthesist','signAnesthesistPadUD')">Validate &Load Sign</button>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Anesthesist')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Anesthesist')"
+                                          title="{{canEditSignatureDateTimeFor('Anesthesist') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.AnesthesistDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Anesthesist')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Anesthesist')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signAnesthesistPadUD" name="signAnesthesistPadUD" drawing touch-drawing ng-class="{'disabled': signPlusObj.AnesthesistCanvasDisable}"></canvas>
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--">
+                                        <button ng-show="OrgDigitalSignType=='Topaz'" class="btn__xl-- btn__2D2D47--f" ng-hide="signPlusObj.AnesthesistCanvasDisable == true" ng-click="OnSignAnesthesistSignature()">Using Sign Pad</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.anesthesistreadyToSign" ng-click="saveAnesthesistSignatureDraw()">Save Sign</button>-->
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.anesthesistreadyToSign" ng-click="saveUserSignatureDrawtoDB(signPlusObj.AnesthesistUserObj,'Anesthesist')">Save Sign</button>-->
+                                        <button class="btn__xl-- btn__2D2D47--o" ng-show="!SignMainObj.AnesthesistClearbutton" ng-click="OnClearAnesthesistSignature()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <!--<div class="row">
+        <div class="col-lg-6 text-left">
+            <button class="btn btn-info" ng-click="saveandpreviousSignatures('Anesthesist')">Previous</button>
+        </div>
+
+    </div>-->
+                        </div>
+
+                        <div id="gaurdianSignatureid" class="tab-pane in active" ng-show="signaturesTab.activeSigatureTab==6">
+                            <div class="row nocolpad">
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <label>First Name</label>
+                                        <input type="text" class="form-control" ng-model="signPlusObj.GaurdianFirstName" ng-disabled="signPlusObj.PatientGaurdianCanvasDisable == true">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <label>Last Name</label>
+                                        <input type="text" ng-model="signPlusObj.GaurdianLastName" ng-disabled="signPlusObj.PatientGaurdianCanvasDisable == true">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form__group">
+                                        <label>Relation </label>
+                                        <select ng-model="signPlusObj.GaurdianRelationShipId" ng-options="item.RelationId as item.RelationName for item in RelationShipTypeList" ng-disabled="signPlusObj.PatientGaurdianCanvasDisable == true">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <div class="d__f-- fd__c-- gap__5-- mb__10--">
+                                <div class="d__f-- ai__c-- gap__5--">
+                                    <label class="fw__5--">Signed Date:</label>
+                                    <span class="fs__lg-- tc__1D5558-- fw__5--"
+                                          ng-class="{'cur-pointer': canEditSignatureDateTimeFor('Gaurdian')}"
+                                          ng-dblclick="openSignatureDateTimeEditor('Gaurdian')"
+                                          title="{{canEditSignatureDateTimeFor('Gaurdian') ? 'Double-click to edit' : 'Not editable'}}">
+                                        {{SignatureDateTimeEdit.GaurdianDateTime}}
+                                    </span>
+                                    <i class="fa fa-pencil tc__656565--"
+                                       ng-if="canEditSignatureDateTimeFor('Gaurdian')"
+                                       style="font-size: 12px;"></i>
+                                </div>
+                                <p class="fs__sm-- tc__656565--" ng-if="canEditSignatureDateTimeFor('Gaurdian')">
+                                    Double-click the date to edit
+                                </p>
+                            </div>
+                            <div class="row m-y-10">
+                                <div class="col-lg-12">
+                                    <div class="signature-pad">
+                                        <canvas id="signGaurdianPadUD" drawing name="signGaurdianPadUD" touch-drawing ng-class="{'disabled': signPlusObj.PatientGaurdianCanvasDisable}"></canvas>
+                                    </div>
+                                    <div class="d__f-- ai__c-- jc__c--" ng-hide="signPlusObj.PatientGaurdianCanvasDisable == true">
+                                        <button ng-show="OrgDigitalSignType=='Topaz'" class="btn__xl-- btn__1d5558--f" ng-click="OnSignGaurdianSignature()">Using Sign Pad</button>
+                                        <!--<button class="btn btn-save-us btn-block" ng-show="signPlusObj.gaurdianreadyToSign" ng-click="saveGaurdianSignatureDraw()">Save Sign</button>-->
+                                        <button class="btn__xl-- btn__C71D27--" ng-click="OnClearGaurdianSignature()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / -->
+                            <!--<div class="row">
+        <div class="col-lg-6 text-left">
+            <button class="btn btn-info" ng-click="saveandpreviousSignatures('Gaurdian')">Previous</button>
+        </div>
+        <div class="col-lg-6 text-right">
+
+        </div>
+    </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+     
+    
+
+
+</script>
+<script type="text/ng-template" id="signatureDateTimeEditorModal.html">
+    <div class="modal__style--1">
+        <div class="modal__header--">
+            <h1>Edit Signature Date & Time</h1>
+        </div>
+        <div class="modal__body--">
+            <div class="p__10--">
+                <div class="form__group">
+                    <label>Signature Type</label>
+                    <input type="text" class="form-control" ng-model="signatureType" disabled>
+                </div>
+
+                <!-- Date Input with ng-change -->
+                <div class="form__group">
+                    <label>Date</label>
+                    <input type="text"
+                           class="icons-calendar cur-default bg-white"
+                           ng-model="editedDate"
+                           ng-change="updatePreview()"
+                           max="{{maxDate | date:'yyyy-MM-dd'}}"
+                           datepickerregpatient
+                           readonly>
+                </div>
+
+                <!-- Time Input with ng-change -->
+                <div class="form__group">
+                    <label>Time</label>
+                    <!--<input type="text"
+           class="form-outline w-80"
+           ng-model="editedTime"
+           ng-change="updatePreview()"
+           ng-click="GetCurrenttime()">-->
+                    <div class="ehr-input-group">
+                        <input type="text" class="form-outline w-80" placeholder="Time" ng-model="editedTime">
+                        <button ng-click="GetCurrenttime(2)"><i class="fas fa-clock"></i></button>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="form__group" ng-if="previewDateTime">
+                    <label class="tc__656565-- fs__md--">
+                        Preview: {{previewDateTime}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer--">
+            <button class="btn__xl-- btn__1d5558--f" ng-click="confirmDateTime()">Confirm</button>
+            <button class="btn__xl-- btn__C71D27--o" ng-click="cancel()">Cancel</button>
+        </div>
+    </div>
+</script>
+<style>
+    .tractive {
+        /*background-color: cornsilk*/
+        background-color: #c2dfd999;
+    }
+        .disabled {
+        background-color: grey;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    .incomplete {
+        background-color: red;
+        color: white;
+    }
+
+    .complete {
+        background-color: green;
+        color: white;
+    }
+
+    .custom-button {
+        margin-right: 2px;
+        padding: 3px 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    .ta-editor.ta-html, .ta-scroll-window.form-control p{
+        margin :0px !important;
+    }
+    .imgSignature {
+        border:1px solid black;
+    }
+
+    .disabled {
+        pointer-events: none;
+        opacity: 0.3;
+        background-color: #f0f0f0;
+        border: 2px solid #d3d3d3;
+    }
+    .signature-datetime-editable {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .signature-datetime-editable:hover {
+            background-color: #f0f9ff;
+            border: 1px dashed #1d5558;
+        }
+
+    .signature-datetime-non-editable {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .datetime-edit-hint {
+        font-size: 11px;
+        color: #656565;
+        font-style: italic;
+        margin-top: 2px;
+    }
+
+    .datetime-edit-icon {
+        font-size: 12px;
+        color: #1d5558;
+        margin-left: 5px;
+    }
+</style>

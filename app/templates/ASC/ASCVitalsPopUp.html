@@ -1,0 +1,276 @@
+﻿<div class="modal__style--1 modal__popup--1">
+    <div class="modal__header--">
+        <h1>Vitals</h1>
+        
+
+
+        <div class="asc-patient-profile" ng-if="false">
+            <ul>
+                <li>
+                    <img image-viewer ng-if="cacheStorageItem.PatientImageS3URL != ''" src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                    <p title="{{cacheStorageItem.PatientName}}">{{cacheStorageItem.PatientName}}</p>
+                </li>
+                <li>
+                    <span>MR No.:</span>
+                    <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                </li>
+                <li>
+                    <span>Sex:</span>
+                    <label>{{cacheStorageItem.Gender}}</label>
+                </li>
+                <li>
+                    <span>Age:</span>
+                    <label>{{cacheStorageItem.Age}}</label>
+                </li>
+                <li>
+                    <span>DOB:</span>
+                    <label>{{cacheStorageItem.PatientDOB | date:"MM-dd-yyyy"}}</label>
+                </li>
+            </ul>
+        </div>
+        <ul class="us-controls">
+            <li>
+                <div class="d__f-- ai__c-- gap__5-- bs__solid-- bw__1-- border__1D5558-- p__5-- bradius-5" popover-template="'templates/UIBPopovers/patientDetailsPopover.html'" popover-data="{detailsSummary : PaitentDetails, postalAddressSummary : PostalAddressSummaryObj, permanentAddressSummary : PermanentAddressSummaryObj,patientMobileNumber : PatientMobileNumber , patientOfficeNumber : PatientOfficeNumber,demographicSummary : DemographicSummaryObj}" popover-class="profile__popover" dynamic-click-popover-placement ng-click="patiendetilsopen()">
+                    <img ng-if="cacheStorageItem.PatientImageS3URL != ''" width="28" height="28" image-viewer src="{{cacheStorageItem.PatientImageS3URL}}" />
+                    <img ng-if="cacheStorageItem.PatientImageS3URL == ''" width="28" height="28" src="img/sprite-sheet/user-square.svg" />
+                    <div class="vs__list-- gap__0--">
+                        <span>{{cacheStorageItem.PatientName}}</span>
+                        <span><span class="fw__4-- tc__656565--">MR No : </span>{{cacheStorageItem.PatientDisplayId}}</span>
+                    </div>
+                    <span><i class="icons__w16-- info__w16--f"></i></span>
+                </div>
+            </li>
+            <li ng-if="IsCopyAdmitVitalsVisible && TypeId == 4">
+                <button class="btn__lg-- btn__1d5558--o" ng-click="CopyAdmitVitals();" >Copy Admit Vitals</button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" type="button" ng-click="SaveVitals()" ng-disabled="IsClickSaveASCVitalsBtn == true">Save </button>
+            </li>
+            <li>
+                <button class="btn__lg-- btn__C71D27--o" type="button" ng-click="ClosePopup()">Close</button>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body-- height__100-- p__0-- d__f-- fd__c-- position__relative--">
+        <div class="adjustable-position p-8">
+            <div class="asc-section">
+                <!--<div class="asc-section-header">
+                    <h2>Vitals</h2>
+                </div>-->
+                <div class="asc-section-body">
+                    <div class="bg-f2f2f2 p-6 bradius-6">
+                        <table class="asc-vitals-table">
+                            <tbody ng-repeat="kitem in AllVitalsArray | filter:{DeleteInd: 'N'} track by $index">
+                                <tr>
+                                    <td ng-show="$first"></td>
+                                    <td ng-show="$first"><label>Temp</label></td>
+                                    <td ng-show="$first"><label>Pulse</label></td>
+                                    <td ng-show="$first" width="14%"><label>BP</label></td>
+                                    <td ng-show="$first"><label>Resp.rate</label></td>
+                                    <td ng-show="$first"><label>SPO2</label></td>
+                                    <td ng-show="$first"><label>BGL</label></td>
+                                    <!--<td ng-show="$first"><label>ECG</label></td>-->
+                                    <td ng-show="$first"><label>Time</label></td>
+                                    <td ng-show="$first"><label>Performed By</label></td>
+                                    <td ng-show="$first" class="text-right"><label>Action</label></td>
+                                </tr>
+                                <tr>
+                                    <td width="3%" class="valign-bottom">
+                                        <div class="vitals-v1">V{{$index+1}}<span ng-if="kitem.TypeId==7">(Admit)</span><span ng-if="kitem.TypeId==4">(PreOp Nurse)</span> <span ng-if="kitem.TypeId==2">(PreOp Anesthesia)</span></div>
+                                    </td>
+                                    <td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':11}:true track by $index" ng-if="item.VitalId === 11">
+                                        <div class="asc-input-group">
+                                            <input type="text" valid-number ng-model="item.Value" maxlength="5" id="input__temp" ng-change="TimeStamp($index,kitem)">
+                                            <select ng-model="item.UnitTypeId" ng-options="item.UnitId as item.Unit for item in TemperatureUnits" ng-change="onSelectTemperature(item,item.UnitTypeId)">
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':12}:true track by $index" ng-if="item.VitalId === 12">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" maxlength="5" ng-change="TimeStamp($index,kitem)" valid-number>
+                                            <span>BPM</span>
+                                        </div>
+                                    </td>
+                                    <td width="10%">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" maxlength="5" valid-number ng-change="TimeStamp($index,kitem)" ng-repeat="item in kitem.Vitals | filter:{'VitalId':4}:true track by $index" ng-if="item.VitalId === 4">
+                                            <input type="text" value="/" class="w-30 text-center" disabled />
+                                            <input type="text" ng-model="item.Value" maxlength="5" valid-number ng-change="TimeStamp($index,kitem)" ng-repeat="item in kitem.Vitals | filter:{'VitalId':5}:true track by $index" ng-if="item.VitalId === 5">
+                                            <span>mmHg</span>
+                                        </div>
+                                    </td>
+                                    <td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':14}:true track by $index" ng-if="item.VitalId === 14">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" valid-number maxlength="5" ng-change="TimeStamp($index,kitem)">
+                                            <span>BPM</span>
+                                        </div>
+                                    </td>
+                                    <!--<td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':15}:true track by $index" ng-if="item.VitalId === 15">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" valid-number maxlength="5" ng-change="TimeStamp($index,kitem)">
+                                            <span>%</span>
+                                        </div>
+                                    </td>-->
+                                    <td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':15}:true track by $index" ng-if="item.VitalId === 15">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" valid-number maxlength="5" ng-change="TimeStamp($index,kitem)">
+                                            <span>%</span>
+                                        </div>
+                                    </td>
+                                    <td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':8}:true track by $index" ng-if="item.VitalId === 8">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="item.Value" valid-number maxlength="5" ng-change="TimeStamp($index,kitem)">
+                                            <span>mg/dL</span>
+                                        </div>
+                                    </td>
+                                    <!--<td width="10%" ng-repeat="item in kitem.Vitals | filter:{'VitalId':36}:true track by $index" ng-if="item.VitalId === 36">
+                                        <div class="asc-input-group">
+                                            <input type="text" valid-number ng-model="item.Value" maxlength="5" ng-change="TimeStamp($index,kitem)">
+                                            <select ng-model="item.UnitTypeId" ng-options="item.UnitId as item.Unit for item in ECGUnits"
+                                                    ng-change="onSelectECG(item,item.UnitTypeId)">
+                                                <option value=""> select</option>
+                                            </select>
+                                        </div>
+                                    </td>-->
+                                    <td width="10%">
+                                        <div class="asc-input-group">
+                                            <input type="text" ng-model="kitem.VitalAddTime" ng-click="GetPresentTime($index);" />
+                                            <button ng-click="GetPresentTime($index);">
+                                                <i class="fas fa-clock fa-lg"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td width="10%">
+                                        <div class="asc-input-group">
+                                            <select ng-model="kitem.DoctorId"
+                                                    ng-options="pitem.DoctorID as pitem.FullName for pitem in PerformedByArray"
+                                                    ng-change="changePerformedBy(kitem)">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td width="6%" class="valign-bottom">
+                                        <div class="dis-flex grid-gap-10 justify-content-end">
+                                            <a href="javascript:;" ng-show="$last" ng-click="AddVitals();">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="none">
+                                                    <rect x="0.5" y="0.820312" width="20" height="20" rx="10" fill="#1D5558" />
+                                                    <path d="M11.25 10.0703V4.82031H9.75V10.0703H4.5V11.5703H9.75V16.8203H11.25V11.5703H16.5V10.0703H11.25Z" fill="white" />
+                                                </svg>
+                                            </a>
+                                            <a href="javascript:;" ng-click="ClearVitals(kitem);">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="none">
+                                                    <rect x="0.5" width="20" height="20" rx="10" fill="#1D5558" />
+                                                    <path d="M4 10C4 11.5913 4.63214 13.1174 5.75736 14.2426C6.88258 15.3679 8.4087 16 10 16C11.5933 16 13.12 15.3733 14.2667 14.2667L13.2667 13.2667C12.847 13.7111 12.3405 14.0647 11.7786 14.3056C11.2167 14.5464 10.6113 14.6693 10 14.6667C5.84 14.6667 3.76 9.64 6.7 6.7C9.64 3.76 14.6667 5.84667 14.6667 10H12.6667L15.3333 12.6667H15.4L18 10H16C16 8.4087 15.3679 6.88258 14.2426 5.75736C13.1174 4.63214 11.5913 4 10 4C8.4087 4 6.88258 4.63214 5.75736 5.75736C4.63214 6.88258 4 8.4087 4 10Z" fill="white" />
+                                                </svg>
+                                            </a>
+                                            <a ng-hide="$first" class="actions-black" href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Copy" ng-click="CopyVitals(kitem,$index)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <circle cx="10" cy="10" r="10" fill="#1D5558" />
+                                                    <path d="M14.5833 5H7.91667C7.80616 5 7.70018 5.0439 7.62204 5.12204C7.5439 5.20018 7.5 5.30616 7.5 5.41667V7.5H5.41667C5.30616 7.5 5.20018 7.5439 5.12204 7.62204C5.0439 7.70018 5 7.80616 5 7.91667V14.5833C5 14.6938 5.0439 14.7998 5.12204 14.878C5.20018 14.9561 5.30616 15 5.41667 15H12.0833C12.1938 15 12.2998 14.9561 12.378 14.878C12.4561 14.7998 12.5 14.6938 12.5 14.5833V12.5H14.5833C14.6938 12.5 14.7998 12.4561 14.878 12.378C14.9561 12.2998 15 12.1938 15 12.0833V5.41667C15 5.30616 14.9561 5.20018 14.878 5.12204C14.7998 5.0439 14.6938 5 14.5833 5ZM11.6667 14.1667H5.83333V8.33333H11.6667V14.1667ZM14.1667 11.6667H12.5V7.91667C12.5 7.80616 12.4561 7.70018 12.378 7.62204C12.2998 7.5439 12.1938 7.5 12.0833 7.5H8.33333V5.83333H14.1667V11.6667Z" fill="white" />
+                                                </svg>
+                                            </a>
+                                            <a ng-hide="$first" class="actions-black" href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Remove" ng-click="RemoveVitals(kitem)" ng-if="(AllVitalsArray | filter:{'DeleteInd':'N'}).length > 1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <circle cx="10" cy="10" r="10" fill="#FC4848" />
+                                                    <path d="M14.4964 6.51071C14.7745 6.2326 14.7745 5.78169 14.4964 5.50357V5.50357C14.2183 5.22546 13.7674 5.22546 13.4893 5.50357L10 8.99286L6.51071 5.50357C6.2326 5.22546 5.78169 5.22546 5.50357 5.50357V5.50357C5.22546 5.78169 5.22546 6.2326 5.50357 6.51071L8.99286 10L5.50357 13.4893C5.22546 13.7674 5.22546 14.2183 5.50357 14.4964V14.4964C5.78169 14.7745 6.2326 14.7745 6.51071 14.4964L10 11.0071L13.4893 14.4964C13.7674 14.7745 14.2183 14.7745 14.4964 14.4964V14.4964C14.7745 14.2183 14.7745 13.7674 14.4964 13.4893L11.0071 10L14.4964 6.51071Z" fill="white" />
+                                                </svg>
+                                            </a>
+                                            <a class="actions-black" ng-click="kitem.VitalshowNotesInd=!kitem.VitalshowNotesInd" href="javascript:;" tooltip-placement="bottom-right" uib-tooltip="Notes">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <circle cx="10" cy="10" r="10" fill="#1D5558" />
+                                                    <path d="M9.97786 13.6667H10.6445V11.6667H12.6445V11H10.6445V9H9.97786V11H7.97786V11.6667H9.97786V13.6667ZM6.7212 16C6.41453 16 6.15853 15.8973 5.9532 15.692C5.74786 15.4867 5.64498 15.2304 5.64453 14.9233V5.07667C5.64453 4.77 5.74742 4.514 5.9532 4.30867C6.15898 4.10333 6.41498 4.00044 6.7212 4H11.9779L14.9779 7V14.9233C14.9779 15.23 14.8752 15.486 14.6699 15.6913C14.4645 15.8967 14.2083 15.9996 13.9012 16H6.7212ZM11.6445 7.33333V4.66667H6.7212C6.61898 4.66667 6.52498 4.70933 6.4392 4.79467C6.35342 4.88 6.31075 4.974 6.3112 5.07667V14.9233C6.3112 15.0256 6.35386 15.1196 6.4392 15.2053C6.52453 15.2911 6.61853 15.3338 6.7212 15.3333H13.9012C14.0034 15.3333 14.0974 15.2907 14.1832 15.2053C14.269 15.12 14.3116 15.026 14.3112 14.9233V7.33333H11.6445Z" fill="white" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="" ng-if="kitem.VitalshowNotesInd">
+                                    <td colspan="11">
+                                        <textarea class="msd-elastic: \n; asc-notes bg-white m-t-5" placeholder="Notes" ng-model="kitem.VitalRemarks" rows="2" maxlength="500" ng-focus="kitem.VitalshowNotesInd"></textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ul class="flex-flow-ulli-mb0 drawingpad-img-show" ng-if="(PreAdmAnesthetistObj.DocumentDetails|filter:{'FileTypeId':32}).length > 0">
+                            <li ng-repeat="img in PreAdmAnesthetistObj.DocumentDetails |filter:{'FileTypeId': 32} track by $index">
+                                <div>
+                                    <img ngf-thumbnail="img.S3URL" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" ng-if="img.DocumentID != 0 && img.FileExt != 'pdf' && img.FileExt !== 'application/pdf'" width="28" height="28" ng-src="{{img.S3URL}}" image-viewer>
+                                    <a href="{{img.S3URL}}" target="_blank">
+                                        <img src="img/billing/pdf-img.png" ng-if="img.DocumentID != 0 && (img.FileExt == 'pdf'|| img.FileExt == 'application/pdf')" class="img-thumbnail height-50 w-50" width="50" height="50">
+                                    </a>
+                                    <a href="javascript:;" class="pos-absolute top-0 right-0 bg-white p-1 radius-100" ng-click="DeletePreAdmDocumentlist(img,$index,PreAdmAnesthetistObj);">
+                                        <img src="img/close-round.svg" width="17" />
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli-mb0 m-t-5" ng-if="IsComingfrom !== 'Pre-op'">
+                            <li>
+                                <div class="ehr-input">
+                                    <input type="file" class="docsfilechoose height-36" name="upload" ng-model="files" ngf-select="selectedHandP($files)"
+                                           ngf-pattern="'image/*,application/pdf'"
+                                           ngf-accept="'image/*,application/pdf'"
+                                           id="chooseFile" multiple="multiple" title="Choose a file to upload" accept="image/*,application/pdf">
+                                </div>
+                            </li>
+                            <li>
+                                <span>-OR-</span>
+                            </li>
+                            <li>
+                                <button class="btn-scan w-100  ng-binding" ng-click="scanFiles(2);">Scan</button>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli drawingpad-img-show m-t-8" ng-hide="FilesObj.TempImagesArray.length == 0">
+                            <li ng-repeat="imgitem in FilesObj.TempImagesArray | filter: {'FileTypeId':32} track by $index">
+                                <div>
+                                    <img ngf-thumbnail="imgitem.file" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer ng-if="(imgitem.FileExt !== 'application/pdf' && imgitem.FileExt !== 'pdf')&&imgitem.DocumentID==0" />
+                                    <img ng-src="{{imgitem.DocURL}}" class="b-lazy img-responsive img-thumbnail cur-poiter w-50 height-50" image-viewer ng-if="(imgitem.FileExt !== 'application/pdf' && imgitem.FileExt !== 'pdf')&&imgitem.DocumentID!=0" />
+                                    <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="javascript:;" ng-click="DeleteUploadedFileNew(imgitem,$index,FilesObj);">
+                                        <img src="img/close-round.svg" width="17" />
+                                    </a>
+                                    <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="{{imgitem.DocURL}}" target="_blank" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') && imgitem.DocumentID!=0">
+                                        <img src="img/pdf.png" height="60" class="m-b-10" />
+                                    </a>
+                                    <!--<a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') && imgitem.DocumentID==0">
+                                        <img src="img/pdf.png" height="60" class="m-b-10" />
+                                    </a>-->
+                                    <a href="javascript:;" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') && imgitem.DocumentID==0">
+                                        <img src="img/pdf.png" width="50" height="50">
+                                    </a>
+                                    <a class="pos-absolute top-0 right-0 bg-white p-1 radius-100" href="{{imgitem.DocURL}}" target="_blank" ng-if="imgitem.FileExt == 'tiff' || imgitem.FileExt == 'tif' || imgitem.FileExt=='image/tiff'">
+                                        <img height="60" src="img/appt-list/tifficon.png" />
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="flex-flow-ulli-mb0 drawingpad-img-show" ng-if="(FilesObj.DocumentDetails|filter:{'FileTypeId': 32}).length > 0">
+                            <li ng-repeat="img in FilesObj.DocumentDetails|filter:{'FileTypeId': 32} track by $index">
+                                <img ngf-thumbnail="img.S3URL" ng-if="img.DocumentID != 0 && img.FileExt != 'pdf' && img.FileExt !== 'application/pdf'" class="img-thumbnail height-50 w-50" width="28" height="28" ng-src="{{img.S3URL}}" image-viewer>
+                                <a href="{{img.S3URL}}" target="_blank">
+                                    <img src="img/billing/pdf-img.png" ng-if="img.DocumentID != 0 && (img.FileExt == 'pdf'|| img.FileExt == 'application/pdf')" class="img-thumbnail height-50 w-50" width="50" height="50">
+                                </a>
+                                <a href="javascript:;" class="pos-absolute top-0 right-0 bg-white p-1 radius-100" ng-click="DeletePreAdmDocumentlist(img,$index,FilesObj);">
+                                    <img src="img/close-round.svg" width="10" />
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+ 

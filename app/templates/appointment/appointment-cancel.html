@@ -1,0 +1,132 @@
+	<div>
+	    <div class="modal-content modal-calendar">
+			<div class="modal-body">
+				<div id="patient">
+					  <form name="Appform" method="post"> 
+				<div class="textfield-wrapper" id="SearchController"> 
+				  <div class="modal-header" >
+					  <div class="clearfix">
+						 <input type="hidden"  ng-model="getappointmentid" ng-value="{{getappointmentid}}" name="id" id="id"    />
+							<button class="btn btn-primary" ng-click="EnableEdit()" value="Edit">Edit</button>
+							<button class="btn btn-primary"  id="StartAppointment"  ng-click="StartAppointmentFrmCancel()"  value="Start Appointment">StartAppointment</button>
+							<button class="btn btn-primary" ng-click="CancelAppointmentFrmCancel()" id="cancelapmt" value="Cancel">Cancel Appointment</button>
+							<button type="button" ng-click="CloseModal()" class="btn btn-default" data-dismiss="modal" id="cancel">Close</button>
+					</div>
+				</div>
+				  <div class="clearfix" ng-hide="disabled">
+				  <label class="uppercase field-label">Patient Name</label>
+				  <br>
+				   <input type="text" ng-model="patients.Patient[0].FullName"  ng-if="patients.Patient[0].FullName != undefined" disabled class="form-control"> 
+					 <br>
+					<label class="uppercase field-label">Comments</label>
+					<div class="chiefcomplaint">
+					  <textarea ng-model="patient_problems" class="form-control" placeholder="Add any problems or symptoms here" name="patient_problems" id="patient_problems"></textarea>
+					</div>
+					<div class="row">
+					  <div class="col-sm-6">
+						<div class="form-group">
+						  <label class="uppercase required field-label">Appointment Type</label>
+						  <select ng-selected="{{appointment_type}}" name="appointment_type" id="appointment_type" class="form-control" ng-model="appointment_type">
+							<option value="OTHERS">Select Appointment Type</option>
+							<option value="FOLLOWUPVST">Follow-Up Visit</option>
+							<option value="NEWPATVST">New Patient Visit</option>
+							<option value="NURSING">Nursing Only</option>
+							<option value="URGENTVST">Urgent Visit</option>
+						  </select>
+						</div>
+					  </div>
+					  <div class="col-sm-6">
+						<div class="form-group pos-relative top-30">
+						  <label class="uppercase field-label required">When</label>
+						            {{startDate}} {{startDate}}    
+						  <input type="date" ng-change="LoadAptEditTime()" id="dateInput" name="input" ng-model="dt.value"  placeholder="yyyy-MM-dd" />
+						</div>
+					  </div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<label class="control-label required">Booked Time Period:({{StartTime}} -  {{EndTime}})</label>
+							<br>
+							<div class="col-sm-6 p-0ding-left">
+								<input type="hidden" id="diffTime" name="diffTime" value="'+diffMinute+'">
+								 <label for="patinet_appStarttime">Start Time</label>
+								 <br>
+									<select name="patinet_appStarttime" id="patinet_appStarttime"
+									  ng-options="option.startTime for option in setValue track by option.startTime"  ng-model="patinet_appStarttime" ng-change="Endtimechange()" class="form-control"></select>
+							</div>
+							<div class="col-sm-6 p-0ding-right">
+								<label for="patient_appEndTime">End Time</label>
+								<br>
+								{{EndtimeVAlue}}
+								<input ng-model="patient_appEndTime" type="text" name="patient_appEndTime" id="patient_appEndTime" 
+								placeholder="{{EndtimeVAlue}}" value="{{EndtimeVAlue}}" disabled>
+							</div>
+						</div>	
+					</div>
+					<br>
+					<div class="clearfix">
+						<button class="btn btn-primary" ng-click="addEditedAppointment()" value="Save">Save</button>
+					</div>
+				</div>
+				</div>
+	 		  </form>
+				</div>
+			</div> 
+		</div>
+	</div>
+<script type="text/javascript">
+    $("#f").submit(function () {
+        var f = $("#f");
+        $.post(f.attr("action"), f.serialize(), function (result) {
+            DayPilot.Modal.close(result);
+        });
+        return false;
+    });
+    $("#delete").click(function() {
+        $.post("backend_delete.php", { id: $("#id").val()}, function(result) {
+            DayPilot.Modal.close(result);
+        });
+        return false;
+    });
+    $("#cancel").click(function() {
+        DayPilot.Modal.close();
+        return false;
+    });
+    $("#cancel1").click(function() {
+        DayPilot.Modal.close();
+        return false;
+    });
+    $("#close_popuppatient").click(function() {
+        $('.addnew-patient').hide();
+    });
+    $("#AddNewPaintent").on('click',function() {
+        $('.overlay').show();
+		$('.addnew-patient').show();
+        return false;
+    });
+    $('#close_popup').click(function(e) {
+        e.preventDefault();
+        $('.overlay').hide();
+        $('.addPatient').hide();
+    });
+    $(document).ready(function () {
+        $("#name").focus();
+        $('.overlay').hide();
+        $('.addPatient').hide();
+    });
+	$('.calendar_default_event').on('click',function(e) {
+		alert('123');
+		e.preventDefault();
+		e.stopPropagation();
+	});	
+</script> 
+<script type="text/ng-template" id="customTemplate.html">
+  <a class="searchByResultTEst">
+	<span ng-bind-html="match.model.Patient[0].FullName | uibTypeaheadHighlight:query"></span>
+	<span ng-bind-html="match.model.Patient[0].Gender | uibTypeaheadHighlight:query"></span>
+	<span ng-if="match.model.Patient[0].Age == undefined " ng-bind-html="0 | uibTypeaheadHighlight:query"></span>
+	<span ng-if="match.model.Patient[0].Age != undefined" ng-bind-html="match.model.Patient[0].Age | uibTypeaheadHighlight:query"></span>
+	<span ng-if="match.model.PatientPhone[0].PhNumber == undefined" ng-bind-html="0 | uibTypeaheadHighlight:query"></span>
+	<span ng-if="match.model.PatientPhone[0].PhNumber != undefined" ng-bind-html="match.model.PatientPhone[0].PhNumber | uibTypeaheadHighlight:query"></span>
+  </a>
+</script>

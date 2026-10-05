@@ -1,0 +1,486 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Generate Statement</h1>
+        <a class="btn__close--2" ng-click="uibclose()">
+            <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+        </a>
+    </div>
+    <div class="modal__body--">
+        <div class="d__f-- fd__c-- gap__10--y height__100--">
+            <div class="dis-flex flex-direction-column h-100 grid-gap-10 p-8">
+                <div class="row nocolpad">
+                    <div class="col-lg-2 col-md-3">
+                        <div class="form__group">
+                            <label>Claim No.</label>
+                            <input type="text" class="input__style--1 icons-search" id="input_claimno"
+                                   placeholder="Enter Claim No." ng-model="SearchPatientStatementObj.ClaimNumber" />
+                        </div>
+                    </div>
+                    <!--<div class="col-lg-2 col-md-3">
+                <div class="form__group">
+                    <label>Filter</label>
+                    <select>
+                        <option>Select</option>
+                    </select>
+                </div>
+            </div>-->
+                    <div class="col-lg-2 col-md-3">
+                        <div class="form__group">
+                            <label>From DOS</label>
+                            <input type="text" class="icons-calendar"
+                                   id="input_fromdos"
+                                   ng-model="SearchPatientStatementObj.PostingFrom"
+                                   placeholder="MM-DD-YYYY"
+                                   ng-change="changePostingFromDate(SearchPatientStatementObj)"
+                                   datepickeruniversalfromandtodate readonly />
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <div class="form__group">
+                            <label>To DOS</label>
+                            <input type="text" class="icons-calendar"
+                                   id="input_todos"
+                                   ng-model="SearchPatientStatementObj.PostingTo"
+                                   placeholder="MM-DD-YYYY"
+                                   datepickeruniversalfromandtodate
+                                   mindate="{{SearchPatientStatementObj.PostingFrom}}" readonly />
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <div class="dis-flex align-items-center grid-gap-10 m-t-22">
+                            <button class="b-0 bg-none" id="button_reload" ng-click="RefreshPatientstatement()">
+                                <i class="reload-icon"></i>
+                            </button>
+                            <button class="btn__lg-- btn__2D2D47--f" id="button_apply" ng-click="SearchPatientStatement()">Apply</button>
+                            <!--<button class="btn__lg-- btn__2D2D47--o" ng-click="PrintPatientStatement()">Print</button>-->
+                            <button ng-show="IsShowGenerateInd" class="btn__lg-- btn__2D2D47--f" id="button_print" ng-click="AddUpdatePatientStatementsDetails('Print')" ng-if="UserAccessRights.AllAccessRights.BillerGeneratepatientStatements && UserAccessRights.AllAccessRights.BillerPrintPatientStatements">Generate & Print</button>
+                            <button ng-show="IsShowGenerateInd" class="btn__lg-- btn__2D2D47--o " id="button_export" ng-click="AddUpdatePatientStatementsDetails('Export')" ng-if="UserAccessRights.AllAccessRights.BillerGeneratepatientStatements">Generate & Email</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pos-relative h-100">
+                    <div class="adjustable-position">
+                        <div class="table__style--1 h-100" ng-show="PatientStatementList.length > 0">
+                            <table id="table_patientstatement1">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            <p class="dis-flex align-items-center p-3">
+                                                <span class="checkbox">
+                                                    <label class="lh-1-0">
+                                                        <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="SearchPatientStatementObj.IsChecked" ng-click="SelectAllStatements()">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-s14w500c000 pos-relative top-3">
+                                                            S. No
+                                                        </small>
+                                                    </label>
+                                                </span>
+                                            </p>
+                                        </th>
+                                        <th class="text-center"><p>Patient Name</p></th>
+                                        <th class="text-center"><p>Patient Email</p></th>
+                                        <th class="text-center"><p>MR No</p></th>
+                                        <th class="text-center"><p>Billed</p></th>
+                                        <th class="text-center"><p>Ins Pay</p></th>
+                                        <th class="text-center"><p>Dedut</p></th>
+                                        <th class="text-center"><p>Coins</p></th>
+                                        <th class="text-center"><p>Co-pay</p></th>
+                                        <th class="text-center"><p>Pat Bal</p></th>
+                                        <th class="text-center"><p>Total Bal</p></th>
+                                        <th class="text-center"><p>Action</p></th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="item in PatientStatementList track by $index">
+                                    <tr>
+                                        <td>
+                                            <p class="dis-flex align-items-center p-3">
+                                                <span class="checkbox">
+                                                    <label class="lh-1-0">
+                                                        <input name="checkbox-1" type="checkbox" class="checkbox" ng-model="item.IsChecked" ng-click="selectClaimList(item)">
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        <small class="text-s12w500c000 pos-relative top-3">
+                                                            {{$index + 1}}
+                                                        </small>
+                                                    </label>
+                                                </span>
+                                            </p>
+                                        </td>
+                                        <td class="text-left">
+                                            <a class="color-3ea6cd dis-block over-elipsis overflow-hidden white-nowrap">{{item.PatientFullName}}</a>
+                                            <p>{{item.PatientMobile}}</p>
+                                        </td>
+                                        <td> <p class="text-s12w500c000 m-0 text-center">{{item.PatientEmail}}</p></td>
+                                        <td> <a class="color-3ea6cd dis-block over-elipsis overflow-hidden white-nowrap">{{item.PatientMrNo}}</a></td>
+                                        <td> <p class="text-s12w600C000 m-0 text-center">${{item.TotalClaimAmount || 0}}</p></td>
+                                        <td> <p class="text-s12w600C000 m-0 text-center">${{item.TotalInsurancePayment || 0}}</p></td>
+                                        <td> <p class="text-s12w600C000 m-0 text-center">${{item.TotalDeductibleAmount || 0}}</p></td>
+                                        <td> <p class="text-s12w600C000 m-0 text-center">${{item.TotalCoInsuranceAmount || 0}}</p></td>
+                                        <td> <p class="text-s12w600C000 m-0 text-center">${{item.TotalCopayAmount || 0}}</p></td>
+                                        <td> <p class="text-s12w500c000 m-0 text-left">${{item.TotalPatientBalance || 0}}</p></td>
+                                        <td> <p class="text-s12w500c000 m-0 text-left">${{item.TotalBalance || 0}}</p></td>
+                                        <td>
+                                            <div class="dis-flex align-items-center grid-gap-5 justify-content-center">
+                                                <button class="b-0 bg-none" ng-click="item.IsShowDetails = !item.IsShowDetails"> <i class="billing-icons close-dropdown-icon" ng-show="item.IsShowDetails"></i></button>
+                                                <button class="b-0 bg-none" ng-click="item.IsShowDetails = !item.IsShowDetails"> <i class="billing-icons open-dropdown-icon" ng-show="!item.IsShowDetails"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat-end ng-show="item.IsShowDetails">
+                                        <td colspan="12" class="bg-white">
+                                            <table class="table__style--7" id="table_patientstatement2">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">S.No</th>
+                                                        <th class="text-center">Claim Date</th>
+                                                        <th class="text-center">Claim Number</th>
+                                                        <th class="text-center">Primary</th>
+                                                        <th class="text-center">Secondary</th>
+                                                        <th class="text-center">Billed</th>
+                                                        <th class="text-center">Ins.Bal</th>
+                                                        <th class="text-center">Pat.Bal</th>
+                                                        <th class="text-center">Total.Bal</th>
+                                                        <th class="text-center">Doctor Name</th>
+                                                        <th class="text-center">Statement count</th>
+                                                        <th class="text-center">
+
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody ng-repeat="pitem in item.PatientClaim track by $index">
+                                                    <tr>
+                                                        <td> <p>{{$index+1}}</p></td>
+                                                        <td> <p>{{pitem.DOSFrom | date:'MM-dd-yyyy'}}</p></td>
+                                                        <td> <p>{{pitem.PatientClaimNumber}}</p></td>
+                                                        <td> <p>{{pitem.PrimaryInsurancePayorName}}</p></td>
+                                                        <td> <p>{{pitem.SecondaryInsurancePayorName}}</p></td>
+                                                        <td> <p>${{pitem.TotalClaimAmount}}</p></td>
+                                                        <td> <p>${{pitem.TotalInsuranceBalance}}</p></td>
+                                                        <td> <p>${{pitem.TotalPatientBalance}}</p></td>
+                                                        <td> <p>${{pitem.TotalBalance}}</p></td>
+                                                        <td> <p>{{pitem.DoctorName}}</p></td>
+                                                        <td> <p>{{pitem.Statementcount}}</p></td>
+
+                                                        <td>  <button class="btn btn-primary-green" ng-click="navtoOpenAddDepositAmount(pitem,item)">Pay/Adjust</button></td>
+
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="table__style--1 h-100" ng-show="PatientStatementList.length == 0">
+                                <div class="text-center dis-flex justify-content-center align-items-center h-100">
+                                    <div class="billing-cominsoon text-center">
+                                        <img src="img/no-data/no-results.png">
+                                        <div class="msg">
+                                            <p class="goback-text">No Data Found.</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__10--y  height__100--"  ng-show="PatientStatementList.length == 0">
+                            <a><i class="nodata__1-- d3__nodata--1"></i></a>
+                            <h1 class="fs__2l-- fw__6-- tc__1D1D1D-- m__0--">No Results Found</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="dis-flex flex-direction-column grid-gap-10">
+                    <div class="EH-pagination text-center" ng-show="PatientStatementList.length > 0">
+                        <uib-pagination total-items="SearchPatientStatementObj.Count"
+                                        ng-model="SearchPatientStatementObj.PageNumber"
+                                        ng-change="SearchPatientStatement(SearchPatientStatementObj.PageNumber,'All')"
+                                        max-size="PatientStatementList.PageSize"
+                                        class=""
+                                        boundary-link-numbers="true"
+                                        rotate="false"></uib-pagination>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dis-flex flex-direction-column pos-relative" id="pdf-content" style="display:none;" ng-hide="PrintPatientsInfo.IsStatementsListInd">
+                <div ng-repeat="item in PrintPatientStatementList | filter:{'IsChecked':true} track by $index" ng-style="{'page-break-before': $index > 0 ? 'always' : 'auto'}" style="width:100%; margin-top:20px auto; padding:10px;  padding-bottom: 12px; background-color: #fff; display: flex; flex-direction: column; grid-column-gap: 8px; border-bottom:1px solid #d2d2d2;">
+
+                    <table style="width:100%;">
+                        <tbody>
+                            <tr>
+                                <td style="vertical-align:top; width:40%">
+                                    <div>
+                                        <div style="font-size: 16px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{PrintPatientsInfo.ClinicName}}</div>
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{PrintPatientsInfo.Address1}},{{PrintPatientsInfo.Address2}}</div>
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{PrintPatientsInfo.CityName}}, {{PrintPatientsInfo.StateName}}</div>
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{PrintPatientsInfo.CountryName}}, {{PrintPatientsInfo.PinCode}}</div>
+                                    </div>
+                                    <div style="margin-top:10px;">
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">{{item.OrgBillingProviderListData.BillingProviderName}}</div>
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.OrgBillingProviderListData.PostalAddress1}},{{item.OrgBillingProviderListData.PostalAddress2}}</div>
+                                        <div style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.OrgBillingProviderListData.PostalCityName}},{{item.OrgBillingProviderListData.PostalStateName}} -{{item.OrgBillingProviderListData.PostalZipCode}}</div>
+                                    </div>
+                                </td>
+                                <td style="vertical-align:top;">
+                                    <table style="width: 100%; border: 1px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:0px;">
+                                        <tbody>
+                                            <tr style="border-bottom: 0.6px solid #B3B3B3; ">
+                                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align:middle; ">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Statement Date</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.DOSFrom | date:'MM-dd-yyyy'}}</p>
+                                                </td>
+                                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; background: #F2F2F2; padding: 2px 8px; vertical-align: middle; ">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Pay This Amount</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{item.TotalPatientBalance}}</p>
+                                                </td>
+                                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align: middle; ">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Account No.</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientClaimNumber}}</p>
+                                                </td>
+                                                <td style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Amount Paid</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{item.TotalPatientAmountData}}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Patient Name</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientFirstName}} {{item.PatientLastName}}</p>
+                                                </td>
+                                                <td colspan="2" style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Address</label>
+                                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{item.PatientAddress.HNo}} {{item.PatientAddress.AddressLine1}} {{item.PatientAddress.AddressLine2}}, {{item.PatientAddress.CityName}}, {{item.PatientAddress.StateName}}, {{item.PatientAddress.CountryName}} - {{item.PatientAddress.Pin}}</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table style="width: 100%; border-radius: 4px; padding:6px; background: #F2F2F2; border-collapse: collapse; border-spacing: 0; margin-top: 6px;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="2" style="padding: 2px 8px; vertical-align:middle; ">
+                                                    <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Any concerns about your invoice?</label>
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 8px; vertical-align:middle; width:30%;">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Call: </label>
+                                                    <span style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">{{PrintPatientsInfo.ContactNo}}</span>
+                                                </td>
+                                                <td style="padding: 2px 8px; vertical-align:middle; ">
+                                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Visit:</label>
+                                                    <span style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; "> friedelllc.com</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <div style="color: #000;  font-size: 14px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:15px;">
+                        Patient Statement
+                    </div>
+                    <table style="width:100%; border: 0.6px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px; margin-bottom:30px;">
+                        <thead>
+                            <tr>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:12%;">DOS </th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:15%">Provider</th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px;">Description</th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Charges</th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Payment</th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Ins. Pending</th>
+                                <th style="font-size: 12px;  border-right: 0.6px solid #B3B3B3; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Adj.</th>
+                                <th style="font-size: 12px; background: #CECECE; font-style: normal; font-weight: 600; line-height: normal; text-align:center; padding:5px; width:9%">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody style="border-bottom: 0.5px solid #A3A3A3;" ng-repeat="Citem in item.ClaimLineItems">
+                            <tr>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px; ">{{Citem.DOSfrom | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;">{{Citem.BillingProviderName}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: left; color: #000; padding: 5px;">{{Citem.ServiceCode}}-{{Citem.ServiceName}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.TotalChargeAmount}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.PatientPaymentAmount + Citem.InsurancePaymentAmount}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.InsuranceBalance}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.AdjustmentAmount}}</td>
+                                <td style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; "></td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2;" ng-repeat="titem in Citem.ClaimLineItemTransactions track by $index" ng-if="Citem.ClaimLineItemTransactions.length > 0">
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;">{{titem.TransactionDate | date:'MM-dd-yyyy'}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style:italic;">{{titem.TransactionType}}</td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 3">${{titem.TransactionAmount}}</span></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 24 ||titem.TransactionTypeId === 25 ||titem.TransactionTypeId === 26 ||titem.TransactionTypeId === 27 ||titem.TransactionTypeId === 32 || titem.TransactionTypeId === 36 || titem.TransactionTypeId===40 || titem.TransactionTypeId === 98|| titem.TransactionTypeId === 99 || titem.TransactionTypeId === 100">${{titem.TransactionAmount}}</span></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"> <span ng-if="titem.TransactionTypeId === 2 || titem.TransactionTypeId === 53 || titem.TransactionTypeId === 45 ">${{titem.TransactionAmount}}</span> </td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"><span ng-if="titem.TransactionTypeId === 30 || titem.TransactionTypeId === 95 || titem.TransactionTypeId === 96 || titem.TransactionTypeId === 97 ">${{titem.PatientAmount}}</span></td>
+
+                                <td style="font-size: 12px; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2;">
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;"> Deductible </td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.DeductibleAmount}}</td>
+                                <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2;">
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;"> CoInsurance </td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"> ${{Citem.CoInsuranceAmount}}</td>
+                                <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2;">
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 500; line-height: normal; text-align: left; color: #000; padding: 5px; font-style: italic;"> Copay </td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                                <td style="font-size: 12px; border-right: 0.6px solid #B3B3B3; font-style: normal; font-weight: 400; line-height: normal; text-align: center; color: #000; padding: 5px;">${{Citem.CoPaymentAmount}}</td>
+                                <td style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; padding: 5px;"></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td colspan="8" style="padding: 5px; text-align:right;">
+                                    <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; ">Total Due From Patient:</label>
+                                    <span style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; color: #000; ">${{item.TotalPatientBalance}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="color: #000;  font-size: 14px; font-style: normal; font-weight: 700; line-height: normal;  text-align: left; margin-top:15px;">
+                        Patient Aging
+                    </div>
+                    <table style="width: 100%; border: 0.6px solid #B3B3B3; border-collapse: collapse; border-spacing: 0; margin-top: 6px;" ng-show="item.PatientBlanceSummary.length > 0">
+                        <tbody>
+                            <tr style="border-bottom: 0.6px solid #B3B3B3; " ng-repeat="pitem in item.PatientBlanceSummary track by $index">
+                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align:middle; ">
+                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">0-30 Days</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{pitem.Between0to30Days}}</p>
+                                </td>
+                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3;  padding: 2px 8px; vertical-align: middle; ">
+                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">31-60 Days</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{pitem.Between30to60Days}}</p>
+                                </td>
+                                <td style="border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; padding: 2px 8px; vertical-align: middle; ">
+                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">61-90 Days</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{pitem.Between60to90Days}}</p>
+                                </td>
+                                <td style="padding: 2px 8px; border-right: 0.6px solid #B3B3B3; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">91-120 Days</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{pitem.Between90to120Days}}</p>
+                                </td>
+                                <td style="padding: 2px 8px; border-bottom: 0.6px solid #B3B3B3; vertical-align: middle;">
+                                    <label style="font-size: 10px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">120+ Days</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">${{pitem.Morethen120days}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="color: #000;  font-size: 12px; font-style: normal; font-weight: 400; line-height: normal;  text-align: left; font-style:italic; margin-top:5px;">
+                        You are receiving the third statement for a past due
+                        balance on account. Please contact the billing office
+                        immediately in order to avoid your account being sent to a
+                        collection agency.
+                    </div>
+
+                    <table style="width: 100%; border-radius: 4px; padding:6px; background: #F2F2F2; border-collapse: collapse; border-spacing: 0; margin-top: 6px;">
+                        <tbody>
+                            <tr>
+                                <td colspan="2" style="padding: 2px 8px; vertical-align:middle; ">
+                                    <label style="font-size: 12px; font-style: normal; font-weight: 700; line-height: normal; color: #000; ">Office Updates</label>
+                                    <p style="font-size: 12px; font-style: normal; font-weight: 500; line-height: normal; color: #000; ">Payments and scheduling are available 24/7 through friedelle.com</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="PatientStatementsListEmail.html">
+    <div class="modal-header dis-flex align-items-center justify-space-between">
+        <h4 class="modal-title">Send Email</h4>
+        <button type="button" class="close" data-dismiss="modal">
+            <i class="fas fa-times" ng-click="PatientStatementsListEmailClose()"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <form name="userEmailForm">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Patient</label>
+                        <input type="email"
+                               id="input_patientemail"
+                               name="Pemail"
+                               class="form-control"
+                               placeholder="Enter Email"
+                               ng-model="eObj.PatientEmail"
+                               ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/">
+                        <span class="text-reed" ng-show="userEmailForm.Pemail.$dirty && userEmailForm.Pemail.$invalid">
+                            <span ng-show="userEmailForm.Pemail.$error.email">Invalid email address.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label>Doctor</label>
+                        <input type="email"
+                               id="input_doctoremail"
+                               name="Demail"
+                               class="form-control"
+                               placeholder="Enter Email"
+                               ng-model="eObj.DoctorEmail"
+                               ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/">
+                        <span class="text-reed" ng-show="userEmailForm.Demail.$dirty && userEmailForm.Demail.$invalid">
+                            <span ng-show="userEmailForm.Demail.$error.email">Invalid email address.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label>Other</label>
+                        <input type="email"
+                               id="input_otheremail"
+                               name="Oemail"
+                               class="form-control"
+                               placeholder="Enter Email"
+                               ng-model="eObj.OtherEmail"
+                               ng-pattern="/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/">
+                        <span class="text-reed" ng-show="userEmailForm.Oemail.$dirty && userEmailForm.Oemail.$invalid">
+                            <span ng-show="userEmailForm.Oemail.$error.email">Invalid email address.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label>EmailBody</label>
+                        <textarea class="form-control msd-elastic: \n;" id="textarea_emailbody" rows="2" placeholder="Add Notes" ng-model="eObj.body"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-12 text-right">
+                    <button type="button"
+                            id="button_send"
+                            class="btn primary-btn btn-block"
+                            ng-click="SendPatientStatementsListEmail()"
+                            data-dismiss="modal">
+                        <i class="far fa-envelope"></i> Send
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>

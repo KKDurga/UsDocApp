@@ -1,0 +1,226 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Edit Prescription Template</h4>
+    <button type="button" class="btn btn-link" ng-click="CloseEditPrescriptionTemplate()"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="well well-sm bg-info">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Template Name</label>
+                            <input type="text" class="form-control" ng-model="item.TemplateName" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="table-responsive">
+                <table class="table tableno-bordered m-b-0">
+                    <tbody>
+                        <tr>
+                            <td width="95%" class="text-clear-cons p-0 dropdow_templates customul-dropdwn">
+                                <input type="text" class="form-control" placeholder="Search Medicine"
+                                       ng-model="medicineGetObj.MedicineObject"
+                                       ng-show="!isTempGlobalPrescription"
+                                       typeahead-on-select="PushTemplatefreqMedicalItems(medicineGetObj.MedicineObject)"
+                                       typeahead-focus-on-select="false"
+                                       typeahead-min-length="0"
+                                       uib-typeahead="Medlist as Medlist.MedicineNameWithStock for Medlist in getOrgMedicines($viewValue)"
+                                       ng-change="PrescriptionChange(medicineGetObj.SearchText)" />
+
+                                <input type="text" class="form-control" ng-model="medicineGetObj.MedicineObject"
+                                       ng-show="isTempGlobalPrescription"
+                                       typeahead-focus-on-select="false"
+                                       typeahead-min-length="0"
+                                       typeahead-on-select="PushTemplatefreqMedicalItems(medicineGetObj.MedicineObject)"
+                                       placeholder="Enter Medicine Name"
+                                       uib-typeahead="Medlist as Medlist.MedicineNameWithStock for Medlist in GetMedicines($viewValue)"
+                                       ng-change="PrescriptionChange(MedicineObject)" />
+                                <i class="fas fa-times-circle" ng-click="medicineGetObj.SearchText='';obj.AddPrescriptionshow=false;" ng-hide="medicineGetObj.SearchText==''"></i>
+                                <ul class="dropdown-menu pos-absolute" ng-show="obj.AddPrescriptionshow && !isGlobalPrescription" uib-dropdown uib-dropdown-toggle auto-close="disabled">
+                                    <li><a ng-click="ShowAddNewPrescriptionPopUp(medicineGetObj.MedicineObject)">Add new</a></li>
+                                </ul>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="checkbox mr-0">
+                <label>
+                    <input name="checkbox-2" type="checkbox" ng-model="isTempGlobalPrescription" ng-change="changeTemplatefromisGlobal(isTempGlobalPrescription)">
+                    <span class="checkbox-material">
+                        <span class="check"></span>
+                    </span>
+                    <small class="ng-binding">Search from Global</small>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="MedicineTemplateDetails.length>0">
+        <div class="col-lg-12">
+            <div class="table-responsive">
+                <table class="table table-consultation">
+                    <thead>
+                        <tr>
+                            <td width="95%" class="b-0 p-l-0 p-r-0">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                    <tbody>
+                                        <tr>
+                                            <td class="">Drug</td>
+                                            <td class="w-160">Dosage & Frequency</td>
+                                            <td class="w-100">In Take</td>
+                                            <td class="w-100">Eye</td>
+                                            <td class="w-160">Duration</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td width="5%" class="b-0 p-0"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="presc in MedicineTemplateDetails | filter:{ 'PrescriptionType': 'GenericMedicine'} track by $index" ng-hide="presc.PrescriptionData.ActiveInd == 'N'">
+                            <td width="95%">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                    <tbody>
+                                        <tr>
+                                            <td class="valign-top">
+                                                <label>{{presc.PrescriptionData.Name}}</label>
+                                                <a href="javascript:;" ng-click="clickTemplateInstruction()" class="addDetails-text">+ Add Instructions</a>
+                                            </td>
+                                            <td class="w-160 valign-top">
+                                                <div>
+                                                    <div ng-show="presc.PrescriptionData.TypeOfDosage==='Default'">
+                                                        <div class="dis-flex">
+                                                            <div class="width-30">
+                                                                <input type="text" ng-change="AddToCache();" ng-model="presc.PrescriptionData.Dosage" class="form-control" placeholder="0" alpha-numeric-for-dosage />
+                                                            </div>
+                                                            <div class="width-70">
+                                                                <select name="selectedfrequency" class="form-control" ng-model="presc.PrescriptionData.FrequencyObj" ng-options="option.Name for option in DefaultPrescFrequency track by option.FrequencyId" ng-change="PushfreqeuncyItems(presc)">
+                                                                    <option value="" disabled>Select Frequency</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <a ng-show="presc.PrescriptionData.TypeOfDosage == 'Default'" ng-click="changeDosageType(presc,'Custom',$index)">Custom</a>
+                                                    </div>
+                                                    <div ng-show="presc.PrescriptionData.TypeOfDosage==='Custom'">
+                                                        <div class="dis-flex">
+                                                            <div class="width-30">
+                                                                <input type="text" class="form-control btr-radius bbr-radius" ng-model="presc.PrescriptionData.Dosage" />
+                                                            </div>
+                                                            <div class="width-70 medicine-frequencysearch">
+                                                                <input type="text" class="form-control btl-radius bbl-radius"
+                                                                       ng-model="presc.PrescriptionData.FrequencyObj"
+                                                                       typeahead-focus-on-select="false"
+                                                                       typeahead-min-length="0"
+                                                                       typeahead-is-open="customdropdown.isOpen"
+                                                                       typeahead-on-select="PushfreqeuncyItems(presc)"
+                                                                       placeholder="Ex. Twice a Day"
+                                                                       uib-typeahead="Medlist as Medlist.Name for Medlist in CustomPrescFrequency | filter:$viewValue"
+                                                                       ng-change="AddToCache();"
+                                                                       ng-blur="OnBlurFrequencyItems(presc.PrescriptionData.FrequencyObj,presc)" />
+                                                            </div>
+                                                        </div>
+                                                        <a ng-show="presc.PrescriptionData.TypeOfDosage == 'Custom'" ng-click="changeDosageType(presc,'Default',$index)">Default</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="w-100 valign-top">
+                                                <select class="form-control" ng-model="presc.PrescriptionData.Intake" ng-change="AddToCache();">
+                                                    <option value="0" ng-selected="presc.PrescriptionData.Intake==0">A Meal</option>
+                                                    <option value="1" ng-selected="presc.PrescriptionData.Intake==1">B Meal</option>
+                                                    <option value="2" ng-selected="presc.PrescriptionData.Intake==2">N/A</option>
+                                                </select>
+                                            </td>
+                                            <td class="w-100 valign-top" ng-show="SpecializationId =='3'">
+                                                <select class="form-control" ng-model="presc.PrescriptionData.OrganId" ng-change="AddToCache();">
+                                                    <option value="1" ng-selected="presc.PrescriptionData.OrganId==1">OD</option>
+                                                    <option value="2" ng-selected="presc.PrescriptionData.OrganId==2">OS</option>
+                                                    <option value="3" ng-selected="presc.PrescriptionData.OrganId==3">OU</option>
+                                                    <option value="4" ng-selected="presc.PrescriptionData.OrganId==4">General</option>
+                                                </select>
+                                            </td>
+                                            <td class="w-100 valign-top" ng-show="SpecializationId =='16'">
+                                                <select class="form-control" ng-model="presc.PrescriptionData.OrganId" ng-change="AddToCache();">
+                                                    <option value="5" ng-selected="presc.PrescriptionData.OrganId==5">Hair</option>
+                                                    <option value="6" ng-selected="presc.PrescriptionData.OrganId==6">Skin</option>
+                                                    <option value="7" ng-selected="presc.PrescriptionData.OrganId==7">Laser</option>
+                                                    <option value="4" ng-selected="presc.PrescriptionData.OrganId==4">General</option>
+                                                </select>
+                                            </td>
+                                            <td class="w-160 valign-top">
+                                                <div class="dis-flex">
+                                                    <div class="width-40">
+                                                        <input type="text" placeholder="0" class="form-control btr-radius bbr-radius" ng-model="presc.PrescriptionData.Duration" ng-change="AddToCache();" numeric-duration maxlength="3" ng-disabled="presc.PrescriptionData.DurationType=='L' || presc.PrescriptionData.DurationType=='C'|| presc.PrescriptionData.DurationTypeName =='To Be continued'" />
+                                                    </div>
+                                                    <div class="dropdown consultation-button width-60">
+                                                        <button class="btn btn-default dropdown-toggle btl-radius bbl-radius p-l-5 p-r-5 ellipsis-100" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                            {{presc.PrescriptionData.DurationTypeName}}
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                            <li ng-click="bindDurationType(presc,'D');"><a href="">Days</a></li>
+                                                            <li ng-click="bindDurationType(presc,'W');"><a href="">Weeks</a></li>
+                                                            <li ng-click="bindDurationType(presc,'M');"><a href="">Months</a></li>
+                                                            <li ng-click="bindDurationType(presc,'Y');"><a href="">Years</a></li>
+                                                            <li ng-click="bindDurationType(presc,'C');"><a href="">To Be continued</a></li>
+                                                            <li ng-click="bindDurationType(presc,'L');"><a href="">Life Time</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="showPrescTemplateInstruction">
+                                            <td colspan="2">
+                                                <div class="dis-flex justify-space-between align-items-center width-100">
+                                                    <div class="flex">
+                                                        <textarea class="invisible-textarea msd-elastic: \n;" placeholder="Enter Notes Here" rows="1" ng-model="presc.PrescriptionData.Instructions" ng-change="PrescriptionChange(presc)" enter-directive></textarea>
+                                                    </div>
+                                                    <!--<div>
+                                                        <button class="btn btn-primary btn-block" ng-click="TranslateInstruction(presc)">Translate</button>
+                                                    </div>-->
+                                                    <!--<div ng-if="presc.PrescriptionData.InstructionsLanguage.length>0">
+                                                        <a href="javascript:void(0);">
+                                                            <i class="fas fa-check"></i>
+                                                        </a>
+                                                    </div>-->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td width="5%" class="p-0 text-center pos-relative ">
+                                <!--<div class="doc-info-right" uib-popover="by {{presc.PrescriptionData.ModifiedBy}} on {{presc.PrescriptionData.ModifiedDt | date:'dd-MMM-yyyy'}}"
+                                     popover-trigger="mouseenter"
+                                     popover-append-to-body="true" popover-placement="auto right-top">
+                                    <i class="fas fa-info"></i>
+                                </div>-->
+                                <img src="img/delete-icon.svg" class="cur-poiter pos-relative right-5" width="20" height="20" ng-click="RemoveMedicine($index,presc);" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-show="MedicineTemplateDetails.length===0">
+        <div class="col-lg-12 no-data text-center">
+            <img width="120" align="center" src="img/no-data/no-optometry.png">
+            <p>You Dont Have Prescriptions</p>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-click="CloseEditPrescriptionTemplate()">Close</button>
+    <button class="btn btn-success w-150" ng-click="UpdatePrescriptionTemplate()">Update</button>
+</div>

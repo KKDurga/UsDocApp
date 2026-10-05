@@ -1,0 +1,123 @@
+﻿<div class="modal__style--1">
+    <div class="modal__header--">
+        <h1>Upload Files</h1>
+        <ul class="flex-flow-list">
+            <li>
+                <button class="btn__lg-- btn__1d5558--f" ng-disabled="FilesObj.TempImagesArray.length == 0" ng-click="PatientFileUpload()">Upload</button>
+            </li>
+            <li>
+                <a class="btn__close--2" ng-click="uibclose()">
+                    <i class="icons__w16--" ng-class="hovered ? 'close__w16--o' : 'close__w16--s'" ng-mouseenter="hovered = true" ng-mouseleave="hovered = false"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal__body--">
+        <!--ng-change="ChangeDocumentType()"-->
+        <div class="dis-flex flex-direction-column gap-y-10">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form__group">
+                        <label>Document Type</label>
+                        <select ng-options="item.Id as item.Name for item in DocumentTypeArray" ng-model="SelectedFile">
+                            <option>{{ 'SELECTDOCUMENTTYPE' | translate}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="d__f-- ai__c-- gap__10--">
+                        <div class="form__group width-100">
+                            <label>File Upload</label>
+                            <div class="input__style--4">
+                                <input type="file" id="file__choose--" name="upload" ng-model="files"
+                                       ngf-select="selectedImgs($files)"
+                                       ngf-pattern="'image/*,application/pdf'"
+                                       ngf-accept="'image/*,application/pdf'"
+                                       multiple="multiple" title="Choose a file to upload"
+                                       accept="image/*,application/pdf" />
+                                <label for="file__choose--">
+                                    No File Choosen
+                                </label>
+                                <span>
+                                    <i class="upload__w16--w icons__w16--"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <!--<div class="m-t-22">
+                        <button class="btn__xl-- btn__1d5558--o white-nowrap"><i class="icons__w16-- scan__w16--o"></i>Scan File</button>
+                    </div>-->
+                    </div>
+
+                    <div class="input__group" ng-if="false">
+                        <label>File Upload</label>
+                        <div class="dis-flex">
+                            <!--<input type="text">-->
+                            <input type="file"
+                                   name="upload" ng-model="files"
+                                   ngf-select="selectedImgs($files)"
+                                   ngf-pattern="'image/*,application/pdf'"
+                                   ngf-accept="'image/*,application/pdf'" id="chooseFile"
+                                   multiple="multiple" title="Choose a file to upload"
+                                   accept="image/*,application/pdf" />
+                            <label for="chooseFile" class="icon-label width-20 height-32">
+                                <i class="fa fa-upload"></i>
+                            </label>
+                            <!--<input type="file" id="fileInput" class="dis-none">-->
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-lg-4">
+                <div class="mt-20">
+                    <button class="btn__xl-- btn__1d5558--o">Scan file</button>
+                </div>
+            </div>-->
+            </div>
+            <div class="row" ng-if="FilesObj.TempImagesArray.length > 0">
+                <div class="col-lg-12">
+                    <p class="m-0 fs-12 font-weight-600">Uploaded Files</p>
+                </div>
+            </div>
+            <div class="height-300 overflow__auto--y" ng-if="(FilesObj.TempImagesArray| filter:{'DeleteInd':'N'}).length > 0">
+                <div class="row nocolpad dis-flex flex-wrap gap-y-10">
+                    <div class="col-lg-3" ng-repeat="imgitem in FilesObj.TempImagesArray| filter:{'DeleteInd':'N'} track by $index">
+                        <div class="border-1 bradius-5 p-5 w-200">
+                            <div class="dis-flex flex-direction-column grid-gap-10 form__group">
+                                <ul class="us-controls">
+                                    <li>
+                                        <a ng-click="DeleteUploadedFileNew(imgitem,$index,FilesObj);"><i class="icons__w16-- delete__w16--o"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="justify-content-center">
+
+                                    <!--<img src="" width="178" height="120" />-->
+                                    <img ngf-thumbnail="imgitem.file" image-viewer width="178" height="120" ng-if="(imgitem.FileExt !== 'application/pdf' && imgitem.FileExt !== 'pdf')&&imgitem.DocumentID==0" />
+                                    <!--<img ngf-thumbnail="imgitem.DocURL" width="178" height="120" image-viewer ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg'|| imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml')&&imgitem.DocumentID!=0" />-->
+                                    <img ngf-thumbnail="imgitem.S3URL" image-viewer  width="178" height="120" ng-if="(imgitem.FileExt == 'image/png' || imgitem.FileExt == 'image/jpeg' ||imgitem.FileExt == 'jpg' || imgitem.FileExt == 'png'|| imgitem.FileExt == 'jfif' || imgitem.FileExt == 'image/svg+xml' || imgitem.FileExt == 'jpeg')&&(imgitem.DocumentID!=0)" />
+
+                                    <!--<img ng-src="{{imgitem.DocURL}}" width="178" height="120" image-viewer ng-hide="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf') || imgitem.DocumentID == 0 || (imgitem.FileExt == 'tiff' || imgitem.FileExt == 'tif' || imgitem.FileExt=='image/tiff')" />-->
+                                    <a ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf')&&imgitem.DocumentID==0">
+                                        <img src="img/pdf.png" width="178" height="120" class="m-b-10" />
+                                    </a>
+                                    <a href="{{imgitem.DocURL}}" target="_blank" ng-if="(imgitem.FileExt == 'application/pdf' || imgitem.FileExt == 'pdf')&&imgitem.DocumentID!=0">
+                                        <img src="img/pdf.png" height="120" class="m-b-10" />
+                                    </a>
+                                </div>
+                                <p class="p-5 border-1 m-0 bradius-5 text-overflow-ellipsis white-nowrap overflow-hidden" title="{{imgitem.DisplayName}}">{{imgitem.DisplayName}}</p>
+                                <!--<select>
+                                <option selected>Medical Records</option>
+                                <option>option2</option>
+                            </select>-->
+                                <select ng-options="item.Id as item.Name for item in DocumentTypeArray" ng-model="imgitem.FileTypeId" ng-disabled="!imgitem.IsEdit">
+                                    <option>{{ 'SELECTDOCUMENTTYPE' | translate}}</option>
+                                </select>
+                                <!--<textarea type="text" placeholder="Enter Remarks"></textarea>-->
+                                <textarea placeholder="{{ 'ENTERREMARKS' | translate}}" ng-model="imgitem.Remarks"></textarea>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,536 @@
+﻿<div class="row">
+    <div class="col-lg-12">
+        <div class="tile-header dis-flex justify-space-between align-items-center">
+            <h4 class="modal-title text-068cb0">Connect Schedule</h4>
+            <div>
+                <div class="form-group">
+                    <ul class="tabs-fill-outline flex m-r-10">
+                        <li ng-class="addUpdateScheduleObj.Type=='Duration'?'active':''" ng-click="changeType('Duration')">
+                            <a>Duration</a>
+                        </li>
+                         
+                        <li ng-class="addUpdateScheduleObj.Type=='Custom'?'active':''" ng-click="changeType('Custom')">
+                            <a>Custom</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <button type="button" class="btn btn-link pull-right" ng-click="closeuib()">
+                <!--<i class="fas fa-times fa-lg"></i>-->
+                <i class="eh-close eh-icon"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table tableno-bordered m-b-0">
+                        <tbody>
+                            <tr>
+                                <td ng-if="connectedUsersObj.isAvailable">
+                                    <div class="form-group">
+                                        <label>Connected Users <em>*</em></label>
+                                        <select class="form-control" ng-change="changeConnectedUsersObj(addUpdateScheduleObj.ConnectedUserObj)" ng-model="addUpdateScheduleObj.ConnectedUserObj" ng-options="item as item.UserName for item in connectedUsersObj.UsersList">
+                                            <option value="" disabled="disabled">Select</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <label>Schedule <em>*</em></label>
+                                        <select class="form-control" ng-disabled="disableScheduleSelection" ng-change="changeUserScheduleObj(addUpdateScheduleObj.UserScheduleObj)" ng-model="addUpdateScheduleObj.UserScheduleObj" ng-options="item as item.UserScheduleName for item in slotsArray">
+                                            <option value="" disabled="disabled">Select</option>
+                                        </select>
+                                    </div>
+                                </td>
+
+                                <td ng-Show="addUpdateScheduleObj.Type =='Date'">
+                                    <div class="form-group">
+                                        <label class="m-r-10 white-nowrap">{{ 'FROMDATE' | translate}} </label>
+                                        <input type="text" class="icons-calendar form-control cur-default bg-white"
+                                               datepickerapnlus readonly ng-model="addUpdateScheduleObj.FromDate" placeholder="MM-DD-YYYY" />
+                                    </div>
+                                </td>
+                                <td ng-Show="addUpdateScheduleObj.Type =='Date'">
+                                    <div class="form-group">
+                                        <label class="m-r-10 white-nowrap">{{ 'TODATE' | translate}} </label>
+                                        <input type="text" class="icons-calendar form-control cur-default bg-white"
+                                               datepickerapnlus readonly ng-model="addUpdateScheduleObj.ToDate" placeholder="MM-DD-YYYY" />
+                                    </div>
+                                </td>
+                                <td class="w-200" ng-show="addUpdateScheduleObj.Type =='Duration'">
+                                    <fieldset class="pos-relative p-5">
+                                        <div class="dis-inline-block ml-0">
+                                            <input type="radio" class="radio-custom width-0" id="Week" name="MonthAndWeek" ng-value="1" ng-model="addUpdateScheduleObj.ScheduleMonthorWeekType" ng-change="ChangeScheduleMonthorWeek(addUpdateScheduleObj.ScheduleMonthorWeekType)">
+                                            <label for="Week" class="radio-custom-label reg-radio-label">Week</label>
+                                        </div>
+                                        <div class="dis-inline-block">
+                                            <input type="radio" class="radio-custom width-0" id="Month" name="MonthAndWeek" ng-value="2" ng-model="addUpdateScheduleObj.ScheduleMonthorWeekType" ng-change="ChangeScheduleMonthorWeek(addUpdateScheduleObj.ScheduleMonthorWeekType)">
+                                            <label for="Month" class="radio-custom-label reg-radio-label">Day</label>
+                                        </div>
+                                    </fieldset>
+                                </td>
+                                <td class="w-250" ng-show="addUpdateScheduleObj.Type =='Duration' && addUpdateScheduleObj.ScheduleMonthorWeekType == 2">
+                                    <div class="form-group">
+
+                                        <label class="m-r-10 white-nowrap text-s14w500c000">  {{ 'REPEAT' | translate}} </label>
+                                        <div class="dropdown cstm-dropdown w-220">
+                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                {{SelectedMonthobj.Selecteditem}}
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app w-250" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li ng-repeat="item in RepeatMonth">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="OnClickRepeatMonth();">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small ng-bind="item.Name"></small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td class="w-250" ng-show="addUpdateScheduleObj.Type =='Duration' && addUpdateScheduleObj.ScheduleMonthorWeekType == 1">
+                                    <div class="form-group">
+                                        <label class="m-r-10 white-nowrap text-s14w500c000">  {{ 'REPEAT' | translate}} </label>
+                                        <div class="max-ehr-input">
+                                            <select class="p-y-2" ng-model="addUpdateScheduleObj.ScheduleEveryType"
+                                                    ng-change="getTimeSlotsByEveryType(addUpdateScheduleObj.ScheduleEveryType)">
+                                                <option value="">{{ 'SELECT' | translate}}</option>
+                                                <option value="1">{{ 'EVERYWEEK' | translate}}</option>
+                                                <option value="2">{{ 'EVERYEVENWEEK' | translate}}</option>
+                                                <option value="3">{{ 'EVERYODDWEEK' | translate}}</option>
+                                                <option value="4">{{ 'EVERYFIRSTWEEK' | translate}}</option>
+                                                <option value="5">{{ 'EVERYSECONDWEEK' | translate}}</option>
+                                                <option value="6">{{ 'EVERYTHIRDWEEK' | translate}}</option>
+                                                <option value="7">{{ 'EVERYFOURTHWEEK' | translate}}</option>
+                                                <option value="8">{{ 'EVERYFIFTHWEEK' | translate}}</option>
+                                                <option value="9">{{ 'EVERYLASTWEEK' | translate}}</option>
+                                                <option value="10">Every Alternate</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!--<td ng-show="addUpdateScheduleObj.showDaySelection">
+                                    <div class="form-group">
+                                        <label>Day <em>*</em></label>
+                                        <select class="form-control" ng-model="addUpdateScheduleObj.ScheduleMonthEveryType" ng-change="changeMonthEveryType(addUpdateScheduleObj)" ng-options="item.WeekId as item.WeekDay for item in daysofweek">
+                                            <option value="" disabled="disabled">Select</option>
+
+                                        </select>
+                                    </div>
+                                </td>-->
+
+                                <td class="w-180" ng-show="addUpdateScheduleObj.ScheduleEveryType=='10'">
+                                    <div class="form-group">
+                                        <label>Day <em>*</em></label>
+                                        <div class="dropdown cstm-dropdown width-100">
+                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                {{SearchWeekobj.selecteditem}}
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app w-200" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li ng-repeat="item in daysofweek | filter:{ Active: 'Y' }">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="onSelectAlternateWeekDays();">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small ng-bind="item.WeekDay"></small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="w-180" ng-show="addUpdateScheduleObj.showDaySelection">
+                                    <div class="form-group">
+                                        <label>Day <em>*</em></label>
+                                        <div class="dropdown cstm-dropdown width-100">
+                                            <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu3" data-toggle="dropdown">
+                                                {{SearchWeekobj.selecteditem}}
+                                            </button>
+                                            <div class="dropdown-menu dr-drop-app w-200" role="menu" aria-labelledby="dropdownMenu3" ng-click="stopClosingDropDown($event)">
+                                                <!--<div class="p-5">
+                                                    <input type="text" class="form-control input-sm bg-inputy" placeholder="{{ 'SEARCH' | translate}}" ng-model="SearchWeekobj.txt" />
+                                                </div>-->
+                                                <div class="drop-menu-Scroll apptsearchdroplist">
+                                                    <ul>
+                                                        <li ng-repeat="item in daysofweek | filter:{ Active: 'Y' }">
+                                                            <div class="checkbox cn">
+                                                                <label>
+                                                                    <input name="checkbox-11" type="checkbox" ng-model="item.isChecked" ng-click="onselectedDaysofweek();">
+                                                                    <span class="checkbox-material">
+                                                                        <span class="check"></span>
+                                                                    </span>
+                                                                    <small ng-bind="item.WeekDay"></small>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td ng-show="addUpdateScheduleObj.Type =='Duration'">
+                                    <div class="form-group">
+                                        <label class="text-s12w600C000 m-l-5"> {{ 'FORNEXT' | translate}} :</label>
+                                        <div class="dis-flex">
+                                            <div class="max-ehr-input">
+                                                <input type="text" class="p-y-2 text-center" placeholder="3" maxlength="2"
+                                                       ng-model="addUpdateScheduleObj.ScheduleDuration"
+                                                       ng-change="OnChangeslot(addUpdateScheduleObj.ScheduleEveryType)"
+                                                       numbers-only="numbers-only">
+                                            </div>
+                                            <button class="width-50 m-l-5" ng-class="(addUpdateScheduleObj.ScheduleDurationType == 'M')?'score-btn active':'score-btn'"
+                                                    ng-click="addUpdateScheduleObj.ScheduleDurationType = 'M';">
+                                                {{ 'MONTHS' | translate}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr ng-if="addUpdateScheduleObj.IsAlternateDaysSelected">
+                                <td colspan="10">
+                                    <div class="row" ng-repeat="item in daysofweek | filter:{ isChecked: true }">
+                                        <div class="col-lg-7">
+
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="row" style="border-bottom: 1px solid #cbcbcb;">
+                                                <div class="col-lg-6">
+                                                    Alternate {{item.WeekDay}} Starts From :
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <input ng-if="item.WeekId==1" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickermondaysdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()"/>
+                                                        <input ng-if="item.WeekId==2" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickertuesdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()"/>
+                                                        <input ng-if="item.WeekId==3" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickerwedsdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()"/>
+                                                        <input ng-if="item.WeekId==4" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickerthursdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()"/>
+                                                        <input ng-if="item.WeekId==5" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickerfrisdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()"/>
+                                                        <input ng-if="item.WeekId==6" type="text" class="icons-calendar form-control cur-default bg-white"
+                                                               datepickersatsdates readonly ng-model="item.StartDate" placeholder="MM-DD-YYYY" ng-change="changeWeekDayDate()" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-12" ng-if="addUpdateScheduleObj.Type==='Custom'">
+
+
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <div class="table-responsive">
+                                <table class="table table-bordered m-b-0 time-slots-leave-calc">
+                                    <thead>
+                                        <tr>
+                                            <th class="pos-relative text-center bg-white">
+                                                <div colspan="5" class="tickcheck-box">
+                                                    <input id="checkTick" type="checkbox" ng-model="month.checkitem" ng-true-value="'Y'" ng-false-value="'N'" ng-click="selctWholeMonth(month.checkitem)">
+                                                    <label for="checkTick">selectall</label>
+                                                </div>
+                                            </th>
+                                            <th class="pos-relative text-center bg-white">
+                                                <div class="tileslots-arrow" ng-hide="isCurrentPreviousMonth">
+                                                    <span class="pos-absolute bottom-0 top-0 left-0" ng-click="navtoPreviousMonth(selectedmonth,selectedyear)"><i class="fas fa-chevron-left"></i></span>
+                                                </div>
+                                            </th>
+                                            <th colspan="5" class="text-center bg-white">
+                                                <div>
+                                                    <select id="month" name="month" ng-model="selectedmonth" ng-options="item.Id as item.Name for item in months" class="m-10" ng-change="changeYearMonthCalendar(selectedmonth,selectedyear)" ng-disabled="true"> </select>
+                                                    <select id="year" name="year" ng-model="selectedyear" ng-options="item.Id as item.Name for item in years" ng-change="changeYearMonthCalendar(selectedmonth,selectedyear)" ng-disabled="true"></select>
+                                                </div>
+                                            </th>
+                                            <th class="text-center bg-white">
+                                                <div class="tileslots-arrow">
+
+                                                    <span class="pos-absolute bottom-0 top-0 right-0" ng-click="navtoNextMonth(selectedmonth,selectedyear)"><i class="fas fa-chevron-right"></i></span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th class="pos-relative text-center bg-white"></th>
+                                            <th>Mon</th>
+                                            <th>Tue</th>
+                                            <th>Wed</th>
+                                            <th>Thu</th>
+                                            <th>Fri</th>
+                                            <th>Sat</th>
+                                            <th>Sun</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek1" type="checkbox" ng-model="weekitems.checkitem1" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem1,1)" />
+                                                    <label for="checkTickweek1">week1</label>
+                                                </div>
+                                            </td>
+                                            <td class="center-slot-eh" ng-repeat="week1 in MainTimerArray | filter:{ Week: 1 }" ng-style="{ 'background-color' : (week1.IsSelectedMonth == false && !week1.IsHoliday) ? 'rgb(248 227 156)' : '' }" ng-class="holidayActive(week1.IsHoliday)">
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week1.Date}}</p>
+                                                    </div>
+                                                    <!--<div ng-hide="week1.IsHoliday || !week1.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week1.RowIndex}}" type="checkbox" aria-label="..." ng-model="week1.IsSelectedDate" ng-click="checkunselectitem(1)">
+                                                            <label for="checkTick{{week1.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>-->
+                                                </div>
+                                            
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week1.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week1.IsHolidayText}}">{{week1.IsHolidayText}}</span>
+                                                    </div>
+
+                                                    <div class="cal-day-holiday" ng-if="week1.IsDateSlotBooked && !week1.IsHoliday">
+                                                        <span class="" title="{{week1.BranchesFullName}}">{{week1.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week1.IsDateSlotLeave">
+                                                        <span style="font-size: 20px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek2" type="checkbox" ng-model="weekitems.checkitem2" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem2,2)" />
+                                                    <label for="checkTickweek2">week2</label>
+                                                </div>
+                                            </td>
+                                            <td ng-repeat="week2 in MainTimerArray | filter:{ Week: 2 }" ng-style="{ 'background-color' : (week2.IsSelectedMonth == false && !week2.IsHoliday) ? 'rgb(248 227 156)' : '' }" ng-class="holidayActive(week2.IsHoliday)">
+
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week2.Date}}</p>
+                                                    </div>
+                                                    <!--<div ng-hide="week2.IsHoliday || !week2.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week2.RowIndex}}" type="checkbox" aria-label="..." ng-model="week2.IsSelectedDate" ng-click="checkunselectitem(2)">
+                                                            <label for="checkTick{{week2.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>-->
+                                                </div>
+                                             
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week2.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week2.IsHolidayText}}">{{week2.IsHolidayText}}</span>
+                                                    </div>
+
+                                                    <div class="cal-day-holiday" ng-if="week2.IsDateSlotBooked && !week2.IsHoliday">
+                                                        <span class="" title="{{week2.BranchesFullName}}">{{week2.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week2.IsDateSlotLeave">
+                                                        <span style="font-size: 12px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek3" type="checkbox" ng-model="weekitems.checkitem3" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem3,3)" />
+                                                    <label for="checkTickweek3">week3</label>
+                                                </div>
+                                            </td>
+                                            <td ng-repeat="week3 in MainTimerArray | filter:{ Week: 3 }" ng-style="{ 'background-color' : (week3.IsSelectedMonth == false && !week3.IsHoliday) ? 'rgb(248 227 156)' : '' }" ng-class="holidayActive(week3.IsHoliday)">
+
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week3.Date}}</p>
+                                                    </div>
+                                                    <!--<div ng-hide="week3.IsHoliday || !week3.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week3.RowIndex}}" type="checkbox" aria-label="..." ng-model="week3.IsSelectedDate" ng-click="checkunselectitem(3)">
+                                                            <label for="checkTick{{week3.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>-->
+                                                </div>
+
+                                          
+
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week3.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week3.IsHolidayText}}">{{week3.IsHolidayText}}</span>
+                                                    </div>
+
+                                                    <div class="cal-day-holiday" ng-if="week3.IsDateSlotBooked && !week3.IsHoliday">
+                                                        <span class="" title="{{week3.BranchesFullName}}">{{week3.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week3.IsDateSlotLeave">
+                                                        <span style="font-size: 20px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek4" type="checkbox" ng-model="weekitems.checkitem4" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem4,4)" />
+                                                    <label for="checkTickweek4">week4</label>
+                                                </div>
+                                            </td>
+                                            <td ng-repeat="week4 in MainTimerArray | filter:{ Week: 4 }" ng-style="{ 'background-color' : (week4.IsSelectedMonth == false && !week4.IsHoliday) ? 'rgb(248 227 156)' : '' }" ng-class="holidayActive(week4.IsHoliday)">
+
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week4.Date}}</p>
+                                                    </div>
+                                                    <!--<div ng-hide="week4.IsHoliday || !week4.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week4.RowIndex}}" type="checkbox" aria-label="..." ng-model="week4.IsSelectedDate" ng-click="checkunselectitem(4)">
+                                                            <label for="checkTick{{week4.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>-->
+                                                </div>
+
+                                         
+
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week4.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week4.IsHolidayText}}">{{week4.IsHolidayText}}</span>
+                                                    </div>
+                                                    <div class="cal-day-holiday" ng-if="week4.IsDateSlotBooked && !week4.IsHoliday">
+                                                        <span class="" title="{{week4.BranchesFullName}}">{{week4.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week4.IsDateSlotLeave">
+                                                        <span style="font-size: 20px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-show="(MainTimerArray| filter:{'Week':5,'IsSelectedMonth':true}).length !== 0">
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek5" type="checkbox" ng-model="weekitems.checkitem5" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem5,5)" />
+                                                    <label for="checkTickweek5">week5</label>
+                                                </div>
+                                            </td>
+                                            <td ng-repeat="week5 in MainTimerArray | filter:{ Week: 5 }" ng-style="{ 'background-color' : (week5.IsSelectedMonth == false  && !week5.IsHoliday) ? 'rgb(248 227 156)' : '' }" ng-class="holidayActive(week5.IsHoliday)">
+
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week5.Date}}</p>
+                                                    </div>
+                                                    <!--<div ng-hide="week5.IsHoliday  || !week5.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week5.RowIndex}}" type="checkbox" aria-label="..." ng-model="week5.IsSelectedDate" ng-click="checkunselectitem(5)">
+                                                            <label for="checkTick{{week5.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>-->
+                                                </div>
+
+
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week5.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week5.IsHolidayText}}">{{week5.IsHolidayText}}</span>
+                                                    </div>
+
+                                                    <div class="cal-day-holiday" ng-if="week5.IsDateSlotBooked && !week5.IsHoliday">
+                                                        <span class="" title="{{week5.BranchesFullName}}">{{week5.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week5.IsDateSlotLeave">
+                                                        <span style="font-size: 20px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        <tr ng-show="(MainTimerArray| filter:{'Week':6,'IsSelectedMonth':true}).length !== 0">
+                                            <td class="center-slot-eh">
+                                                <div class="tickcheck-box">
+                                                    <input id="checkTickweek6" type="checkbox" ng-model="weekitems.checkitem6" ng-true-value="'Y'" ng-false-value="'N'" ng-click="changeWholeWeek(weekitems.checkitem6,6)" />
+                                                    <label for="checkTickweek6">week6</label>
+                                                </div>
+                                            </td>
+                                            <td ng-repeat="week6 in MainTimerArray | filter:{ Week: 6 }" ng-style="{ 'background-color' : (week6.IsSelectedMonth == false && !week6.IsHoliday) ? 'rgb(248 227 156)' : ''}" ng-class="holidayActive(week6.IsHoliday)">
+
+                                                <div class="dis-flex justify-space-between height-20">
+                                                    <div class="cald-day">
+                                                        <p>{{week6.Date}}</p>
+                                                    </div>
+                                                    <div ng-hide="week6.IsHoliday || !week6.IsSelectedMonth">
+                                                        <div class="tickcheck-box">
+                                                            <input id="checkTick{{week6.RowIndex}}" type="checkbox" aria-label="..." ng-model="week6.IsSelectedDate" ng-click="checkunselectitem(6)">
+                                                            <label for="checkTick{{week6.RowIndex}}"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="pos-absolute width-80 bottom-5">
+                                                    <div ng-show="week6.IsHoliday" class="cal-day-holiday">
+                                                        <span class="" title="{{week6.IsHolidayText}}">{{week6.IsHolidayText}}</span>
+                                                    </div>
+                                                    <div class="cal-day-holiday" ng-if="week6.IsDateSlotBooked && !week6.IsHoliday">
+                                                        <span class="" title="{{week6.BranchesFullName}}">{{week6.BranchesName}}</span>
+                                                    </div>
+                                                    <div ng-show="week6.IsDateSlotLeave">
+                                                        <span style="font-size: 20px;font-weight: 700;color: red;">Leave</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <button class="btn btn-primary btn-lg" ng-click="addmoreDatesinCustom()">+ Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12" ng-if="addUpdateScheduleObj.Type==='Custom'">
+                    <div class="row">
+                        <div class="col-lg-3" ng-repeat="citem in calendarSelectedSlots">
+                            <label>{{citem.SlotDate | date : 'MM-dd-yyyy' }}</label> <span>Week - {{citem.Week}} </span> <span ng-hide="$last">,</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer p-10">
+            <div class="dis-flex align-items-center m-l-10 justify-content-end">
+                <button class="btn btn-discard-us m-r-5 ng-binding" ng-click="closeuib()">{{ 'CLOSE' | translate}}</button>
+                <button class="btn btn-save-us" ng-click="SaveSelectedScheduleToCalendar();">{{ 'SAVE' | translate}}</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,440 @@
+﻿<div class="asc-model-header">
+    <h1>Pre-OP</h1>
+    <div>
+        <ul class="autofill-list m-b-0">
+            <li ng-class="Preopobj.SubType=='AldereteScore' ?'active':''"  ng-if="UserAccessRights.AllAccessRights.PreOpAldereteScore">
+                <a href="javascript:;" ng-click="TabChange(1)">Aldrete Score</a>
+            </li>
+            <li ng-class="Preopobj.SubType=='PreOpCall' ?'active':''" ng-if="UserAccessRights.AllAccessRights.PreOpPreopcall">
+                <a href="javascript:;" ng-click="TabChange(3)">Pre-Op Call</a>
+            </li>
+            <li ng-class="Preopobj.SubType=='Patient' ?'active':''" ng-if="UserAccessRights.AllAccessRights.PreOpPatientCheckList">
+                <a href="javascript:;" ng-click="TabChange(4)">Patient CheckList</a>
+            </li>
+        </ul>
+    </div>   
+    <ul>
+        <li>
+            <button class="btn-d" ng-click="closeuib()">Close</button>
+        </li>
+        <li>
+            <button class="btn-s" ng-click="SavePreopMultipleData()">Save</button>
+        </li>
+    </ul>
+</div>
+
+
+<div class="modal-body p-5">
+    <div class="asc-patient-profile">
+        <ul>
+            <li>
+                <img image-viewer ng-if="cacheStorageItem.PatientImageS3URL != ''" src="{{cacheStorageItem.PatientImageS3URL}}" />
+                <img ng-if="cacheStorageItem.PatientImageS3URL == ''" src="img/sprite-sheet/user-square.svg" />
+                <p title="{{cacheStorageItem.PatientName}}">{{cacheStorageItem.PatientName}}</p>
+            </li>
+            <li>
+                <span>MR No.:</span>
+                <label>{{cacheStorageItem.PatientDisplayId}}</label>
+            </li>
+            <li>
+                <span>Sex:</span>
+                <label>{{cacheStorageItem.Gender}}</label>
+            </li>
+            <li>
+                <span>Age:</span>
+                <label>{{cacheStorageItem.Age}}</label>
+            </li>
+            <li>
+                <span>DOB:</span>
+                <label>{{cacheStorageItem.PatientDOB | date:"MM-dd-yyyy"}}</label>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-pane show" ng-show="Preopobj.SubType=='AldereteScore'">
+        <div class="row" ng-if="preopSubPopupScreenAccessObj.AldereteScoreEditAccess">
+            <div class="col-lg-12">
+                <section class="eh-panel b-0">
+                    
+                    <div class="eh-body">
+                        <table class="table tableno-bordered tableno-padding tableno-border-body m-0">
+                            <tbody ng-repeat="item in AlderetScoreDetails track by $index">
+                                <tr>
+                                    <td colspan="4">
+                                        <label class="text-s12w700c000 fs-14">{{item.AldreteScoreTypeName}}</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="30%" ng-repeat="kitem in item.AldreteScoreDetailTypes track by $index">
+                                        <ul class="ul-Aideret-score">
+                                            <li ng-class="(kitem.IsChecked && kitem.DeleteInd=='N')?'active':''">
+                                                <button ng-click="OnSelectAlderetScore1(kitem,item);">{{kitem.AldreteScoreDetailTypeName}}</button>
+                                                <span>{{kitem.AldreteScore}}</span>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <ul class="ul-Aideret-score">
+                                            <li>
+                                                <button class="active height-25">{{item.Value}}</button>
+                                            </li>
+                                        </ul>
+                                    </td>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">
+                                        <ul class="referral-summary-list justify-content-end">
+                                            <li>
+                                                <label>Total Alderete Score</label>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td width="10%">
+                                        <ul class="ul-Aideret-score">
+                                            <li>
+                                                <button class="text-red active bradius-5 height-25" ng-show="PreOpObj.TotalAlderetScore >=0 && PreOpObj.TotalAlderetScore <= 6">{{PreOpObj.TotalAlderetScore}}</button>
+                                                <button class="text-ecc83b active bradius-5 height-25" ng-show="PreOpObj.TotalAlderetScore >=7 &&PreOpObj.TotalAlderetScore <=8">{{PreOpObj.TotalAlderetScore}}</button>
+                                                <button class="active bradius-5 height-25" ng-show="PreOpObj.TotalAlderetScore >=9 &&PreOpObj.TotalAlderetScore <=12">{{PreOpObj.TotalAlderetScore}}</button>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="tab-pane show" ng-show="Preopobj.SubType=='PreOpCall'">
+        <div class="row" ng-if="preopSubPopupScreenAccessObj.PreOpCallEditAccess">
+            <div class="col-lg-12">
+                <section class="eh-panel b-0">
+                     
+                    <div class="eh-body">
+                        <table class="table tableno-bordered table-layout-fix">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="ehr-input  pop-ehr-input">
+                                            <label>Contact Type</label>
+                                            <select ng-model="PreOpCallObj.ContactType" ng-options="item.value as item.value for item in ContactList">
+                                                <option value="" disabled>Contact Number</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td class="dis-flex" colspan="3">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Date</label>
+                                            <div class="preopcal-btn">
+                                                <input ng-focus="IsContactStartDateInd" class="form-control icons-calendar" type="text" ng-model="PreOpCallObj.ContactStartDate" placeholder="MM-DD-YYYY" datepickeruniversal readonly />
+                                                <!--<button ng-click="IsContactStartDateInd = !IsContactStartDateInd" class="bg-c2dfd9"> <i class="far fa-calendar"></i> </button>-->
+                                            </div>
+                                        </div>
+                                        <div class="ehr-input m-l-5 pop-ehr-input">
+                                            <label>Time</label>
+                                            <div class="ehr-input-group">
+                                                <input type="text" ng-model="PreOpCallObj.ContactStartTime">
+                                                <button ng-click="newclicktime(PreOpCallObj,'StartTime')" class="bg-c2dfd9">
+                                                    <i class="far fa-clock"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsConnectedWithPatient?'active':''" ng-click="PreOpConnectedWithPatient(PreOpCallObj)">Connected with Patient</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsConnectedWithFamilyOrFriend?'active':''" ng-click="PreOpConnectedWithFamilyOrFriend(PreOpCallObj)">Connected with Family/Friend</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsLeftMsgWithPatient?'active':''" ng-click="PreOpLeftMsgWithPatient(PreOpCallObj)">Left Message with Patient</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsLeftMsgWithFamilyOrFriend?'active':''" ng-click="PreLeftMsgWithFamilyOrFriend(PreOpCallObj)">Left Message with Family/Friend</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsNoResponse?'active':''"
+                                                ng-click="PreOpNoResponse(PreOpCallObj)">
+                                            No Response
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <b class="text-s12w700c000 fs-14">Instructions Shared With Patient</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsArrivalTimeShared?'active':''" ng-click="PreOpCallObj.IsArrivalTimeShared = !PreOpCallObj.IsArrivalTimeShared;">Arrival Time</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsAccompanyShared?'active':''" ng-click="PreOpCallObj.IsAccompanyShared = !PreOpCallObj.IsAccompanyShared;">Accompany</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsDrinkPlentyWaterShared?'active':''" ng-click="PreOpCallObj.IsDrinkPlentyWaterShared = !PreOpCallObj.IsDrinkPlentyWaterShared;">Drink Plenty of water</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsNpoAfterMidnightShared?'active':''" ng-click="PreOpCallObj.IsNpoAfterMidnightShared = !PreOpCallObj.IsNpoAfterMidnightShared;">NPO after Midnight</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsTakeBpHeartMedShared?'active':''" ng-click="PreOpCallObj.IsTakeBpHeartMedShared = !PreOpCallObj.IsTakeBpHeartMedShared;">Take BP/Heart Medication</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsDoNotTakeBpMedShared?'active':''" ng-click="PreOpCallObj.IsDoNotTakeBpMedShared = !PreOpCallObj.IsDoNotTakeBpMedShared;">Do not take Diabetic Medication</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsNoMakeupJewelMoistShared?'active':''" ng-click="PreOpCallObj.IsNoMakeupJewelMoistShared = !PreOpCallObj.IsNoMakeupJewelMoistShared;">No Makeup/Jewelry/Moisturizers</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreOpCallObj.IsCoPay?'active':''" ng-click="PreOpCallObj.IsCoPay = !PreOpCallObj.IsCoPay;">Co-Pay</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="dis-flex">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <label>Start Drops</label>
+                                            <input type="text" ng-focus="StartDrops" class="form-control icons-calendar" ng-model="PreOpCallObj.DropStartDate" placeholder="MM-DD-YYYY" datepickeruniversal readonly />
+                                            
+                                        </div>
+                                        <div class="ehr-input m-l-5 pop-ehr-input">
+                                            <label>&nbsp;</label>
+                                            <div class="ehr-input-group">
+                                                <input type="text" ng-model="PreOpCallObj.DropsStartTime">
+                                                <button ng-click="newclicktime(PreOpCallObj,'DropsTime')">
+                                                    <i class="far fa-clock"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td colspan="3">
+                                        <a href="javascript:;" ng-click="ShowCopaynotes = !ShowCopaynotes"> {{ShowCopaynotes ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                        <div class="ehr-input pop-ehr-input" ng-if="ShowCopaynotes">
+                                            <textarea rows="2" class="msd-elastic: \n" placeholder="Notes" maxlength="500" ng-model="PreOpCallObj.CoPayNotes" spellcheck="false"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <a href="javascript:;" ng-click="ShowPreopOverallnotes = !ShowPreopOverallnotes"> {{ShowPreopOverallnotes ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                        <div class="ehr-input" ng-if="ShowPreopOverallnotes">
+                                            <textarea rows="2" placeholder="Enter Notes" maxlength="500" class="msd-elastic: \n" ng-model="PreOpCallObj.Remarks" spellcheck="false"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane show" ng-show="Preopobj.SubType=='Patient'">
+        <div class="row" ng-if="preopSubPopupScreenAccessObj.PatientCheckListEditAccess">
+            <div class="col-lg-12">
+                <section class="eh-panel b-0">
+                    
+                    <div class="search-panel-body">
+                        <table class="table tableno-bordered tableno-padding m-b-0">
+                            <tbody>
+                                 
+                                 
+                                <tr>
+                                    <td>
+                                        <span class="text-s14w600c000">pre-operative orientation offered</span>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PreOperativeOrientationOffered =='AboutPremedicationEffects'?'active':''"
+                                                ng-click="PreopCheckinObj.PreOperativeOrientationOffered ='AboutPremedicationEffects' ; PreopCheckinObj.PreOperativeOrientationOfferedNotes =''">
+                                            About-Premedication Effects
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PreOperativeOrientationOffered =='PreIntraPhase'?'active':''"
+                                                ng-click="PreopCheckinObj.PreOperativeOrientationOffered ='PreIntraPhase' ;PreopCheckinObj.PreOperativeOrientationOfferedNotes =''">
+                                            Pre Intra Phase
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PreOperativeOrientationOffered =='PostSurgery'?'active':''"
+                                                ng-click="PreopCheckinObj.PreOperativeOrientationOffered ='PostSurgery' ;PreopCheckinObj.PreOperativeOrientationOfferedNotes =''">
+                                            Post Surgery
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PreOperativeOrientationOffered =='Others'?'active':''"
+                                                ng-click="PreopCheckinObj.PreOperativeOrientationOffered ='Others'; focusTextarea('PreOperative')">
+                                            Others
+                                        </button>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" maxlength="100" ng-show="PreopCheckinObj.PreOperativeOrientationOffered =='Others'" ng-focus="isPreOperative == true" ng-model="PreopCheckinObj.PreOperativeOrientationOfferedNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-s14w600c000">Observed Behavior</span>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.ObservedBehavior =='CalmedDown'?'active':''"
+                                                ng-click="PreopCheckinObj.ObservedBehavior ='CalmedDown' ; PreopCheckinObj.ObservedBehaviorNotes =''">
+                                            Calmed Down
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.ObservedBehavior =='Anxious'?'active':''"
+                                                ng-click="PreopCheckinObj.ObservedBehavior ='Anxious' ; PreopCheckinObj.ObservedBehaviorNotes =''">
+                                            Anxious
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.ObservedBehavior =='RefersToFear'?'active':''"
+                                                ng-click="PreopCheckinObj.ObservedBehavior ='RefersToFear' ; PreopCheckinObj.ObservedBehaviorNotes =''">
+                                            Refers To Fear
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.ObservedBehavior =='Others'?'active':''"
+                                                ng-click="PreopCheckinObj.ObservedBehavior ='Others' ; focusTextarea('Observed Behavior')">
+                                            Others
+                                        </button>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" maxlength="100" ng-show="PreopCheckinObj.ObservedBehavior =='Others'" ng-focus="isObservedBehavior == true" ng-model="PreopCheckinObj.ObservedBehaviorNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-s14w600c000">Level Of Consciousness</span>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Alert'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Alert' ; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Alert
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Unconscious'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Unconscious' ; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Unconscious
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Semiconcious'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Semiconcious'; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Semiconcious
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Oriented'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Oriented' ; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Oriented
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Sedated'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Sedated' ; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Sedated
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Disorientated'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Disorientated' ; PreopCheckinObj.LevelOfConsciousnessNotes =''">
+                                            Disorientated
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.LevelOfConsciousness =='Others'?'active':''"
+                                                ng-click="PreopCheckinObj.LevelOfConsciousness ='Others' ; focusTextarea('Level Of Consciousness')">
+                                            Others
+                                        </button>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="ehr-input pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" ng-show="PreopCheckinObj.LevelOfConsciousness =='Others'" ng-focus="isPatientLevelOfConsciousnessFocused" maxlength="100" ng-model="PreopCheckinObj.LevelOfConsciousnessNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="text-s14w600c000">Patient Transferred in</span>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PatientTransfferedIn =='Stretcher'?'active':''" ng-click="PreopCheckinObj.PatientTransfferedIn = 'Stretcher' ; PreopCheckinObj.PatientTransfferedNotes=''">Stretcher</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PatientTransfferedIn =='Self'?'active':''" ng-click="PreopCheckinObj.PatientTransfferedIn = 'Self' ; PreopCheckinObj.PatientTransfferedNotes=''">Self</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PatientTransfferedIn =='Others'?'active':''" ng-click="PreopCheckinObj.PatientTransfferedIn = 'Others' ;focusTextarea('Patient Transferred')">Others</button>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="ehr-input  pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" maxlength="100" ng-show="PreopCheckinObj.PatientTransfferedIn =='Others'" ng-focus="isPatientTransferredFocused" ng-model="PreopCheckinObj.PatientTransfferedNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="text-s14w600c000">Patient Destination</span>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PatientDestination =='LivingRoom'?'active':''" ng-click="PreopCheckinObj.PatientDestination = 'LivingRoom' ; PreopCheckinObj.PatientDestinationNotes = ''">Living Room</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PatientDestination =='Others'?'active':''" ng-click="PreopCheckinObj.PatientDestination = 'Others' ; focusTextarea('Patient Destination')">Others</button>
+                                    </td>
+                                    <td colspan="3">
+                                        <div class="ehr-input  pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" ng-show="PreopCheckinObj.PatientDestination =='Others'" maxlength="100" ng-focus="isPatientDestinationFocused" ng-model="PreopCheckinObj.PatientDestinationNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="text-s14w600c000">PTE Refers</span>
+                                    </td>
+                                    <td colspan="3">
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PTERefers =='Feeling good, there is no pain or Discomfort'?'active':''" ng-click="PreopCheckinObj.PTERefers = 'Feeling good, there is no pain or Discomfort'; PreopCheckinObj.PTEReferNotes =''">Feeling good, there is no pain or Discomfort</button>
+                                    </td>
+                                    <td>
+                                        <button class="alderete-score-inactive" ng-class="PreopCheckinObj.PTERefers =='Others'?'active':''" ng-click="PreopCheckinObj.PTERefers = 'Others'; focusTextarea ('PTE Refers')">Others</button>
+                                    </td>
+                                    <td>
+                                        <div class="ehr-input  pop-ehr-input">
+                                            <textarea rows="1" placeholder="Notes" maxlength="100" ng-show="PreopCheckinObj.PTERefers =='Others'" ng-focus="isPatientPTERefersFocused" ng-model="PreopCheckinObj.PTEReferNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <a href="javascript:;" ng-click="ShowPreopPatientnotes = !ShowPreopPatientnotes"> {{ShowPreopPatientnotes ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                        <div class="ehr-input" ng-if="ShowPreopPatientnotes">
+
+                                            <textarea rows="2" placeholder="Enter Notes" maxlength="500" class="msd-elastic: \n" ng-model="PreopCheckinObj.PreOpOverallNotes"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+</div>

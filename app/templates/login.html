@@ -1,0 +1,414 @@
+<link href="css/login.css" rel="stylesheet" />
+<div class="container-fluid h-100 visible-lg visible-md" ng-controller="EhnoteLoginCtrl">
+    <div class="d__f-- fd__c-- jc__c-- ai__c-- h-100">
+        <div class="d__f-- fd__c-- jc__c-- ai__c-- h-100  width__100-- position__relative--">
+            <div class="d__f-- ai__c-- adjustable-position slim-scroll width__100-- row height__100-- jc__c--">
+                <div class="col-lg-5 col-md-9">
+                    <!--Login -->
+                    <div class="width__100-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-show="!(TwoWayVerifaction)&&ShowLoginScreen && !(IsValidOAuth)&&!IsMailSendOpen">
+                        <div class="width__100-- h__200-- bg__1D5558-- brtl__10-- brtr__10--">
+                            <img src="images/login-backgroundimage.png" class="of__c-- op__t-- h__200-- width__100--" />
+                        </div>
+                        <form class="width__100-- px__60-- py__20-- d__f-- fd__c--" name="validateUserForm" ng-submit="ValidateUser(validateUserForm,validateInfo)" novalidate>
+                            <div class="d__f-- fd__c-- gap__y--15">
+                                <div class="input__style--6" ng-class="{'has-error': validateUserForm.emailid.$invalid && validateUserForm.emailid.$dirty, 'has-success': validateUserForm.emailid.$valid }">
+                                    <label>Email ID</label>
+                                    <input ng-pattern="emailpattern" name="emailid" id="input__emailid" ng-model="validateInfo.userName" type="email" placeholder="Email ID" required />
+                                    <span ng-show="validateUserForm.emailid.$invalid && !validateUserForm.emailid.$error.required" class="help-block mb__0--">Enter a Valid Email Id</span>
+                                    <span ng-show="validateUserForm.emailid.$dirty && validateUserForm.emailid.$error.required" class="help-block mb__0--">Email ID is required</span>
+                                </div>
+                                <div class="input__style--6 position__relative--">
+                                    <label>Password</label>
+                                    <input name="password" ng-model="validateInfo.passWord" id="input__password" ng-attr-type="{{ showPassword ? 'text' : 'password' }}" placeholder="Password" required />
+                                    <span ng-show="validateUserForm.password.$dirty && validateUserForm.password.$error.required" class="help-block">Password is required</span>
+                                    <a class="position__absolute-- right__14-- top__42--" ng-click="showPassword = !showPassword"><i ng-class="showPassword ? 'icons__hidePassword--' : 'icons__showPassword--'"></i></a>
+                                </div>
+                                <div>
+                                    <label class="cur-poiter d__f-- ai__c-- gap__5-- lh__18--">
+                                        <input class="checkbox" id="ckb1" type="checkbox" name="remember-me" ng-true-value="'sure'" ng-false-value="'false'" ng-model="validateInfo.rememberMe">
+                                        <span class="lbl"></span>
+                                        <span class="fs__lg-- fw__5-- tc__1D1D1D--"> Remember me</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" id="btn__validateuser" ng-disabled="validateUserForm.$invalid">Login</button>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__md-- fw__5-- fs__normal-- tc__656565-- text-center lh__18--">
+                                        By logging in, you agree to receive OTPs via SMS. Message/data rates may apply. Reply<span class="fw__6-- tc__1D1D1D--"> STOP </span>to unsubscribe or<span class="fw__6-- tc__1D1D1D--"> HELP </span>for assistance.<!--<a href="https://ehnote.com/legal/privacy-policy" class="tc__A7A7A7-- fs__lg-- fw__6-- fs__normal--" target="_blank">Privacy Policy</a>-->
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!--OTP Authenticator-->
+                    <form class="width__100-- px__30-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-if="showMFAAuthenticationScreen">
+                        <div class="d__f-- fd__c-- gap__20--y">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <a class="hover__back-- p__10--" id="a__backtologin" ng-click="backtologin()">
+                                    <i class="icons__w16-- goingback__w16--l"></i>
+                                </a>
+                                <a class="d__f-- ai__c-- gap__10--x tc__1D1D1D-- fs__lg-- fs__normal-- fw__6-- hover__F5F5F5--bg br__5-- p__8--"
+                                   role="button"
+                                   uib-popover-template="'helpPopover.html'"
+                                   popover-placement="bottom-right"
+                                   popover-trigger="mouseenter mouseleave"
+                                   popover-class="ros__summary--hover"
+                                   popover-append-to-body="true" ng-if="!isMFAauthEnabled">
+
+                                    <i class="tc__1D1D1D--" svg-icon="icon__help--o" size="20"></i>
+                                    Help
+                                </a>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__20--y px__18--">
+                                <div class="d__f-- jc__c-- ai__c--" ng-if="!isMFAauthEnabled">
+                                    <label class="fs__xl-- fw__6-- tc__1D1D1D-- fs__normal-- ">Set Up Multi-Factor Authentication</label>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__c-- width__100--" ng-if="!isMFAauthEnabled">
+                                    <img ng-src="{{mfaQRCode}}" class="w__120-- h__120-- br__10--" />
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--" ng-if="!isMFAauthEnabled">
+                                    <label class="fs__lg-- fw__7-- tc__1D1D1D-- fs__normal-- ">Confirm Your 6-Digit Authenticator Code <em>*</em></label>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--" ng-if="isMFAauthEnabled">
+                                    <label class="fs__lg-- fw__7-- tc__1D1D1D-- fs__normal-- ">Enter Authentication Code</label>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--" ng-if="isMFAauthEnabled">
+                                    <label class="fs__lg-- fw__7-- tc__656565-- fs__normal-- text-center">Open your authenticator app and enter the 6-digit code shown there.</label>
+                                </div>
+                                <div class="input__style--6">
+                                    <label class="fs__lg-- fw__7-- tc__344054-- fs__normal--" ng-if="isMFAauthEnabled"> 6-Digit Code <em>*</em></label>
+                                    <input type="text" id="input__mfaauth"
+                                           class="otp__single--input"
+                                           placeholder="------"
+                                           ng-model="MFAVerifactionObj.MFAOTP"
+                                           ng-focus="showMFAAuthenticationScreen"
+                                           autofocus
+                                           ng-required="true"
+                                           maxlength="6"
+                                           numbers-only />
+                                </div>
+                                <div>
+                                    <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" id="a__navtovalidatemfa" ng-click="navtovalidateMFAOtpUser()">Authenticate</button>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__c-- gap__10--x">
+                                    <span class="tc__1D1D1D-- fs__lg-- fw__5-- fs__normal-- ">Can’t verify right now? </span>
+                                    <a href="javascript:;" class="tc__1D5558-- fs__lg-- fs__normal-- fw__6-- td__u--" id="a__navtootpscreen" ng-click="navtoShowOTPScreen()">Try a different way</a>
+                                </div>
+                                <script type="text/ng-template" id="helpPopover.html">
+                                    <div class="">
+                                        <ul class="list__unstyled-- fd__c-- gap__y--5">
+                                            <li class="mb__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal--"><span class="fw__5--">1. Download any authenticator app</span> (Google Authenticator, Microsoft Authenticator, etc.)</label>
+                                            </li>
+                                            <li class="mb__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal--">2. Open the app and select "<span class="fw__5--">Scan QR code</span>"</label>
+                                            </li>
+                                            <li class="mb__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal--">3. Scan the above QR code with your device camera</label>
+                                            </li>
+                                            <li class="mb__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal--">4. You will receive a <span class="fw__5--">6-digit code</span>in the app</label>
+                                            </li>
+                                            <li class="mb__5--">
+                                                <label class="fs__lg-- fw__4-- tc__1D1D1D-- fs__normal--">5. <span class="fw__5--">Enter the code </span>on the screen to complete setup</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </script>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Try another Way-->
+                    <form class="width__100-- px__30-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-if="tryAnotherWay">
+                        <div class="d__f-- fd__c-- gap__20--y">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <a class="hover__back-- p__10--" id="a__backtologin" ng-click="backtologin()">
+                                    <i class="icons__w16-- goingback__w16--l"></i>
+                                </a>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__20--y px__18-- ">
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__xl-- fw__6-- tc__1D1D1D-- fs__normal-- ">Select an authentication method</label>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__lg-- fw__5-- tc__656565-- fs__normal-- text-center">Choose how you want to receive your verification code.</label>
+                                </div>
+                                <div class="d__f-- jc__sb-- ai__c-- pb__15-- bb__DDD-- cur-pointer" ng-if="Email !=''" ng-click="selectVerificationMethod('email')">
+                                    <div class="d__f-- fd__c-- gap__5--y">
+                                        <label class="fs__lg-- fw__6-- tc__1D1D1D-- fs__normal--">Email</label>
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D-- fs__normal--"> We’ll send a code to {{Email | maskSensitive}}</label>
+                                    </div>
+                                    <div class="d__ib--">
+                                        <input type="radio" class="radio-custom width-0" name="verifyMethod" id="radio__email" ng-model="verificationMethod.method" ng-value="'email'">
+                                        <label class="radio-custom-label mb-0"></label>
+                                    </div>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__sb-- cur-pointer" ng-click="selectVerificationMethod('mobile')">
+                                    <div class="d__f-- fd__c-- gap__5--y">
+                                        <label class="fs__lg-- fw__6-- tc__1D1D1D-- fs__normal--">Mobile</label>
+                                        <label class="fs__lg-- fw__5-- tc__1D1D1D-- fs__normal--"> We’ll send a code to {{TwoWayVerifactionObj.MobileNo| maskSensitive}}</label>
+                                    </div>
+                                    <div class="d__ib--">
+                                        <input type="radio" class="radio-custom width-0" name="verifyMethod" id="radio__mobile" ng-model="verificationMethod.method" ng-value="'mobile'">
+                                        <label class="radio-custom-label cur-pointer mb-0"></label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" id="btn__sendcode" ng-click="sendVerificationcode()" ng-disabled="verificationMethod.method == null">Send Code</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Email OTP-->
+                    <form class="width__100-- px__30-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-if="IsMailSendOpen">
+                        <div class="d__f-- fd__c-- gap__20--y">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <a class="hover__back-- p__10--" id="a__backtologin" ng-click="backtologin()">
+                                    <i class="icons__w16-- goingback__w16--l"></i>
+                                </a>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__20--y px__18-- ">
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__xl-- fw__6-- tc__1D1D1D-- fs__normal-- ">Enter your verification code</label>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__lg-- fw__5-- tc__656565-- fs__normal-- text-center">We’ve sent a verification code to {{Email | maskSensitive}}</label>
+                                </div>
+                                <div class="input__style--6">
+                                    <label class="fs__lg-- fw__7-- tc__344054-- fs__normal--"> 4-Digit Code <em>*</em></label>
+                                    <input type="text" id="input__smsotp"
+                                           class="otp__single--input"
+                                           placeholder="----"
+                                           ng-model="TwoWayVerifactionObj.SMSOTP"
+                                           ng-focus="IsMailSendOpen"
+                                           autofocus
+                                           ng-required="true"
+                                           maxlength="4"
+                                           numbers-only />
+                                </div>
+                                <div class="d__f-- ai__c-- jc__sb--">
+                                    <label class=" tc__344054-- fs__lg-- fw__5-- fs__normal--" ng-if="!otpExpired">OTP Expires in <span class="fw__7--"> {{ formatOtpTime() }}</span></label>
+                                    <label class=" tc__C71D27-- fs__lg-- fw__5-- fs__normal--" ng-if="otpExpired">OTP Expired</label>
+                                    <button class="btn__sm-- btn__1d5558-- gap__5--x" id="btn__resendotp" ng-click="TwoWayVerifactionOTPGenarating('Resend',1)" ng-if="otpExpired"><i svg-icon="icon__reset--o" size="16"></i>Resend OTP</button>
+                                </div>
+                                <div ng-if="!otpExpired">
+                                    <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" id="btn__verify" ng-click="CheckingTwoWayVerification(TwoWayVerifactionObj,2)">Verify</button>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__c-- gap__10--x">
+                                    <span class="tc__1D1D1D-- fs__lg-- fw__5-- fs__normal-- ">Didn’t receive a code?</span>
+                                    <a href="javascript:;" class="tc__1D5558-- fs__lg-- fs__normal-- fw__6-- td__u--" id="a__navtomobile" ng-click="NavtoMobileScreen()"> Receive it via SMS</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Mobile OTP-->
+                    <form class="width__100-- px__30-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-show="TwoWayVerifaction&&!(ShowLoginScreen) && !(IsValidOAuth) && !tryAnotherWay">
+                        <div class="d__f-- fd__c-- gap__20--y">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <a class="hover__back-- p__10--" id="a__backtologin" ng-click="backtologin();">
+                                    <i class="icons__w16-- goingback__w16--l"></i>
+                                </a>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__20--y px__18-- ">
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__xl-- fw__6-- tc__1D1D1D-- fs__normal-- ">Enter your verification code</label>
+                                </div>
+                                <div class="d__f-- jc__c-- ai__c--">
+                                    <label class="fs__lg-- fw__5-- tc__656565-- fs__normal-- text-center">We’ve sent a verification code to {{TwoWayVerifactionObj.MobileNo| maskSensitive}}</label>
+                                </div>
+                                <div class="input__style--6">
+                                    <label class="fs__lg-- fw__7-- tc__344054-- fs__normal--"> 4-Digit Code <em>*</em></label>
+                                    <input type="text" id="input__smsotp"
+                                           class="otp__single--input"
+                                           placeholder="----"
+                                           ng-model="TwoWayVerifactionObj.SMSOTP"
+                                           ng-focus="TwoWayVerifaction&&!(ShowLoginScreen) && !(IsValidOAuth)"
+                                           autofocus
+                                           maxlength="4"
+                                           numbers-only />
+                                </div>
+                                <div class="d__f-- ai__c-- jc__sb--">
+                                    <label class=" tc__344054-- fs__lg-- fw__5-- fs__normal--" ng-if="!otpExpired">OTP Expires in <span class="fw__7--"> {{ formatOtpTime() }}</span></label>
+                                    <label class=" tc__C71D27-- fs__lg-- fw__5-- fs__normal--" ng-if="otpExpired">OTP Expired</label>
+                                    <button class="btn__sm-- btn__1d5558-- gap__5--x" ng-click="TwoWayVerifactionOTPGenarating('Resend')" id="btn__resendotp" ng-if="otpExpired"><i svg-icon="icon__reset--o" size="16"></i>Resend OTP</button>
+                                </div>
+                                <div ng-if="!otpExpired">
+                                    <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" id="btn__verify" ng-click="CheckingTwoWayVerification(TwoWayVerifactionObj,1)" ng-disabled="!TwoWayVerifactionObj.SMSOTP || TwoWayVerifactionObj.SMSOTP.length !== 4">Verify</button>
+                                </div>
+                                <div class="d__f-- ai__c-- jc__c-- gap__10--x" ng-if="Email !=''">
+                                    <span class="tc__1D1D1D-- fs__lg-- fw__5-- fs__normal-- ">Didn’t receive a code? </span>
+                                    <a href="javascript:;" class="tc__1D5558-- fs__lg-- fs__normal-- fw__6-- td__u--" id="a__navtoemail" ng-click="NavtoEmailScreen()">Receive it via email</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Select Branch-->
+                    <form class="width__100-- px__30-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-show="!TwoWayVerifaction && !ShowLoginScreen && !IsValidOAuth && !showMFAAuthenticationScreen && !tryAnotherWay && !emptyScreen">
+                        <div class="d__f-- fd__c-- gap__20--y">
+                            <div class="d__f-- ai__c-- jc__sb--">
+                                <a class="hover__back-- p__10--" id="a__navtologout" ng-click="navToLogout();">
+                                    <i class="icons__w16-- goingback__w16--l"></i>
+                                </a>
+                                <p class="tc__1D1D1D-- fs__5l-- fw__6-- fs__normal-- m-0">Hello, {{doctorBranchList.User[0].FullName}}</p>
+                            </div>
+                            <div class="d__f-- fd__c-- gap__5--y">
+                                <div class="d__f-- jc__sb-- ai__c--">
+                                    <span class="tc__344054-- fw__7-- fs__normal-- fs__lg--">Select Your Branch <b class="tc__F0CCB4-- fs__lg-- fw__5-- fs__normal--">*</b></span>
+                                    <span class="fs__lg-- fw__6-- tc__656565-- fs__normal--"> {{doctorBranchList.UserAddress.length}} Branches</span>
+                                </div>
+                                <div class="d__f-- fd__c-- gap__6--y bg__F5F5F5-- bradius__5-- border__E4E4E4-- p__8--">
+                                    <div ng-if="doctorBranchList.UserAddress.length > 4">
+                                        <input type="text" placeholder="Search branches or location" id="input__search" ng-model="searchHospital.txt1" class="input__style--3 border__E4E4E4-- py__10--" />
+                                    </div>
+                                    <div class="bg__F6F6F6-- br__10-- p__15-- position__relative-- min__h300-- max__h200-- o__h--">
+                                        <div class="adjustable-position slim-scroll">
+                                            <div class="  d__f-- fd__c-- gap__y--8">
+                                                <div class="d__f-- fd__c-- gap__10--y c__p-- bg__FFFFFF-- br__8-- px__12-- py__8-- bw__1-- bs__s-- bc__E4E4E4--" id="div__changebranch" ng-repeat="item in (filteredList = (doctorBranchList.UserAddress | filter:branchSearch))" ng-click="ChangeDoctorBranch(item)"
+                                                     ng-class="DoctorBranchName === item ? 'bc__B9B9B9--' : 'bc__E4E4E4--'">
+                                                    <div class="d__f-- ai__c-- jc__sb--">
+                                                        <div class="d__f-- ai__c-- gap__10--x  ">
+                                                            <div class="w__35-- h__35-- d__f-- ai__c-- jc__c-- tc__FFFFFF-- fs__3l-- br__6--" ng-style="{'background-color': getItemColor(item.ClinicName)}">
+                                                                {{ (item.ClinicName.split(' ')[0] | limitTo:1) + (item.ClinicName.split(' ')[1] | limitTo:1) }}
+                                                            </div>
+                                                            <div class="d__f-- fd__c-- gap__y--3">
+                                                                <label class="tc__4A4A4A-- fs__xl-- fw__6--  fs__normal--">{{item.ClinicName}}</label>
+                                                                <p class="tc__656565-- m-0 fs__lg-- fs__normal-- fw__5--">{{item.Location}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d__f-- jc__c-- ai__c--">
+                                                            <a ng-if="DoctorBranchName === item"><i class="tc__1D5558--" svg-icon="icon__success--f" size="20"></i></a>
+                                                            <a ng-if="DoctorBranchName !== item"> <i class="tc__E4E4E4--" svg-icon="icon__circle--o" size="20"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <label class="fs__lg-- fw__5--  tc__656565-- fs__lg-- text-center p__20--"
+                                                       ng-if="filteredList.length === 0">
+                                                    No Branches Found.
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn__lg-- btn__1d5558--f fs__3l-- fw__6-- p__12-- width__100--" ng-click="ContinueToBranchLogin(DoctorBranchName,RoleBranchName)" ng-disabled="DoctorBranchName==''&&RoleBranchName ==''">Let’s Begin</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!--Session has expired-->
+                    <div class="width__100-- px__60-- py__20-- bg__FFFFFF-- br__10-- d__f-- fd__c--" ng-if="!(TwoWayVerifaction)&&IsValidOAuth&&!IsMailSendOpen">
+                        <div class="d__f-- fd__c-- jc__c-- ai__c-- gap__20--y">
+                            <i svg-icon="icon__sessionexpired--" size="120"></i>
+                            <div class="d__f-- fd__c-- ai__c-- gap__6--y">
+                                <label class="fs__3l-- fw__6-- tc__1D1D1D-- fs__normal--">Your  session has expired</label>
+                                <span class="fs__2l-- fw__4-- tc__656565-- fs__normal--">You will be redirected to the login page</span>
+                            </div>
+                            <button class="btn__xl-- btn__C71D27--f min__w90--" id="btn__navtologin" ng-click="navToSessionLogin()">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d__f-- ai__c-- p__10-- jc__sb-- width__100-- zindex-1 ">
+            <div class="tc__1D1D1D-- fs__lg-- fw__5-- fs__normal--">
+                ⓒ  <span id="year"></span> EHNOTE SOFTLABS (P) LTD. All Rights Reserved.
+            </div>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <a target="_blank" href="https://www.ehnote.com/ehr/TermsOfService.html" class="tc__1D5558-- fs__lg-- fw__6--">Terms of Service</a>
+                <a target="_blank" href="https://www.ehnote.com/ehr/Privacy-Policy.html" class="tc__1D5558-- fs__lg-- fw__6--">Privacy Policy</a>
+            </div>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <a href="mailto:info@ehnote.com" class="d__f-- ai__c-- gap__10--x tc__1D1D1D-- fs__lg-- fw__5--">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6.05371 1.85742C7.35574 1.82471 8.64524 1.82471 9.94727 1.85742L9.98633 1.8584C11.0027 1.88392 11.8211 1.9044 12.4766 2.01855C13.1627 2.1381 13.7203 2.36788 14.1914 2.84082C14.6606 3.31186 14.8886 3.86193 15.0059 4.53711C15.1174 5.17988 15.1342 5.97762 15.1553 6.96582L15.1562 7.00488C15.1704 7.6691 15.1704 8.32992 15.1562 8.99414L15.1553 9.0332C15.1342 10.0218 15.1175 10.82 15.0059 11.4629C14.8886 12.1381 14.6607 12.6881 14.1914 13.1592C13.7203 13.632 13.1626 13.8609 12.4766 13.9805C11.8211 14.0946 11.0027 14.1151 9.98633 14.1406L9.94727 14.1416C8.64524 14.1743 7.35574 14.1743 6.05371 14.1416L6.01465 14.1406C4.99848 14.1151 4.18078 14.0946 3.52539 13.9805C2.83912 13.861 2.28079 13.6321 1.80957 13.1592C1.34032 12.6881 1.11237 12.1381 0.995117 11.4629C0.883471 10.82 0.866768 10.0218 0.845703 9.0332L0.844727 8.99414C0.830562 8.32992 0.830562 7.6691 0.844727 7.00488L0.845703 6.96582C0.866759 5.97763 0.883545 5.17987 0.995117 4.53711C1.11236 3.86196 1.34038 3.31185 1.80957 2.84082C2.28081 2.36778 2.83906 2.13808 3.52539 2.01855C4.18077 1.90447 4.99852 1.88391 6.01465 1.8584L6.05371 1.85742ZM11.7646 5.41211C11.6241 5.17441 11.3168 5.09579 11.0791 5.23633L9.11816 6.39551C8.55556 6.72814 8.25622 6.8329 8.00098 6.83301C7.74564 6.83301 7.44572 6.72832 6.88281 6.39551L4.92188 5.23633C4.68422 5.09582 4.37788 5.17452 4.2373 5.41211C4.09677 5.64981 4.17538 5.95614 4.41309 6.09668L6.37402 7.25684C6.95456 7.60006 7.45608 7.83301 8.00098 7.83301C8.54568 7.83289 9.04661 7.59994 9.62695 7.25684L11.5879 6.09668C11.8255 5.95618 11.905 5.64978 11.7646 5.41211Z" fill="#1D5558" />
+                    </svg>
+                    info@ehnote.com
+                </a>
+                <a href="tel:+17472226099" class="d__f-- ai__c-- gap__10--x tc__1D1D1D-- fs__lg-- fw__5--">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M7.99805 1.3335C10.7238 1.33361 13.1198 3.16612 13.3164 5.66748C13.3181 5.6684 13.3196 5.66948 13.3213 5.67041C13.4886 5.76429 13.6139 5.8903 13.7041 5.99365C13.7538 6.05065 13.8212 6.13569 13.8701 6.19775C14.1741 6.567 14.4855 6.94748 14.668 7.20654C14.8562 7.47377 14.9983 7.72859 15.0771 8.01709C15.1936 8.44325 15.1936 8.88976 15.0771 9.31592C14.9684 9.71392 14.7497 10.0564 14.5312 10.3423C14.3991 10.5153 14.2389 10.7011 14.0977 10.8647C14.0205 10.9542 13.9107 11.0842 13.8525 11.1548C13.6945 11.3476 13.5381 11.5377 13.332 11.6567V11.8667C13.332 13.5442 11.6925 14.6675 9.99805 14.6675H8.66504C8.29693 14.6674 7.99813 14.3686 7.99805 14.0005C7.99805 13.6323 8.29688 13.3335 8.66504 13.3335H9.99805C11.2491 13.3335 11.998 12.5456 11.998 11.8667V11.6558C11.9106 11.6186 11.8241 11.5841 11.748 11.5493C11.5105 11.4432 11.063 11.2433 10.8926 10.7388C10.8306 10.5552 10.8306 10.3589 10.8311 10.1763V7.15674C10.8306 6.97421 10.8306 6.7777 10.8926 6.59424C11.0631 6.08986 11.5106 5.88977 11.748 5.78369C11.8186 5.75141 11.8978 5.71875 11.9785 5.68408C11.7895 4.06553 10.167 2.66662 7.99805 2.6665C5.82892 2.6665 4.20563 4.06544 4.0166 5.68408C4.09756 5.71884 4.17732 5.75132 4.24805 5.78369C4.48552 5.88979 4.933 6.08993 5.10352 6.59424C5.1655 6.7777 5.16451 6.97421 5.16406 7.15674V10.1763C5.16451 10.3589 5.16552 10.5552 5.10352 10.7388C4.9331 11.2432 4.4856 11.4432 4.24805 11.5493C4.00625 11.66 3.67886 11.8092 3.44043 11.8286C3.17552 11.85 2.90652 11.7942 2.67383 11.6636C2.46256 11.545 2.30422 11.3508 2.14355 11.1548C2.08543 11.0842 1.97568 10.9543 1.89844 10.8647C1.75719 10.7011 1.5961 10.5153 1.46387 10.3423C1.24552 10.0565 1.02666 9.71376 0.917969 9.31592C0.801603 8.88982 0.801565 8.44319 0.917969 8.01709C0.996831 7.72847 1.13985 7.47387 1.32812 7.20654C1.51061 6.94748 1.82197 6.567 2.12598 6.19775C2.17494 6.13566 2.24227 6.05062 2.29199 5.99365C2.38215 5.89038 2.50677 5.76427 2.67383 5.67041C2.67534 5.66956 2.67719 5.66833 2.67871 5.66748C2.87533 3.16602 5.27216 1.3335 7.99805 1.3335Z" fill="#1D5558" />
+                    </svg>
+                    +1 (747) 222-6099
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/ng-template" id="">
+    <ul>
+        <li class="tc__1D1D1D-- fs__lg-- fw__4-- fs__normal--">
+            <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--">Download any authenticator app</span> <br /> (Google Authenticator, Microsoft Authenticator, etc.)
+        </li>
+        <li class="tc__1D1D1D-- fs__lg-- fw__4-- fs__normal--">
+            Open the app and select <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--"> "Scan QR code"</span>
+        </li>
+        <li class="tc__1D1D1D-- fs__lg-- fw__4-- fs__normal--">
+            Scan the above QR code with your device camera
+        </li>
+        <li class="tc__1D1D1D-- fs__lg-- fw__4-- fs__normal--">
+            You will receive a   <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--">6-digit code</span> in the app
+        </li>
+        <li class="tc__1D1D1D-- fs__lg-- fw__4-- fs__normal--">
+            <span class="tc__1D1D1D-- fs__lg-- fw__6-- fs__normal--">Enter the code</span>  on the screen to complete setup
+        </li>
+    </ul>
+</script>
+
+<div class="container-fluid visible-sm visible-xs height__100--">
+
+    <div class="d__f-- fd__c-- height__100--">
+        <div class="pt__15--">
+            <img src="images/mobile/logo.png" width="350" />
+        </div>
+        <div class="height__100-- position__relative-- d__f-- fd__c-- gap__10--y">
+            <h2 class=" fs__6l-- tc__0040A1-- fw__6-- fs__normal--">Oops...</h2>
+            <h3 class="fs__2l-- fw__5-- tc__1D1D1D-- fs__normal--">Please use desktop version or Download Mobile app</h3>
+            <h3 class="fs__2l-- fw__5-- tc__1D1D1D-- fs__normal-- mt__0--">The application is not suitable for mobile device browsers. Please use the desktop application or Download <span>EHNOTE Doc for Doctors </span> from your playstore / appstore </h3>
+            <div class="d__f-- fd__c-- gap__10--y">
+                <button target="_blank" href="https://play.google.com/store/apps/details?id=ehnote.doc&hl=en_IN" class="bg__1D5558-- tc__FFFFFF-- px__10-- py__15-- ta__c-- br__10-- d__f-- ai__c-- gap__10--x fs__3l-- bw__0-- width__100-- jc__c--">
+                    <i class="fab fa-google-play fs__6l--"></i>
+                    Available on Google Store
+                </button>
+                <button target="_blank" class="bg__FFFFFF-- tc__1D5558-- px__10-- py__15-- ta__c-- br__10-- d__f-- ai__c-- gap__10--x fs__3l-- bw__1-- bs__s-- bc__1d5558-- width__100-- jc__c--" href="https://apps.apple.com/us/app/ehnote-doc-for-doctors/id1342250781">
+                    <i class="fab fa-app-store fs__6l--"></i> Available on Apple Store
+                </button>
+            </div>
+        </div>
+        <div class="d__f-- fd__c-- ai__c-- p__10-- jc__c-- width__100-- zindex-1 ff__w-- gap__y--15">
+            <div class="tc__1D1D1D-- fs__lg-- fw__5-- fs__normal--">
+                ⓒ  <span id="yeartwo"></span> EHNOTE SOFTLABS (P) LTD. All Rights Reserved.
+            </div>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <a target="_blank" href="https://www.ehnote.com/ehr/TermsOfService.html" class="tc__1D5558-- fs__lg-- fw__6--">Terms of Service</a>
+                <a target="_blank" href="https://www.ehnote.com/ehr/Privacy-Policy.html" class="tc__1D5558-- fs__lg-- fw__6--">Privacy Policy</a>
+            </div>
+            <div class="d__f-- ai__c-- gap__10--x">
+                <a href="mailto:info@ehnote.com" class="d__f-- ai__c-- gap__10--x tc__1D1D1D-- fs__lg-- fw__5--">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6.05371 1.85742C7.35574 1.82471 8.64524 1.82471 9.94727 1.85742L9.98633 1.8584C11.0027 1.88392 11.8211 1.9044 12.4766 2.01855C13.1627 2.1381 13.7203 2.36788 14.1914 2.84082C14.6606 3.31186 14.8886 3.86193 15.0059 4.53711C15.1174 5.17988 15.1342 5.97762 15.1553 6.96582L15.1562 7.00488C15.1704 7.6691 15.1704 8.32992 15.1562 8.99414L15.1553 9.0332C15.1342 10.0218 15.1175 10.82 15.0059 11.4629C14.8886 12.1381 14.6607 12.6881 14.1914 13.1592C13.7203 13.632 13.1626 13.8609 12.4766 13.9805C11.8211 14.0946 11.0027 14.1151 9.98633 14.1406L9.94727 14.1416C8.64524 14.1743 7.35574 14.1743 6.05371 14.1416L6.01465 14.1406C4.99848 14.1151 4.18078 14.0946 3.52539 13.9805C2.83912 13.861 2.28079 13.6321 1.80957 13.1592C1.34032 12.6881 1.11237 12.1381 0.995117 11.4629C0.883471 10.82 0.866768 10.0218 0.845703 9.0332L0.844727 8.99414C0.830562 8.32992 0.830562 7.6691 0.844727 7.00488L0.845703 6.96582C0.866759 5.97763 0.883545 5.17987 0.995117 4.53711C1.11236 3.86196 1.34038 3.31185 1.80957 2.84082C2.28081 2.36778 2.83906 2.13808 3.52539 2.01855C4.18077 1.90447 4.99852 1.88391 6.01465 1.8584L6.05371 1.85742ZM11.7646 5.41211C11.6241 5.17441 11.3168 5.09579 11.0791 5.23633L9.11816 6.39551C8.55556 6.72814 8.25622 6.8329 8.00098 6.83301C7.74564 6.83301 7.44572 6.72832 6.88281 6.39551L4.92188 5.23633C4.68422 5.09582 4.37788 5.17452 4.2373 5.41211C4.09677 5.64981 4.17538 5.95614 4.41309 6.09668L6.37402 7.25684C6.95456 7.60006 7.45608 7.83301 8.00098 7.83301C8.54568 7.83289 9.04661 7.59994 9.62695 7.25684L11.5879 6.09668C11.8255 5.95618 11.905 5.64978 11.7646 5.41211Z" fill="#1D5558" />
+                    </svg>
+                    info@ehnote.com
+                </a>
+                <a href="tel:+17472226099" class="d__f-- ai__c-- gap__10--x tc__1D1D1D-- fs__lg-- fw__5--">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M7.99805 1.3335C10.7238 1.33361 13.1198 3.16612 13.3164 5.66748C13.3181 5.6684 13.3196 5.66948 13.3213 5.67041C13.4886 5.76429 13.6139 5.8903 13.7041 5.99365C13.7538 6.05065 13.8212 6.13569 13.8701 6.19775C14.1741 6.567 14.4855 6.94748 14.668 7.20654C14.8562 7.47377 14.9983 7.72859 15.0771 8.01709C15.1936 8.44325 15.1936 8.88976 15.0771 9.31592C14.9684 9.71392 14.7497 10.0564 14.5312 10.3423C14.3991 10.5153 14.2389 10.7011 14.0977 10.8647C14.0205 10.9542 13.9107 11.0842 13.8525 11.1548C13.6945 11.3476 13.5381 11.5377 13.332 11.6567V11.8667C13.332 13.5442 11.6925 14.6675 9.99805 14.6675H8.66504C8.29693 14.6674 7.99813 14.3686 7.99805 14.0005C7.99805 13.6323 8.29688 13.3335 8.66504 13.3335H9.99805C11.2491 13.3335 11.998 12.5456 11.998 11.8667V11.6558C11.9106 11.6186 11.8241 11.5841 11.748 11.5493C11.5105 11.4432 11.063 11.2433 10.8926 10.7388C10.8306 10.5552 10.8306 10.3589 10.8311 10.1763V7.15674C10.8306 6.97421 10.8306 6.7777 10.8926 6.59424C11.0631 6.08986 11.5106 5.88977 11.748 5.78369C11.8186 5.75141 11.8978 5.71875 11.9785 5.68408C11.7895 4.06553 10.167 2.66662 7.99805 2.6665C5.82892 2.6665 4.20563 4.06544 4.0166 5.68408C4.09756 5.71884 4.17732 5.75132 4.24805 5.78369C4.48552 5.88979 4.933 6.08993 5.10352 6.59424C5.1655 6.7777 5.16451 6.97421 5.16406 7.15674V10.1763C5.16451 10.3589 5.16552 10.5552 5.10352 10.7388C4.9331 11.2432 4.4856 11.4432 4.24805 11.5493C4.00625 11.66 3.67886 11.8092 3.44043 11.8286C3.17552 11.85 2.90652 11.7942 2.67383 11.6636C2.46256 11.545 2.30422 11.3508 2.14355 11.1548C2.08543 11.0842 1.97568 10.9543 1.89844 10.8647C1.75719 10.7011 1.5961 10.5153 1.46387 10.3423C1.24552 10.0565 1.02666 9.71376 0.917969 9.31592C0.801603 8.88982 0.801565 8.44319 0.917969 8.01709C0.996831 7.72847 1.13985 7.47387 1.32812 7.20654C1.51061 6.94748 1.82197 6.567 2.12598 6.19775C2.17494 6.13566 2.24227 6.05062 2.29199 5.99365C2.38215 5.89038 2.50677 5.76427 2.67383 5.67041C2.67534 5.66956 2.67719 5.66833 2.67871 5.66748C2.87533 3.16602 5.27216 1.3335 7.99805 1.3335Z" fill="#1D5558" />
+                    </svg>
+                    +1 (747) 222-6099
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script defer>
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+<script defer>
+    document.getElementById("yeartwo").textContent = new Date().getFullYear();
+</script>
+
+ 
+
+

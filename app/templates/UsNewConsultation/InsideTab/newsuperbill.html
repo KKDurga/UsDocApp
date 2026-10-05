@@ -1,0 +1,136 @@
+﻿<div class="fullcons-header">
+    <div class="dis-flex align-items-center width-60">
+        <h1 class="text-ocularhist">Super Bill</h1>
+         
+    </div>
+     
+    <ul class="us-controls">
+        <li>
+            <a href="javascript:;" ng-click="clickSuperBill('')">
+                <i class="plus-icon-us us-icon"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="consultation-body">
+    <div class="row" ng-show="(cacheStorageItem.SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd':  'N'}).length == 0">
+        <div class="col-lg-12">
+            <div class="no-data-text">
+                <span>No data added</span>
+                <a href="javascript:;" ng-click="clickSuperBill('')">Click here</a>
+                <span>or on Add button to add the Super Bill item </span>
+            </div>
+        </div>
+    </div>
+    <!--ng-click="SuperBillObj.Isfocused = true;"-->
+     
+
+    <table class="table-gray-head table table-bordered" ng-if="(cacheStorageItem.SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': false}).length > 0">
+        <thead>
+            <tr>
+                <th class="text-left p-l-15">Suggested Procedure</th>
+                <th width="5%">Units</th>
+                <th width="30%">Modifier</th>
+                <th width="5%"></th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="item in (cacheStorageItem.SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': false}) track by $index">
+            <tr>
+                <th class="text-left p-t-10 p-b-10">
+                    <div class="dis-flex align-items-center">
+                        <div class="flex">
+                            <span class="text-s14w600c000">{{item.ProcedureCode}}</span>-
+                            <span class="text-s14w600c000" ng-hide="item.OrganName==''">({{item.OrganName}})</span>-
+                            <span class="text-s14w600c000">{{item.ProcedureName}}</span>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <span class="text-s14w600c000">{{item.Quantity}}</span>
+                </th>
+                <th>
+                    <span class="text-s14w600c000" ng-repeat="m in item.Modifiers | filter: {'IsChecked':true}">{{m.ModifierCode}}<span ng-if="!$last">,</span></span>
+                </th>
+                <th width="5%">
+                    <div class="dis-flex">
+                        <a href="javascript:;" ng-click="clickSuperBill();">
+                            <i class="eh-edit eh-icon"></i>
+                        </a>
+                        <a href="javascript:;" class="m-l-5" ng-click="DeleteProcInSuperBill(item);">
+                            <img src="img/close-red.svg" width="17" height="17" />
+                        </a>
+                    </div>
+                </th>
+            </tr>
+            <tr ng-if="item.ShowDiagForAdd">
+                <td colspan="4">
+                    <table class="table tableno-bordered m-0 text-left" ng-if="item.DiagnosisArray.length > 0">
+                        <tbody>
+                            <tr ng-repeat="diag in item.DiagnosisArray | filter: {'DeleteInd': false} track by $index">
+                                <td>{{diag.ICD10CODE}} - {{diag.DiagnosisName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div  ng-if="(cacheStorageItem.SuperBillFinalObj.SuperBillSuggestedCodes | filter: {'DeleteInd': false}).length > 0">
+        <p class="mb-0">
+            <span ng-show="cacheStorageItem.SuperBillFinalObj.SuperBillRemarks !=''"> <b class="complaint-text">Remarks: </b></span>
+            <span> {{cacheStorageItem.SuperBillFinalObj.SuperBillRemarks}}</span>
+        </p>
+    </div>
+
+
+
+    <!-- / -->
+    <div class="suggested-codes-custom-popup" ng-if="ShowSuggestedCodes">
+        <div class="eh-header">
+            <h1>Suggested codes</h1>
+            <div>
+                <button class="btn btn-save-us" ng-click="AddSuggestedCodesFromPopup();" ng-if="SuggestedCodesArray.length > 0">+Add</button>
+                <button class="btn btn-discard-us" ng-click="ShowSuggestedCodesOnClick();">close</button>
+            </div>
+        </div>
+        <div class="ehnote-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="list-eh-checkbox" ng-if="SuggestedCodesArray.length > 0">
+                        <li ng-repeat="item in SuggestedCodesArray track by $index">
+                            <div class="checkbox cn">
+                                <label>
+                                    <input name="checkbox-1" type="checkbox" ng-model="item.IsChecked" ng-change="OnCheckSuggestedCode(item);">
+                                    <span class="checkbox-material">
+                                        <span class="check"></span>
+                                    </span>
+                                    <small class="text-s14w600c000">
+                                        {{item.ProcedureCode}} {{item.ProcedureName}}
+                                    </small>
+                                </label>
+                            </div>
+                            <ul class="list-eh-checkbox m-l-25" ng-show="item.IsChecked == true">
+                                <li ng-repeat="diag in item.DiagnosisArray">
+                                    <div class="checkbox cn">
+                                        <label>
+                                            <input name="checkbox-1" type="checkbox" ng-model="diag.IsChecked" ng-change="OnCheckDiagforSuggestedCode(diag,item);">
+                                            <span class="checkbox-material">
+                                                <span class="check"></span>
+                                            </span>
+                                            <small class="text-s12w500C000">
+                                                {{diag.ICDCode}} - {{diag.DiagnosisName}}
+                                            </small>
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p ng-if="SuggestedCodesArray.length == 0" class="text-center">No Suggested procedures!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,700 @@
+﻿<div class="modal-body h-100 p-0 dis-flex flex-direction-column" ng-show="isAddingScreenVisible">
+    <div class="asc-model-header">
+        <h1>Discharge Summary</h1>
+        <ul>
+            <li>
+                <button class="btn-d" type="button" ng-click="closeuib()">Close</button>
+            </li>
+            <li>
+                <button class="btn-s" type="button" ng-show="UserAccessRights.AllAccessRights.ASCDischargeSave&&DischargeSummaryObj.DischargeChartStatus!= 'E'" ng-click="SavePostOpDischargeData();">Save</button>
+            </li>
+            <li>
+                <button class="btn-d" type="button" ng-show="UserAccessRights.AllAccessRights.ASCDischargeSignoff" ng-click="PostOpDischargeSignOff('SignOff');">Sign Off</button>
+            </li>
+        </ul>
+    </div>
+    <div class="asc-model-body h-100">
+        <div class="">
+            <div class="adjustable-position p-8">
+                <div class="asc-panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Patient : </span>
+                                    <label>{{cacheStorageItem.PatientName}}</label>
+                                </li>
+                                <li>
+                                    <span>MR.No : </span>
+                                    <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                                </li>
+                                <li>
+                                    <span>DOB : </span>
+                                    <label>{{cacheStorageItem.PatientDOB | date: "MM-dd-yyyy"}}</label>
+                                </li>
+                                <li>
+                                    <span>Date : </span>
+                                    <label>{{SurgeryDiagnosisObj.SurgeryDate  | date: "MM-dd-yyyy"}}</label>
+                                </li>
+                            </ul>
+                             
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Procedure : </span>
+                                    <label>{{SurgeryDiagnosisObj.OperativeProcedure}}</label>
+                                </li>
+                                <li>
+                                    <span>Operated Eye : </span>
+                                    <label> {{SurgeryDiagnosisObj.OrganId === 1 ? 'OD' : (SurgeryDiagnosisObj.OrganId === 2 ? 'OS': (SurgeryDiagnosisObj.OrganId === 3 ? 'OU':(SurgeryDiagnosisObj.OrganId === 4 ? 'General':''))) }}</label>
+                                </li>
+                            </ul>
+
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Surgeon : </span>
+                                    <label>{{SurgeryDiagnosisObj.Surgeon}}</label>
+                                </li>
+                            </ul>
+
+                            <ul class="referral-summary-list">
+                                <li>
+                                    <span>Anesthetist : </span>
+                                    <label>{{SurgeryDiagnosisObj.Anesthetist}}</label>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="asc-panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <table class="asc-table-admission">
+                                <tbody>
+                                    <tr>
+                                        <th width="16%">
+                                            Pre-Op Diagnosis
+                                        </th>
+                                        <td ng-if="SurgeryDiagnosisObj.Diagnosis!=''">
+                                            <ul class="referral-summary-list">
+                                                <li>
+                                                    {{ SurgeryDiagnosisObj.ICDCode}}-{{SurgeryDiagnosisObj.Diagnosis}}  <span ng-show="SurgeryDiagnosisObj.Diagnosis2 !=''">,{{ SurgeryDiagnosisObj.ICDCode2}}-{{SurgeryDiagnosisObj.Diagnosis2}}</span>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td ng-if="SurgeryDiagnosisObj.Diagnosis ==''">
+                                            <p>No data added.</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Post-Op Diagnosis
+                                        </th>
+                                        <td ng-if="DischargeSummaryObj.Diagnosis.length > 0">
+                                            <div ng-repeat="item in DischargeSummaryObj.Diagnosis | filter:{DeleteInd: 'N'} track by $index">
+                                                <ul class="referral-summary-list">
+                                                    <li>
+                                                        <label>{{item.ICD10CODE}}-{{item.ICD10DIAGNAME}}</label>
+                                                    </li>
+                                                </ul>
+                                                <ul class="referral-summary-list" ng-repeat="Litem in item.StatusList">
+                                                    <li ng-if="Litem.SeverityId!=null">
+                                                        <span>Severity:</span>
+                                                        <label ng-if="Litem.SeverityId==1">Mild</label>
+                                                        <label ng-if="Litem.SeverityId==3">Moderate</label>
+                                                        <label ng-if="Litem.SeverityId==5">Severe</label>
+                                                    </li>
+                                                    <li ng-if="Litem.DiagnosisStatusId!=null">
+                                                        <span>Status:</span>
+                                                        <label ng-if="Litem.DiagnosisStatusId==1">Provisional</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==2">Active</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==3">In-Active</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==4">Resolved</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==5">RuledOut</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==6">Not Examined</label>
+                                                        <label ng-if="Litem.DiagnosisStatusId==7">Entered In Error</label>
+                                                    </li>
+                                                    <li ng-if="Litem.OrganId!=null">
+                                                        <span>Eye:</span>
+                                                        <label ng-if="Litem.OrganId==1">OD</label>
+                                                        <label ng-if="Litem.OrganId==2">OS</label>
+                                                        <label ng-if="Litem.OrganId==3">OU</label>
+                                                        <label ng-if="Litem.OrganId==4">General</label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td ng-if="DischargeSummaryObj.Diagnosis.length === 0">
+                                            <p>No data added.</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Examinations/Findings
+                                        </th>
+                                        <td>
+                                            <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                <select class="form-outline flex" ng-model="DischargeSummaryObj.SelectedFindingsNotesTemplate" ng-options="item as item.TemplateName for item in DischargeSummaryObj.FindingsTemplates" ng-change="OnselectFindingsNotesTemplates(DischargeSummaryObj.SelectedFindingsNotesTemplate);">
+                                                    <option value="">Select</option>
+                                                </select>
+                                                <!--<a class="white-nowrap" ng-click="AddChecklistFindingsTemplate();">Add Template</a>-->
+                                                <a class="white-nowrap"
+                                                   popover-class="popover-auto ros-popover-width popover-width-300"
+                                                   popover-trigger="outsideClick"
+                                                   popover-is-open="TempObj.IsFindingsTemplateSavePopOver == true"
+                                                   ng-click="TempObj.IsFindingsTemplateSavePopOver = true;TempObj.EnterFindingsTemplateName=''"
+                                                   popover-placement="bottom-right"
+                                                   uib-popover-template="Findingstemplateover.templateUrl">
+                                                    Add Template
+                                                </a>
+                                            </div>
+                                            <div>
+                                                <a href="javascript:;" ng-click="DischargeSummaryObj.ExaminationNotesInd = !DischargeSummaryObj.ExaminationNotesInd"> {{ DischargeSummaryObj.ExaminationNotesInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                <textarea ng-if="DischargeSummaryObj.ExaminationNotesInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="DischargeSummaryObj.ExaminationNotes" ng-focus="DischargeSummaryObj.ExaminationNotesInd"></textarea>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                     
+                                    <tr>
+                                        <th width="16%">
+                                            Patient Condition on Discharge
+                                        </th>
+                                        <td>
+                                            <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                <select class="form-outline flex" ng-model="DischargeSummaryObj.PatientDischargeConditionInstructionTemplateId" ng-options="item.PatientDischargeConditionInstructionTemplateId as item.TemplateName for item in DischargeSummaryObj.PostOpConditionTemplatesList" ng-change="OnSelectConditionTemplatelist(DischargeSummaryObj.PostOpConditionTemplatesList)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                                <a popover-class="popover-auto ros-popover-width popover-width-300" popover-trigger="outsideClick" popover-is-open="IsOpenPatientCondition == true" ng-click="IsOpenPatient()" popover-placement="bottom-right" uib-popover-template="ClickConditionOnDischargeTemplate.templateUrl">Add Template</a>
+                                            </div>
+                                            <div>
+                                                <a href="javascript:;" ng-click="DischargeSummaryObj.PatientConditionInstructionInd = !DischargeSummaryObj.PatientConditionInstructionInd"> {{ DischargeSummaryObj.PatientConditionInstructionInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                <textarea ng-if="DischargeSummaryObj.PatientConditionInstructionInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="DischargeSummaryObj.PatientConditionInstruction" ng-focus="DischargeSummaryObj.PatientConditionInstructionInd"></textarea>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Discharge Instructions
+                                        </th>
+                                        <td>
+                                            <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                <select class="form-outline flex" ng-model="DischargeSummaryObj.PostOpInstructionTemplateId" ng-options="item.PostOpInstructionTemplateId as item.TemplateName for item in DischargeSummaryObj.AscPostOpInstructionTemplateList" ng-change="OnSelectTemplatelist(DischargeSummaryObj.AscPostOpInstructionTemplateList)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                                <a popover-class="popover-auto ros-popover-width popover-width-300" popover-trigger="outsideClick" popover-is-open="IsOpenDischarge == true" ng-click="IsOpenDiscahrge()" popover-placement="bottom-right" uib-popover-template="ClickcreateAddtemplateover.templateUrl">Add Template</a>
+                                            </div>
+                                            <div>
+                                                <a href="javascript:;" ng-click="DischargeSummaryObj.DischargeInstructionInd = !DischargeSummaryObj.DischargeInstructionInd"> {{ DischargeSummaryObj.DischargeInstructionInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                <textarea ng-if="DischargeSummaryObj.DischargeInstructionInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="DischargeSummaryObj.DischargeInstruction" ng-focus="DischargeSummaryObj.DischargeInstructionInd"></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Medications
+                                        </th>
+                                        <td ng-repeat="presc in DischargeSummaryObj.Prescriptions track by $index">
+                                            <ul class="referral-summary-list dis-block" ng-repeat="item in presc.PrescriptionDetails track by $index" ng-show="item.Type == 'MedicineOrders' && item.DeleteInd == 'N'">
+                                                <li>
+                                                    <label>{{item.MedicationName}}</label>
+                                                    <!--<label ng-if="item.RcopiaPrescriptionId != null &&  item.RcopiaMedicationId != null">E Rx Sent</label>
+                                        <label ng-if="item.RcopiaMedicationId != null &&  item.RcopiaPrescriptionId == null ">E Rx Pending</label>-->
+                                                    <label class="text-danger" ng-if="item.IsMedicationStopped">Medication Stopped</label>
+                                                    <label ng-if="item.IsMedicationStopped">-{{ item.StopDate | date:'MM/dd/yyyy'}}</label>
+                                                </li>
+                                                <li>
+                                                    <span ng-show="item.Action!=''">{{item.Action}}</span>
+                                                    <span ng-show="item.Dose!=''">{{item.Dose}}</span>
+                                                    <span ng-show="item.DoseUnit!=''">{{item.DoseUnit}}</span>
+                                                    <span ng-show="item.Route!=''">{{item.Route}}</span>
+                                                    <span ng-show="item.Frequency!=''">{{item.Frequency}}</span>
+                                                    <span ng-show="item.DoseOther!=''">{{item.DoseOther}}</span>
+                                                    <span ng-show="item.DaysSupply!=''"> for {{item.DaysSupply}} Days</span>
+                                                </li>
+                                                <li>
+                                                    <span ng-show="item.Refills!=''">
+                                                        <b>Refills</b>
+                                                        <span>:{{item.Refills}}</span>
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <small ng-show="item.PatientInstructions!=''"><b>Medication Instructions:</b>{{item.PatientInstructions}}</small>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td ng-if="DischargeSummaryObj.Prescriptions.length === 0">
+                                            <p>No data added.</p>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th width="16%">
+                                            Co-Management
+                                        </th>
+                                        <td>
+                                            <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                <select class="form-outline flex" ng-model="DischargeSummaryObj.DischargeCoManagementInstructionTemplateId" ng-options="item.DischargeCoManagementInstructionTemplateId as item.TemplateName for item in DischargeSummaryObj.PostOpCoManagementTemplates" ng-change="OnSelectCoManagementTemplatelist(DischargeSummaryObj.PostOpCoManagementTemplates)">
+                                                    <option value="">Select</option>
+                                                </select>
+                                                <a class="white-nowrap" popover-class="popover-auto ros-popover-width popover-width-300" popover-trigger="outsideClick" popover-is-open="IsOpenComange == true" ng-click="IsOpenComangement()" ng popover-placement="bottom-right" uib-popover-template="ClickCoManagementTemplate.templateUrl">Add Template</a>
+                                            </div>
+                                            <span ng-show="SurgeryDiagnosisObj.ExternalCoManagerId !=null">ExternalCoManager: {{SurgeryDiagnosisObj.ExternalCoManager}}</span>
+                                            <span ng-show="SurgeryDiagnosisObj.InternalCoManagerId !=null">InternalCoManager: {{SurgeryDiagnosisObj.InternalCoManager}}</span>
+                                            <div>
+                                                <a href="javascript:;" ng-click="DischargeSummaryObj.CoManagementInstructionInd = !DischargeSummaryObj.CoManagementInstructionInd"> {{ DischargeSummaryObj.CoManagementInstructionInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                <textarea ng-if="DischargeSummaryObj.CoManagementInstructionInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="DischargeSummaryObj.CoManagementInstruction" ng-focus="DischargeSummaryObj.CoManagementInstructionInd"></textarea>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="16%">
+                                            Follow-Up
+                                        </th>
+                                        <td>
+                                            <ul class="flex-flow-ulli-mb0">
+                                                <li>Follow-Up1 : </li>
+                                                <li>
+                                                    <div class="form-group">
+                                                        <input type="text" ng-model="DischargeSummaryObj.FollowUpDate1" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" datepickerapnlus readonly ng-disabled="DischargeSummaryObj.FirstFollowupAppointmentId != 0">
+                                                    </div>
+                                                </li>
+                                                <li ng-hide="DischargeSummaryObj.FollowUpDate1 !== '' && DischargeSummaryObj.FollowUpDate2Ind">
+                                                    <button class="btn btn-link btn-sm" ng-click="addTextBoxF1()">+ Add</button>
+                                                </li>
+                                            </ul>
+
+                                            <ul class="flex-flow-ulli-mb0 mt-10" ng-if="DischargeSummaryObj.FollowUpDate2Ind">
+                                                <li>Follow-Up2 :</li>
+                                                <li>
+                                                    <div class="form-group">
+                                                        <input type="text" ng-model="DischargeSummaryObj.FollowUpDate2" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" datepickerapnlus readonly ng-disabled="DischargeSummaryObj.SecondFollowupAppointmentId != 0">
+                                                    </div>
+                                                </li>
+                                                <li ng-hide="DischargeSummaryObj.FollowUpDate2 !== ''&&DischargeSummaryObj.FollowUpDate3Ind">
+                                                    <button class="btn btn-link btn-sm" ng-click="addTextBoxF2()">+ Add</button>
+                                                </li>
+                                            </ul>
+
+                                            <ul class="flex-flow-ulli-mb0" ng-if="DischargeSummaryObj.FollowUpDate3Ind">
+                                                <li>Follow-Up3 :</li>
+                                                <li>
+                                                    <div class="form-group">
+                                                        <input type="text" ng-model="DischargeSummaryObj.FollowUpDate3" class="form-outline icons-calendar" placeholder="MM-DD-YYYY" datepickerapnlus readonly ng-disabled="DischargeSummaryObj.ThirdFollowupAppointmentId != 0">
+                                                    </div>
+                                                </li>
+                                                <!--<li ng-hide="DischargeSummaryObj.FollowUpDate3 == ''">
+                                        <button class="btn btn-link btn-sm" ng-click="addTextBoxF2()">+ Add</button>
+                                    </li>-->
+                                            </ul>
+
+                                            <!-- <p class="text-s12w600c079aca">allergen xt-mite,D.pteronyssin</p>-->
+
+                                            <div class="asc-templates-view m-b-5 pull-right col-lg-5 col-md-6 col-sm-12">
+                                                <select class="form-outline flex" ng-model="DischargeSummaryObj.SelectedFollowupNotesTemplate" ng-options="item as item.TemplateName for item in DischargeSummaryObj.FollowupTemplates" ng-change="OnselectFollowUpNotesTemplates(DischargeSummaryObj.SelectedFollowupNotesTemplate);">
+                                                    <option value="">Select</option>
+                                                </select>
+                                                <!--<a class="white-nowrap" ng-click="AddChecklistFollowupTemplate();">Add Template</a>-->
+                                                <a class="white-nowrap"
+                                                   popover-class="popover-auto ros-popover-width popover-width-300"
+                                                   popover-trigger="outsideClick"
+                                                   popover-is-open="TempObj.IsFollowUpTemplateSavePopOver == true"
+                                                   ng-click="TempObj.IsFollowUpTemplateSavePopOver = true;TempObj.EnterFollowUpTemplateName=''"
+                                                   popover-placement="bottom-right"
+                                                   uib-popover-template="FollowUptemplateover.templateUrl">
+                                                    Add Template
+                                                </a>
+
+                                            </div>
+                                            <div>
+                                                <a href="javascript:;" ng-click="DischargeSummaryObj.FollowUpInstructionsInd = !DischargeSummaryObj.FollowUpInstructionsInd"> {{ DischargeSummaryObj.FollowUpInstructionsInd ? '- Hide Notes' : '+ Add Notes' }}</a>
+                                                <textarea ng-if="DischargeSummaryObj.FollowUpInstructionsInd" class="form-outline msd-elastic: \n;" placeholder="Enter Notes" rows="3" ng-model="DischargeSummaryObj.FollowUpInstructions" ng-change="ClearFollowupTempNotes(DischargeSummaryObj.FollowUpInstructions)" ng-focus="DischargeSummaryObj.FollowUpInstructionsInd"></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="asc-panel">
+                    <div class="asc-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <ul class="flex-flow-ulli">
+                                    <li>
+                                        <span class="text-s12w400C000">Reviewed By:</span>
+                                    </li>
+                                    <li>
+                                        <select class="form-outline w-250" ng-model="DischargeSummaryObj.DischargeReviewedBy" ng-options="item.DoctorID as item.FullName for item in DischargeArray" ng-change="ChangeReviewedbyItem(DischargeSummaryObj.DischargeReviewedBy)">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        Signature
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-body h-100 p-0 dis-flex flex-direction-column" ng-show="isEditScreenVisible">
+    <div class="asc-model-header">
+        <h1>Discharge Summary</h1>
+        <ul>
+            <li>
+                <button class="btn-d" type="button" ng-click="closeuib()">Close</button>
+            </li>
+            <li>
+                <button class="btn-u" type="button" ng-if="DischargeSummaryObj.DischargeChartStatus !== 'E'&&UserAccessRights.AllAccessRights.ASCDischargeEdit" ng-click="NavFromSumary(DischargeSummaryObj)">Edit</button>
+            </li>
+            <li>
+                <button class="btn-d" type="button" ng-if="DischargeSummaryObj.DischargeChartStatus === 'E'&&UserAccessRights.AllAccessRights.ASCDischargeUnsign" ng-click="UnsignFromSumary(DischargeSummaryObj)">Un-Sign</button>
+            </li>
+            <li>
+                <button class="btn-p" type="button" ng-click="DischargeSummaryPrint()">Print</button>
+            </li>
+        </ul>
+    </div>
+    <div class="asc-model-body h-100">
+        <div class="adjustable-position p-8">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="referral-summary-list">
+                        <li>
+                            <span>Patient : </span>
+                            <label>{{cacheStorageItem.PatientName}}</label>
+                        </li>
+                        <li>
+                            <span>MR.No : </span>
+                            <label>{{cacheStorageItem.PatientDisplayId}}</label>
+                        </li>
+                        <li>
+                            <span>DOB : </span>
+                            <label>{{cacheStorageItem.PatientDOB | date: "MM-dd-yyyy"}}</label>
+                        </li>
+                        <li>
+                            <span>DOS : </span>
+                            <label>{{SurgeryDiagnosisObj.SurgeryDate  | date: "MM-dd-yyyy"}}</label>
+                        </li>
+                    </ul>
+                    <ul class="referral-summary-list hide">
+                        <li>
+                            <span>Diagnosis : </span>
+                            <label>H23.50 Vitreous prolapse</label>
+                        </li>
+                    </ul>
+                    <ul class="referral-summary-list">
+                        <li>
+                            <span>Procedure : </span>
+                            <label>{{SurgeryDiagnosisObj.OperativeProcedure}}</label>
+                        </li>
+                    </ul>
+                    <ul class="referral-summary-list">
+                        <li>
+                            <span>Operated Eye : </span>
+                            <label> {{SurgeryDiagnosisObj.OrganId === 1 ? 'OD' : (SurgeryDiagnosisObj.OrganId === 2 ? 'OS': (SurgeryDiagnosisObj.OrganId === 3 ? 'OU':(SurgeryDiagnosisObj.OrganId === 4 ? 'General':''))) }}</label>
+                        </li>
+                        <li>
+                            <span>Surgeon : </span>
+                            <label>{{SurgeryDiagnosisObj.Surgeon}}</label>
+                        </li>
+
+
+                        <li>
+                            <span>Anesthetist : </span>
+                            <label>{{SurgeryDiagnosisObj.Anesthetist}}</label>
+                        </li>
+
+
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="asc-table-admission">
+                        <tbody>
+                            <tr>
+                                <th width="16%">
+                                    Pre-Op Diagnosis
+                                </th>
+                                <td ng-if="SurgeryDiagnosisObj.Diagnosis!=''">
+                                    <ul class="referral-summary-list">
+                                        <li>
+                                            {{SurgeryDiagnosisObj.ICDCode}}-{{SurgeryDiagnosisObj.Diagnosis}}  <span ng-show="SurgeryDiagnosisObj.Diagnosis2 !=''">,{{ SurgeryDiagnosisObj.ICDCode2}}-{{SurgeryDiagnosisObj.Diagnosis2}}</span>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td ng-show="SurgeryDiagnosisObj.Diagnosis ==''">
+                                    <p>No data added.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="16%">
+                                    Post-Op Diagnosis
+                                </th>
+                                <td ng-if="DischargeSummaryObj.Diagnosis.length > 0">
+                                    <div ng-repeat="item in DischargeSummaryObj.Diagnosis | filter:{DeleteInd: 'N'} track by $index">
+                                        <span class="text-s12w400C000">{{$index+1}}.{{item.ICD10CODE}}-{{item.ICD10DIAGNAME}}</span>
+                                        <ul class="flex-flow-ulli-mb0" ng-repeat="Litem in item.StatusList">
+                                            <li class="text-s12w500c000" ng-if="Litem.SeverityId!=null">
+                                                <label>Severity:</label>
+                                                <span ng-if="Litem.SeverityId==1">Mild</span>
+                                                <span ng-if="Litem.SeverityId==3">Moderate</span>
+                                                <span ng-if="Litem.SeverityId==5">Severe</span>
+                                            </li>
+                                            <li class="text-s12w500c000" ng-if="Litem.DiagnosisStatusId!=null">
+                                                <label>Status:</label>
+                                                <span ng-if="Litem.DiagnosisStatusId==1">Provisional</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==2">Active</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==3">InActive</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==4">Resolved</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==5">RuledOut</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==6">Not Examined</span>
+                                                <span ng-if="Litem.DiagnosisStatusId==7">Entered In Error</span>
+                                            </li>
+                                            <li class="text-s12w500c000" ng-if="Litem.OrganId!=null">
+                                                <label>Eye:</label>
+                                                <span ng-if="Litem.OrganId==1">OD</span>
+                                                <span ng-if="Litem.OrganId==2">OS</span>
+                                                <span ng-if="Litem.OrganId==3">OU</span>
+                                                <span ng-if="Litem.OrganId==4">General</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td ng-if="DischargeSummaryObj.Diagnosis.length === 0">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="16%">
+                                    Examinations/Findings
+                                </th>
+                                <td ng-if="DischargeSummaryObj.Findings!=''">
+                                    <span class="pre-line text-s12w400C000" ng-bind-html="DischargeSummaryObj.Findings"></span>
+                                </td>
+                                <td ng-if="DischargeSummaryObj.Findings==''">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                             
+                            <tr>
+                                <th width="16%">
+                                    Patient Condition on Discharge
+                                </th>
+                                <td ng-if="DischargeSummaryObj.PatientConditionInstruction!=''">
+                                    <span class="pre-line text-s12w400C000" ng-bind-html="DischargeSummaryObj.PatientConditionInstruction"></span>
+                                </td>
+                                <td ng-if="DischargeSummaryObj.PatientConditionInstruction==''">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="16%">
+                                    Discharge Instructions
+                                </th>
+                                <td ng-if="DischargeSummaryObj.DischargeInstruction!=''">
+                                    <span class="pre-line text-s12w400C000" ng-bind-html="DischargeSummaryObj.DischargeInstruction"></span>
+                                </td>
+                                <td ng-if="DischargeSummaryObj.DischargeInstruction==''">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="16%">
+                                    Medications
+                                </th>
+                                <td ng-if="DischargeSummaryObj.Prescriptions.length > 0" ng-repeat="presc in DischargeSummaryObj.Prescriptions track by $index">
+                                    <ul class="referral-summary-list dis-block" ng-repeat="item in presc.PrescriptionDetails track by $index" ng-show="item.Type == 'MedicineOrders' && item.DeleteInd == 'N'">
+                                        <li>
+                                            <span>{{item.MedicationName}}</span>
+                                            <!--<label ng-if="item.RcopiaPrescriptionId != null &&  item.RcopiaMedicationId != null">E Rx Sent</label>
+                                    <label ng-if="item.RcopiaMedicationId != null &&  item.RcopiaPrescriptionId == null ">E Rx Pending</label>-->
+                                            <label class="text-danger" ng-if="item.IsMedicationStopped">Medication Stopped</label>
+                                            <label ng-if="item.IsMedicationStopped">-{{ item.StopDate | date:'MM/dd/yyyy'}}</label>
+                                        </li>
+                                        <li>
+                                            <span ng-show="item.Action!=''">{{item.Action}}</span>
+                                            <span ng-show="item.Dose!=''">{{item.Dose}}</span>
+                                            <span ng-show="item.DoseUnit!=''">{{item.DoseUnit}}</span>
+                                            <span ng-show="item.Route!=''">{{item.Route}}</span>
+                                            <span ng-show="item.Frequency!=''">{{item.Frequency}}</span>
+                                            <span ng-show="item.DoseOther!=''">{{item.DoseOther}}</span>
+                                            <span ng-show="item.DaysSupply!=''"> for {{item.DaysSupply}} Days</span>
+                                        </li>
+                                        <li>
+                                            <span ng-show="item.Refills!=''">
+                                                <b>Refills</b>
+                                                <span>:{{item.Refills}}</span>
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <small ng-show="item.PatientInstructions!=''"><b>Medication Instructions:</b>{{item.PatientInstructions}}</small>
+                                        </li>
+
+                                    </ul>
+                                </td>
+                                <td ng-if="DischargeSummaryObj.Prescriptions.length === 0">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                             
+
+
+                            <tr>
+                                <th width="16%">
+                                    Co-Management
+                                </th>
+                                <td ng-if="SurgeryDiagnosisObj.ExternalCoManagerId !=null||SurgeryDiagnosisObj.InternalCoManagerId !=null||DischargeSummaryObj.CoManagementInstruction!=''">
+                                    <span ng-show="SurgeryDiagnosisObj.ExternalCoManagerId !=null">ExternalCoManager: {{SurgeryDiagnosisObj.ExternalCoManager}}</span>
+                                    <span ng-show="SurgeryDiagnosisObj.InternalCoManagerId !=null">InternalCoManager: {{SurgeryDiagnosisObj.InternalCoManager}}</span>
+                                    <span class="pre-line text-s12w400C000" ng-bind-html="DischargeSummaryObj.CoManagementInstruction"></span>
+                                </td>
+                                <td ng-if="SurgeryDiagnosisObj.ExternalCoManagerId ==null&&SurgeryDiagnosisObj.InternalCoManagerId ==null&&DischargeSummaryObj.CoManagementInstruction==''">
+                                    <p>No data Added.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="16%">
+                                    Follow-Up
+                                </th>
+                                <td ng-if="(DischargeSummaryObj.FollowUpDate1 =='')&&(DischargeSummaryObj.FollowUpDate2 =='')&&(DischargeSummaryObj.FollowUpDate3 =='')&&(DischargeSummaryObj.FollowUpInstructions=='')">
+                                    <p>No data Added.</p>
+                                </td>
+                                <td ng-if="(DischargeSummaryObj.FollowUpDate1 !='')||(DischargeSummaryObj.FollowUpDate2 !='')||(DischargeSummaryObj.FollowUpDate3 !='')||(DischargeSummaryObj.FollowUpInstructions!='')">
+                                    <ul class="referral-summary-list">
+                                        <li>
+                                            <span ng-show="DischargeSummaryObj.FollowUpDate1 !=''">Follow-Up1 :</span>
+                                            <label ng-show="DischargeSummaryObj.FollowUpDate1 !=''">{{DischargeSummaryObj.FollowUpDate1}} <span>;</span></label>
+                                        </li>
+
+                                        <li>
+                                            <span ng-show="DischargeSummaryObj.FollowUpDate2 !=''">Follow-Up2 :</span>
+                                            <label ng-show="DischargeSummaryObj.FollowUpDate2 !=''">{{DischargeSummaryObj.FollowUpDate2}} <span>;</span></label>
+                                        </li>
+                                        <li>
+
+                                            <span ng-show="DischargeSummaryObj.FollowUpDate3 !=''">Follow-Up3 :</span>
+                                            <label>{{DischargeSummaryObj.FollowUpDate3}}</label>
+                                        </li>
+                                    </ul>
+                                    <p class="mb-0 text-s12w400C000" ng-bind-html="DischargeSummaryObj.FollowUpInstructions"></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ascsec">
+            <div class="row" ng-if="DischargeSummaryObj.DischargeReviewedBy != ''">
+                <div class="col-lg-12">
+                    <table class="asc-table-admission">
+                        <tbody>
+                            <tr>
+                                <th width="16%">
+                                    Reviewed By:
+                                </th>
+                                <td>
+                                    {{DischargeSummaryObj.DischargeReviewedByName}} {{DischargeSummaryObj.DischargeReviewedBySuffix}} <label ng-show="DischargeSummaryObj.ReviewedByLicenseNumber !==''"> Lic: {{DischargeSummaryObj.ReviewedByLicenseNumber}}</label>  {{DischargeSummaryObj.DischargeReviewedDate}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="asc-panel">
+                <div class="asc-panel-header">
+                    <h1>Signed By</h1>
+                </div>
+                <div class="asc-panel-body">
+                    <ul class="flex-flow-ulli-mb0" ng-repeat="item in DischargeSummaryObj.LastSignOffUserDetails track by $index">
+                        <li>
+                            <label ng-show="item.IsSurgeon">Surgeon :  </label>
+                            <label ng-show="item.IsNurse">Nurse :  </label>
+                            <label>Electronically Signed By - </label>
+                            <label ng-show="item.SuffixId ==10">Dr. </label>
+                            <label>{{item.SignOffUserName}} {{item.SuffixName}},</label>
+                            <label ng-show="item.LicenseNumber !==''&& item.LicenseNumber !==null">Lic: {{item.LicenseNumber}},</label>
+                            <label>{{item.Date | date:"MM-dd-yyyy"}},</label>
+                            <label>{{item.Time | amPm}}</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/ng-template" id="AddPostopInstructionTemplate.html">
+    <div ng-if="IsOpenDischarge">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="DischargeSummaryObj.DischargePostOpInstructionTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveDischargePostOpInstructionTemplate()">Save Template</button>
+    </div>
+</script>
+<script type="text/ng-template" id="AddMedInstructionTemplate.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="DischargeSummaryObj.MedictionTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddDischargeMedicationInstructionTemplate()">Save Template</button>
+    </div>
+</script>
+<script type="text/ng-template" id="AddProceduralNameTemplate.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="DischargeSummaryObj.ProceduralNameTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddUpdateAscPostOpProceduralNameTemplates()">Save Template</button>
+    </div>
+</script>
+<script type="text/ng-template" id="AddConditionOnDischargeTemplate.html">
+    <div ng-if="IsOpenPatientCondition">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="DischargeSummaryObj.ConditionOnDischargeTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddUpdateAscPostOpConditionOnDischargeTemplates()">Save Template</button>
+    </div>
+</script>
+<script type="text/ng-template" id="AddCoManagementTemplate.html">
+    <div ng-if="IsOpenComange">
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="DischargeSummaryObj.CoManagementTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="AddUpdateAscPostOpCoManagementTemplates()">Save Template</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="AddFindingsTemplatSave.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterFindingsTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveFindingsTemplate()">Save Template</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="AddFollowUpTemplatSave.html">
+    <div>
+        <div class="input-group input-group-sm width-100">
+            <label>Template Name</label>
+            <input type="text" class="form-control bg-f1f1f1" ng-model="TempObj.EnterFollowUpTemplateName" placeholder="Enter Template Name" />
+        </div>
+        <button class="btn btn-ehnote btn-block m-t-10" ng-click="SaveFollowUpTemplate()">Save Template</button>
+    </div>
+</script>

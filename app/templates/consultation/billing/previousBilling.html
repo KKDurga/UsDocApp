@@ -1,0 +1,815 @@
+﻿ 
+     <div class="row m-t-10">
+                <div class="col-lg-12">
+                     <section class="tile tile-shadow">
+                <div class="tile-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                    <tbody>
+                                        <tr>
+                                            <td class="w-200">
+                                                <div class="form-group">
+                                                    <label>From Date</label>
+                                                    <input class="form-control icons-calendar cur-default bg-white"
+                                                           ng-model="LedgerSearchObj.FromDate"
+                                                           datepickerforinventoryus readonly />
+                                                </div>
+                                            </td>
+                                            <td class="w-200">
+                                                <div class="form-group">
+                                                    <label>To Date</label>
+                                                    <input class="form-control icons-calendar cur-default bg-white"
+                                                           ng-model="LedgerSearchObj.ToDate"
+                                                           datepickerforinventoryus readonly />
+                                                </div>
+                                            </td>
+                                            <td class="w-300">
+                                                <div class="form-group">
+                                                    <fieldset class="pos-relative bottom-2">
+                                                        <div class="dis-inline-block">
+                                                            <input type="radio" class="radio-custom width-0" id="PatientName" name="PatientName1" ng-value="1" aria-invalid="false" ng-model="patientSearchObj.TypeId" ng-change="ChangePatientSearchType(patientSearchObj.TypeId)">
+                                                            <label for="PatientName" class="radio-custom-label cur-poiter mb-0">Name </label>
+                                                        </div>
+                                                        <div class="dis-inline-block">
+                                                            <input type="radio" class="radio-custom width-0" id="PatientMrno" name="PatientMrno2" ng-value="2" aria-invalid="false" ng-model="patientSearchObj.TypeId" ng-change="ChangePatientSearchType(patientSearchObj.TypeId)">
+                                                            <label for="PatientMrno" class="radio-custom-label cur-poiter mb-0">Mobile.No. </label>
+                                                        </div>
+                                                        <div class="dis-inline-block ml-15">
+                                                            <input type="radio" class="radio-custom width-0" id="PatientMobileNo" name="PatientMobileNo3" ng-value="3" aria-invalid="false" ng-model="patientSearchObj.TypeId" ng-change="ChangePatientSearchType(patientSearchObj.TypeId)">
+                                                            <label for="PatientMobileNo" class="radio-custom-label cur-poiter mb-0">MR.No.</label>
+                                                        </div>
+
+                                                    </fieldset>
+                                                    <div class="btn-group select-form-uib dropdown open">
+                                                        <input type="text" class="form-control pl-15" placeholder="Search By Name" ng-if="patientSearchObj.TypeId == 1" ng-model="patientSearchObj.SearchText" ng-change="ChangePatientSearch(patientSearchObj.SearchText, patientSearchObj.TypeId)">
+                                                        <input type="text" class="form-control pl-15" placeholder="Search By Mobile No" ng-if="patientSearchObj.TypeId == 2" ng-model="patientSearchObj.SearchText" ng-change="ChangePatientSearch(patientSearchObj.SearchText, patientSearchObj.TypeId)">
+                                                        <input type="text" class="form-control pl-15" placeholder="Search By MR No" ng-if="patientSearchObj.TypeId == 3" ng-model="patientSearchObj.SearchText" ng-change="ChangePatientSearch(patientSearchObj.SearchText, patientSearchObj.TypeId)">
+                                                        <ul class="list-group dropdown-menu m-t-0 m-b-0 p-0 dropdown-list-group-item" ng-show="AllPatientList.length > 0">
+                                                            <li class="list-group-item text-dark cur-poiter"
+                                                                ng-repeat="patientitem in AllPatientList" ng-click="selectedPatient(patientitem)">
+                                                                <span class="badge badge-primary">
+                                                                    <!--{{patientitem.MobileNo}}-->
+                                                                    <span ng-if="patientitem.HomeCountryCode != '' && patientitem.HomeCountryCode != null">
+                                                                        {{patientitem.HomeCountryCode}}
+                                                                    </span>
+                                                                    <span ng-if="patientitem.HomeAreaCode != '' && patientitem.HomeAreaCode != null">
+                                                                        -{{patientitem.HomeAreaCode}}
+                                                                    </span>
+                                                                    <span ng-if="patientitem.HomeNumber != '' && patientitem.HomeNumber != null">
+                                                                        -{{patientitem.HomeNumber}}
+                                                                    </span>
+                                                                </span>
+                                                                {{patientitem.fullname}}
+                                                                <b>{{patientitem.PatientDisplayId}}</b>
+                                                            </li>
+                                                            <li class="list-group-item text-dark cur-poiter" ng-if="AllPatientList.length===0">
+                                                                <div class="billing-cominsoon">
+                                                                    <img src="img/no-data/no-patient-found.png">
+                                                                    <div class="msg">
+                                                                        <p class="goback-text">No Patient Found</p>
+                                                                        <p class="no-records-txt-line2">
+                                                                            Please Search with Different Name
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+
+                                                </div>
+                                            </td>
+                                            <td class="w-150">
+                                                <div class="form-group">
+                                                    <button class="btn btn-success m-t-25" ng-click="GetAllPatientInvoiceList();">Search</button>
+                                                    <button class="btn btn-warning m-t-25" ng-click="ClearInvoice();">Clear</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </section>
+                    <section class="tile tile-shadow">
+                        <div class="tile-header">
+                            <h1>Invoices</h1>
+                            <ul class="controls">
+                                <li>
+                                    <button class="btn blue-btn btn-sm" ng-click="CreateNewBill()" ng-if="showHideCreateBillBtn">Create New Bill</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tile-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div ng-if="patientInvoicesArray.length>0">
+                                        <uib-accordion class="case-history">
+                                            <uib-accordion-group is-open="mitem.isaccordianOpen" ng-repeat="mitem in patientInvoicesArray" class="mb-0">
+                                                <uib-accordion-heading>
+                                                    <div class="row width-100 cur-poiter fs-13 durgatest" for="{{'small-reg2' + $index}}" ng-click="onParticularInvoiceClick(mitem,mitem.isaccordianOpen)">
+                                                    <div class="col-lg-12">
+                                                        <div class="table-responsive">
+                                                            <table class="table tableno-bordered m-b-0 apptFilterTable">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td width="15%" class="valign-top">
+                                                                            <div class="form-group mb-0">
+                                                                                <b>{{mitem.PatientName}}</b>
+                                                                                <p class="mb-0" ng-bind="mitem.PatientDisplayId"></p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td width="12%" class="valign-top">
+                                                                            <div class="form-group mb-0">
+                                                                                <b ng-if="mitem.BillingTypeId==1">OP Invoice No <span ng-if="mitem.IsInvestigationInvoice ===true">(INV)</span>:</b>
+                                                                                <b ng-if="mitem.BillingTypeId==2">OT Invoice No :</b>
+                                                                                <p class="mb-0" title="Invoice ID" ng-bind="mitem.InvoiceId"></p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top" width="10%">
+                                                                            <div class="form-group mb-0">
+                                                                                <b>Date :</b>
+                                                                                <p class="mb-0" title="Invoice ID" ng-bind="mitem.CreatedDt | date:'dd-MM-yyyy'"></p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top" width="6%">
+                                                                            <div class="form-group mb-0">
+                                                                                <b>Status :</b>
+                                                                                <p class="mb-0" title="Invoice Status" ng-style="mitem.IsInvoiceCancelled && {'color':'red'} || {'color': 'green'}">{{mitem.InvoiceStatus}}</p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top" width="16%">
+                                                                            <div class="form-group mb-0">
+                                                                                <b>Towards the Doctor's :</b>
+                                                                                <p class="mb-0">Dr.{{mitem.DoctorName}}</p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top">
+                                                                            <div class="form-group mb-0">
+                                                                                <b>Branch Name :</b>
+                                                                                <p>{{mitem.HospitalName}}</p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top">
+                                                                            <div class="form-group mb-0">
+                                                                                <p class="m-b-0">
+                                                                                    <b>Total Amount: </b>
+                                                                                    <span ng-bind="mitem.TotalNetAmount"></span>
+                                                                                </p>
+                                                                                <p class="m-b-0">
+                                                                                    <b>Paid: </b>
+                                                                                    <span ng-bind="mitem.TotalReceivedAmount" style="color:green"></span>
+                                                                                </p>
+                                                                                <p class="mb-0 error" ng-hide="mitem.PromoCodeId ===0">
+                                                                                    <b style="font-size:10px;">PromoCode Applied: </b>
+                                                                                    <span ng-bind="mitem.PromoCode"></span>
+                                                                                </p>
+                                                                                <p class="mb-0 error" ng-hide="mitem.PromoCodeId ===0">
+                                                                                    <b style="font-size:10px;">PromoCode Amount: </b>
+                                                                                    <span ng-bind="mitem.PromoCodeAmount | number:2"></span>
+                                                                                </p>
+                                                                                <p class="mb-0 error" ng-if="mitem.TotalBalance!=0">
+                                                                                    <b>Due: </b>
+                                                                                    <span ng-bind="mitem.TotalBalance | number:2"></span>
+                                                                                </p>
+                                                                                <!--<p class="mb-0 error" ng-show="selectedBillingModeId ===2">
+            <b style="font-size:10px;">Payment Type : Credit ({{selectedInsuranceTpaObj.BillingCategoryType}}) </b>
+            <span></span>
+        </p>-->
+                                                                                <p class="mb-0 error" ng-show="mitem.IsCreditBill">
+                                                                                    <b style="font-size:10px;">Payment Type : Credit Bill </b>
+                                                                                    <span></span>
+                                                                                </p>
+                                                                                <p ng-show="mitem.IsCreditBill">
+                                                                                    <label style="font-size:10px;">
+                                                                                        Due Amount:<span style="color:red" ng-bind="mitem.DueFromInsurance"></span>
+                                                                                    </label>
+                                                                                </p>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="valign-top">
+                                                                            <div class="form-group">
+                                                                                <b>Created By :</b>
+                                                                                <p class="mb-0" title="Created By" ng-bind="mitem.CreatedBy"></p>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div class="row" ng-if="mitem.DeleteInd">
+                                                        <div class="col-lg-12">
+                                                            <label>Remarks :</label><span ng-if="mitem.IsWrongEntry">Wrong Entry - Amount Cleared ,  <span>Note :</span> <span>{{mitem.CancelBillingRemarks}}</span></span>
+                                                            <span ng-if="!mitem.IsWrongEntry">Amount Paid - Added to Patient Advance, <span>Note :</span> <span>{{mitem.CancelBillingRemarks}}</span></span>
+
+                                                        </div>
+                                                    </div>
+                                                </uib-accordion-heading>
+                                                <div class="row pos-relative bottom-5">
+                                                    <div class="col-lg-12 text-right" ng-if="mainBillingObject.BillingDetail.length > 0">
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="GetPatientDetailsForHCFA(mitem);">
+                                                            <i class="fa fa-lg fa-print"></i> &nbsp; HCFA Print
+                                                        </button>
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="printCancelReceipt(mitem)" title="Print Bill" ng-if="mitem.IsInvoiceCancelled"><i class="fa fa-lg fa-print"></i> Print Cancelled Invoice</button>
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="printCreditInvoiceBill(mainBillingObject,mitem)" title="Print Bill" ng-if="mainBillingObject.IsCreditBill"><i class="fa fa-lg fa-print"></i> Print Credit Invoice Bill</button>
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="PrintFinalInvoice(mitem)" title="Print Bill" ng-if="!mitem.IsInvoiceCancelled"><i class="fa fa-lg fa-print"></i> Print Final Bill</button>
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="PrintAppointwiseInvoice(mitem)" title="Print Bill" ng-if="!mitem.IsInvoiceCancelled"><i class="fa fa-lg fa-print"></i> Print Appointmentwise Bill</button>
+                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="deleteParticularInvoice(mitem)" ng-if="UserAccessRights.AllAccessRights.DeleteInvoice && !mitem.IsInvoiceCancelled && mitem.isCurrentMonth && mitem.isBilledHospital && mitem.BillingTypeId == 1"><i class="fas fa-trash"></i> Delete Invoice</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+
+                                                    <div class="col-lg-12">
+                                                        <div class="table-responsive" ng-if="mainBillingObject.BillingDetail.length > 0">
+                                                            <table class="table table-bordered multi-tabletreatment">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Date</th>
+                                                                        <th>Treatment Name</th>
+                                                                        <th ng-show="SpecializationId != 2">Code</th>
+                                                                        <th>Treatment Cost</th>
+                                                                        <th>Unit</th>
+                                                                        <th ng-if="mainBillingObject.IsDiscountChecked">Discount</th>
+                                                                        <th ng-if="mainBillingObject.IsGSTChecked">Gst (%)</th>
+                                                                        <th>Total Amount</th>
+                                                                        <th class="text-center" width="10%"><span>Paid</span></th>
+                                                                        <th class="text-center w-100" ng-if="PayDueAmount"><span>Received</span></th>
+                                                                        <th ng-show="SpecializationId == 2 ||SpecializationId == 16">Conv. Doctor</th>
+                                                                        <th>Tre. Doctor</th>
+                                                                        <th>Cons. Doctor</th>
+
+                                                                        <th ng-show="SpecializationId == 16">Ref.Doctor </th>
+                                                                        <th>Remarks</th>
+                                                                        <th>Waive Off</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="item in mainBillingObject.BillingDetail track by $index"
+                                                                        ng-hide="item.ProcedureID==0 || !item.IsIncluded">
+                                                                        <td><span ng-bind="item.BillingDate"></span></td>
+                                                                        <td>
+                                                                            <span ng-bind="item.ProcedureName"></span>
+                                                                            <a href="javascript:void(0);" style="float:right"
+                                                                               class="mt-clearbtn-billing cur-poiter"
+                                                                               ng-show="item.ProcedureTypeId==8"
+                                                                               ng-click="showInventoryItemDetails(item,$index)">View Inventory Items</a>
+                                                                        </td>
+                                                                        <td ng-show="SpecializationId != 2"><span ng-bind="item.BillingCode"></span></td>
+                                                                        <td><span ng-bind="item.ProcedureCost"></span></td>
+                                                                        <td class="pos-relative">
+                                                                            <span ng-bind="item.Multiplyfactor"></span>
+                                                                            <a ng-if="SpecializationId == 2 && item.TeethArray != null"
+                                                                               href="javascript:void(0);"
+                                                                               title="" tooltip=""
+                                                                               data-original-title="{{item.TeethArray}}"
+                                                                               class="pos-absolute top-0 right-0">
+                                                                                <i class="fa fa-info-circle"
+                                                                                   aria-hidden="true"
+                                                                                   data-original-title="{{item.TeethArray}}"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td ng-if="mainBillingObject.IsDiscountChecked">
+                                                                            <span ng-if="item.DiscountType == 'AMOUNT'">
+                                                                                <span ng-bind="item.DiscountCost"></span>(INR)
+                                                                            </span>
+                                                                            <span ng-if="item.DiscountType == 'PERCENT'">
+                                                                                <span ng-bind="item.DiscountCost"></span>(%)
+                                                                            </span>
+                                                                        </td>
+                                                                        <td ng-if="mainBillingObject.IsGSTChecked">
+                                                                            <span> {{item.Gst}}  <span ng-if="!item.isExclusiveTax">(Incl)</span> <span ng-if="item.isExclusiveTax">(Excl)</span> </span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span ng-bind="item.Total"></span>
+                                                                            <div class="col-lg-12" ng-if="item.PromoCodeAmount > 0">
+                                                                                <label class="m-b-0 fs-10" style="color:red;">PromoCode Disc : {{item.PromoCodeAmount | number:2}}</label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td><span ng-bind="item.TotalAmountReceived"></span></td>
+                                                                        <td ng-if="PayDueAmount">
+                                                                            <input type="text" ng-model="item.BilledCost" class="form-control"
+                                                                                   ng-blur="CalculateProcedureWiseAmount(item,$index)"
+                                                                                   numbers-only="numbers-only"
+                                                                                   ng-disabled="item.TotalAmountReceived == item.Total || item.IsWaved" />
+                                                                        </td>
+                                                                        <td ng-show="SpecializationId == 2||SpecializationId == 16">
+                                                                            <span ng-bind="item.ConversionDoctorName"></span>
+                                                                        </td>
+                                                                        <td><span ng-bind="item.TreatmentDoctorName"></span></td>
+                                                                        <td><span ng-bind="item.ConsultantDoctorName"></span></td>
+                                                                        <td ng-show="SpecializationId == 16"><span ng-bind="item.TherapistName"></span></td>
+                                                                        <!--<td ng-show="SpecializationId == 16"><span ng-bind="item.SalesPersonName"></span></td>-->
+                                                                        <td ng-if="item.Notes == null ||item.Notes == ''">
+                                                                            <span></span>
+                                                                        </td>
+                                                                        <td ng-if="item.Notes">
+                                                                            <button popover-placement="left" uib-popover="{{item.Notes}}" type="button" popover-trigger="outsideClick" class="btn btn-default">view </button>
+
+                                                                        </td>
+                                                                        <td>
+                                                                            <span ng-bind="item.IsWaved ? 'Yes':'No'"></span>
+                                                                            <button class="btn primary-btn cur-poiter" popover-placement="left" uib-popover="{{item.WavedOffRemarks}}" type="button" popover-trigger="outsideClick" ng-if="item.WavedOffRemarks != ''">                                                                                   <i class="far fa-comments"></i>                                              </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="col-lg-12 pl-0">
+
+                                                            <!--<div class="row mt-10" ng-if="selectedBillingModeId==2">-->
+                                                            <div class="row mt-10" ng-if="mainBillingObject.IsCreditBill">
+                                                                <div class="col-lg-12" ng-if="selectedInsuranceTpaObj.BillingCategoryTypeId!==15">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <th width="20%">Insured Company :</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.InsuranceCompanyName}}</td>
+                                                                                    <th width="20%">TPA:</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.TPAName}}</td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th width="20%">Policy No:	</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.InsurancePolicyNo}}</td>
+
+                                                                                    <th width="20%" class="bg-info">Insured Amount:</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.SumInsured}}</td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th width="20%">Start Date:</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.StartDate |date :'dd-MM-yyyy'}}</td>
+                                                                                    <th width="20%">End Date:</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.EndDate |date :'dd-MM-yyyy'}}</td>
+                                                                                </tr>
+
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12" ng-if="selectedInsuranceTpaObj.BillingCategoryTypeId===15">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <th width="20%">Corporate Company :</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.InsuranceCompanyName}}</td>
+                                                                                    <th width="20%">Reference Number:</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.ReferenceNumber}}</td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th width="20%">Name of the Employee:	</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.NameOfTheEmployee}}</td>
+
+                                                                                    <th width="20%" class="bg-info">Relation with Patient :</th>
+                                                                                    <td width="30%" class="text-uppercase">{{selectedInsuranceTpaObj.RelationName}}</td>
+                                                                                </tr>
+
+
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button class="btn primary-btn cur-poiter"
+                                                                    ng-click="mainBillingObject.ShowPaymentDetails = !mainBillingObject.ShowPaymentDetails;PayDueAmount = false">
+                                                                <i class="fa fa-eye fa-lg"></i> View Payment Details
+                                                            </button>
+                                                            <button class="btn btn-orange btn-fill-horz-o fund-bill p-l-50 p-r-50 cur-poiter"
+                                                                    ng-click="PayDueAmount = !PayDueAmount" ng-show="!mitem.IsInvoiceCancelled">
+                                                                <i class="create-bill-bill"></i> &nbsp; Pay Due Amount
+                                                            </button>
+
+                                                            <div class="row" ng-show="PayDueAmount && !mainBillingObject.IsCreditBill">
+                                                                <div class="col-lg-4 col-lg-offset-8">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered">
+                                                                            <tbody>
+                                                                                <tr ng-if="ShowPatientGst">
+                                                                                    <th>
+                                                                                        GST No:
+                                                                                    </th>
+                                                                                    <td width="150">
+                                                                                        <input type="text" ng-model="mainBillingObject.PatientGSTNo"
+                                                                                               class="form-control" maxlength="15" />
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr ng-hide="mainBillingObject.PromoCodeId ===0">
+                                                                                    <th>Promo Code Amount : </th>
+                                                                                    <td width="150">
+                                                                                        <span style="color:red">{{mainBillingObject.PromoCodeAmount | number:2}}</span>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th>Total Net:</th>
+                                                                                    <td width="150" ng-bind="mainBillingObject.TotalSubAmount | number :2"></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th>Tax Amount:</th>
+                                                                                    <td width="150"><span ng-bind="mainBillingObject.TotalGST | number:2"></span></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th>Wavie Off Amount: </th>
+                                                                                    <td width="150">
+                                                                                        <span ng-bind="mainBillingObject.TotalWaviedOffAmount | number:2"></span>
+                                                                                    </td>
+                                                                                </tr>
+
+                                                                                <tr>
+                                                                                    <th>Total Gross Amount:</th>
+                                                                                    <td width="150"><span ng-bind="mainBillingObject.TotalNetAmount | number"></span></td>
+                                                                                </tr>
+                                                                                <tr ng-hide="mainBillingObject.PreviousPaidAmount=='0'">
+                                                                                    <th>Previously Paid Amount :</th>
+                                                                                    <td width="150"><span ng-bind="mainBillingObject.PreviousPaidAmount | number:2"></span></td>
+                                                                                </tr>
+                                                                                <tr ng-if="mainBillingObject.TotalAmountToBeCollected > 0">
+                                                                                    <th>Total Amount To Be Collected :</th>
+                                                                                    <td width="150">
+                                                                                        lNR
+                                                                                        <span ng-bind="mainBillingObject.TotalAmountToBeCollected" style="font-weight:600;color:green;"></span>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr colspan="2" ng-if="mainBillingObject.PatientAdvanceAmount > 0">
+                                                                                    <th>
+                                                                                        <span class="top-10">
+                                                                                            <div class="checkbox cn">
+                                                                                                <label>
+                                                                                                    <!--ng-disabled="mainBillingObject.TotalReceivedAmount==0"-->
+                                                                                                    <input name="checkbox-1" type="checkbox" ng-model="mainBillingObject.includeAdvanceAmount"
+                                                                                                           ng-click="changeIncludeAdvanceStatus(mainBillingObject.includeAdvanceAmount)" />
+                                                                                                    <span class="checkbox-material">
+                                                                                                        <span class="check"></span>
+                                                                                                    </span>
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            Include Advance:
+                                                                                        </span>
+                                                                                        <p class="m-0 fs-12 text-success">Avaliable Advance: {{mainBillingObject.PatientAdvanceAmount}}</p>
+                                                                                    </th>
+                                                                                    <td width="150">
+                                                                                        <input type="text" class="form-control" ng-model="mainBillingObject.PayableAdvanceAmount"
+                                                                                               ng-change="changeAdvancepayableAmt()" ng-disabled="!mainBillingObject.includeAdvanceAmount" />
+                                                                                    </td>
+                                                                                </tr>
+
+
+                                                                                <tr ng-show="showPayableAdvanceBillingDiv">
+                                                                                    <th>
+                                                                                        <span>Due After Advance :</span>
+                                                                                    </th>
+                                                                                    <td width="150">
+                                                                                        <span ng-bind="mainBillingObject.DueAfterAdvanceAmt"></span>
+                                                                                    </td>
+                                                                                </tr>
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-5" ng-show="PayDueAmount && !mainBillingObject.IsCreditBill">
+                                                                <label style="margin-left: 31px; margin-bottom: 4px;">
+                                                                    Payment Details :
+                                                                </label>
+
+
+                                                                <div class="col-lg-12">
+                                                                    <div class="col-lg-8 table-responsive">
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th ng-repeat="hitem in mainBillingObject.Payments"
+                                                                                        ng-hide="hitem.PaymentModeId==18"
+                                                                                        ng-style="hitem.IsActive && {'background-color':'#41a6c2'}"
+                                                                                        ng-click="activeParticularPaymentMode(hitem)">
+                                                                                        {{hitem.PaymentModeName}}
+                                                                                    </th>
+                                                                                    <th width="20%">Other Modes</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+
+                                                                                    <td ng-repeat="hitem in mainBillingObject.Payments"
+                                                                                        ng-hide="hitem.PaymentModeId==18">
+                                                                                        <input type="text"
+                                                                                               class="form-control"
+                                                                                               numbers-only="numbers-only"
+                                                                                               ng-model="hitem.Amount"
+                                                                                               id="pModeAmountHistory_{{$index+1}}"
+                                                                                               ng-change="changePayableAmount(hitem)"
+                                                                                               ng-click="activeParticularPaymentMode(hitem)" />
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="sel-doc-box width-100">
+                                                                                            <div class="dropdown dropdown-scroll width-100">
+                                                                                                <button class="form-control select-dropdown boxshadowbill text-left" id="dropdownMenu1" data-toggle="dropdown">Select</button>
+                                                                                                <div class="dropdown-menu dr-drop-app apptsearchdroplist" role="menu" aria-labelledby="dropdownMenu1">
+                                                                                                    <ul class="list-group list-group">
+                                                                                                        <li role="presentation" ng-repeat="modeitem in masterPaymentModes" class="list-group-item" ng-if="!modeitem.IsDefaultPaymentMode">
+                                                                                                            <div class="checkbox cn">
+                                                                                                                <label>
+                                                                                                                    <input name="checkbox-1" type="checkbox" aria-invalid="false" ng-model="modeitem.IsPaymentModeSelected" ng-change="addupdateModeofpay(modeitem)">
+                                                                                                                    <span class="checkbox-material">
+                                                                                                                        <span class="check"></span>
+                                                                                                                    </span>
+                                                                                                                    <small ng-bind="modeitem.PaymentModeName"></small>
+                                                                                                                </label>
+                                                                                                            </div>
+                                                                                                        </li>
+                                                                                                    </ul>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    <div class="col-lg-4  p-0">
+                                                                        <div class="table-responsive">
+                                                                            <table class="table table-bordered mb-5">
+                                                                                <tbody>
+                                                                                    <tr colspan="2">
+                                                                                        <th ng-class="bg-success"><span class="top-10">Amount Paid Now :</span></th>
+                                                                                        <td width="150" ng-class="bg-success">
+                                                                                            <span ng-bind="mainBillingObject.TotalCollectedAmount" style="font-weight:600;color:green;"></span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr colspan="2">
+                                                                                        <th><span class="top-10">Total Received :</span></th>
+                                                                                        <td width="150">
+                                                                                            <span ng-bind="mainBillingObject.TotalReceivedAmount" style="font-weight:600;"></span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr colspan="4">
+                                                                                        <th>Total Balance:</th>
+                                                                                        <td width="150">
+                                                                                            <span ng-bind="mainBillingObject.TotalBalance" class="text-reed" style="font-weight:600;"></span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-4">
+                                                                                <label class="m-0 pl-15">SMS</label>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <div class="checkbox cn">
+                                                                                    <label>
+                                                                                        <input name="checkbox-1" type="checkbox" ng-model="sendPatientSms" />
+                                                                                        <span class="checkbox-material">
+                                                                                            <span class="check"></span>
+                                                                                        </span>
+                                                                                        <small>Patient</small>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-4">
+                                                                                <label class="m-0 pl-15">
+                                                                                    Email
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <div class="checkbox cn">
+                                                                                    <label>
+                                                                                        <input name="checkbox-1" type="checkbox" ng-model="sendDocEmail" />
+                                                                                        <span class="checkbox-material">
+                                                                                            <span class="check"></span>
+                                                                                        </span>
+                                                                                        <small>Doctor</small>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-4">
+                                                                                <div class="checkbox cn">
+                                                                                    <label>
+                                                                                        <input name="checkbox-1" type="checkbox" ng-model="sendPatientEmail" />
+                                                                                        <span class="checkbox-material">
+                                                                                            <span class="check"></span>
+                                                                                        </span>
+                                                                                        <small>Patient</small>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row" ng-repeat="item in mainBillingObject.Payments" ng-if="item.IsActive && item.OtherDetailsDiv && PayDueAmount">
+                                                                <div class="col-lg-12" ng-if="item.PaymentModeId==2">
+                                                                    <div class="col-lg-8 pb-5" style="background-color:#41a6c2">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Transaction Number <span class="text-reed">*</span> :</label>
+                                                                                <input type="text" class="form-control" placeholder="Enter Transaction No" alpha-numeric ng-model="item.TransactionNumber" maxlength="28" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Card Number  :</label>
+                                                                                <input type="text" class="form-control" placeholder="Enter Card Number" numbers-only="numbers-only" ng-model="item.CardNumber" maxlength="19" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-4">
+                                                                    </div>
+                                                                    <div class="col-lg-8 pb-5" style="background-color:#41a6c2">
+                                                                        <div class="col-lg-5">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Name on card :</label>
+                                                                                <input type="text" class="form-control" placeholder="Enter Name" ng-model="item.NameonCard" maxlength="25" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-4">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Card Type  :</label>
+                                                                                <select ng-model="item.CardTypeId"
+                                                                                        class="form-control select-dropdown z-index-auto"
+                                                                                        ng-options="item.Id as item.Name for item in CardTypeDetails">
+                                                                                    <option value="" disabled="disabled">Select</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Expiry :</label>
+                                                                                <input type="text" class="form-control" maxlength="7" placeholder="MM/YY" ng-model="item.VallidTill" ng-keydown="ExpireremoveTagOnBackspace($event,item,item.VallidTill)" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-4">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12" ng-if="item.PaymentModeId==3">
+                                                                    <div class="col-lg-8 pb-5" style="background-color:#41a6c2">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Cheque Number :</label>
+                                                                                <input type="text" class="form-control" placeholder="Enter Cheque No" numbers-only="numbers-only" ng-model="item.ChequeNumber" maxlength="6" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Bank Name  :</label>
+                                                                                <input type="text" class="form-control" ng-model="item.BankName" maxlength="28" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-4">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12" ng-if="item.PaymentModeId!=1 && item.PaymentModeId!=2 && item.PaymentModeId!=3 && item.PaymentModeId!=18">
+                                                                    <div class="col-lg-8 pb-5" style="background-color:#41a6c2">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group mb-5">
+                                                                                <label> Transaction Number  <span class="text-reed">*</span> :</label>
+                                                                                <input type="text" class="form-control" placeholder="Enter Transaction No" alpha-numeric ng-model="item.TransactionNumber" maxlength="28" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-10 pull-right" ng-show="PayDueAmount">
+                                                                <div class="col-lg-12">
+                                                                    <button class="btn btn-orange mw-100"
+                                                                            ng-click="savePreviousBilling('Print',sendDocEmail,sendPatientEmail,sendPatientSms,'')"
+                                                                            ng-disabled="mainBillingObject.TotalBilledCost==='0' || mainBillingObject.TotalBilledCost===0 || mainBillingObject.TotalBilledCost===''">
+                                                                        Pay & Print
+                                                                    </button>
+                                                                    <button class="btn blue-btn mw-100 mr-10"
+                                                                            ng-click="savePreviousBilling('NoPrint',sendDocEmail,sendPatientEmail,sendPatientSms,'A4')"
+                                                                            ng-disabled="mainBillingObject.TotalBilledCost==='0' || mainBillingObject.TotalBilledCost===0 || mainBillingObject.TotalBilledCost===''">
+                                                                        Pay
+                                                                    </button>
+                                                                    <button class="btn btn-SP btn-fill-horz-o mw-100"
+                                                                            ng-show="SpecializationId == 2"
+                                                                            ng-disabled="mainBillingObject.TotalBilledCost==='0' || mainBillingObject.TotalBilledCost===0 || mainBillingObject.TotalBilledCost===''"
+                                                                            ng-click="savePreviousBilling('Print',sendDocEmail,sendPatientEmail,sendPatientSms,'A6')">
+                                                                        Pay & Print with A6
+                                                                    </button>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-10" ng-if="mainBillingObject.ShowPaymentDetails">
+                                                                <div class="col-lg-12">
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered m-b-0">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Date</th>
+                                                                                    <th>ReceiptId</th>
+                                                                                    <th>Paid</th>
+                                                                                    <th>Mode of Payment</th>
+                                                                                    <th>Transaction Number</th>
+                                                                                    <th>Created By</th>
+                                                                                    <th>Branch</th>
+                                                                                    <th>Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr ng-repeat="ritem in mainBillingObject.BillingHistoryDetails">
+                                                                                    <td><span ng-bind="ritem.CreatedDt | date:'dd-MM-yyyy'"></span></td>
+                                                                                    <td> <span ng-bind="ritem.ReceiptNo"></span></td>
+                                                                                    <td><span ng-bind="ritem.BilledCost"></span></td>
+                                                                                    <td>
+                                                                                        <span ng-repeat="paymentitem in ritem.PaymentInfo">
+                                                                                            {{paymentitem.PaymentModeName}}
+                                                                                            ({{paymentitem.Amount}})
+                                                                                            <span ng-show="paymentitem.InsuranceAdvanceAmount!=0">
+                                                                                                Discount from insurance : {{paymentitem.InsuranceAdvanceAmount}}
+
+                                                                                            </span>
+                                                                                            <span ng-if="!$last">,</span>
+                                                                                        </span>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <span ng-repeat="paymentitem in ritem.PaymentInfo">
+
+
+                                                                                            <span ng-show="paymentitem.TransactionNumber !==''"> {{paymentitem.PaymentModeName}} -{{paymentitem.TransactionNumber}} <span ng-if="!$last">,</span></span>
+
+                                                                                            <span ng-show="paymentitem.TransactionNumber ===''"> N/A</span>
+                                                                                        </span>
+
+                                                                                    </td>
+                                                                                    <td><span ng-bind="ritem.CreatedBy"></span></td>
+                                                                                    <th>
+                                                                                        <span ng-bind="ritem.BranchName"></span>
+                                                                                    </th>
+                                                                                    <th>
+                                                                                        <!--<a href="javascript:void(0);" ng-click="printParticularReceipt(ritem,mitem)" class="text-info m-r-5 dis-inline-block" title="Print Receipt" ng-if="!mitem.IsInvoiceCancelled">
+                                                                                        <span>
+                                                                                            <i class="fa fa fa-print"></i> Print
+                                                                                        </span>
+                                                                                    </a>-->
+
+                                                                                        <a href="javascript:void(0);" ng-click="printNewParticularReceipt(ritem,mitem)" class="text-info m-r-5 dis-inline-block" title="Print Receipt" ng-if="!mitem.IsInvoiceCancelled">
+                                                                                            <span>
+                                                                                                <i class="fa fa fa-print"></i> Print
+                                                                                            </span>
+                                                                                        </a>
+                                                                                        <a class="text-info dis-inline-block" ng-click="EditPaymentModeForReceipt(ritem)" title="Edit Receipt" ng-if="editBillingOption && !mitem.IsInvoiceCancelled && mitem.isCurrentMonth && ritem.isReceiptBilledHospital && mitem.BillingTypeId==1">
+                                                                                            <i class="fa fa fa-edit"></i>Edit
+                                                                                        </a>
+                                                                                        <button class="btn btn-sm btn-link text-uppercase font-weight-600" ng-click="printNewParticularReceipt(ritem,mitem,'A5')" title="Print Bill"><i class="fa fa-lg fa-print"></i> PrintA5</button>
+
+
+
+                                                                                    </th>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </uib-accordion-group>
+                                        </uib-accordion>
+                                    </div>
+
+                                    <div class="EH-pagination text-center" ng-show="LedgetListCount > 10">
+                                       <uib-pagination total-items="LedgetListCount"
+                                            ng-model="LedgerSearchObj.PageNumber"
+                                            ng-change="changePageNumber(LedgerSearchObj.PageNumber)"
+                                            ng-show="patientInvoicesArray.length > 0"
+                                            max-size="LedgerSearchObj.PageSize"
+                                            class=""
+                                            boundary-link-numbers="true"
+                                            rotate="false"></uib-pagination>
+                                     </div>
+                                </div>
+                                <div class="billing-cominsoon norecords-found-patients text-center" ng-show="patientInvoicesArray.length == 0 || patientInvoicesArray.length == undefined" style="height:350px !important;">
+                                    <img src="img/no-data/no_payment_history.png" style="margin-top:45px;"/>
+                                    <div class="msg">
+                                        <p class="goback-text">No Invoices to Display.</p>
+                                        <p class="no-records-txt-line2">
+                                            No Previous Invoices available for this Search !!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+  
+
+      
